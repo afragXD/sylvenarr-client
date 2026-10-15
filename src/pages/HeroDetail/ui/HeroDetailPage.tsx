@@ -72,13 +72,13 @@ export const HeroDetailPage = () => {
 					preventGrowOverflow={false}
 					w="100%"
 				>
-					<Box w={{ base: '100%', sm: 240, md: 280 }} maw={320} style={{ flexShrink: 0 }}>
+					<Box w={{ base: '100%', sm: 248, md: 288 }} maw={328} style={{ flexShrink: 0 }}>
 						<HeroImage
 							code={hero.code}
 							alt={hero.displayName}
 							variant="character"
 							w="100%"
-							h="auto"
+							h={328}
 							radius={0}
 							bg="transparent"
 						/>
