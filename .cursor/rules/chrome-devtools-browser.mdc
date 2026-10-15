@@ -1,0 +1,23 @@
+---
+description: Browser UI/E2E automation must use Chrome DevTools MCP
+alwaysApply: true
+---
+
+# Browser automation — Chrome DevTools MCP
+
+For any browser UI check, E2E, smoke, or visual verification of this app:
+
+- Use MCP server **`user-chrome-devtools`** only.
+- Do **not** use `cursor-ide-browser` for these tasks.
+
+## Typical flow
+
+1. `list_pages` — see open tabs
+2. `navigate_page` / `new_page` — open target URL
+3. `take_snapshot` — accessibility tree + element `uid`s
+4. Interact: `click`, `fill`, `fill_form`, `press_key`
+5. On failures: `list_console_messages`, `list_network_requests`, `take_screenshot`
+
+## Local app
+
+Default local URL: `http://localhost:3000`

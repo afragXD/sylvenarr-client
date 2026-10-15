@@ -1,0 +1,63 @@
+---
+description: Frontend conventions for TanStack Start + Mantine + FSD
+alwaysApply: true
+---
+
+# Frontend — Sylvenarr Client
+
+Senior React/TypeScript engineer for this codebase. Follow requirements precisely. Prefer readable, complete code over clever optimizations. No placeholders or TODOs. If unsure — say so.
+
+## Stack
+
+- **Runtime / app:** React 19, TypeScript, Vite, TanStack Start
+- **Routing:** TanStack Router (file-based in `src/routes`)
+- **UI:** Mantine 9 (`@mantine/core`, `@mantine/hooks`)
+- **Icons:** `lucide-react`
+- **Architecture:** Feature-Sliced Design (`app` → `pages` → `widgets` → `features` → `entities` → `shared`)
+- **Lint/format:** Biome (`biome.json`)
+
+Do **not** use Next.js, Tailwind, Shadcn, Radix, or CSS Modules as the primary styling approach.
+
+## FSD
+
+- Put UI in the correct layer; export only via slice `index.ts`.
+- Slice and shared UI folder names use PascalCase (`Header`, `ThemeToggle`, `Home`).
+- Routes in `src/routes` stay thin: import page/widget, no business UI inline.
+- Do not import upward (e.g. `shared` must not import `features`).
+- Never edit generated `src/routeTree.gen.ts`.
+
+## UI (Mantine)
+
+- Prefer Mantine components and style props (`m`, `p`, `c`, `bg`, `gap`, …) over custom CSS.
+- Theme / tokens via `createTheme` and Mantine CSS variables; primary palette is `brand`, accent `accent`.
+- Color scheme: `useMantineColorScheme` / `useComputedColorScheme`; `ColorSchemeScript` in root shell.
+- Icons from `lucide-react` at 18–20px in header/actions.
+
+## Code style
+
+- Functional components; typed props; early returns.
+- Event handlers: `handle*` prefix (`handleClick`, `handleKeyDown`).
+- Descriptive names; `const` + arrow for local handlers/helpers when natural.
+- Accessibility: meaningful `aria-label` / `aria-labelledby` on icon-only controls; keyboard support for custom interactive elements.
+- Follow React Compiler–friendly patterns; avoid unnecessary `useMemo` / `useCallback` unless already established.
+- Format/lint with Biome (tabs, indentWidth 2, single quotes in JS/TS; JSX stays double).
+
+## Commits
+
+Сообщения коммитов всегда в формате:
+
+`<тип>: <описание на русском>`
+
+Типы:
+- `feat` — новая функциональность
+- `fix` — исправление бага
+- `docs` — документация
+- `style` — форматирование, без логики
+- `refactor` — рефакторинг без смены поведения
+- `test` — тесты
+- `chore` — рутина (зависимости, конфиг, tooling)
+
+Примеры:
+- `feat: добавить переключатель темы`
+- `fix: исправить отображение заголовка`
+- `chore: обновить конфиг Biome`
