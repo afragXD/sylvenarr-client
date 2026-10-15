@@ -37,7 +37,7 @@ export const seo = ({
 		{ name: 'description', content: description },
 		{ name: 'keywords', content: keywords },
 		{ name: 'author', content: APP_TITLE },
-		{ name: 'theme-color', content: '#2F5F7A' },
+		{ name: 'theme-color', content: '#C4A35A' },
 		{
 			name: 'robots',
 			content: noIndex ? 'noindex, nofollow' : 'index, follow',

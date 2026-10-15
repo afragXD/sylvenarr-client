@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "format": "biome format",
     "lint": "biome lint",
-    "check": "biome check"
+    "check": "biome check",
+    "copy-hero-images": "bun scripts/copy-hero-images.mjs"
   },
   "dependencies": {
     "@mantine/core": "^9.5.1",
@@ -19,6 +20,9 @@
     "@tanstack/react-router": "latest",
     "@tanstack/react-router-devtools": "latest",
     "@tanstack/react-start": "latest",
+    "@tanstack/react-table": "^9.3.1",
+    "effector": "^23.4.4",
+    "effector-react": "^23.3.0",
     "lucide-react": "^1.30.0",
     "nitro": "^3.0.260610-beta",
     "react": "^19.2.0",

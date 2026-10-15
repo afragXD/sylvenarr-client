@@ -1,0 +1,756 @@
+{
+  "version": "2.21",
+  "themes": {
+    "mode": ["dark", "light"]
+  },
+  "variables": {
+    "color.charcoal": {
+      "type": "color",
+      "value": "#0B0A09"
+    },
+    "color.surface": {
+      "type": "color",
+      "value": [
+        { "value": "#1A1714", "theme": { "mode": "dark" } },
+        { "value": "#F4EFE6", "theme": { "mode": "light" } }
+      ]
+    },
+    "color.bg": {
+      "type": "color",
+      "value": [
+        { "value": "#0B0A09", "theme": { "mode": "dark" } },
+        { "value": "#E7DFD0", "theme": { "mode": "light" } }
+      ]
+    },
+    "color.mist": {
+      "type": "color",
+      "value": [
+        { "value": "#E8E0D0", "theme": { "mode": "dark" } },
+        { "value": "#1A1510", "theme": { "mode": "light" } }
+      ]
+    },
+    "color.ash": {
+      "type": "color",
+      "value": [
+        { "value": "#A89B88", "theme": { "mode": "dark" } },
+        { "value": "#5C5348", "theme": { "mode": "light" } }
+      ]
+    },
+    "color.brass": {
+      "type": "color",
+      "value": "#C4A35A"
+    },
+    "color.oxide": {
+      "type": "color",
+      "value": "#C45C48"
+    },
+    "color.border": {
+      "type": "color",
+      "value": [
+        { "value": "#4A3F2E", "theme": { "mode": "dark" } },
+        { "value": "#B8A88E", "theme": { "mode": "light" } }
+      ]
+    },
+    "font.headings": {
+      "type": "string",
+      "value": "Cinzel"
+    },
+    "font.body": {
+      "type": "string",
+      "value": "Source Sans 3"
+    },
+    "font.mono": {
+      "type": "string",
+      "value": "JetBrains Mono"
+    },
+    "space.page": {
+      "type": "number",
+      "value": 40
+    },
+    "radius.sm": {
+      "type": "number",
+      "value": 0
+    }
+  },
+  "children": [
+    {
+      "id": "tokens-board",
+      "type": "frame",
+      "name": "Tokens",
+      "x": 0,
+      "y": 0,
+      "width": 420,
+      "height": 520,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "gap": 16,
+      "padding": 24,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "tokens-title",
+          "type": "text",
+          "content": "Sylvenarr · Rune Gate",
+          "fontFamily": "$font.headings",
+          "fontSize": 28,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "tokens-swatches",
+          "type": "frame",
+          "layout": "horizontal",
+          "gap": 12,
+          "children": [
+            {
+              "id": "swatch-brass",
+              "type": "rectangle",
+              "width": 56,
+              "height": 56,
+              "cornerRadius": 4,
+              "fill": "$color.brass"
+            },
+            {
+              "id": "swatch-oxide",
+              "type": "rectangle",
+              "width": 56,
+              "height": 56,
+              "cornerRadius": 4,
+              "fill": "$color.oxide"
+            },
+            {
+              "id": "swatch-surface",
+              "type": "rectangle",
+              "width": 56,
+              "height": 56,
+              "cornerRadius": 4,
+              "fill": "$color.surface",
+              "stroke": { "thickness": 1, "fill": "$color.border" }
+            },
+            {
+              "id": "swatch-ash",
+              "type": "rectangle",
+              "width": 56,
+              "height": 56,
+              "cornerRadius": 4,
+              "fill": "$color.ash"
+            }
+          ]
+        },
+        {
+          "id": "tokens-caption",
+          "type": "text",
+          "content": "Brass · Ember · Void · Panel\nCinzel / Source Sans 3 / JetBrains Mono",
+          "fontFamily": "$font.body",
+          "fontSize": 14,
+          "fill": "$color.ash"
+        }
+      ]
+    },
+    {
+      "id": "logo-frame",
+      "type": "frame",
+      "name": "Logo / Rune Gate",
+      "x": 460,
+      "y": 0,
+      "width": 280,
+      "height": 280,
+      "fill": "$color.charcoal",
+      "layout": "vertical",
+      "justifyContent": "center",
+      "alignItems": "center",
+      "gap": 16,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "logo-mark-box",
+          "type": "frame",
+          "width": 96,
+          "height": 96,
+          "cornerRadius": 8,
+          "stroke": { "thickness": 2, "fill": "$color.brass" },
+          "layout": "vertical",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "logo-rune-s",
+              "type": "text",
+              "content": "S",
+              "fontFamily": "$font.headings",
+              "fontSize": 48,
+              "fontWeight": "700",
+              "fill": "$color.mist"
+            }
+          ]
+        },
+        {
+          "id": "logo-wordmark",
+          "type": "text",
+          "content": "SYLVENARR",
+          "fontFamily": "$font.headings",
+          "fontSize": 22,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        }
+      ]
+    },
+    {
+      "id": "header-frame",
+      "type": "frame",
+      "name": "Header",
+      "x": 0,
+      "y": 560,
+      "width": 1280,
+      "height": 64,
+      "fill": "$color.surface",
+      "layout": "horizontal",
+      "justifyContent": "space_between",
+      "alignItems": "center",
+      "padding": [0, 24],
+      "stroke": { "thickness": 1, "fill": "$color.border" },
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "header-left",
+          "type": "frame",
+          "layout": "horizontal",
+          "gap": 24,
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "header-brand",
+              "type": "text",
+              "content": "Sylvenarr",
+              "fontFamily": "$font.headings",
+              "fontSize": 20,
+              "fontWeight": "700",
+              "fill": "$color.mist"
+            },
+            {
+              "id": "header-nav",
+              "type": "text",
+              "content": "Герои   Лобби   Рейтинг",
+              "fontFamily": "$font.body",
+              "fontSize": 14,
+              "fill": "$color.ash"
+            }
+          ]
+        },
+        {
+          "id": "header-theme",
+          "type": "text",
+          "content": "◐",
+          "fontSize": 18,
+          "fill": "$color.ash"
+        }
+      ]
+    },
+    {
+      "id": "landing-frame",
+      "type": "frame",
+      "name": "Landing",
+      "x": 0,
+      "y": 660,
+      "width": 1280,
+      "height": 720,
+      "fill": "$color.charcoal",
+      "layout": "vertical",
+      "justifyContent": "center",
+      "padding": 64,
+      "gap": 20,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "landing-brand",
+          "type": "text",
+          "content": "Sylvenarr",
+          "fontFamily": "$font.headings",
+          "fontSize": 72,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "landing-support",
+          "type": "text",
+          "content": "Origins — пошаговый PvP. Создайте аккаунт, выберите героя и выйдите на арену.",
+          "fontFamily": "$font.body",
+          "fontSize": 20,
+          "fill": "$color.ash"
+        },
+        {
+          "id": "landing-ctas",
+          "type": "frame",
+          "layout": "horizontal",
+          "gap": 12,
+          "children": [
+            {
+              "id": "cta-signup",
+              "type": "frame",
+              "padding": [12, 20],
+              "cornerRadius": 4,
+              "fill": "$color.brass",
+              "children": [
+                {
+                  "id": "cta-signup-label",
+                  "type": "text",
+                  "content": "Создать аккаунт",
+                  "fontFamily": "$font.body",
+                  "fontSize": 16,
+                  "fontWeight": "600",
+                  "fill": "#FFFFFF"
+                }
+              ]
+            },
+            {
+              "id": "cta-signin",
+              "type": "frame",
+              "padding": [12, 20],
+              "cornerRadius": 4,
+              "stroke": { "thickness": 1, "fill": "$color.border" },
+              "children": [
+                {
+                  "id": "cta-signin-label",
+                  "type": "text",
+                  "content": "Войти",
+                  "fontFamily": "$font.body",
+                  "fontSize": 16,
+                  "fontWeight": "600",
+                  "fill": "$color.mist"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "heroes-frame",
+      "type": "frame",
+      "name": "Heroes",
+      "x": 1320,
+      "y": 0,
+      "width": 1120,
+      "height": 640,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "gap": 20,
+      "padding": 48,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "heroes-title",
+          "type": "text",
+          "content": "Реестр героев",
+          "fontFamily": "$font.headings",
+          "fontSize": 36,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "heroes-sub",
+          "type": "text",
+          "content": "Двадцать четыре класса. Сортируйте по статам перед набором отряда.",
+          "fontFamily": "$font.body",
+          "fontSize": 16,
+          "fill": "$color.ash"
+        },
+        {
+          "id": "heroes-table-chrome",
+          "type": "rectangle",
+          "width": "fill_container",
+          "height": 320,
+          "fill": "$color.surface",
+          "stroke": { "thickness": 1, "fill": "$color.border" },
+          "cornerRadius": 4
+        }
+      ]
+    },
+    {
+      "id": "hero-detail-frame",
+      "type": "frame",
+      "name": "Hero Detail",
+      "x": 1320,
+      "y": 680,
+      "width": 720,
+      "height": 560,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "gap": 20,
+      "padding": 40,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "detail-back",
+          "type": "text",
+          "content": "← К реестру",
+          "fontFamily": "$font.body",
+          "fontSize": 14,
+          "fill": "$color.brass"
+        },
+        {
+          "id": "detail-name",
+          "type": "text",
+          "content": "Archlich",
+          "fontFamily": "$font.headings",
+          "fontSize": 40,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "detail-badge",
+          "type": "text",
+          "content": "Можно выбрать",
+          "fontFamily": "$font.body",
+          "fontSize": 13,
+          "fill": "$color.oxide"
+        },
+        {
+          "id": "detail-stats",
+          "type": "rectangle",
+          "width": "fill_container",
+          "height": 220,
+          "fill": "$color.surface",
+          "stroke": { "thickness": 1, "fill": "$color.border" },
+          "cornerRadius": 4
+        }
+      ]
+    },
+    {
+      "id": "lobby-frame",
+      "type": "frame",
+      "name": "Lobby",
+      "x": 2480,
+      "y": 0,
+      "width": 560,
+      "height": 640,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "gap": 16,
+      "padding": 40,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "lobby-title",
+          "type": "text",
+          "content": "Лобби",
+          "fontFamily": "$font.headings",
+          "fontSize": 36,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "lobby-sub",
+          "type": "text",
+          "content": "Создайте матч и передайте код другу.",
+          "fontFamily": "$font.body",
+          "fontSize": 16,
+          "fill": "$color.ash"
+        },
+        {
+          "id": "lobby-status",
+          "type": "frame",
+          "width": "fill_container",
+          "padding": 16,
+          "fill": "$color.surface",
+          "stroke": { "thickness": 1, "fill": "$color.border" },
+          "layout": "vertical",
+          "gap": 8,
+          "children": [
+            {
+              "id": "lobby-status-line",
+              "type": "text",
+              "content": "Статус: ожидание соперника",
+              "fontFamily": "$font.body",
+              "fontSize": 15,
+              "fill": "$color.mist"
+            },
+            {
+              "id": "lobby-code",
+              "type": "text",
+              "content": "Код: ABC123",
+              "fontFamily": "$font.mono",
+              "fontSize": 18,
+              "fontWeight": "700",
+              "fill": "$color.brass"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rating-frame",
+      "type": "frame",
+      "name": "Rating",
+      "x": 2480,
+      "y": 680,
+      "width": 800,
+      "height": 520,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "gap": 16,
+      "padding": 40,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "rating-title",
+          "type": "text",
+          "content": "Рейтинг",
+          "fontFamily": "$font.headings",
+          "fontSize": 36,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "rating-sub",
+          "type": "text",
+          "content": "Победы / игры / винрейт",
+          "fontFamily": "$font.body",
+          "fontSize": 16,
+          "fill": "$color.ash"
+        },
+        {
+          "id": "rating-table",
+          "type": "rectangle",
+          "width": "fill_container",
+          "height": 280,
+          "fill": "$color.surface",
+          "stroke": { "thickness": 1, "fill": "$color.border" },
+          "cornerRadius": 4
+        }
+      ]
+    },
+    {
+      "id": "landing-light",
+      "type": "frame",
+      "name": "Landing · Light",
+      "x": 0,
+      "y": 1420,
+      "width": 1280,
+      "height": 480,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "justifyContent": "center",
+      "padding": 64,
+      "gap": 16,
+      "theme": { "mode": "light" },
+      "children": [
+        {
+          "id": "landing-light-brand",
+          "type": "text",
+          "content": "Sylvenarr",
+          "fontFamily": "$font.headings",
+          "fontSize": 64,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "landing-light-support",
+          "type": "text",
+          "content": "Origins — пошаговый PvP. Создайте аккаунт.",
+          "fontFamily": "$font.body",
+          "fontSize": 18,
+          "fill": "$color.ash"
+        }
+      ]
+    },
+    {
+      "id": "landing-path",
+      "type": "frame",
+      "name": "Landing / Path",
+      "x": 1320,
+      "y": 1420,
+      "width": 1120,
+      "height": 320,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "gap": 20,
+      "padding": 48,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "path-title",
+          "type": "text",
+          "content": "Три шага до арены",
+          "fontFamily": "$font.headings",
+          "fontSize": 32,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "path-steps",
+          "type": "text",
+          "content": "01 Создать аккаунт · 02 Изучить реестр · 03 Выйти на арену",
+          "fontFamily": "$font.body",
+          "fontSize": 16,
+          "fill": "$color.ash"
+        }
+      ]
+    },
+    {
+      "id": "landing-roster",
+      "type": "frame",
+      "name": "Landing / Roster",
+      "x": 1320,
+      "y": 1780,
+      "width": 1120,
+      "height": 280,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "gap": 16,
+      "padding": 48,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "roster-title",
+          "type": "text",
+          "content": "Реестр",
+          "fontFamily": "$font.headings",
+          "fontSize": 32,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "roster-sub",
+          "type": "text",
+          "content": "Двадцать четыре класса уже в реестре. → Весь реестр",
+          "fontFamily": "$font.body",
+          "fontSize": 16,
+          "fill": "$color.ash"
+        }
+      ]
+    },
+    {
+      "id": "landing-account",
+      "type": "frame",
+      "name": "Landing / Account",
+      "x": 2480,
+      "y": 1420,
+      "width": 800,
+      "height": 400,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "gap": 16,
+      "padding": 40,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "account-title",
+          "type": "text",
+          "content": "Зачем аккаунт",
+          "fontFamily": "$font.headings",
+          "fontSize": 32,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "account-rows",
+          "type": "text",
+          "content": "Прогресс на вашем имени\nРейтинг привязан к аккаунту\nВозврат к матчам с того же профиля",
+          "fontFamily": "$font.body",
+          "fontSize": 16,
+          "fill": "$color.ash"
+        }
+      ]
+    },
+    {
+      "id": "landing-close",
+      "type": "frame",
+      "name": "Landing / Close",
+      "x": 2480,
+      "y": 1860,
+      "width": 800,
+      "height": 280,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "gap": 16,
+      "padding": 40,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "close-title",
+          "type": "text",
+          "content": "Создать аккаунт",
+          "fontFamily": "$font.headings",
+          "fontSize": 32,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "close-cta",
+          "type": "text",
+          "content": "[Создать аккаунт]  Уже есть аккаунт? Войти",
+          "fontFamily": "$font.body",
+          "fontSize": 16,
+          "fill": "$color.brass"
+        }
+      ]
+    },
+    {
+      "id": "auth-signup",
+      "type": "frame",
+      "name": "Sign up",
+      "x": 3320,
+      "y": 0,
+      "width": 480,
+      "height": 420,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "gap": 16,
+      "padding": 40,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "signup-title",
+          "type": "text",
+          "content": "Создать аккаунт",
+          "fontFamily": "$font.headings",
+          "fontSize": 28,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "signup-fields",
+          "type": "text",
+          "content": "Email\nПароль\n[Создать аккаунт]",
+          "fontFamily": "$font.body",
+          "fontSize": 15,
+          "fill": "$color.ash"
+        }
+      ]
+    },
+    {
+      "id": "auth-signin",
+      "type": "frame",
+      "name": "Sign in",
+      "x": 3320,
+      "y": 460,
+      "width": 480,
+      "height": 420,
+      "fill": "$color.bg",
+      "layout": "vertical",
+      "gap": 16,
+      "padding": 40,
+      "theme": { "mode": "dark" },
+      "children": [
+        {
+          "id": "signin-title",
+          "type": "text",
+          "content": "Войти",
+          "fontFamily": "$font.headings",
+          "fontSize": 28,
+          "fontWeight": "700",
+          "fill": "$color.mist"
+        },
+        {
+          "id": "signin-fields",
+          "type": "text",
+          "content": "Email\nПароль\n[Войти]",
+          "fontFamily": "$font.body",
+          "fontSize": 15,
+          "fill": "$color.ash"
+        }
+      ]
+    }
+  ]
+}

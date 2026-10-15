@@ -10,11 +10,33 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HeroesRouteImport } from './routes/heroes'
+import { Route as LobbyRouteImport } from './routes/lobby'
+import { Route as RatingRouteImport } from './routes/rating'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as HeroesIndexRouteImport } from './routes/heroes.index'
+import { Route as HeroesCodeRouteImport } from './routes/heroes.$code'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HeroesRoute = HeroesRouteImport.update({
+  id: '/heroes',
+  path: '/heroes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LobbyRoute = LobbyRouteImport.update({
+  id: '/lobby',
+  path: '/lobby',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RatingRoute = RatingRouteImport.update({
+  id: '/rating',
+  path: '/rating',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -22,31 +44,103 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HeroesIndexRoute = HeroesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HeroesRoute,
+} as any)
+const HeroesCodeRoute = HeroesCodeRouteImport.update({
+  id: '/$code',
+  path: '/$code',
+  getParentRoute: () => HeroesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/heroes': typeof HeroesRouteWithChildren
+  '/lobby': typeof LobbyRoute
+  '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/heroes/$code': typeof HeroesCodeRoute
+  '/heroes/': typeof HeroesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/lobby': typeof LobbyRoute
+  '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/heroes/$code': typeof HeroesCodeRoute
+  '/heroes': typeof HeroesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/heroes': typeof HeroesRouteWithChildren
+  '/lobby': typeof LobbyRoute
+  '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
+  '/heroes/$code': typeof HeroesCodeRoute
+  '/heroes/': typeof HeroesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/robots.txt'
+  fullPaths:
+    | '/'
+    | '/heroes'
+    | '/lobby'
+    | '/rating'
+    | '/robots.txt'
+    | '/sign-in'
+    | '/sign-up'
+    | '/heroes/$code'
+    | '/heroes/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/robots.txt'
-  id: '__root__' | '/' | '/robots.txt'
+  to:
+    | '/'
+    | '/lobby'
+    | '/rating'
+    | '/robots.txt'
+    | '/sign-in'
+    | '/sign-up'
+    | '/heroes/$code'
+    | '/heroes'
+  id:
+    | '__root__'
+    | '/'
+    | '/heroes'
+    | '/lobby'
+    | '/rating'
+    | '/robots.txt'
+    | '/sign-in'
+    | '/sign-up'
+    | '/heroes/$code'
+    | '/heroes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HeroesRoute: typeof HeroesRouteWithChildren
+  LobbyRoute: typeof LobbyRoute
+  RatingRoute: typeof RatingRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SignInRoute: typeof SignInRoute
+  SignUpRoute: typeof SignUpRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +152,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/heroes': {
+      id: '/heroes'
+      path: '/heroes'
+      fullPath: '/heroes'
+      preLoaderRoute: typeof HeroesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lobby': {
+      id: '/lobby'
+      path: '/lobby'
+      fullPath: '/lobby'
+      preLoaderRoute: typeof LobbyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rating': {
+      id: '/rating'
+      path: '/rating'
+      fullPath: '/rating'
+      preLoaderRoute: typeof RatingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/robots.txt': {
       id: '/robots.txt'
       path: '/robots.txt'
@@ -65,12 +180,58 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/heroes/': {
+      id: '/heroes/'
+      path: '/'
+      fullPath: '/heroes/'
+      preLoaderRoute: typeof HeroesIndexRouteImport
+      parentRoute: typeof HeroesRoute
+    }
+    '/heroes/$code': {
+      id: '/heroes/$code'
+      path: '/$code'
+      fullPath: '/heroes/$code'
+      preLoaderRoute: typeof HeroesCodeRouteImport
+      parentRoute: typeof HeroesRoute
+    }
   }
 }
 
+interface HeroesRouteChildren {
+  HeroesCodeRoute: typeof HeroesCodeRoute
+  HeroesIndexRoute: typeof HeroesIndexRoute
+}
+
+const HeroesRouteChildren: HeroesRouteChildren = {
+  HeroesCodeRoute: HeroesCodeRoute,
+  HeroesIndexRoute: HeroesIndexRoute,
+}
+
+const HeroesRouteWithChildren =
+  HeroesRoute._addFileChildren(HeroesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HeroesRoute: HeroesRouteWithChildren,
+  LobbyRoute: LobbyRoute,
+  RatingRoute: RatingRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
+  SignInRoute: SignInRoute,
+  SignUpRoute: SignUpRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

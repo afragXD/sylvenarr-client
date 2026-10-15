@@ -12,11 +12,20 @@ Senior React/TypeScript engineer for this codebase. Follow requirements precisel
 - **Runtime / app:** React 19, TypeScript, Vite, TanStack Start
 - **Routing:** TanStack Router (file-based in `src/routes`)
 - **UI:** Mantine 9 (`@mantine/core`, `@mantine/hooks`)
+- **State:** Effector (`effector` + `effector-react`); бизнес-логика в `entities/*/model`, в UI — `useUnit`
+- **Tables:** TanStack Table (`@tanstack/react-table`) + рендер через Mantine `Table.*`
 - **Icons:** `lucide-react`
 - **Architecture:** Feature-Sliced Design (`app` → `pages` → `widgets` → `features` → `entities` → `shared`)
 - **Lint/format:** Biome (`biome.json`)
 
 Do **not** use Next.js, Tailwind, Shadcn, Radix, or CSS Modules as the primary styling approach.
+
+## Effector
+
+- Stores/events/effects живут в `entities/<name>/model/` (или `features/<name>/model` для UI-состояния фичи).
+- Страницы подписываются через `useUnit`; не дублировать fetch-state в `useState`, если уже есть стор.
+- API-вызовы — `createEffect` поверх `entities/*/api`; связывание через `sample`.
+- Feature-таблицы получают `data` пропсом и не импортируют effector-сторы entity напрямую.
 
 ## FSD
 

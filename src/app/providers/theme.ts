@@ -1,58 +1,78 @@
 import { type CSSVariablesResolver, createTheme, type MantineColorsTuple } from '@mantine/core';
 
+/** Brass — brand / primary (CRPG metal) */
 const brand: MantineColorsTuple = [
-	'#eef3f7',
-	'#d5e1eb',
-	'#a9c3d6',
-	'#7ba4bf',
-	'#568aab',
-	'#3f789c',
-	'#2F5F7A',
-	'#275068',
-	'#1f4054',
-	'#163040',
+	'#f7f1e4',
+	'#ebe0c4',
+	'#dccfa0',
+	'#cdb87a',
+	'#c4a866',
+	'#c4a35a',
+	'#C4A35A',
+	'#a88948',
+	'#8a6f3a',
+	'#6b552c',
 ];
 
+/** Ember — accent (рана / победа) */
 const accent: MantineColorsTuple = [
-	'#eef8f4',
-	'#d4eee3',
-	'#a8dcc6',
-	'#79c9a7',
-	'#54b98f',
-	'#3daa7d',
-	'#2F8F68',
-	'#277857',
-	'#1f6046',
-	'#164834',
+	'#faf0ee',
+	'#f0d6d1',
+	'#e3ada4',
+	'#d58274',
+	'#c96555',
+	'#c45c48',
+	'#C45C48',
+	'#a84c3c',
+	'#8c3f32',
+	'#6b2f26',
 ];
 
 export const theme = createTheme({
 	primaryColor: 'brand',
-	primaryShade: { light: 6, dark: 4 },
+	primaryShade: { light: 7, dark: 5 },
 	colors: {
 		brand,
 		accent,
 	},
-	fontFamily: 'DM Sans, system-ui, sans-serif',
-	fontFamilyMonospace: 'JetBrains Mono, ui-monospace, monospace',
+	fontFamily: '"Source Sans 3", system-ui, sans-serif',
+	fontFamilyMonospace: '"JetBrains Mono", ui-monospace, monospace',
 	headings: {
-		fontFamily: 'DM Sans, system-ui, sans-serif',
-		fontWeight: '700',
+		fontFamily: 'Cinzel, "Times New Roman", serif',
+		fontWeight: '600',
 	},
-	defaultRadius: 'md',
+	defaultRadius: 0,
 	other: {
-		appBgLight: '#F5F7F9',
-		appBgDark: '#101418',
-		appSurfaceLight: '#FFFFFF',
-		appSurfaceDark: '#1A1F24',
-		appSurfaceMutedLight: '#E8EDF1',
-		appSurfaceMutedDark: '#242A31',
-		appTextLight: '#142018',
-		appTextDark: '#E8EEF2',
-		appTextMutedLight: '#5C6B75',
-		appTextMutedDark: '#8A97A1',
-		appBorderLight: '#D0D8E0',
-		appBorderDark: '#2E363F',
+		appBgLight: '#E7DFD0',
+		appBgDark: '#0B0A09',
+		appSurfaceLight: '#F4EFE6',
+		appSurfaceDark: '#1A1714',
+		appSurfaceMutedLight: '#D9D0C0',
+		appSurfaceMutedDark: '#252018',
+		appTextLight: '#1A1510',
+		appTextDark: '#E8E0D0',
+		appTextMutedLight: '#5C5348',
+		appTextMutedDark: '#A89B88',
+		appBorderLight: '#B8A88E',
+		appBorderDark: '#4A3F2E',
+	},
+	components: {
+		Button: {
+			defaultProps: {
+				radius: 0,
+			},
+			styles: {
+				root: {
+					fontWeight: 600,
+					letterSpacing: '0.02em',
+				},
+			},
+		},
+		TextInput: {
+			defaultProps: {
+				radius: 0,
+			},
+		},
 	},
 });
 

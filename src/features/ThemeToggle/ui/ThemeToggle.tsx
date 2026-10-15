@@ -6,7 +6,7 @@ import { animateThemeTransition } from '../lib/animateThemeTransition';
 
 export const ThemeToggle = () => {
 	const { setColorScheme } = useMantineColorScheme();
-	const computedColorScheme = useComputedColorScheme('light');
+	const computedColorScheme = useComputedColorScheme('dark');
 
 	const isDark = computedColorScheme === 'dark';
 	const nextScheme = isDark ? 'light' : 'dark';
@@ -27,7 +27,7 @@ export const ThemeToggle = () => {
 		<ActionIcon
 			variant="default"
 			size={32}
-			radius="md"
+			radius={0}
 			aria-label={label}
 			title={label}
 			onClick={handleClick}

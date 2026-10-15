@@ -6,7 +6,7 @@ import type { AppShellLayoutProps } from '../model/types';
 
 export const AppShellLayout = ({ children }: AppShellLayoutProps) => {
 	return (
-		<AppShell header={{ height: 56 }} padding={0}>
+		<AppShell header={{ height: 64 }} padding={0}>
 			<AppShell.Header withBorder={false}>
 				<Header />
 			</AppShell.Header>

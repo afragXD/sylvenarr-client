@@ -8,7 +8,7 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
 		<MantineProvider
 			theme={theme}
 			cssVariablesResolver={cssVariablesResolver}
-			defaultColorScheme="auto"
+			defaultColorScheme="dark"
 		>
 			{children}
 		</MantineProvider>

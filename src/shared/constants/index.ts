@@ -1,6 +1,7 @@
 export const APP_TITLE = 'Sylvenarr' as const;
 
-export const APP_DESCRIPTION = 'Клиентское приложение Sylvenarr.' as const;
+export const APP_DESCRIPTION =
+	'Sylvenarr: Origins — пошаговый PvP. Создайте аккаунт, выберите героя и выйдите на арену.' as const;
 
 export const APP_KEYWORDS = 'sylvenarr' as const;
 
@@ -16,3 +17,6 @@ export const absoluteUrl = (path = '/'): string => {
 };
 
 export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL;
+
+/** Origin Angie для картинок героев (без завершающего `/`). */
+export const STATIC_BASE_URL = (import.meta.env.VITE_STATIC_BASE_URL ?? '').replace(/\/$/, '');
