@@ -5,9 +5,6 @@ import { STATIC_BASE_URL } from '@/shared/constants';
  * `{VITE_STATIC_BASE_URL}/static/images/heroes/...`
  */
 function heroAssetUrl(relativePath: string): string {
-	if (!STATIC_BASE_URL) {
-		throw new Error('VITE_STATIC_BASE_URL is required (Angie static host)');
-	}
 	return `${STATIC_BASE_URL}/static/images/heroes/${relativePath}`;
 }
 

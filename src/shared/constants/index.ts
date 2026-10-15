@@ -18,5 +18,13 @@ export const absoluteUrl = (path = '/'): string => {
 
 export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL;
 
-/** Origin Angie для картинок героев (без завершающего `/`). */
-export const STATIC_BASE_URL = (import.meta.env.VITE_STATIC_BASE_URL ?? '').replace(/\/$/, '');
+/** Origin Angie для картинок героев (без завершающего `/`). Из `VITE_STATIC_BASE_URL`. */
+export const STATIC_BASE_URL = String(import.meta.env.VITE_STATIC_BASE_URL ?? '').replace(/\/$/, '');
+
+if (!STATIC_BASE_URL) {
+	throw new Error('VITE_STATIC_BASE_URL is required');
+}
+
+if (!API_BASE_URL) {
+	throw new Error('VITE_API_BASE_URL is required');
+}

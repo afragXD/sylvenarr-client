@@ -9,14 +9,26 @@ RUN bun install --frozen-lockfile
 FROM oven/bun:1.3-alpine AS build
 WORKDIR /app
 
-ARG VITE_SITE_URL=http://localhost:3000
-ARG VITE_API_BASE_URL=http://localhost:4000
-ENV VITE_SITE_URL=$VITE_SITE_URL
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+# Проброс из Dokploy Build-time Arguments / Environment (.env)
+ARG VITE_SITE_URL
+ARG VITE_API_BASE_URL
+ARG VITE_STATIC_BASE_URL
+ENV VITE_SITE_URL=$VITE_SITE_URL \
+    VITE_API_BASE_URL=$VITE_API_BASE_URL \
+    VITE_STATIC_BASE_URL=$VITE_STATIC_BASE_URL
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run build
+
+# Build args (ARG/ENV) или .env из Dokploy «Create Environment File»
+RUN set -a; \
+    if [ -f .env ]; then . ./.env; fi; \
+    set +a; \
+    if [ -z "$VITE_SITE_URL" ] || [ -z "$VITE_API_BASE_URL" ] || [ -z "$VITE_STATIC_BASE_URL" ]; then \
+      echo "Missing VITE_SITE_URL / VITE_API_BASE_URL / VITE_STATIC_BASE_URL (build args or .env)" >&2; \
+      exit 1; \
+    fi; \
+    bun run build
 
 FROM oven/bun:1.3-alpine AS runner
 WORKDIR /app
