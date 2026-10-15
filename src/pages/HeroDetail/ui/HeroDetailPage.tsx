@@ -72,19 +72,15 @@ export const HeroDetailPage = () => {
 					preventGrowOverflow={false}
 					w="100%"
 				>
-					<Box
-						className="sylvenarr-plaque"
-						w={{ base: '100%', sm: 240, md: 280 }}
-						maw={320}
-						style={{ flexShrink: 0 }}
-					>
+					<Box w={{ base: '100%', sm: 240, md: 280 }} maw={320} style={{ flexShrink: 0 }}>
 						<HeroImage
 							code={hero.code}
 							alt={hero.displayName}
 							variant="character"
 							w="100%"
-							h={320}
+							h="auto"
 							radius={0}
+							bg="transparent"
 						/>
 					</Box>
 					<Stack gap="lg" style={{ flex: '1 1 360px', minWidth: 0 }}>
