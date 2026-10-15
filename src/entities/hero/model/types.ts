@@ -1,6 +1,8 @@
 export type HeroClass = {
 	code: string;
 	displayName: string;
+	description: string;
+	roleSummary: string;
 	health: number;
 	damage: number;
 	armor: number;

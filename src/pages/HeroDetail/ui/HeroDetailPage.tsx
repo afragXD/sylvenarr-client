@@ -114,6 +114,16 @@ export const HeroDetailPage = () => {
 									? 'Доступен при формировании отряда'
 									: 'Появляется только как призванное существо'}
 							</Text>
+							{hero.description ? (
+								<Text size="md" maw="42rem" style={{ lineHeight: 1.55 }}>
+									{hero.description}
+								</Text>
+							) : null}
+							{hero.roleSummary ? (
+								<Text size="sm" c="var(--app-text-muted)" maw="42rem" style={{ lineHeight: 1.5 }}>
+									{hero.roleSummary}
+								</Text>
+							) : null}
 						</Stack>
 						<SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} spacing="xs">
 							{statRows.map((stat) => (
