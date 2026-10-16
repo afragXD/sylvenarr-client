@@ -4,11 +4,20 @@ import { SignInPage } from '@/pages/SignIn';
 import { absoluteUrl } from '@/shared/constants';
 import { seo } from '@/shared/lib/seo/seo';
 
+type SignInSearch = {
+	auth?: 'error';
+	reason?: string;
+};
+
 export const Route = createFileRoute('/sign-in')({
+	validateSearch: (search: Record<string, unknown>): SignInSearch => ({
+		auth: search.auth === 'error' ? 'error' : undefined,
+		reason: typeof search.reason === 'string' ? search.reason : undefined,
+	}),
 	head: () => ({
 		meta: seo({
 			title: 'Войти',
-			description: 'Вход в аккаунт Sylvenarr: Origins',
+			description: 'Вход в Sylvenarr через OAuth',
 			url: absoluteUrl('/sign-in'),
 			noIndex: true,
 		}),

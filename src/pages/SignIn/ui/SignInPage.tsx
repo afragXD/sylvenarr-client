@@ -1,21 +1,53 @@
-import { Anchor, Box, Button, Stack, Text, TextInput, Title } from '@mantine/core';
-import { Link } from '@tanstack/react-router';
-import { type FormEvent, useState } from 'react';
+import { Alert, Box, Button, Stack, Text, Title } from '@mantine/core';
+import { Link, useSearch } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 
+import {
+	type AuthProvider,
+	fetchAuthProviders,
+	fetchCurrentPlayer,
+	getOAuthStartUrl,
+} from '@/entities/player';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 /**
- * Заглушка входа (без API).
+ * Вход только через OAuth-провайдеров.
  */
 export const SignInPage = () => {
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [notice, setNotice] = useState<string | null>(null);
+	const search = useSearch({ from: '/sign-in' });
+	const authError = search.auth === 'error';
+	const [providers, setProviders] = useState<AuthProvider[]>([]);
+	const [loadError, setLoadError] = useState<string | null>(null);
+	const [alreadySignedIn, setAlreadySignedIn] = useState(false);
 
-	const handleSubmit = (event: FormEvent) => {
-		event.preventDefault();
-		setNotice('Вход скоро откроется. Пока можно смотреть реестр героев.');
-	};
+	useEffect(() => {
+		let mounted = true;
+		void fetchAuthProviders()
+			.then((items) => {
+				if (mounted) {
+					setProviders(items);
+				}
+			})
+			.catch((err: unknown) => {
+				if (mounted) {
+					setLoadError(err instanceof Error ? err.message : 'Не удалось загрузить вход');
+				}
+			});
+		void fetchCurrentPlayer()
+			.then(() => {
+				if (mounted) {
+					setAlreadySignedIn(true);
+				}
+			})
+			.catch(() => {
+				if (mounted) {
+					setAlreadySignedIn(false);
+				}
+			});
+		return () => {
+			mounted = false;
+		};
+	}, []);
 
 	return (
 		<PageFrame width="form">
@@ -23,45 +55,48 @@ export const SignInPage = () => {
 				<Stack gap={6}>
 					<Title order={1}>Войти</Title>
 					<Text c="var(--app-text-muted)">
-						Войдите в аккаунт Sylvenarr. Сейчас это заглушка без серверной сессии.
+						Вход в Sylvenarr только через OAuth. Создавать матчи и заходить в лобби могут
+						авторизованные игроки.
 					</Text>
 				</Stack>
-				<form onSubmit={handleSubmit}>
-					<Stack gap="md" mt="lg">
-						<TextInput
-							label="Email"
-							type="email"
-							autoComplete="email"
-							required
-							value={email}
-							onChange={(event) => setEmail(event.currentTarget.value)}
-							placeholder="you@example.com"
-						/>
-						<TextInput
-							label="Пароль"
-							type="password"
-							autoComplete="current-password"
-							required
-							value={password}
-							onChange={(event) => setPassword(event.currentTarget.value)}
-							placeholder="Ваш пароль"
-						/>
-						<Button className="sylvenarr-plate-btn" type="submit" color="brand">
-							Войти
-						</Button>
-						{notice && (
-							<Text size="sm" c="brand" role="status">
-								{notice}
+				<Stack gap="md" mt="lg">
+					{authError && (
+						<Alert color="red" title="Не удалось войти" role="alert">
+							Попробуйте ещё раз. Если ошибка повторяется — проверьте настройки OAuth.
+						</Alert>
+					)}
+					{alreadySignedIn && (
+						<Alert color="brand" title="Вы уже вошли">
+							Можно перейти в{' '}
+							<Text component={Link} to="/lobby" c="brand" span fw={600} td="underline">
+								лобби
 							</Text>
-						)}
-						<Text size="sm" c="var(--app-text-muted)">
-							Нет аккаунта?{' '}
-							<Anchor component={Link} to="/sign-up" c="brand" fw={600}>
-								Создать аккаунт
-							</Anchor>
+							.
+						</Alert>
+					)}
+					{loadError && (
+						<Text c="red" role="alert">
+							{loadError}
 						</Text>
-					</Stack>
-				</form>
+					)}
+					{providers.length === 0 && !loadError ? (
+						<Text size="sm" c="var(--app-text-muted)">
+							Способы входа пока не настроены на сервере.
+						</Text>
+					) : (
+						providers.map((provider) => (
+							<Button
+								key={provider.id}
+								className="sylvenarr-plate-btn"
+								color="brand"
+								component="a"
+								href={getOAuthStartUrl(provider.id)}
+							>
+								Войти через {provider.label}
+							</Button>
+						))
+					)}
+				</Stack>
 			</Box>
 		</PageFrame>
 	);

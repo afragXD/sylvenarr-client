@@ -27,14 +27,14 @@ export const CloseSection = () => {
 						Войдите под своим именем
 					</Title>
 					<Text className="sylvenarr-landing-close__lead" c="var(--app-text-muted)">
-						Создайте аккаунт — затем откройте реестр и готовьтесь к арене.
+						Войдите через OAuth — затем откройте реестр и готовьтесь к арене.
 					</Text>
 					<Group className="sylvenarr-hero-cta" gap="md" justify="center" mt="xs">
-						<Button component={Link} to="/sign-up" color="brand" size="lg">
-							Создать аккаунт
+						<Button component={Link} to="/sign-in" color="brand" size="lg">
+							Войти
 						</Button>
-						<Text component={Link} to="/sign-in" className="sylvenarr-landing-close__signin">
-							Уже есть профиль? Войти
+						<Text component={Link} to="/heroes" className="sylvenarr-landing-close__signin">
+							Сначала реестр героев
 						</Text>
 					</Group>
 				</Stack>

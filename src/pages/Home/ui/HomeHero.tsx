@@ -34,15 +34,15 @@ export const HomeHero = () => {
 				>
 					<BrandMark variant="hero" size={56} />
 					<Text className="sylvenarr-hero-supporting" c="var(--app-text-muted)">
-						Пошаговый PvP под вашим именем. Создайте аккаунт, выберите класс из реестра и выйдите к
+						Пошаговый PvP под вашим именем. Войдите через OAuth, выберите класс из реестра и выйдите к
 						вратам арены.
 					</Text>
 					<Group className="sylvenarr-hero-cta" gap="sm" mt="md">
-						<Button component={Link} to="/sign-up" color="brand" size="lg">
-							Создать аккаунт
-						</Button>
-						<Button component={Link} to="/sign-in" variant="default" size="lg">
+						<Button component={Link} to="/sign-in" color="brand" size="lg">
 							Войти
+						</Button>
+						<Button component={Link} to="/heroes" variant="default" size="lg">
+							Реестр героев
 						</Button>
 					</Group>
 				</Stack>

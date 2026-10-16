@@ -1,2 +1,7 @@
-export { ensureGuestPlayer, fetchCurrentPlayer } from './api/playersApi';
-export type { Player } from './model/types';
+export {
+	fetchAuthProviders,
+	fetchCurrentPlayer,
+	getOAuthStartUrl,
+	logoutPlayer,
+} from './api/playersApi';
+export type { AuthProvider, Player } from './model/types';
