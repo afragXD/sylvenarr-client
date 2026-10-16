@@ -346,13 +346,20 @@ export const MatchRoomPage = () => {
 													b.size - a.size || a.displayName.localeCompare(b.displayName, 'ru'),
 											)
 											.map((hero) => {
-												const fits = mySize + hero.size <= match.draft.initialTeamSize;
+												const freeSlots = match.draft.initialTeamSize - mySize;
+												const fits = hero.size <= freeSlots;
 												const disabled = !isMyTurn || isBusy || !fits;
+												const disabledReason = !isMyTurn
+													? 'Сейчас ход соперника'
+													: !fits
+														? `Не хватает места: нужно ${hero.size}, свободно ${freeSlots}`
+														: undefined;
 												return (
 													<DraftHeroCard
 														key={hero.code}
 														hero={hero}
 														disabled={disabled}
+														disabledReason={disabledReason}
 														onOpen={setModalHeroCode}
 													/>
 												);

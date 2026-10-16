@@ -22,13 +22,15 @@ export const slotsHint = (size: number): string =>
 type DraftHeroCardProps = {
 	hero: HeroClass;
 	disabled: boolean;
+	/** Почему карточка заблокирована — показывается в тултипе. */
+	disabledReason?: string;
 	onOpen: (code: string) => void;
 };
 
 /**
  * Карточка героя в сетке draft: drag на ряд, клик — модалка.
  */
-export const DraftHeroCard = ({ hero, disabled, onOpen }: DraftHeroCardProps) => {
+export const DraftHeroCard = ({ hero, disabled, disabledReason, onOpen }: DraftHeroCardProps) => {
 	const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
 		id: `hero:${hero.code}`,
 		disabled,
@@ -41,44 +43,54 @@ export const DraftHeroCard = ({ hero, disabled, onOpen }: DraftHeroCardProps) =>
 		zIndex: isDragging ? 20 : undefined,
 	};
 
+	const reason = disabled ? disabledReason : undefined;
+
 	return (
-		<button
-			type="button"
-			ref={setNodeRef}
-			className={styles.card}
-			data-disabled={disabled ? 'true' : undefined}
-			aria-disabled={disabled || undefined}
-			style={style}
-			{...(disabled ? {} : { ...listeners, ...attributes })}
-			onClick={() => {
-				if (!isDragging) {
-					onOpen(hero.code);
-				}
-			}}
+		<Tooltip
+			label={reason}
+			disabled={!reason}
+			withArrow
+			openDelay={150}
+			events={{ hover: true, focus: true, touch: true }}
 		>
-			<Box className={styles.portrait}>
-				<HeroImage
-					code={hero.code}
-					alt={hero.displayName}
-					w="100%"
-					h="100%"
-					radius={0}
-					fit="cover"
-					bg="transparent"
-				/>
-				<Tooltip
-					label={slotsHint(hero.size)}
-					withArrow
-					events={{ hover: true, focus: true, touch: true }}
-				>
-					<span className={styles.slots} role="img" aria-label={slotsHint(hero.size)}>
-						{sizeToRoman(hero.size)}
-					</span>
-				</Tooltip>
-			</Box>
-			<Text className={styles.name} lineClamp={1}>
-				{hero.displayName}
-			</Text>
-		</button>
+			<button
+				type="button"
+				ref={setNodeRef}
+				className={styles.card}
+				data-disabled={disabled ? 'true' : undefined}
+				aria-disabled={disabled || undefined}
+				style={style}
+				{...(disabled ? {} : { ...listeners, ...attributes })}
+				onClick={() => {
+					if (!isDragging) {
+						onOpen(hero.code);
+					}
+				}}
+			>
+				<Box className={styles.portrait}>
+					<HeroImage
+						code={hero.code}
+						alt={hero.displayName}
+						w="100%"
+						h="100%"
+						radius={0}
+						fit="cover"
+						bg="transparent"
+					/>
+					<Tooltip
+						label={slotsHint(hero.size)}
+						withArrow
+						events={{ hover: true, focus: true, touch: true }}
+					>
+						<span className={styles.slots} role="img" aria-label={slotsHint(hero.size)}>
+							{sizeToRoman(hero.size)}
+						</span>
+					</Tooltip>
+				</Box>
+				<Text className={styles.name} lineClamp={1}>
+					{hero.displayName}
+				</Text>
+			</button>
+		</Tooltip>
 	);
 };

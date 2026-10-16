@@ -9,6 +9,7 @@ const footerLinks = [
 	{ to: '/lobby', label: 'Лобби' },
 	{ to: '/rating', label: 'Рейтинг' },
 	{ to: '/sign-in', label: 'Войти' },
+	{ to: '/privacy', label: 'Конфиденциальность' },
 ] as const;
 
 /**

@@ -1,5 +1,6 @@
 import { AppShell } from '@mantine/core';
 
+import { CookieNotice } from '@/shared/ui/CookieNotice';
 import { Header } from '@/widgets/Header';
 
 import type { AppShellLayoutProps } from '../model/types';
@@ -11,6 +12,7 @@ export const AppShellLayout = ({ children }: AppShellLayoutProps) => {
 				<Header />
 			</AppShell.Header>
 			<AppShell.Main>{children}</AppShell.Main>
+			<CookieNotice />
 		</AppShell>
 	);
 };
