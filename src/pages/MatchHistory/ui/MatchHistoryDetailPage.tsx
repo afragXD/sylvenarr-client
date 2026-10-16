@@ -1,4 +1,4 @@
-import { Anchor, Box, Group, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { Anchor, Box, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
@@ -11,8 +11,12 @@ import {
 } from '@/entities/match';
 import { ApiError } from '@/shared/api/http';
 import { PageFrame } from '@/shared/ui/PageFrame';
+
 import styles from './MatchHistoryDetailPage.module.css';
 import { formatDuration } from './MatchHistoryPage';
+
+const ROW_FRONT = 0;
+const ROW_BACK = 1;
 
 /**
  * Карточка завершённого матча: составы, статы, лог.
@@ -79,10 +83,18 @@ export const MatchHistoryDetailPage = () => {
 							)}
 						</Stack>
 
-						<SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
-							<TeamBlock title={`Игрок 1 · ${detail.host.displayName}`} team={detail.host} />
-							<TeamBlock title={`Игрок 2 · ${detail.guest.displayName}`} team={detail.guest} />
-						</SimpleGrid>
+						<div className={styles.field}>
+							<div className={styles.playerLabel} data-side="host">
+								Игрок 1 · {detail.host.displayName}
+							</div>
+							<div className={styles.playerLabel} data-side="guest">
+								Игрок 2 · {detail.guest.displayName}
+							</div>
+							<RowColumn label="Задний ряд" units={unitsInRow(detail.host, ROW_BACK)} />
+							<RowColumn label="Передний ряд" units={unitsInRow(detail.host, ROW_FRONT)} />
+							<RowColumn label="Передний ряд" units={unitsInRow(detail.guest, ROW_FRONT)} />
+							<RowColumn label="Задний ряд" units={unitsInRow(detail.guest, ROW_BACK)} />
+						</div>
 
 						{detail.hasSnapshot && detail.log.length > 0 && (
 							<Box className={styles.logPanel}>
@@ -103,21 +115,24 @@ export const MatchHistoryDetailPage = () => {
 	);
 };
 
-const TeamBlock = ({ title, team }: { title: string; team: MatchHistoryTeam }) => (
-	<div className={styles.team}>
-		<Text fw={700} mb="sm">
-			{title}
+const unitsInRow = (team: MatchHistoryTeam, row: number): MatchHistoryUnit[] =>
+	team.units.filter((unit) => unit.row === row).sort((a, b) => a.column - b.column);
+
+const RowColumn = ({ label, units }: { label: string; units: MatchHistoryUnit[] }) => (
+	<div className={styles.column}>
+		<Text size="xs" c="var(--app-text-muted)" className={styles.columnLabel}>
+			{label}
 		</Text>
-		{team.units.length === 0 ? (
-			<Text c="var(--app-text-muted)" size="sm">
-				Нет данных о составе
+		{units.length === 0 ? (
+			<Text size="sm" c="var(--app-text-muted)">
+				—
 			</Text>
 		) : (
-			<Stack gap="sm">
-				{team.units.map((unit) => (
+			<div className={styles.columnUnits}>
+				{units.map((unit) => (
 					<UnitCard key={unit.pickId} unit={unit} />
 				))}
-			</Stack>
+			</div>
 		)}
 	</div>
 );
@@ -126,20 +141,15 @@ const UnitCard = ({ unit }: { unit: MatchHistoryUnit }) => {
 	const hasStats = unit.maxHp > 0;
 	return (
 		<div className={styles.unit} data-dead={unit.alive ? undefined : 'true'}>
-			<Group gap="sm" wrap="nowrap" align="flex-start">
-				<HeroImage code={unit.heroClassCode} alt={unit.displayName} w={40} h={40} radius={0} />
+			<Group gap={8} wrap="nowrap" align="flex-start">
+				<HeroImage code={unit.heroClassCode} alt={unit.displayName} w={36} h={36} radius={0} />
 				<Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
-					<Group justify="space-between" wrap="nowrap" gap="xs">
-						<Text fw={600} lineClamp={1}>
-							{unit.displayName}
-						</Text>
-						<Text size="xs" c="var(--app-text-muted)">
-							{unit.row === 0 ? 'Передний' : 'Задний'}
-						</Text>
-					</Group>
+					<Text fw={600} size="sm" lineClamp={1}>
+						{unit.displayName}
+					</Text>
 					{hasStats ? (
 						<>
-							<Text size="sm" c={unit.alive ? undefined : 'var(--app-text-muted)'}>
+							<Text size="xs" c={unit.alive ? undefined : 'var(--app-text-muted)'}>
 								ОЗ {unit.health}/{unit.maxHp}
 								{unit.alive ? '' : ' · пал'}
 							</Text>
@@ -148,8 +158,8 @@ const UnitCard = ({ unit }: { unit: MatchHistoryUnit }) => {
 							</Text>
 						</>
 					) : (
-						<Text size="sm" c="var(--app-text-muted)">
-							Статы конца боя недоступны
+						<Text size="xs" c="var(--app-text-muted)">
+							Статы недоступны
 						</Text>
 					)}
 				</Stack>
