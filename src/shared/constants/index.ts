@@ -18,8 +18,16 @@ export const absoluteUrl = (path = '/'): string => {
 
 export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL;
 
+/** Почта оператора для запросов по персональным данным (политика конфиденциальности). */
+export const CONTACT_EMAIL: string = String(
+	import.meta.env.VITE_CONTACT_EMAIL ?? 'support@wormgod.site',
+);
+
 /** Origin Angie для картинок героев (без завершающего `/`). Из `VITE_STATIC_BASE_URL`. */
-export const STATIC_BASE_URL = String(import.meta.env.VITE_STATIC_BASE_URL ?? '').replace(/\/$/, '');
+export const STATIC_BASE_URL = String(import.meta.env.VITE_STATIC_BASE_URL ?? '').replace(
+	/\/$/,
+	'',
+);
 
 if (!STATIC_BASE_URL) {
 	throw new Error('VITE_STATIC_BASE_URL is required');
