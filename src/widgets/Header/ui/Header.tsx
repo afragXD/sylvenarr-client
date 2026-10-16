@@ -70,14 +70,14 @@ export const Header = () => {
 					</Group>
 				</Group>
 
-				<Group className="sylvenarr-header-dock" gap={6} wrap="nowrap">
+				<Group gap="sm" wrap="nowrap" align="center">
 					<ThemeToggle />
 					{player ? (
 						<Menu shadow="md" width={240} position="bottom-end" radius={0}>
 							<Menu.Target>
 								<UnstyledButton
 									aria-label="Меню аккаунта"
-									className="sylvenarr-header-dock__avatar"
+									className="sylvenarr-header-avatar"
 								>
 									<Avatar
 										src={player.avatarUrl}
@@ -90,7 +90,7 @@ export const Header = () => {
 									</Avatar>
 								</UnstyledButton>
 							</Menu.Target>
-							<Menu.Dropdown className="sylvenarr-header-dock__menu">
+							<Menu.Dropdown className="sylvenarr-header-menu">
 								<Menu.Label>
 									<Group gap="sm" wrap="nowrap" align="flex-start">
 										<Avatar
@@ -140,7 +140,7 @@ export const Header = () => {
 							color="brand"
 							size="compact-sm"
 							radius={0}
-							className="sylvenarr-header-dock__signin"
+							className="sylvenarr-header-signin"
 						>
 							Войти
 						</Button>

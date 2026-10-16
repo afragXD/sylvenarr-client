@@ -119,17 +119,7 @@
 	color: var(--mantine-color-brand-5);
 }
 
-.sylvenarr-header-dock {
-	align-items: center;
-	padding: 4px;
-	background: var(--app-surface);
-	border: 1px solid var(--app-border);
-	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 28%, transparent),
-		0 0 0 1px color-mix(in srgb, #000 40%, transparent);
-}
-
-.sylvenarr-header-dock__theme.mantine-ActionIcon-root {
+.sylvenarr-header-theme.mantine-ActionIcon-root {
 	border: 1px solid var(--app-border);
 	background: color-mix(in srgb, var(--app-surface) 92%, var(--mantine-color-brand-6));
 	box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
@@ -138,17 +128,17 @@
 		background-color 120ms ease;
 }
 
-.sylvenarr-header-dock__theme.mantine-ActionIcon-root:hover {
+.sylvenarr-header-theme.mantine-ActionIcon-root:hover {
 	border-color: var(--mantine-color-brand-5);
 	background: color-mix(in srgb, var(--mantine-color-brand-6) 14%, var(--app-surface));
 }
 
-.sylvenarr-header-dock__theme.mantine-ActionIcon-root:focus-visible {
+.sylvenarr-header-theme.mantine-ActionIcon-root:focus-visible {
 	outline: 2px solid var(--mantine-color-brand-5);
 	outline-offset: 2px;
 }
 
-.sylvenarr-header-dock__avatar {
+.sylvenarr-header-avatar {
 	display: inline-flex;
 	line-height: 0;
 	padding: 0;
@@ -161,21 +151,21 @@
 		box-shadow 120ms ease;
 }
 
-.sylvenarr-header-dock__avatar:hover,
-.sylvenarr-header-dock__avatar:focus-visible {
+.sylvenarr-header-avatar:hover,
+.sylvenarr-header-avatar:focus-visible {
 	border-color: var(--mantine-color-brand-5);
 	box-shadow:
 		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-5) 55%, transparent),
 		0 0 0 2px color-mix(in srgb, var(--mantine-color-brand-6) 28%, transparent);
 }
 
-.sylvenarr-header-dock__signin.mantine-Button-root {
+.sylvenarr-header-signin.mantine-Button-root {
 	height: 36px;
 	border: 1px solid color-mix(in srgb, var(--mantine-color-brand-4) 70%, var(--app-border));
 	box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 14%, transparent);
 }
 
-.sylvenarr-header-dock__menu.mantine-Menu-dropdown {
+.sylvenarr-header-menu.mantine-Menu-dropdown {
 	border: 1px solid var(--app-border);
 	background: var(--app-surface);
 	box-shadow:

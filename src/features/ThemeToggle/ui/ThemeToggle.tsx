@@ -29,7 +29,7 @@ export const ThemeToggle = () => {
 			radius={0}
 			aria-label={label}
 			title={label}
-			className="sylvenarr-header-dock__theme"
+			className="sylvenarr-header-theme"
 			onClick={handleClick}
 		>
 			{isDark ? <Sun size={18} /> : <Moon size={18} />}
