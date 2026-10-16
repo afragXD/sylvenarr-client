@@ -87,6 +87,25 @@ export async function draftRandom(input: {
 }
 
 /**
+ * Перенос своего пика на другой ряд.
+ */
+export async function moveDraftPick(input: {
+	readonly matchId: string;
+	readonly pickId: string;
+	readonly row: number;
+}): Promise<Match> {
+	return apiFetchJson(
+		`/matches/${encodeURIComponent(input.matchId)}/draft/picks/${encodeURIComponent(input.pickId)}`,
+		{
+			method: 'PATCH',
+			body: JSON.stringify({ row: input.row }),
+		},
+		parseMatch,
+		'Не удалось переместить героя',
+	);
+}
+
+/**
  * Отменяет матч (хост).
  */
 export async function cancelMatch(id: string): Promise<Match> {

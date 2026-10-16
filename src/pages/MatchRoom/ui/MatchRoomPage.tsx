@@ -1,18 +1,9 @@
-import {
-	Anchor,
-	Box,
-	Button,
-	Group,
-	SimpleGrid,
-	Stack,
-	Text,
-	Title,
-	UnstyledButton,
-} from '@mantine/core';
+import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { Anchor, Box, Button, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
-import { fetchHeroes, HeroImage, type HeroClass } from '@/entities/hero';
+import { fetchHeroes, type HeroClass } from '@/entities/hero';
 import {
 	cancelMatch,
 	draftPick,
@@ -20,9 +11,12 @@ import {
 	fetchMatchById,
 	type Match,
 	type MatchDraftPick,
+	moveDraftPick,
 } from '@/entities/match';
 import { fetchCurrentPlayer, type Player } from '@/entities/player';
+import { DraftHeroCard, DraftRowDropZone, HeroDetailModal } from '@/features/draft';
 import { ApiError } from '@/shared/api/http';
+import { InviteCodeChip } from '@/shared/ui/InviteCodeChip';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 const POLL_MS = 2500;
@@ -35,10 +29,16 @@ export const MatchRoomPage = () => {
 	const [player, setPlayer] = useState<Player | null>(null);
 	const [match, setMatch] = useState<Match | null>(null);
 	const [heroes, setHeroes] = useState<HeroClass[]>([]);
-	const [selectedRow, setSelectedRow] = useState(ROW_FRONT);
 	const [error, setError] = useState<string | null>(null);
 	const [isBusy, setIsBusy] = useState(false);
 	const [bootError, setBootError] = useState<string | null>(null);
+	const [modalHeroCode, setModalHeroCode] = useState<string | null>(null);
+
+	const sensors = useSensors(
+		useSensor(PointerSensor, {
+			activationConstraint: { distance: 8 },
+		}),
+	);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -101,26 +101,6 @@ export const MatchRoomPage = () => {
 		}
 	};
 
-	const handlePick = async (heroCode: string) => {
-		if (!match) {
-			return;
-		}
-		setIsBusy(true);
-		setError(null);
-		try {
-			const next = await draftPick({
-				matchId: match.id,
-				heroCode,
-				row: selectedRow,
-			});
-			setMatch(next);
-		} catch (err) {
-			setError(err instanceof ApiError ? err.message : 'Ошибка выбора');
-		} finally {
-			setIsBusy(false);
-		}
-	};
-
 	const handleRandom = async () => {
 		if (!match) {
 			return;
@@ -128,7 +108,7 @@ export const MatchRoomPage = () => {
 		setIsBusy(true);
 		setError(null);
 		try {
-			const next = await draftRandom({ matchId: match.id, row: selectedRow });
+			const next = await draftRandom({ matchId: match.id });
 			setMatch(next);
 		} catch (err) {
 			setError(err instanceof ApiError ? err.message : 'Ошибка случайного выбора');
@@ -137,9 +117,68 @@ export const MatchRoomPage = () => {
 		}
 	};
 
+	const handleDragEnd = (event: DragEndEvent) => {
+		if (!match || !player || isBusy) {
+			return;
+		}
+		const over = event.over;
+		if (!over) {
+			return;
+		}
+		const overData = over.data.current as
+			| { type?: string; row?: number; ownerPlayerId?: string }
+			| undefined;
+		if (overData?.type !== 'row' || overData.ownerPlayerId !== player.id) {
+			return;
+		}
+		const row = overData.row;
+		if (row !== ROW_FRONT && row !== ROW_BACK) {
+			return;
+		}
+
+		const activeData = event.active.data.current as
+			| { type?: string; heroCode?: string; pickId?: string; fromRow?: number; size?: number }
+			| undefined;
+
+		if (activeData?.type === 'hero' && activeData.heroCode) {
+			if (match.draft.turnPlayerId !== player.id) {
+				return;
+			}
+			const hero = heroes.find((item) => item.code === activeData.heroCode);
+			const mySize = player.id === match.host.id ? match.draft.hostSize : match.draft.guestSize;
+			if (!hero || mySize + hero.size > match.draft.initialTeamSize) {
+				return;
+			}
+			setIsBusy(true);
+			setError(null);
+			void draftPick({ matchId: match.id, heroCode: activeData.heroCode, row })
+				.then((next) => setMatch(next))
+				.catch((err: unknown) => {
+					setError(err instanceof ApiError ? err.message : 'Ошибка выбора');
+				})
+				.finally(() => setIsBusy(false));
+			return;
+		}
+
+		if (activeData?.type === 'pick' && activeData.pickId) {
+			if (activeData.fromRow === row) {
+				return;
+			}
+			setIsBusy(true);
+			setError(null);
+			void moveDraftPick({ matchId: match.id, pickId: activeData.pickId, row })
+				.then((next) => setMatch(next))
+				.catch((err: unknown) => {
+					setError(err instanceof ApiError ? err.message : 'Ошибка перестановки');
+				})
+				.finally(() => setIsBusy(false));
+		}
+	};
+
 	const isHost = Boolean(player && match && player.id === match.host.id);
-	const isMyTurn =
-		Boolean(player && match?.status === 'drafting' && match.draft.turnPlayerId === player.id);
+	const isMyTurn = Boolean(
+		player && match?.status === 'drafting' && match.draft.turnPlayerId === player.id,
+	);
 	const mySize =
 		player && match
 			? player.id === match.host.id
@@ -171,109 +210,111 @@ export const MatchRoomPage = () => {
 		);
 	}
 
+	const canDragUnits =
+		match.status === 'drafting' &&
+		!isBusy &&
+		(player.id === match.host.id || player.id === match.guest?.id);
+
 	return (
 		<PageFrame width="wide">
-			<Stack gap="lg" w="100%">
-				<Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
-					<Stack gap={6} maw={560}>
-						<Anchor component={Link} to="/lobby" c="brand" fw={600} size="sm">
-							← Лобби
-						</Anchor>
-						<Title order={1}>Матч</Title>
-						<Text c="var(--app-text-muted)">
-							Статус: {statusLabel(match.status)}. Код:{' '}
-							<Text span ff="monospace" fw={700} c="var(--app-text)">
-								{match.inviteCode}
-							</Text>
-						</Text>
-					</Stack>
-					{isHost && (match.status === 'waiting' || match.status === 'drafting') && (
-						<Button
-							variant="outline"
-							color="red"
-							loading={isBusy}
-							onClick={() => void handleCancel()}
-						>
-							Отменить
-						</Button>
-					)}
-				</Group>
-
-				{match.status === 'waiting' && (
-					<Box className="sylvenarr-panel" maw={520}>
-						<Stack gap="sm">
-							<Text fw={600}>Ожидание соперника</Text>
-							<Text size="sm" c="var(--app-text-muted)">
-								Передайте код другу. После входа начнётся draft — ход хоста.
-							</Text>
-							<Box className="sylvenarr-invite-plate">{match.inviteCode}</Box>
-							<Text size="sm" c="var(--app-text-muted)">
-								Хост: {match.host.displayName}
+			<DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+				<Stack gap="lg" w="100%">
+					<Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
+						<Stack gap={6} maw={560}>
+							<Anchor component={Link} to="/lobby" c="brand" fw={600} size="sm">
+								← Лобби
+							</Anchor>
+							<Title order={1}>Матч</Title>
+							<Text c="var(--app-text-muted)">
+								Статус: {statusLabel(match.status)}. Код:{' '}
+								<InviteCodeChip code={match.inviteCode} compact />
 							</Text>
 						</Stack>
-					</Box>
-				)}
-
-				{(match.status === 'drafting' || match.status === 'drafted') && (
-					<>
-						<Group align="stretch" gap="xl" wrap="wrap" preventGrowOverflow={false}>
-							<TeamPanel
-								title={`Хост · ${match.host.displayName}`}
-								size={match.draft.hostSize}
-								cap={match.draft.initialTeamSize}
-								picks={match.draft.hostPicks}
-								isTurn={match.draft.turnPlayerId === match.host.id}
-							/>
-							<TeamPanel
-								title={`Гость · ${match.guest?.displayName ?? '…'}`}
-								size={match.draft.guestSize}
-								cap={match.draft.initialTeamSize}
-								picks={match.draft.guestPicks}
-								isTurn={match.draft.turnPlayerId === match.guest?.id}
-							/>
-						</Group>
-
-						{match.status === 'drafted' && (
-							<Box className="sylvenarr-panel" maw={560}>
-								<Text fw={600} c="accent">
-									Составы готовы. Бой — фаза 3.
-								</Text>
-								<Button
-									mt="md"
-									variant="light"
-									color="brand"
-									onClick={() => void navigate({ to: '/lobby' })}
-								>
-									Вернуться в лобби
-								</Button>
-							</Box>
+						{isHost && (match.status === 'waiting' || match.status === 'drafting') && (
+							<Button
+								variant="outline"
+								color="red"
+								loading={isBusy}
+								onClick={() => void handleCancel()}
+							>
+								Отменить
+							</Button>
 						)}
+					</Group>
 
-						{match.status === 'drafting' && (
-							<Stack gap="md">
-								<Group justify="space-between" align="center" wrap="wrap" gap="sm">
-									<Text fw={600}>
-										{isMyTurn
-											? `Ваш ход · квота ${mySize}/${match.draft.initialTeamSize}`
-											: 'Ход соперника…'}
+					{match.status === 'waiting' && (
+						<Box className="sylvenarr-panel" maw={520}>
+							<Stack gap="sm">
+								<Text fw={600}>Ожидание соперника</Text>
+								<Text size="sm" c="var(--app-text-muted)">
+									Передайте код другу. После входа начнётся набор отряда — ходит игрок 1.
+								</Text>
+								<InviteCodeChip code={match.inviteCode} />
+								<Text size="sm" c="var(--app-text-muted)">
+									Игрок 1: {match.host.displayName}
+								</Text>
+							</Stack>
+						</Box>
+					)}
+
+					{(match.status === 'drafting' || match.status === 'drafted') && (
+						<>
+							<Group align="stretch" gap="xl" wrap="wrap" preventGrowOverflow={false}>
+								<TeamPanel
+									title={`Игрок 1 · ${match.host.displayName}`}
+									ownerPlayerId={match.host.id}
+									size={match.draft.hostSize}
+									cap={match.draft.initialTeamSize}
+									picks={match.draft.hostPicks}
+									isTurn={match.draft.turnPlayerId === match.host.id}
+									acceptDrops={
+										match.status === 'drafting' && player.id === match.host.id && !isBusy
+									}
+									canDragUnits={canDragUnits && player.id === match.host.id}
+								/>
+								<TeamPanel
+									title={`Игрок 2 · ${match.guest?.displayName ?? '…'}`}
+									ownerPlayerId={match.guest?.id ?? 'guest'}
+									size={match.draft.guestSize}
+									cap={match.draft.initialTeamSize}
+									picks={match.draft.guestPicks}
+									isTurn={match.draft.turnPlayerId === match.guest?.id}
+									acceptDrops={
+										match.status === 'drafting' &&
+										Boolean(match.guest) &&
+										player.id === match.guest?.id &&
+										!isBusy
+									}
+									canDragUnits={
+										canDragUnits && Boolean(match.guest) && player.id === match.guest?.id
+									}
+								/>
+							</Group>
+
+							{match.status === 'drafted' && (
+								<Box className="sylvenarr-panel" maw={560}>
+									<Text fw={600} c="accent">
+										Составы готовы. Бой — фаза 3.
 									</Text>
-									<Group gap="xs">
-										<Button
-											variant={selectedRow === ROW_FRONT ? 'filled' : 'light'}
-											color="brand"
-											size="compact-sm"
-											onClick={() => setSelectedRow(ROW_FRONT)}
-										>
-											Передний ряд
-										</Button>
-										<Button
-											variant={selectedRow === ROW_BACK ? 'filled' : 'light'}
-											color="brand"
-											size="compact-sm"
-											onClick={() => setSelectedRow(ROW_BACK)}
-										>
-											Задний ряд
-										</Button>
+									<Button
+										mt="md"
+										variant="light"
+										color="brand"
+										onClick={() => void navigate({ to: '/lobby' })}
+									>
+										Вернуться в лобби
+									</Button>
+								</Box>
+							)}
+
+							{match.status === 'drafting' && (
+								<Stack gap="md">
+									<Group justify="space-between" align="center" wrap="wrap" gap="sm">
+										<Text fw={600}>
+											{isMyTurn
+												? `Ваш ход · квота ${mySize}/${match.draft.initialTeamSize}. Перетащите героя на ряд.`
+												: 'Ход соперника…'}
+										</Text>
 										<Button
 											variant="light"
 											color="accent"
@@ -281,86 +322,67 @@ export const MatchRoomPage = () => {
 											disabled={!isMyTurn}
 											onClick={() => void handleRandom()}
 										>
-											Random
+											Случайно
 										</Button>
 									</Group>
-								</Group>
-								{error && (
-									<Text c="red" role="alert">
-										{error}
-									</Text>
-								)}
-								<SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing="sm">
-									{heroes.map((hero) => {
-										const fits =
-											mySize + hero.size <= match.draft.initialTeamSize;
-										return (
-											<UnstyledButton
-												key={hero.code}
-												disabled={!isMyTurn || isBusy || !fits}
-												onClick={() => void handlePick(hero.code)}
-												style={{
-													opacity: !isMyTurn || !fits ? 0.45 : 1,
-													cursor:
-														isMyTurn && fits && !isBusy
-															? 'pointer'
-															: 'default',
-													border:
-														'1px solid color-mix(in srgb, var(--app-text) 12%, transparent)',
-													borderRadius: 8,
-													padding: 8,
-													background: 'var(--app-surface)',
-													textAlign: 'left',
-												}}
-											>
-												<Stack gap={6}>
-													<HeroImage
-														code={hero.code}
-														alt={hero.displayName}
-														w="100%"
-														h={72}
-													/>
-													<Text size="sm" fw={600} lineClamp={1}>
-														{hero.displayName}
-													</Text>
-													<Text size="xs" c="var(--app-text-muted)">
-														size {hero.size}
-													</Text>
-												</Stack>
-											</UnstyledButton>
-										);
-									})}
-								</SimpleGrid>
-							</Stack>
-						)}
-					</>
-				)}
+									{error && (
+										<Text c="red" role="alert">
+											{error}
+										</Text>
+									)}
+									<SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing="sm">
+										{heroes.map((hero) => {
+											const fits = mySize + hero.size <= match.draft.initialTeamSize;
+											const disabled = !isMyTurn || isBusy || !fits;
+											return (
+												<DraftHeroCard
+													key={hero.code}
+													hero={hero}
+													disabled={disabled}
+													onOpen={setModalHeroCode}
+												/>
+											);
+										})}
+									</SimpleGrid>
+								</Stack>
+							)}
+						</>
+					)}
 
-				{match.status === 'cancelled' && (
-					<Box className="sylvenarr-panel" maw={480}>
-						<Text>Матч отменён.</Text>
-						<Button mt="md" component={Link} to="/lobby" color="brand">
-							К лобби
-						</Button>
-					</Box>
-				)}
-			</Stack>
+					{match.status === 'cancelled' && (
+						<Box className="sylvenarr-panel" maw={480}>
+							<Text>Матч отменён.</Text>
+							<Button mt="md" component={Link} to="/lobby" color="brand">
+								К лобби
+							</Button>
+						</Box>
+					)}
+				</Stack>
+			</DndContext>
+
+			<HeroDetailModal code={modalHeroCode} onClose={() => setModalHeroCode(null)} />
 		</PageFrame>
 	);
 };
 
 const TeamPanel = ({
 	title,
+	ownerPlayerId,
 	size,
 	cap,
 	picks,
 	isTurn,
+	acceptDrops,
+	canDragUnits,
 }: {
 	title: string;
+	ownerPlayerId: string;
 	size: number;
 	cap: number;
 	picks: MatchDraftPick[];
 	isTurn: boolean;
+	acceptDrops: boolean;
+	canDragUnits: boolean;
 }) => {
 	const front = picks.filter((pick) => pick.row === ROW_FRONT);
 	const back = picks.filter((pick) => pick.row === ROW_BACK);
@@ -380,37 +402,28 @@ const TeamPanel = ({
 						{size}/{cap}
 					</Text>
 				</Group>
-				<RowLabel label="Передний ряд" picks={front} />
-				<RowLabel label="Задний ряд" picks={back} />
+				<SimpleGrid cols={2} spacing="sm">
+					<DraftRowDropZone
+						row={ROW_FRONT}
+						label="Передний ряд"
+						picks={front}
+						acceptDrops={acceptDrops}
+						ownerPlayerId={ownerPlayerId}
+						canDragUnits={canDragUnits}
+					/>
+					<DraftRowDropZone
+						row={ROW_BACK}
+						label="Задний ряд"
+						picks={back}
+						acceptDrops={acceptDrops}
+						ownerPlayerId={ownerPlayerId}
+						canDragUnits={canDragUnits}
+					/>
+				</SimpleGrid>
 			</Stack>
 		</Box>
 	);
 };
-
-const RowLabel = ({ label, picks }: { label: string; picks: MatchDraftPick[] }) => (
-	<Stack gap={4}>
-		<Text size="xs" c="var(--app-text-muted)" tt="uppercase">
-			{label}
-		</Text>
-		{picks.length === 0 ? (
-			<Text size="sm" c="var(--app-text-muted)">
-				—
-			</Text>
-		) : (
-			<Group gap="xs" wrap="wrap">
-				{picks.map((pick) => (
-					<Group key={pick.id} gap={6} wrap="nowrap">
-						<HeroImage code={pick.heroClassCode} alt={pick.displayName} w={36} h={36} />
-						<Text size="sm">
-							{pick.displayName}
-							{pick.size > 1 ? ` (${pick.size})` : ''}
-						</Text>
-					</Group>
-				))}
-			</Group>
-		)}
-	</Stack>
-);
 
 const statusLabel = (status: Match['status']): string => {
 	switch (status) {
@@ -419,7 +432,7 @@ const statusLabel = (status: Match['status']): string => {
 		case 'ready':
 			return 'готово (устаревший)';
 		case 'drafting':
-			return 'draft';
+			return 'набор отряда';
 		case 'drafted':
 			return 'составы готовы';
 		case 'cancelled':

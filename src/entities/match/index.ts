@@ -5,6 +5,7 @@ export {
 	draftRandom,
 	fetchMatchById,
 	joinMatch,
+	moveDraftPick,
 } from './api/matchesApi';
 export type {
 	Match,
