@@ -5,6 +5,7 @@ export {
 	draftPick,
 	draftRandom,
 	fetchMatchById,
+	fetchMyMatchDetail,
 	fetchMyMatches,
 	joinMatch,
 	moveDraftPick,
@@ -15,7 +16,10 @@ export type {
 	Match,
 	MatchDraftPick,
 	MatchDraftState,
+	MatchHistoryDetail,
 	MatchHistoryItem,
+	MatchHistoryTeam,
+	MatchHistoryUnit,
 	MatchPlayerBrief,
 	MatchStatus,
 } from './model/types';

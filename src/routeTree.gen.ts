@@ -22,6 +22,7 @@ import { Route as HeroesIndexRouteImport } from './routes/heroes.index'
 import { Route as HeroesCodeRouteImport } from './routes/heroes.$code'
 import { Route as LobbyIndexRouteImport } from './routes/lobby.index'
 import { Route as LobbyMatchIdRouteImport } from './routes/lobby.$matchId'
+import { Route as MatchesMatchIdRouteImport } from './routes/matches.$matchId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,12 +89,17 @@ const LobbyMatchIdRoute = LobbyMatchIdRouteImport.update({
   path: '/$matchId',
   getParentRoute: () => LobbyRoute,
 } as any)
+const MatchesMatchIdRoute = MatchesMatchIdRouteImport.update({
+  id: '/$matchId',
+  path: '/$matchId',
+  getParentRoute: () => MatchesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/heroes': typeof HeroesRouteWithChildren
   '/lobby': typeof LobbyRouteWithChildren
-  '/matches': typeof MatchesRoute
+  '/matches': typeof MatchesRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -101,12 +107,13 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/heroes/$code': typeof HeroesCodeRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
+  '/matches/$matchId': typeof MatchesMatchIdRoute
   '/heroes/': typeof HeroesIndexRoute
   '/lobby/': typeof LobbyIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/matches': typeof MatchesRoute
+  '/matches': typeof MatchesRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/heroes/$code': typeof HeroesCodeRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
+  '/matches/$matchId': typeof MatchesMatchIdRoute
   '/heroes': typeof HeroesIndexRoute
   '/lobby': typeof LobbyIndexRoute
 }
@@ -122,7 +130,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/heroes': typeof HeroesRouteWithChildren
   '/lobby': typeof LobbyRouteWithChildren
-  '/matches': typeof MatchesRoute
+  '/matches': typeof MatchesRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/heroes/$code': typeof HeroesCodeRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
+  '/matches/$matchId': typeof MatchesMatchIdRoute
   '/heroes/': typeof HeroesIndexRoute
   '/lobby/': typeof LobbyIndexRoute
 }
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/heroes/$code'
     | '/lobby/$matchId'
+    | '/matches/$matchId'
     | '/heroes/'
     | '/lobby/'
   fileRoutesByTo: FileRoutesByTo
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/heroes/$code'
     | '/lobby/$matchId'
+    | '/matches/$matchId'
     | '/heroes'
     | '/lobby'
   id:
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/heroes/$code'
     | '/lobby/$matchId'
+    | '/matches/$matchId'
     | '/heroes/'
     | '/lobby/'
   fileRoutesById: FileRoutesById
@@ -183,7 +195,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HeroesRoute: typeof HeroesRouteWithChildren
   LobbyRoute: typeof LobbyRouteWithChildren
-  MatchesRoute: typeof MatchesRoute
+  MatchesRoute: typeof MatchesRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   RatingRoute: typeof RatingRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
@@ -284,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LobbyMatchIdRouteImport
       parentRoute: typeof LobbyRoute
     }
+    '/matches/$matchId': {
+      id: '/matches/$matchId'
+      path: '/$matchId'
+      fullPath: '/matches/$matchId'
+      preLoaderRoute: typeof MatchesMatchIdRouteImport
+      parentRoute: typeof MatchesRoute
+    }
   }
 }
 
@@ -312,11 +331,22 @@ const LobbyRouteChildren: LobbyRouteChildren = {
 
 const LobbyRouteWithChildren = LobbyRoute._addFileChildren(LobbyRouteChildren)
 
+interface MatchesRouteChildren {
+  MatchesMatchIdRoute: typeof MatchesMatchIdRoute
+}
+
+const MatchesRouteChildren: MatchesRouteChildren = {
+  MatchesMatchIdRoute: MatchesMatchIdRoute,
+}
+
+const MatchesRouteWithChildren =
+  MatchesRoute._addFileChildren(MatchesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HeroesRoute: HeroesRouteWithChildren,
   LobbyRoute: LobbyRouteWithChildren,
-  MatchesRoute: MatchesRoute,
+  MatchesRoute: MatchesRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   RatingRoute: RatingRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,

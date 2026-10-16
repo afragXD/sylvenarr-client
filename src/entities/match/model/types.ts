@@ -77,5 +77,39 @@ export type MatchHistoryItem = {
 	result: 'win' | 'loss' | 'draw';
 	opponentName: string;
 	finishedAt: string;
-	heroCodes: string[];
+	durationSeconds: number | null;
+};
+
+export type MatchHistoryUnit = {
+	pickId: string;
+	heroClassCode: string;
+	displayName: string;
+	row: number;
+	column: number;
+	maxHp: number;
+	health: number;
+	alive: boolean;
+	damage: number;
+	armor: number;
+	initiative: number;
+};
+
+export type MatchHistoryTeam = {
+	playerId: string;
+	displayName: string;
+	units: MatchHistoryUnit[];
+};
+
+export type MatchHistoryDetail = {
+	id: string;
+	result: 'win' | 'loss' | 'draw';
+	opponentName: string;
+	finishedAt: string;
+	durationSeconds: number | null;
+	stage: number | null;
+	outcome: 'host_win' | 'guest_win' | 'draw' | null;
+	hasSnapshot: boolean;
+	log: string[];
+	host: MatchHistoryTeam;
+	guest: MatchHistoryTeam;
 };

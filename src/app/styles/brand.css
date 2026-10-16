@@ -3,6 +3,8 @@
 .sylvenarr-page-veil {
 	position: relative;
 	isolation: isolate;
+	/* AppShell header = 64px */
+	min-height: calc(100dvh - 64px);
 }
 
 .sylvenarr-page-veil::before {

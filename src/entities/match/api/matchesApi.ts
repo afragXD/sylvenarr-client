@@ -1,6 +1,6 @@
 import { apiFetchJson } from '@/shared/api/http';
 
-import type { Match, MatchHistoryItem } from '../model/types';
+import type { Match, MatchHistoryDetail, MatchHistoryItem } from '../model/types';
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
 	typeof value === 'object' && value !== null;
@@ -155,5 +155,22 @@ export async function fetchMyMatches(): Promise<MatchHistoryItem[]> {
 			return data as MatchHistoryItem[];
 		},
 		'Не удалось загрузить историю матчей',
+	);
+}
+
+/**
+ * Детали завершённого матча.
+ */
+export async function fetchMyMatchDetail(matchId: string): Promise<MatchHistoryDetail> {
+	return apiFetchJson(
+		`/players/me/matches/${encodeURIComponent(matchId)}`,
+		undefined,
+		(data) => {
+			if (!isRecord(data) || typeof data.id !== 'string') {
+				throw new Error('Некорректный ответ деталей матча');
+			}
+			return data as unknown as MatchHistoryDetail;
+		},
+		'Не удалось загрузить матч',
 	);
 }

@@ -1,0 +1,29 @@
+.team {
+	padding: 1rem 0;
+}
+
+.unit {
+	padding: 0.75rem 0;
+	border-bottom: 1px solid var(--app-border);
+}
+
+.unit[data-dead="true"] {
+	opacity: 0.65;
+}
+
+.logPanel {
+	margin-top: 0.5rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--app-border);
+	max-width: 42rem;
+}
+
+.log {
+	font-family: var(--mantine-font-family-monospace);
+	font-size: 0.8rem;
+	line-height: 1.45;
+	color: var(--app-text-muted);
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
