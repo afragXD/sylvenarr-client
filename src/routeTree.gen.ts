@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HeroesRouteImport } from './routes/heroes'
 import { Route as LobbyRouteImport } from './routes/lobby'
+import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RatingRouteImport } from './routes/rating'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
@@ -35,6 +36,11 @@ const HeroesRoute = HeroesRouteImport.update({
 const LobbyRoute = LobbyRouteImport.update({
   id: '/lobby',
   path: '/lobby',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MatchesRoute = MatchesRouteImport.update({
+  id: '/matches',
+  path: '/matches',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/heroes': typeof HeroesRouteWithChildren
   '/lobby': typeof LobbyRouteWithChildren
+  '/matches': typeof MatchesRoute
   '/privacy': typeof PrivacyRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/matches': typeof MatchesRoute
   '/privacy': typeof PrivacyRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/heroes': typeof HeroesRouteWithChildren
   '/lobby': typeof LobbyRouteWithChildren
+  '/matches': typeof MatchesRoute
   '/privacy': typeof PrivacyRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/'
     | '/heroes'
     | '/lobby'
+    | '/matches'
     | '/privacy'
     | '/rating'
     | '/robots.txt'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/matches'
     | '/privacy'
     | '/rating'
     | '/robots.txt'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/'
     | '/heroes'
     | '/lobby'
+    | '/matches'
     | '/privacy'
     | '/rating'
     | '/robots.txt'
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HeroesRoute: typeof HeroesRouteWithChildren
   LobbyRoute: typeof LobbyRouteWithChildren
+  MatchesRoute: typeof MatchesRoute
   PrivacyRoute: typeof PrivacyRoute
   RatingRoute: typeof RatingRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
@@ -199,6 +212,13 @@ declare module '@tanstack/react-router' {
       path: '/lobby'
       fullPath: '/lobby'
       preLoaderRoute: typeof LobbyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matches': {
+      id: '/matches'
+      path: '/matches'
+      fullPath: '/matches'
+      preLoaderRoute: typeof MatchesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -296,6 +316,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HeroesRoute: HeroesRouteWithChildren,
   LobbyRoute: LobbyRouteWithChildren,
+  MatchesRoute: MatchesRoute,
   PrivacyRoute: PrivacyRoute,
   RatingRoute: RatingRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,

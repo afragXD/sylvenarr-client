@@ -1,6 +1,6 @@
 import { apiFetchJson } from '@/shared/api/http';
 
-import type { Match } from '../model/types';
+import type { Match, MatchHistoryItem } from '../model/types';
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
 	typeof value === 'object' && value !== null;
@@ -114,5 +114,46 @@ export async function cancelMatch(id: string): Promise<Match> {
 		{ method: 'POST' },
 		parseMatch,
 		'Не удалось отменить матч',
+	);
+}
+
+/**
+ * Действие юнита в бою.
+ */
+export async function battleAction(input: {
+	readonly matchId: string;
+	readonly unitId: string;
+	readonly action: 'attack' | 'defend' | 'wait' | 'skill';
+	readonly targetId?: string;
+}): Promise<Match> {
+	return apiFetchJson(
+		`/matches/${encodeURIComponent(input.matchId)}/battle/action`,
+		{
+			method: 'POST',
+			body: JSON.stringify({
+				unitId: input.unitId,
+				action: input.action,
+				targetId: input.targetId,
+			}),
+		},
+		parseMatch,
+		'Не удалось выполнить действие',
+	);
+}
+
+/**
+ * История завершённых матчей текущего игрока.
+ */
+export async function fetchMyMatches(): Promise<MatchHistoryItem[]> {
+	return apiFetchJson(
+		'/players/me/matches',
+		undefined,
+		(data) => {
+			if (!Array.isArray(data)) {
+				throw new Error('Некорректный ответ истории');
+			}
+			return data as MatchHistoryItem[];
+		},
+		'Не удалось загрузить историю матчей',
 	);
 }

@@ -1,4 +1,14 @@
-import { Anchor, Avatar, Box, Button, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
+import {
+	Anchor,
+	Avatar,
+	Box,
+	Button,
+	Group,
+	Menu,
+	Stack,
+	Text,
+	UnstyledButton,
+} from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -10,6 +20,7 @@ import { BrandMark } from '@/shared/ui/BrandMark';
 const navItems = [
 	{ to: '/heroes', label: 'Герои' },
 	{ to: '/lobby', label: 'Лобби' },
+	{ to: '/matches', label: 'Матчи' },
 	{ to: '/rating', label: 'Рейтинг' },
 ] as const;
 
@@ -75,10 +86,7 @@ export const Header = () => {
 					{player ? (
 						<Menu shadow="md" width={240} position="bottom-end" radius={0}>
 							<Menu.Target>
-								<UnstyledButton
-									aria-label="Меню аккаунта"
-									className="sylvenarr-header-avatar"
-								>
+								<UnstyledButton aria-label="Меню аккаунта" className="sylvenarr-header-avatar">
 									<Avatar
 										src={player.avatarUrl}
 										alt={player.displayName}
@@ -93,13 +101,7 @@ export const Header = () => {
 							<Menu.Dropdown className="sylvenarr-header-menu">
 								<Menu.Label>
 									<Group gap="sm" wrap="nowrap" align="flex-start">
-										<Avatar
-											src={player.avatarUrl}
-											alt=""
-											radius="xl"
-											size={32}
-											color="brand"
-										>
+										<Avatar src={player.avatarUrl} alt="" radius="xl" size={32} color="brand">
 											{initialsFromName(player.displayName)}
 										</Avatar>
 										<Stack gap={2} style={{ minWidth: 0 }}>
