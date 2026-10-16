@@ -331,11 +331,19 @@ export const MatchRoomPage = () => {
 											{error}
 										</Text>
 									)}
-									<SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing="sm">
+									<Text size="sm" c="var(--app-text-muted)">
+										Цифра в углу карточки — сколько слотов герой занимает в отряде: I — один, II —
+										два.
+									</Text>
+									<SimpleGrid
+										cols={{ base: 3, sm: 4, md: 6, lg: 8 }}
+										spacing="lg"
+										verticalSpacing="lg"
+									>
 										{[...heroes]
 											.sort(
 												(a, b) =>
-													a.size - b.size || a.displayName.localeCompare(b.displayName, 'ru'),
+													b.size - a.size || a.displayName.localeCompare(b.displayName, 'ru'),
 											)
 											.map((hero) => {
 												const fits = mySize + hero.size <= match.draft.initialTeamSize;

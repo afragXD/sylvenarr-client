@@ -1,10 +1,23 @@
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { Box, Text } from '@mantine/core';
+import { Box, Text, Tooltip } from '@mantine/core';
 
 import { type HeroClass, HeroImage } from '@/entities/hero';
 
 import styles from './DraftHeroCard.module.css';
+
+const ROMAN = ['', 'I', 'II', 'III', 'IV'] as const;
+
+/**
+ * Размер героя римской цифрой: 1 → I, 2 → II.
+ */
+export const sizeToRoman = (size: number): string => ROMAN[size] ?? String(size);
+
+/**
+ * Текст подсказки о занимаемых слотах.
+ */
+export const slotsHint = (size: number): string =>
+	size === 1 ? 'Занимает один слот в отряде' : `Занимает ${size} слота в отряде`;
 
 type DraftHeroCardProps = {
 	hero: HeroClass;
@@ -53,10 +66,15 @@ export const DraftHeroCard = ({ hero, disabled, onOpen }: DraftHeroCardProps) =>
 					fit="cover"
 					bg="transparent"
 				/>
-				<span className={styles.slots} role="img" aria-label={`Слоты: ${hero.size}`}>
-					{hero.size >= 1 ? <span className={styles.pip} /> : null}
-					{hero.size >= 2 ? <span className={styles.pip} /> : null}
-				</span>
+				<Tooltip
+					label={slotsHint(hero.size)}
+					withArrow
+					events={{ hover: true, focus: true, touch: true }}
+				>
+					<span className={styles.slots} role="img" aria-label={slotsHint(hero.size)}>
+						{sizeToRoman(hero.size)}
+					</span>
+				</Tooltip>
 			</Box>
 			<Text className={styles.name} lineClamp={1}>
 				{hero.displayName}
