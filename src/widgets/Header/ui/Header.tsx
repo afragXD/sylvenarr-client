@@ -1,5 +1,6 @@
-import { Anchor, Box, Button, Group, Text } from '@mantine/core';
+import { Anchor, Avatar, Box, Button, Group, Menu, Text, UnstyledButton } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
+import { LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { fetchCurrentPlayer, logoutPlayer, type Player } from '@/entities/player';
@@ -12,20 +13,27 @@ const navItems = [
 	{ to: '/rating', label: 'Рейтинг' },
 ] as const;
 
+const initialsFromName = (name: string): string => {
+	const parts = name.trim().split(/\s+/).filter(Boolean);
+	if (parts.length === 0) {
+		return '?';
+	}
+	if (parts.length === 1) {
+		return parts[0].slice(0, 2).toUpperCase();
+	}
+	return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase();
+};
+
 export const Header = () => {
 	const [player, setPlayer] = useState<Player | null>(null);
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-	const refreshSession = () => {
+	useEffect(() => {
 		void fetchCurrentPlayer()
 			.then(setPlayer)
 			.catch(() => {
 				setPlayer(null);
 			});
-	};
-
-	useEffect(() => {
-		refreshSession();
 	}, []);
 
 	const handleLogout = async () => {
@@ -63,20 +71,47 @@ export const Header = () => {
 				</Group>
 				<Group gap="sm" wrap="nowrap">
 					{player ? (
-						<>
-							<Text size="sm" c="var(--app-text-muted)" visibleFrom="sm" lineClamp={1} maw={160}>
-								{player.displayName}
-							</Text>
-							<Button
-								variant="subtle"
-								color="gray"
-								size="compact-sm"
-								loading={isLoggingOut}
-								onClick={() => void handleLogout()}
-							>
-								Выйти
-							</Button>
-						</>
+						<Menu shadow="md" width={220} position="bottom-end" radius={0}>
+							<Menu.Target>
+								<UnstyledButton
+									aria-label="Меню аккаунта"
+									className="sylvenarr-header-avatar-btn"
+									style={{ borderRadius: 0 }}
+								>
+									<Avatar
+										src={player.avatarUrl}
+										alt={player.displayName}
+										radius={0}
+										size={34}
+										color="brand"
+									>
+										{initialsFromName(player.displayName)}
+									</Avatar>
+								</UnstyledButton>
+							</Menu.Target>
+							<Menu.Dropdown>
+								<Menu.Label>
+									<Text size="sm" fw={600} c="var(--app-text)" lineClamp={1}>
+										{player.displayName}
+									</Text>
+								</Menu.Label>
+								<Menu.Item component={Link} to="/lobby">
+									Лобби
+								</Menu.Item>
+								<Menu.Item component={Link} to="/rating">
+									Рейтинг
+								</Menu.Item>
+								<Menu.Divider />
+								<Menu.Item
+									color="red"
+									leftSection={<LogOut size={14} />}
+									disabled={isLoggingOut}
+									onClick={() => void handleLogout()}
+								>
+									Выйти
+								</Menu.Item>
+							</Menu.Dropdown>
+						</Menu>
 					) : (
 						<Button
 							component={Link}

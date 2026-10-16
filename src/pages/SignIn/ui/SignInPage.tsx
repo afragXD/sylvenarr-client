@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Stack, Text, Title } from '@mantine/core';
+import { Alert, Box, Group, Stack, Text, Title } from '@mantine/core';
 import { Link, useSearch } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
@@ -6,8 +6,8 @@ import {
 	type AuthProvider,
 	fetchAuthProviders,
 	fetchCurrentPlayer,
-	getOAuthStartUrl,
 } from '@/entities/player';
+import { OAuthProviderButton } from '@/shared/ui/oauth';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 /**
@@ -84,17 +84,15 @@ export const SignInPage = () => {
 							Способы входа пока не настроены на сервере.
 						</Text>
 					) : (
-						providers.map((provider) => (
-							<Button
-								key={provider.id}
-								className="sylvenarr-plate-btn"
-								color="brand"
-								component="a"
-								href={getOAuthStartUrl(provider.id)}
-							>
-								Войти через {provider.label}
-							</Button>
-						))
+						<Group gap="md" justify="center" mt="xs">
+							{providers.map((provider) => (
+								<OAuthProviderButton
+									key={provider.id}
+									providerId={provider.id}
+									label={provider.label}
+								/>
+							))}
+						</Group>
 					)}
 				</Stack>
 			</Box>

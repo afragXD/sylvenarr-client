@@ -1,4 +1,4 @@
-import { Badge, Box, Group, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { Anchor, Badge, Box, Group, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { Link, useParams } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
 import { useEffect } from 'react';
@@ -48,9 +48,18 @@ export const HeroDetailPage = () => {
 
 	return (
 		<PageFrame width="wide">
-			<Text component={Link} to="/heroes" c="brand" td="none" size="sm" fw={500}>
+			<Anchor
+				component={Link}
+				to="/heroes"
+				c="brand"
+				td="none"
+				size="sm"
+				fw={500}
+				w="fit-content"
+				display="inline-block"
+			>
 				← К реестру
-			</Text>
+			</Anchor>
 			{isPending && (
 				<Group gap="sm">
 					<Loader color="brand" size="sm" />
