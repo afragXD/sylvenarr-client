@@ -17,6 +17,7 @@ type HeroImageProps = {
 	h?: number | string;
 	radius?: string | number;
 	bg?: string;
+	fit?: 'contain' | 'cover';
 };
 
 /**
@@ -30,6 +31,7 @@ export const HeroImage = ({
 	h = 40,
 	radius = 4,
 	bg = 'var(--app-surface)',
+	fit = 'contain',
 }: HeroImageProps) => {
 	const primary = variant === 'character' ? getHeroCharacterUrl(code) : getHeroPortraitUrl(code);
 
@@ -53,7 +55,7 @@ export const HeroImage = ({
 			w={w}
 			h={h}
 			radius={radius}
-			fit="contain"
+			fit={fit}
 			bg={bg}
 			onError={handleError}
 		/>

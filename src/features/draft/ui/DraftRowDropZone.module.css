@@ -1,0 +1,19 @@
+.row {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 140px;
+	padding: 0.5rem;
+	border: 1px dashed color-mix(in srgb, var(--app-text) 22%, transparent);
+	background: color-mix(in srgb, var(--app-surface-muted) 70%, transparent);
+	transition:
+		border-color 120ms ease,
+		background 120ms ease,
+		outline 120ms ease;
+}
+
+.row[data-over="true"] {
+	border-color: var(--mantine-color-accent-filled);
+	background: color-mix(in srgb, var(--mantine-color-accent-filled) 12%, var(--app-surface));
+	outline: 1px solid color-mix(in srgb, var(--mantine-color-accent-filled) 45%, transparent);
+}

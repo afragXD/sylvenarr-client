@@ -4,6 +4,8 @@ import { Box, Text } from '@mantine/core';
 
 import { type HeroClass, HeroImage } from '@/entities/hero';
 
+import styles from './DraftHeroCard.module.css';
+
 type DraftHeroCardProps = {
 	hero: HeroClass;
 	disabled: boolean;
@@ -30,7 +32,7 @@ export const DraftHeroCard = ({ hero, disabled, onOpen }: DraftHeroCardProps) =>
 		<button
 			type="button"
 			ref={setNodeRef}
-			className="sylvenarr-torn-card"
+			className={styles.card}
 			data-disabled={disabled ? 'true' : undefined}
 			aria-disabled={disabled || undefined}
 			style={style}
@@ -41,13 +43,24 @@ export const DraftHeroCard = ({ hero, disabled, onOpen }: DraftHeroCardProps) =>
 				}
 			}}
 		>
-			<Box className="sylvenarr-torn-card__portrait">
-				<HeroImage code={hero.code} alt={hero.displayName} w="100%" h={72} radius={0} />
+			<Box className={styles.portrait}>
+				<HeroImage
+					code={hero.code}
+					alt={hero.displayName}
+					w="100%"
+					h="100%"
+					radius={0}
+					fit="cover"
+					bg="transparent"
+				/>
+				<span className={styles.slots} role="img" aria-label={`Слоты: ${hero.size}`}>
+					{hero.size >= 1 ? <span className={styles.pip} /> : null}
+					{hero.size >= 2 ? <span className={styles.pip} /> : null}
+				</span>
 			</Box>
-			<Text className="sylvenarr-torn-card__name" lineClamp={1}>
+			<Text className={styles.name} lineClamp={1}>
 				{hero.displayName}
 			</Text>
-			<Text className="sylvenarr-torn-card__slots">слоты {hero.size}</Text>
 		</button>
 	);
 };

@@ -271,6 +271,7 @@ export const MatchRoomPage = () => {
 										match.status === 'drafting' && player.id === match.host.id && !isBusy
 									}
 									canDragUnits={canDragUnits && player.id === match.host.id}
+									mirrorRows
 								/>
 								<TeamPanel
 									title={`Игрок 2 · ${match.guest?.displayName ?? '…'}`}
@@ -331,18 +332,23 @@ export const MatchRoomPage = () => {
 										</Text>
 									)}
 									<SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing="sm">
-										{heroes.map((hero) => {
-											const fits = mySize + hero.size <= match.draft.initialTeamSize;
-											const disabled = !isMyTurn || isBusy || !fits;
-											return (
-												<DraftHeroCard
-													key={hero.code}
-													hero={hero}
-													disabled={disabled}
-													onOpen={setModalHeroCode}
-												/>
-											);
-										})}
+										{[...heroes]
+											.sort(
+												(a, b) =>
+													a.size - b.size || a.displayName.localeCompare(b.displayName, 'ru'),
+											)
+											.map((hero) => {
+												const fits = mySize + hero.size <= match.draft.initialTeamSize;
+												const disabled = !isMyTurn || isBusy || !fits;
+												return (
+													<DraftHeroCard
+														key={hero.code}
+														hero={hero}
+														disabled={disabled}
+														onOpen={setModalHeroCode}
+													/>
+												);
+											})}
 									</SimpleGrid>
 								</Stack>
 							)}
@@ -374,6 +380,7 @@ const TeamPanel = ({
 	isTurn,
 	acceptDrops,
 	canDragUnits,
+	mirrorRows = false,
 }: {
 	title: string;
 	ownerPlayerId: string;
@@ -383,9 +390,31 @@ const TeamPanel = ({
 	isTurn: boolean;
 	acceptDrops: boolean;
 	canDragUnits: boolean;
+	/** Игрок 1: задний слева, передний справа (фронты к центру). */
+	mirrorRows?: boolean;
 }) => {
 	const front = picks.filter((pick) => pick.row === ROW_FRONT);
 	const back = picks.filter((pick) => pick.row === ROW_BACK);
+	const frontZone = (
+		<DraftRowDropZone
+			row={ROW_FRONT}
+			label="Передний ряд"
+			picks={front}
+			acceptDrops={acceptDrops}
+			ownerPlayerId={ownerPlayerId}
+			canDragUnits={canDragUnits}
+		/>
+	);
+	const backZone = (
+		<DraftRowDropZone
+			row={ROW_BACK}
+			label="Задний ряд"
+			picks={back}
+			acceptDrops={acceptDrops}
+			ownerPlayerId={ownerPlayerId}
+			canDragUnits={canDragUnits}
+		/>
+	);
 	return (
 		<Box
 			className="sylvenarr-panel"
@@ -403,22 +432,17 @@ const TeamPanel = ({
 					</Text>
 				</Group>
 				<SimpleGrid cols={2} spacing="sm">
-					<DraftRowDropZone
-						row={ROW_FRONT}
-						label="Передний ряд"
-						picks={front}
-						acceptDrops={acceptDrops}
-						ownerPlayerId={ownerPlayerId}
-						canDragUnits={canDragUnits}
-					/>
-					<DraftRowDropZone
-						row={ROW_BACK}
-						label="Задний ряд"
-						picks={back}
-						acceptDrops={acceptDrops}
-						ownerPlayerId={ownerPlayerId}
-						canDragUnits={canDragUnits}
-					/>
+					{mirrorRows ? (
+						<>
+							{backZone}
+							{frontZone}
+						</>
+					) : (
+						<>
+							{frontZone}
+							{backZone}
+						</>
+					)}
 				</SimpleGrid>
 			</Stack>
 		</Box>

@@ -5,6 +5,8 @@ import { Box, Text } from '@mantine/core';
 import { HeroImage } from '@/entities/hero';
 import type { MatchDraftPick } from '@/entities/match';
 
+import styles from './DraftUnitChip.module.css';
+
 type DraftUnitChipProps = {
 	pick: MatchDraftPick;
 	canDrag: boolean;
@@ -23,7 +25,7 @@ export const DraftUnitChip = ({ pick, canDrag }: DraftUnitChipProps) => {
 	return (
 		<Box
 			ref={setNodeRef}
-			className="sylvenarr-draft-unit"
+			className={styles.unit}
 			data-dragging={isDragging ? 'true' : undefined}
 			style={{
 				transform: CSS.Translate.toString(transform),
@@ -32,7 +34,7 @@ export const DraftUnitChip = ({ pick, canDrag }: DraftUnitChipProps) => {
 			{...(canDrag ? { ...listeners, ...attributes } : {})}
 		>
 			<HeroImage code={pick.heroClassCode} alt={pick.displayName} w={32} h={32} radius={0} />
-			<Text size="sm">
+			<Text className={styles.name} size="sm" lineClamp={1}>
 				{pick.displayName}
 				{pick.size > 1 ? ` (${pick.size})` : ''}
 			</Text>

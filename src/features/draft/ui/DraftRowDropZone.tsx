@@ -2,7 +2,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { Stack, Text } from '@mantine/core';
 
 import type { MatchDraftPick } from '@/entities/match';
-
+import styles from './DraftRowDropZone.module.css';
 import { DraftUnitChip } from './DraftUnitChip';
 
 type DraftRowDropZoneProps = {
@@ -38,7 +38,7 @@ export const DraftRowDropZone = ({
 			</Text>
 			<div
 				ref={setNodeRef}
-				className="sylvenarr-draft-row"
+				className={styles.row}
 				data-over={acceptDrops && isOver ? 'true' : undefined}
 			>
 				{picks.length === 0 ? (

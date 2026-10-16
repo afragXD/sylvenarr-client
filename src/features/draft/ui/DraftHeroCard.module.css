@@ -1,0 +1,86 @@
+.card {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	padding: 0;
+	text-align: left;
+	color: var(--app-text);
+	background: var(--app-surface);
+	border: 1px solid var(--app-border);
+	border-radius: 0;
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 22%, transparent);
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
+	overflow: hidden;
+	transition:
+		transform 120ms ease,
+		box-shadow 120ms ease,
+		opacity 120ms ease,
+		border-color 120ms ease;
+}
+
+.card:hover:not([data-disabled="true"]) {
+	transform: translateY(-2px);
+	border-color: var(--mantine-color-brand-5);
+	box-shadow:
+		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-5) 45%, transparent),
+		0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 28%, transparent);
+}
+
+.card:active:not([data-disabled="true"]) {
+	cursor: grabbing;
+}
+
+.card[data-disabled="true"] {
+	opacity: 0.42;
+	cursor: default;
+	filter: grayscale(0.2);
+}
+
+.portrait {
+	position: relative;
+	aspect-ratio: 3 / 4;
+	width: 100%;
+	overflow: hidden;
+	background: color-mix(in srgb, var(--app-surface-muted) 80%, #000);
+}
+
+.portrait :global(.mantine-Image-root),
+.portrait :global(img) {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.slots {
+	position: absolute;
+	top: 0.35rem;
+	right: 0.35rem;
+	display: flex;
+	gap: 3px;
+	padding: 3px 4px;
+	background: color-mix(in srgb, var(--app-surface) 78%, transparent);
+	border: 1px solid color-mix(in srgb, var(--mantine-color-accent-filled) 55%, var(--app-border));
+	box-shadow: inset 0 0 0 1px
+		color-mix(in srgb, var(--mantine-color-accent-filled) 25%, transparent);
+}
+
+.pip {
+	display: block;
+	width: 7px;
+	height: 7px;
+	background: var(--mantine-color-accent-filled);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, #000 25%, transparent);
+}
+
+.name {
+	padding: 0.4rem 0.45rem 0.5rem;
+	font-family: var(--mantine-font-family-headings);
+	font-size: 0.88rem;
+	font-weight: 600;
+	line-height: 1.25;
+	color: var(--app-text);
+	border-top: 1px solid var(--app-border);
+	background: color-mix(in srgb, var(--app-surface-muted) 55%, var(--app-surface));
+}

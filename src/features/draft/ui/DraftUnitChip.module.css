@@ -1,0 +1,22 @@
+.unit {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	width: 100%;
+	padding: 0.25rem 0.4rem;
+	background: var(--app-surface-muted);
+	border: 1px solid var(--app-border);
+	color: var(--app-text);
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
+}
+
+.unit[data-dragging="true"] {
+	opacity: 0.55;
+}
+
+.name {
+	color: var(--app-text);
+	min-width: 0;
+}
