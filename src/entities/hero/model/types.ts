@@ -14,6 +14,7 @@ export type HeroClass = {
 	power: number;
 	gold: number;
 	accuracy: number;
+	size: number;
 	isPlayable: boolean;
 	sortOrder: number;
 };

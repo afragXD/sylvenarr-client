@@ -9,6 +9,9 @@ const parseMatch = (data: unknown): Match => {
 	if (!isRecord(data) || typeof data.id !== 'string' || typeof data.inviteCode !== 'string') {
 		throw new Error('Некорректный ответ матча');
 	}
+	if (!isRecord(data.draft)) {
+		throw new Error('Некорректный draft state матча');
+	}
 	return data as unknown as Match;
 };
 
@@ -43,6 +46,43 @@ export async function fetchMatchById(id: string): Promise<Match> {
 		undefined,
 		parseMatch,
 		'Матч не найден',
+	);
+}
+
+/**
+ * Пик героя в draft.
+ */
+export async function draftPick(input: {
+	readonly matchId: string;
+	readonly heroCode: string;
+	readonly row: number;
+}): Promise<Match> {
+	return apiFetchJson(
+		`/matches/${encodeURIComponent(input.matchId)}/draft/pick`,
+		{
+			method: 'POST',
+			body: JSON.stringify({ heroCode: input.heroCode, row: input.row }),
+		},
+		parseMatch,
+		'Не удалось выбрать героя',
+	);
+}
+
+/**
+ * Случайный пик в draft.
+ */
+export async function draftRandom(input: {
+	readonly matchId: string;
+	readonly row?: number;
+}): Promise<Match> {
+	return apiFetchJson(
+		`/matches/${encodeURIComponent(input.matchId)}/draft/random`,
+		{
+			method: 'POST',
+			body: JSON.stringify(input.row === undefined ? {} : { row: input.row }),
+		},
+		parseMatch,
+		'Не удалось выбрать случайного героя',
 	);
 }
 
