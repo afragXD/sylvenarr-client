@@ -27,12 +27,12 @@ export const RosterSection = () => {
 			<Stack gap={{ base: 'lg', md: 'xl' }}>
 				<Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
 					<Stack gap={10} maw={{ base: 560, lg: 720 }}>
-						<Text className="sylvenarr-landing-kicker">Каталог печатей</Text>
+						<Text className="sylvenarr-landing-kicker">Герои</Text>
 						<Title order={2} className="sylvenarr-landing-h2">
 							Реестр классов
 						</Title>
 						<Text className="sylvenarr-landing-lead" c="var(--app-text-muted)">
-							Двадцать четыре класса уже высечены в каталоге. Откройте карточку перед набором.
+							Двадцать четыре класса со статами и ролями. Откройте карточку перед набором отряда.
 						</Text>
 					</Stack>
 					<Anchor

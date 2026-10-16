@@ -26,12 +26,12 @@ export const AccountSection = () => {
 		<Box className="sylvenarr-landing-section" component="section">
 			<Stack gap={{ base: 'lg', md: 'xl' }}>
 				<Stack gap={10} maw={{ base: 560, lg: 720 }}>
-					<Text className="sylvenarr-landing-kicker">Печать игрока</Text>
+					<Text className="sylvenarr-landing-kicker">Аккаунт</Text>
 					<Title order={2} className="sylvenarr-landing-h2">
-						Зачем аккаунт
+						Зачем входить
 					</Title>
 					<Text className="sylvenarr-landing-lead" c="var(--app-text-muted)">
-						Арена ведёт учёт по профилю — не по одноразовому гостю.
+						Рейтинг и матчи привязаны к профилю — не к разовой сессии в браузере.
 					</Text>
 				</Stack>
 				<Box className="sylvenarr-ledger">
@@ -50,7 +50,7 @@ export const AccountSection = () => {
 					))}
 				</Box>
 				<Text className="sylvenarr-landing-meta" c="var(--app-text-muted)" ff="monospace">
-					Draft · бой — следующая фаза архива
+					Набор отряда уже открыт · бой — следующая фаза
 				</Text>
 			</Stack>
 		</Box>
