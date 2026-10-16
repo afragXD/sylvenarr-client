@@ -13,25 +13,29 @@ type OAuthProviderButtonProps = {
  * Компактная иконка-кнопка входа через OAuth-провайдера.
  */
 export const OAuthProviderButton = ({ providerId, label }: OAuthProviderButtonProps) => {
-	const icon =
-		providerId === 'yandex' ? (
-			<YandexIcon size={26} />
-		) : (
-			<Text size="sm" fw={700} tt="uppercase" c="var(--app-text)">
-				{label.slice(0, 1)}
-			</Text>
-		);
+	const isYandex = providerId === 'yandex';
+	const icon = isYandex ? (
+		<YandexIcon size={18} />
+	) : (
+		<Text size="sm" fw={700} tt="uppercase" c="var(--app-text)">
+			{label.slice(0, 1)}
+		</Text>
+	);
 
 	return (
 		<ActionIcon
 			component="a"
 			href={getOAuthStartUrl(providerId)}
 			variant="default"
-			size={48}
-			radius={0}
+			size={52}
+			radius={8}
 			aria-label={`Войти через ${label}`}
 			title={`Войти через ${label}`}
-			className="sylvenarr-oauth-icon-btn"
+			className={
+				isYandex
+					? 'sylvenarr-oauth-icon-btn sylvenarr-oauth-icon-btn--yandex'
+					: 'sylvenarr-oauth-icon-btn'
+			}
 		>
 			{icon}
 		</ActionIcon>

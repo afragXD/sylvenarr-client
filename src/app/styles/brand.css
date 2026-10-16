@@ -119,30 +119,111 @@
 	color: var(--mantine-color-brand-5);
 }
 
-.sylvenarr-header-avatar-btn {
-	display: inline-flex;
-	line-height: 0;
-	border: 1px solid var(--app-border);
-	outline: none;
-	transition: border-color 120ms ease;
-}
-
-.sylvenarr-header-avatar-btn:hover,
-.sylvenarr-header-avatar-btn:focus-visible {
-	border-color: var(--mantine-color-brand-5);
-}
-
-.sylvenarr-oauth-icon-btn.mantine-ActionIcon-root {
-	border: 1px solid var(--app-border);
+.sylvenarr-header-dock {
+	align-items: center;
+	padding: 4px;
 	background: var(--app-surface);
+	border: 1px solid var(--app-border);
+	box-shadow:
+		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 28%, transparent),
+		0 0 0 1px color-mix(in srgb, #000 40%, transparent);
+}
+
+.sylvenarr-header-dock__theme.mantine-ActionIcon-root {
+	border: 1px solid var(--app-border);
+	background: color-mix(in srgb, var(--app-surface) 92%, var(--mantine-color-brand-6));
+	box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
 	transition:
 		border-color 120ms ease,
 		background-color 120ms ease;
 }
 
+.sylvenarr-header-dock__theme.mantine-ActionIcon-root:hover {
+	border-color: var(--mantine-color-brand-5);
+	background: color-mix(in srgb, var(--mantine-color-brand-6) 14%, var(--app-surface));
+}
+
+.sylvenarr-header-dock__theme.mantine-ActionIcon-root:focus-visible {
+	outline: 2px solid var(--mantine-color-brand-5);
+	outline-offset: 2px;
+}
+
+.sylvenarr-header-dock__avatar {
+	display: inline-flex;
+	line-height: 0;
+	padding: 0;
+	border: 1px solid var(--app-border);
+	border-radius: 999px;
+	outline: none;
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 35%, transparent);
+	transition:
+		border-color 120ms ease,
+		box-shadow 120ms ease;
+}
+
+.sylvenarr-header-dock__avatar:hover,
+.sylvenarr-header-dock__avatar:focus-visible {
+	border-color: var(--mantine-color-brand-5);
+	box-shadow:
+		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-5) 55%, transparent),
+		0 0 0 2px color-mix(in srgb, var(--mantine-color-brand-6) 28%, transparent);
+}
+
+.sylvenarr-header-dock__signin.mantine-Button-root {
+	height: 36px;
+	border: 1px solid color-mix(in srgb, var(--mantine-color-brand-4) 70%, var(--app-border));
+	box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 14%, transparent);
+}
+
+.sylvenarr-header-dock__menu.mantine-Menu-dropdown {
+	border: 1px solid var(--app-border);
+	background: var(--app-surface);
+	box-shadow:
+		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 22%, transparent),
+		0 12px 28px color-mix(in srgb, #000 40%, transparent);
+}
+
+.sylvenarr-oauth-icon-btn.mantine-ActionIcon-root {
+	border: 1px solid var(--app-border);
+	background: var(--app-surface);
+	border-radius: 8px;
+	box-shadow:
+		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 22%, transparent),
+		inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
+	transition:
+		border-color 120ms ease,
+		background-color 120ms ease,
+		filter 120ms ease;
+}
+
 .sylvenarr-oauth-icon-btn.mantine-ActionIcon-root:hover {
 	border-color: var(--mantine-color-brand-5);
 	background: color-mix(in srgb, var(--mantine-color-brand-6) 12%, var(--app-surface));
+}
+
+.sylvenarr-oauth-icon-btn.mantine-ActionIcon-root:focus-visible {
+	outline: 2px solid var(--mantine-color-brand-5);
+	outline-offset: 2px;
+}
+
+.sylvenarr-oauth-icon-btn--yandex.mantine-ActionIcon-root {
+	color: #fff;
+	background: #fc3f1d;
+	border-color: color-mix(in srgb, #8a1e0c 55%, #fc3f1d);
+	box-shadow:
+		inset 0 0 0 1px color-mix(in srgb, #fff 18%, transparent),
+		inset 0 -1px 0 color-mix(in srgb, #000 18%, transparent);
+}
+
+.sylvenarr-oauth-icon-btn--yandex.mantine-ActionIcon-root:hover {
+	background: #e63516;
+	border-color: color-mix(in srgb, #6e1609 50%, #e63516);
+	filter: brightness(1.04);
+}
+
+.sylvenarr-oauth-icon-btn--yandex.mantine-ActionIcon-root:focus-visible {
+	outline: 2px solid color-mix(in srgb, #fc3f1d 70%, #fff);
+	outline-offset: 2px;
 }
 
 .sylvenarr-plaque {

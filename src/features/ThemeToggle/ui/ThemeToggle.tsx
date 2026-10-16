@@ -13,7 +13,6 @@ export const ThemeToggle = () => {
 	const label = isDark ? 'Светлая тема' : 'Тёмная тема';
 
 	const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
-		// Центр кнопки надёжнее clientX/Y на touch (нулевые/сдвинутые координаты)
 		const rect = event.currentTarget.getBoundingClientRect();
 		const x = rect.left + rect.width / 2;
 		const y = rect.top + rect.height / 2;
@@ -26,13 +25,14 @@ export const ThemeToggle = () => {
 	return (
 		<ActionIcon
 			variant="default"
-			size={32}
+			size={36}
 			radius={0}
 			aria-label={label}
 			title={label}
+			className="sylvenarr-header-dock__theme"
 			onClick={handleClick}
 		>
-			{isDark ? <Sun size={16} /> : <Moon size={16} />}
+			{isDark ? <Sun size={18} /> : <Moon size={18} />}
 		</ActionIcon>
 	);
 };

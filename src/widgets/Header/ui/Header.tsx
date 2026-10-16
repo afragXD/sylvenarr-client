@@ -1,4 +1,4 @@
-import { Anchor, Avatar, Box, Button, Group, Menu, Text, UnstyledButton } from '@mantine/core';
+import { Anchor, Avatar, Box, Button, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -69,32 +69,52 @@ export const Header = () => {
 						))}
 					</Group>
 				</Group>
-				<Group gap="sm" wrap="nowrap">
+
+				<Group className="sylvenarr-header-dock" gap={6} wrap="nowrap">
+					<ThemeToggle />
 					{player ? (
-						<Menu shadow="md" width={220} position="bottom-end" radius={0}>
+						<Menu shadow="md" width={240} position="bottom-end" radius={0}>
 							<Menu.Target>
 								<UnstyledButton
 									aria-label="Меню аккаунта"
-									className="sylvenarr-header-avatar-btn"
-									style={{ borderRadius: 0 }}
+									className="sylvenarr-header-dock__avatar"
 								>
 									<Avatar
 										src={player.avatarUrl}
 										alt={player.displayName}
-										radius={0}
-										size={34}
+										radius="xl"
+										size={36}
 										color="brand"
 									>
 										{initialsFromName(player.displayName)}
 									</Avatar>
 								</UnstyledButton>
 							</Menu.Target>
-							<Menu.Dropdown>
+							<Menu.Dropdown className="sylvenarr-header-dock__menu">
 								<Menu.Label>
-									<Text size="sm" fw={600} c="var(--app-text)" lineClamp={1}>
-										{player.displayName}
-									</Text>
+									<Group gap="sm" wrap="nowrap" align="flex-start">
+										<Avatar
+											src={player.avatarUrl}
+											alt=""
+											radius="xl"
+											size={32}
+											color="brand"
+										>
+											{initialsFromName(player.displayName)}
+										</Avatar>
+										<Stack gap={2} style={{ minWidth: 0 }}>
+											<Text size="sm" fw={600} c="var(--app-text)" lineClamp={1}>
+												{player.displayName}
+											</Text>
+											{player.email ? (
+												<Text size="xs" c="var(--app-text-muted)" lineClamp={1}>
+													{player.email}
+												</Text>
+											) : null}
+										</Stack>
+									</Group>
 								</Menu.Label>
+								<Menu.Divider />
 								<Menu.Item component={Link} to="/lobby">
 									Лобби
 								</Menu.Item>
@@ -119,11 +139,12 @@ export const Header = () => {
 							variant="light"
 							color="brand"
 							size="compact-sm"
+							radius={0}
+							className="sylvenarr-header-dock__signin"
 						>
 							Войти
 						</Button>
 					)}
-					<ThemeToggle />
 				</Group>
 			</Group>
 		</Box>
