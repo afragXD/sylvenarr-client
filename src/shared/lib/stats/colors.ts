@@ -1,7 +1,24 @@
 /**
  * Цвета результата матча и винрейта для Mantine prop `c`.
- * Победа / высокий WR — `moss` (не `brand`: латунь везде в UI).
+ * Победа — `moss` (не `brand`: латунь везде в UI).
+ * Винрейт — плавный градиент accent → тёплый mid → moss (0–100%).
  */
+
+type Rgb = readonly [number, number, number];
+
+/** Accent 6 — поражение */
+const WINRATE_LOW: Rgb = [196, 92, 72];
+/** Тёплый камень между ember и moss (избегаем грязного RGB red↔green) */
+const WINRATE_MID: Rgb = [168, 140, 72];
+/** Moss 6 — победа */
+const WINRATE_HIGH: Rgb = [94, 127, 74];
+
+const lerp = (a: number, b: number, t: number): number => Math.round(a + (b - a) * t);
+
+const lerpRgb = (from: Rgb, to: Rgb, t: number): string => {
+	const clamped = Math.min(1, Math.max(0, t));
+	return `rgb(${lerp(from[0], to[0], clamped)} ${lerp(from[1], to[1], clamped)} ${lerp(from[2], to[2], clamped)})`;
+};
 
 export const getMatchResultColor = (result: 'win' | 'loss' | 'draw'): string | undefined => {
 	if (result === 'win') {
@@ -13,15 +30,11 @@ export const getMatchResultColor = (result: 'win' | 'loss' | 'draw'): string | u
 	return 'var(--app-text-muted)';
 };
 
-export const getWinrateColor = (winrate: number): string | undefined => {
-	if (winrate >= 60) {
-		return 'moss';
+/** Плавный цвет винрейта: 0% → accent, 50% → mid, 100% → moss. */
+export const getWinrateColor = (winrate: number): string => {
+	const t = Math.min(100, Math.max(0, winrate)) / 100;
+	if (t <= 0.5) {
+		return lerpRgb(WINRATE_LOW, WINRATE_MID, t / 0.5);
 	}
-	if (winrate >= 50) {
-		return undefined;
-	}
-	if (winrate >= 40) {
-		return 'var(--app-text-muted)';
-	}
-	return 'accent';
+	return lerpRgb(WINRATE_MID, WINRATE_HIGH, (t - 0.5) / 0.5);
 };
