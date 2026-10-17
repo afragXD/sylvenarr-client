@@ -31,6 +31,11 @@ export type MatchDraftState = {
 	initialTeamSize: number;
 };
 
+export type BattleEffectBrief = {
+	id: string;
+	rounds: number;
+};
+
 export type BattleUnit = {
 	id: string;
 	playerId: string;
@@ -44,6 +49,25 @@ export type BattleUnit = {
 	alive: boolean;
 	defending: boolean;
 	attackStyle: 'melee' | 'ranged' | 'magic';
+	effects: BattleEffectBrief[];
+	isSummon: boolean;
+	horseIsDead: boolean;
+	mana: number;
+};
+
+export type AbilityInfo = {
+	slot: 1 | 2 | 3 | 4 | 5;
+	label: string;
+	needsTarget: boolean;
+	disabledReason: string | null;
+	legalTargetIds: string[];
+};
+
+export type PendingPrompt = {
+	unitId: string;
+	kind: string;
+	slot: 1 | 2 | 3 | 4 | 5;
+	options: { id: string; label: string }[];
 };
 
 export type BattleState = {
@@ -56,6 +80,8 @@ export type BattleState = {
 	legalTargetIds: string[];
 	skillLabel: string | null;
 	legalSkillTargetIds: string[];
+	abilities: AbilityInfo[];
+	pendingPrompt: PendingPrompt | null;
 	units: BattleUnit[];
 };
 

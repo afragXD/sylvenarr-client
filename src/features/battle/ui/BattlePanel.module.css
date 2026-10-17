@@ -85,6 +85,60 @@
 	gap: 0.5rem;
 }
 
+.prompt {
+	padding: 0.65rem 0.75rem;
+	border: 1px solid color-mix(in srgb, var(--mantine-color-accent-filled) 45%, var(--app-border));
+	background: color-mix(in srgb, var(--app-surface-muted) 55%, var(--app-surface));
+}
+
+.effects {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 0.2rem;
+	min-width: 0;
+}
+
+.effectTag,
+.effectOverflow {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.1rem;
+	flex-shrink: 0;
+	min-width: 1.15rem;
+	height: 1.15rem;
+	padding: 0 0.2rem;
+	font-size: 0.65rem;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+	color: var(--app-text-muted);
+	border: 1px solid color-mix(in srgb, var(--app-text) 20%, transparent);
+	background: color-mix(in srgb, var(--app-surface) 70%, transparent);
+}
+
+.effectTag[data-kind="buff"] {
+	border-color: color-mix(in srgb, var(--mantine-color-brand-5) 45%, var(--app-border));
+	color: color-mix(in srgb, var(--mantine-color-brand-6) 70%, var(--app-text));
+}
+
+.effectTag[data-kind="debuff"] {
+	border-color: color-mix(in srgb, var(--mantine-color-accent-filled) 40%, var(--app-border));
+	color: color-mix(in srgb, var(--mantine-color-accent-filled) 65%, var(--app-text));
+}
+
+.effectRounds {
+	font-size: 0.6rem;
+}
+
+.effectOverflow {
+	letter-spacing: 0.02em;
+}
+
+.unit[data-summon="true"] {
+	border-color: color-mix(in srgb, var(--mantine-color-brand-5) 55%, var(--app-border));
+}
+
 .log {
 	max-height: 160px;
 	overflow: auto;

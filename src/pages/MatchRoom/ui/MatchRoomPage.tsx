@@ -142,6 +142,15 @@ export const MatchRoomPage = () => {
 								...battle,
 								skillLabel: battle.skillLabel ?? null,
 								legalSkillTargetIds: battle.legalSkillTargetIds ?? [],
+								abilities: battle.abilities ?? [],
+								pendingPrompt: battle.pendingPrompt ?? null,
+								units: (battle.units ?? []).map((unit) => ({
+									...unit,
+									effects: unit.effects ?? [],
+									isSummon: unit.isSummon ?? false,
+									horseIsDead: unit.horseIsDead ?? false,
+									mana: unit.mana ?? 0,
+								})),
 							},
 						};
 					});
@@ -190,8 +199,10 @@ export const MatchRoomPage = () => {
 
 	const handleBattleAction = async (input: {
 		unitId: string;
-		action: 'attack' | 'defend' | 'wait' | 'skill';
+		action: 'attack' | 'defend' | 'wait' | 'skill' | 'ability';
 		targetId?: string;
+		slot?: 1 | 2 | 3 | 4 | 5;
+		choice?: string;
 	}) => {
 		if (!match) {
 			return;

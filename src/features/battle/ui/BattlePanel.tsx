@@ -1,25 +1,38 @@
-import { Button, Group, Stack, Text } from '@mantine/core';
+import { Button, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useState } from 'react';
 import { HeroImage } from '@/entities/hero';
-import type { BattleState, BattleUnit, Match } from '@/entities/match';
+import type { AbilityInfo, BattleState, BattleUnit, Match } from '@/entities/match';
 
 import styles from './BattlePanel.module.css';
+import { UnitEffects } from './UnitEffects';
 
-type BattleActionKind = 'attack' | 'defend' | 'wait' | 'skill';
+type BattleActionKind = 'attack' | 'defend' | 'wait' | 'skill' | 'ability';
 
 type BattlePanelProps = {
 	match: Match;
 	playerId: string;
 	busy: boolean;
-	onAction: (input: { unitId: string; action: BattleActionKind; targetId?: string }) => void;
+	onAction: (input: {
+		unitId: string;
+		action: BattleActionKind;
+		targetId?: string;
+		slot?: 1 | 2 | 3 | 4 | 5;
+		choice?: string;
+	}) => void;
 };
 
+type PendingMode =
+	| { kind: 'attack' }
+	| { kind: 'skill' }
+	| { kind: 'ability'; slot: 1 | 2 | 3 | 4 | 5 }
+	| null;
+
 /**
- * Поле боя: два фланга, действия активного юнита.
+ * Поле боя: два фланга, слоты 1–5 для пилотов, multi-step prompt.
  */
 export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProps) => {
 	const battle = match.battle;
-	const [pendingMode, setPendingMode] = useState<'attack' | 'skill' | null>(null);
+	const [pendingMode, setPendingMode] = useState<PendingMode>(null);
 
 	if (!battle) {
 		return <Text c="var(--app-text-muted)">Загрузка боя…</Text>;
@@ -29,17 +42,28 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 	const active = battle.units.find((unit) => unit.id === battle.activeUnitId) ?? null;
 	const hostUnits = battle.units.filter((unit) => unit.team === 0);
 	const guestUnits = battle.units.filter((unit) => unit.team === 1);
+	const abilities = battle.abilities ?? [];
+	const isPilot = abilities.length > 0;
 	const skillLabel = battle.skillLabel;
 	const skillNeedsTarget = (battle.legalSkillTargetIds?.length ?? 0) > 0;
-	const highlightTargets =
-		pendingMode === 'attack'
-			? battle.legalTargetIds
-			: pendingMode === 'skill'
-				? (battle.legalSkillTargetIds ?? [])
-				: [];
+	const prompt = battle.pendingPrompt;
+
+	const highlightTargets = (() => {
+		if (!pendingMode) {
+			return [];
+		}
+		if (pendingMode.kind === 'attack') {
+			return battle.legalTargetIds;
+		}
+		if (pendingMode.kind === 'skill') {
+			return battle.legalSkillTargetIds ?? [];
+		}
+		const ability = abilities.find((item) => item.slot === pendingMode.slot);
+		return ability?.legalTargetIds ?? [];
+	})();
 
 	const handleAttackClick = () => {
-		if (!active || !isMyTurn) {
+		if (!active || !isMyTurn || prompt) {
 			return;
 		}
 		if (battle.legalTargetIds.length === 1) {
@@ -47,11 +71,11 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 			setPendingMode(null);
 			return;
 		}
-		setPendingMode('attack');
+		setPendingMode({ kind: 'attack' });
 	};
 
 	const handleSkillClick = () => {
-		if (!active || !isMyTurn || !skillLabel) {
+		if (!active || !isMyTurn || !skillLabel || prompt) {
 			return;
 		}
 		if (!skillNeedsTarget) {
@@ -68,17 +92,61 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 			setPendingMode(null);
 			return;
 		}
-		setPendingMode('skill');
+		setPendingMode({ kind: 'skill' });
+	};
+
+	const handleAbilityClick = (ability: AbilityInfo) => {
+		if (!active || !isMyTurn || prompt || ability.disabledReason) {
+			return;
+		}
+		if (!ability.needsTarget) {
+			onAction({ unitId: active.id, action: 'ability', slot: ability.slot });
+			setPendingMode(null);
+			return;
+		}
+		if (ability.legalTargetIds.length === 1) {
+			onAction({
+				unitId: active.id,
+				action: 'ability',
+				slot: ability.slot,
+				targetId: ability.legalTargetIds[0],
+			});
+			setPendingMode(null);
+			return;
+		}
+		setPendingMode({ kind: 'ability', slot: ability.slot });
 	};
 
 	const handleUnitClick = (unit: BattleUnit) => {
-		if (!pendingMode || !active || !isMyTurn) {
+		if (!pendingMode || !active || !isMyTurn || prompt) {
 			return;
 		}
 		if (!highlightTargets.includes(unit.id)) {
 			return;
 		}
-		onAction({ unitId: active.id, action: pendingMode, targetId: unit.id });
+		if (pendingMode.kind === 'ability') {
+			onAction({
+				unitId: active.id,
+				action: 'ability',
+				slot: pendingMode.slot,
+				targetId: unit.id,
+			});
+		} else {
+			onAction({ unitId: active.id, action: pendingMode.kind, targetId: unit.id });
+		}
+		setPendingMode(null);
+	};
+
+	const handlePromptChoice = (choiceId: string) => {
+		if (!active || !isMyTurn || !prompt) {
+			return;
+		}
+		onAction({
+			unitId: active.id,
+			action: 'ability',
+			slot: prompt.slot,
+			choice: choiceId,
+		});
 		setPendingMode(null);
 	};
 
@@ -92,6 +160,7 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 				{active && battle.outcome === 'ongoing' && (
 					<Text size="sm" c="var(--app-text-muted)">
 						Ходит: {active.displayName}
+						{typeof active.mana === 'number' && active.mana > 0 ? ` · МР ${active.mana}` : ''}
 					</Text>
 				)}
 			</Group>
@@ -115,28 +184,77 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 				/>
 			</div>
 
-			{battle.outcome === 'ongoing' && isMyTurn && active && (
+			{battle.outcome === 'ongoing' && isMyTurn && active && prompt && (
+				<div className={styles.prompt}>
+					<Text size="sm" fw={600} mb={6}>
+						Выберите вариант
+					</Text>
+					<div className={styles.actions}>
+						{prompt.options.map((option) => (
+							<Button
+								key={option.id}
+								color="accent"
+								loading={busy}
+								onClick={() => handlePromptChoice(option.id)}
+							>
+								{option.label}
+							</Button>
+						))}
+					</div>
+				</div>
+			)}
+
+			{battle.outcome === 'ongoing' && isMyTurn && active && !prompt && (
 				<div className={styles.actions}>
-					<Button
-						color="accent"
-						loading={busy}
-						onClick={handleAttackClick}
-						disabled={battle.legalTargetIds.length === 0}
-					>
-						Атака
-						{pendingMode === 'attack' ? ' — выберите цель' : ''}
-					</Button>
-					{skillLabel && (
-						<Button
-							variant="light"
-							color="accent"
-							loading={busy}
-							onClick={handleSkillClick}
-							disabled={skillNeedsTarget && battle.legalSkillTargetIds.length === 0}
-						>
-							{skillLabel}
-							{pendingMode === 'skill' ? ' — выберите цель' : ''}
-						</Button>
+					{isPilot ? (
+						abilities.map((ability) => {
+							const selecting =
+								pendingMode?.kind === 'ability' && pendingMode.slot === ability.slot;
+							const button = (
+								<Button
+									key={ability.slot}
+									variant={ability.slot === 1 ? 'filled' : 'light'}
+									color="accent"
+									loading={busy}
+									disabled={Boolean(ability.disabledReason)}
+									onClick={() => handleAbilityClick(ability)}
+								>
+									[{ability.slot}] {ability.label}
+									{selecting ? ' — цель' : ''}
+								</Button>
+							);
+							return ability.disabledReason ? (
+								<Tooltip key={ability.slot} label={ability.disabledReason}>
+									<span>{button}</span>
+								</Tooltip>
+							) : (
+								button
+							);
+						})
+					) : (
+						<>
+							<Button
+								color="accent"
+								loading={busy}
+								onClick={handleAttackClick}
+								disabled={battle.legalTargetIds.length === 0}
+							>
+								Атака
+								{pendingMode?.kind === 'attack' ? ' — выберите цель' : ''}
+							</Button>
+							{skillLabel && (
+								<Button
+									variant="light"
+									color="accent"
+									loading={busy}
+									onClick={handleSkillClick}
+									disabled={skillNeedsTarget && battle.legalSkillTargetIds.length === 0}
+								>
+									{skillLabel}
+									{pendingMode?.kind === 'skill' ? ' — выберите цель' : ''}
+								</Button>
+							)}
+						</>
 					)}
 					<Button
 						variant="light"
@@ -171,8 +289,8 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 			)}
 
 			<div className={styles.log} aria-live="polite">
-				{battle.log.map((line) => (
-					<div key={line}>{line}</div>
+				{battle.log.map((line, index) => (
+					<div key={`${index}-${line}`}>{line}</div>
 				))}
 			</div>
 		</div>
@@ -255,6 +373,7 @@ const RowColumn = ({
 						data-active={unit.id === activeId ? 'true' : undefined}
 						data-target={legalTargets.includes(unit.id) ? 'true' : undefined}
 						data-dead={unit.alive ? undefined : 'true'}
+						data-summon={unit.isSummon ? 'true' : undefined}
 						onClick={() => onUnitClick(unit)}
 					>
 						<Group gap={6} wrap="nowrap">
@@ -266,13 +385,16 @@ const RowColumn = ({
 								radius={0}
 							/>
 							<Text size="sm" lineClamp={1}>
+								{unit.isSummon ? '✦ ' : ''}
 								{unit.displayName}
 								{unit.defending ? ' 🛡' : ''}
+								{unit.horseIsDead ? ' ✗конь' : ''}
 							</Text>
 						</Group>
 						<Text className={styles.hp}>
 							{unit.health}/{unit.maxHp}
 						</Text>
+						<UnitEffects effects={unit.effects ?? []} />
 					</button>
 				))
 			)}

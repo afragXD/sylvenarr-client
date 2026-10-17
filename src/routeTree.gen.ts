@@ -20,6 +20,7 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as HeroesIndexRouteImport } from './routes/heroes.index'
 import { Route as HeroesCodeRouteImport } from './routes/heroes.$code'
+import { Route as HeroesEffectsRouteImport } from './routes/heroes.effects'
 import { Route as LobbyIndexRouteImport } from './routes/lobby.index'
 import { Route as LobbyMatchIdRouteImport } from './routes/lobby.$matchId'
 import { Route as MatchesIndexRouteImport } from './routes/matches.index'
@@ -80,6 +81,11 @@ const HeroesCodeRoute = HeroesCodeRouteImport.update({
   path: '/$code',
   getParentRoute: () => HeroesRoute,
 } as any)
+const HeroesEffectsRoute = HeroesEffectsRouteImport.update({
+  id: '/effects',
+  path: '/effects',
+  getParentRoute: () => HeroesRoute,
+} as any)
 const LobbyIndexRoute = LobbyIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/heroes/$code': typeof HeroesCodeRoute
+  '/heroes/effects': typeof HeroesEffectsRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/heroes/': typeof HeroesIndexRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/heroes/$code': typeof HeroesCodeRoute
+  '/heroes/effects': typeof HeroesEffectsRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/heroes': typeof HeroesIndexRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/heroes/$code': typeof HeroesCodeRoute
+  '/heroes/effects': typeof HeroesEffectsRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/heroes/': typeof HeroesIndexRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/heroes/$code'
+    | '/heroes/effects'
     | '/lobby/$matchId'
     | '/matches/$matchId'
     | '/heroes/'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/heroes/$code'
+    | '/heroes/effects'
     | '/lobby/$matchId'
     | '/matches/$matchId'
     | '/heroes'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/heroes/$code'
+    | '/heroes/effects'
     | '/lobby/$matchId'
     | '/matches/$matchId'
     | '/heroes/'
@@ -292,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HeroesCodeRouteImport
       parentRoute: typeof HeroesRoute
     }
+    '/heroes/effects': {
+      id: '/heroes/effects'
+      path: '/effects'
+      fullPath: '/heroes/effects'
+      preLoaderRoute: typeof HeroesEffectsRouteImport
+      parentRoute: typeof HeroesRoute
+    }
     '/lobby/': {
       id: '/lobby/'
       path: '/'
@@ -325,11 +344,13 @@ declare module '@tanstack/react-router' {
 
 interface HeroesRouteChildren {
   HeroesCodeRoute: typeof HeroesCodeRoute
+  HeroesEffectsRoute: typeof HeroesEffectsRoute
   HeroesIndexRoute: typeof HeroesIndexRoute
 }
 
 const HeroesRouteChildren: HeroesRouteChildren = {
   HeroesCodeRoute: HeroesCodeRoute,
+  HeroesEffectsRoute: HeroesEffectsRoute,
   HeroesIndexRoute: HeroesIndexRoute,
 }
 

@@ -11,6 +11,8 @@ export {
 	moveDraftPick,
 } from './api/matchesApi';
 export type {
+	AbilityInfo,
+	BattleEffectBrief,
 	BattleState,
 	BattleUnit,
 	Match,
@@ -22,4 +24,5 @@ export type {
 	MatchHistoryUnit,
 	MatchPlayerBrief,
 	MatchStatus,
+	PendingPrompt,
 } from './model/types';

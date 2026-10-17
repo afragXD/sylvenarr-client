@@ -11,6 +11,8 @@ export {
 	fetchHeroByCodeFx,
 	heroPageOpened,
 } from './model/hero-detail';
+export type { HeroAbilityDoc, HeroAbilitySlot } from './model/heroAbilities';
+export { getHeroAbilities } from './model/heroAbilities';
 export {
 	$heroes,
 	$heroesError,

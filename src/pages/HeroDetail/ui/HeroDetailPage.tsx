@@ -6,6 +6,8 @@ import { useEffect } from 'react';
 import { $hero, $heroError, $heroPending, HeroImage, heroPageOpened } from '@/entities/hero';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
+import { HeroAbilitiesSection } from './HeroAbilitiesSection';
+
 const statRows: ReadonlyArray<{ key: keyof StatSource; label: string }> = [
 	{ key: 'health', label: 'Здоровье' },
 	{ key: 'damage', label: 'Урон' },
@@ -139,6 +141,7 @@ export const HeroDetailPage = () => {
 								<StatCell key={stat.key} label={stat.label} value={hero[stat.key]} />
 							))}
 						</SimpleGrid>
+						<HeroAbilitiesSection code={hero.code} isPlayable={hero.isPlayable} />
 					</Stack>
 				</Group>
 			)}

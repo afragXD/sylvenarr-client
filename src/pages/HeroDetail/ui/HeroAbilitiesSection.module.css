@@ -1,0 +1,12 @@
+.section {
+	padding-top: 0.5rem;
+	border-top: 1px solid color-mix(in srgb, var(--app-text) 14%, transparent);
+}
+
+.entry {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding-bottom: 0.65rem;
+	border-bottom: 1px solid color-mix(in srgb, var(--app-text) 10%, transparent);
+}

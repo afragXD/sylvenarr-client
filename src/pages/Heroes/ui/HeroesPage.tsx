@@ -1,4 +1,5 @@
-import { Box, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { Anchor, Box, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { Link } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
 import { useEffect } from 'react';
 
@@ -36,6 +37,9 @@ export const HeroesPage = () => {
 						Двадцать четыре класса Sylvenarr: Origins. Сортируйте по статам и откройте карточку
 						перед набором отряда.
 					</Text>
+					<Anchor component={Link} to="/heroes/effects" size="sm" c="brand" w="fit-content">
+						Кодекс эффектов
+					</Anchor>
 				</Stack>
 				{showTable && (
 					<Text size="sm" c="brand" ff="monospace">
