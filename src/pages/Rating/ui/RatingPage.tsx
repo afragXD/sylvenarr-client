@@ -1,10 +1,17 @@
 import { Box, Group, Loader, Stack, Table, Text, Title } from '@mantine/core';
+import { Medal, Trophy, type LucideIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { fetchRating, type RatingRow } from '@/entities/rating';
 import { ApiError } from '@/shared/api/http';
 import { getWinrateColor } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
+
+const TOP_RANK_ICONS: Record<number, { Icon: LucideIcon; color: string }> = {
+	1: { Icon: Trophy, color: '#C4A35A' },
+	2: { Icon: Medal, color: '#9AA3AD' },
+	3: { Icon: Medal, color: '#B07A4A' },
+};
 
 export const RatingPage = () => {
 	const [rows, setRows] = useState<RatingRow[]>([]);
@@ -69,7 +76,7 @@ export const RatingPage = () => {
 					>
 						<Table.Thead>
 							<Table.Tr>
-								<Table.Th w={64}>#</Table.Th>
+								<Table.Th w={80}>#</Table.Th>
 								<Table.Th>Игрок</Table.Th>
 								<Table.Th>Победы</Table.Th>
 								<Table.Th>Игры</Table.Th>
@@ -77,35 +84,53 @@ export const RatingPage = () => {
 							</Table.Tr>
 						</Table.Thead>
 						<Table.Tbody>
-							{rows.map((row, index) => (
-								<Table.Tr
-									key={row.playerId}
-									style={{ borderBottom: '1px solid var(--app-border)' }}
-								>
-									<Table.Td ff="monospace" c="var(--app-text-muted)">
-										{index + 1}
-									</Table.Td>
-									<Table.Td fw={600}>{row.displayName}</Table.Td>
-									<Table.Td ff="monospace" style={{ fontVariantNumeric: 'tabular-nums' }}>
-										{row.wins}
-									</Table.Td>
-									<Table.Td
-										ff="monospace"
-										c="var(--app-text-muted)"
-										style={{ fontVariantNumeric: 'tabular-nums' }}
+							{rows.map((row, index) => {
+								const rank = index + 1;
+								const meta = TOP_RANK_ICONS[rank];
+								return (
+									<Table.Tr
+										key={row.playerId}
+										style={{ borderBottom: '1px solid var(--app-border)' }}
 									>
-										{row.games}
-									</Table.Td>
-									<Table.Td
-										ff="monospace"
-										c={getWinrateColor(row.winrate)}
-										fw={600}
-										style={{ fontVariantNumeric: 'tabular-nums' }}
-									>
-										{row.winrate}%
-									</Table.Td>
-								</Table.Tr>
-							))}
+										<Table.Td>
+											<Group gap={6} wrap="nowrap" align="center">
+												{meta && (
+													<meta.Icon
+														size={16}
+														strokeWidth={1.75}
+														color={meta.color}
+														fill={meta.color}
+														fillOpacity={0.22}
+														aria-hidden
+													/>
+												)}
+												<Text span ff="monospace" c="var(--app-text-muted)">
+													{rank}
+												</Text>
+											</Group>
+										</Table.Td>
+										<Table.Td fw={600}>{row.displayName}</Table.Td>
+										<Table.Td ff="monospace" style={{ fontVariantNumeric: 'tabular-nums' }}>
+											{row.wins}
+										</Table.Td>
+										<Table.Td
+											ff="monospace"
+											c="var(--app-text-muted)"
+											style={{ fontVariantNumeric: 'tabular-nums' }}
+										>
+											{row.games}
+										</Table.Td>
+										<Table.Td
+											ff="monospace"
+											c={getWinrateColor(row.winrate)}
+											fw={600}
+											style={{ fontVariantNumeric: 'tabular-nums' }}
+										>
+											{row.winrate}%
+										</Table.Td>
+									</Table.Tr>
+								);
+							})}
 						</Table.Tbody>
 					</Table>
 				</Box>
