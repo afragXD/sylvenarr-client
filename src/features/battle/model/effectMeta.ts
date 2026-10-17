@@ -70,7 +70,8 @@ export type EffectId =
 	| 'INVISIBLE'
 	| 'INTERDICT'
 	| 'MAGIC_SHACKLES'
-	| 'ENSLAVED';
+	| 'ENSLAVED'
+	| 'ROW_FORTIFY';
 
 export type EffectKind = 'buff' | 'debuff';
 
@@ -106,6 +107,7 @@ const BUFF_ORDER: EffectId[] = [
 	'FIREDWEAPON',
 	'MIND_WARD',
 	'INVISIBLE',
+	'ROW_FORTIFY',
 ];
 
 const DEBUFF_ORDER: EffectId[] = [
@@ -455,6 +457,15 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		exampleAtL: exampleAt('1 р.'),
 		Icon: Hand,
 		kind: 'debuff',
+	},
+	ROW_FORTIFY: {
+		id: 'ROW_FORTIFY',
+		label: 'Укрепление ряда',
+		description: 'Пассивная броня отряда на ряду (рыцарь, злое дерево и т.п.).',
+		mechanics: '+power брони · 1 р.',
+		exampleAtL: exampleAt('+6 брони · 1 р.'),
+		Icon: Shield,
+		kind: 'buff',
 	},
 };
 

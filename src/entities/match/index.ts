@@ -25,4 +25,5 @@ export type {
 	MatchPlayerBrief,
 	MatchStatus,
 	PendingPrompt,
+	TurnOrderEntry,
 } from './model/types';

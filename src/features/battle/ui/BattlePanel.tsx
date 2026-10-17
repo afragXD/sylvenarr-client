@@ -1,12 +1,16 @@
 import { Button, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useState } from 'react';
-import { HeroImage } from '@/entities/hero';
+
+import { getHeroAbilities, HeroImage } from '@/entities/hero';
 import type { AbilityInfo, BattleState, BattleUnit, Match } from '@/entities/match';
 
+import { AbilityTags } from './AbilityTags';
 import styles from './BattlePanel.module.css';
+import { TurnOrderStrip } from './TurnOrderStrip';
 import { UnitEffects } from './UnitEffects';
+import { UnitInspectModal } from './UnitInspectModal';
 
-type BattleActionKind = 'attack' | 'defend' | 'wait' | 'skill' | 'ability';
+type BattleActionKind = 'attack' | 'defend' | 'wait' | 'skill' | 'ability' | 'move';
 
 type BattlePanelProps = {
 	match: Match;
@@ -27,12 +31,26 @@ type PendingMode =
 	| { kind: 'ability'; slot: 1 | 2 | 3 | 4 | 5 }
 	| null;
 
+type ConfirmState = {
+	title: string;
+	detail: string;
+	isAoe: boolean;
+	payload: {
+		unitId: string;
+		action: BattleActionKind;
+		targetId?: string;
+		slot?: 1 | 2 | 3 | 4 | 5;
+	};
+};
+
 /**
- * Поле боя: два фланга, слоты 1–5 для пилотов, multi-step prompt.
+ * Поле боя: очередь, лог справа, слоты 1–5, подтверждение, инспектор.
  */
 export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProps) => {
 	const battle = match.battle;
 	const [pendingMode, setPendingMode] = useState<PendingMode>(null);
+	const [confirm, setConfirm] = useState<ConfirmState | null>(null);
+	const [inspectUnit, setInspectUnit] = useState<BattleUnit | null>(null);
 
 	if (!battle) {
 		return <Text c="var(--app-text-muted)">Загрузка боя…</Text>;
@@ -47,6 +65,9 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 	const skillLabel = battle.skillLabel;
 	const skillNeedsTarget = (battle.legalSkillTargetIds?.length ?? 0) > 0;
 	const prompt = battle.pendingPrompt;
+	const abilityDocs = active
+		? getHeroAbilities(active.heroClassCode, true).slots
+		: [];
 
 	const highlightTargets = (() => {
 		if (!pendingMode) {
@@ -62,16 +83,62 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 		return ability?.legalTargetIds ?? [];
 	})();
 
+	const openConfirm = (next: ConfirmState) => {
+		setConfirm(next);
+		setPendingMode(null);
+	};
+
+	const commitConfirm = () => {
+		if (!confirm) {
+			return;
+		}
+		onAction(confirm.payload);
+		setConfirm(null);
+	};
+
+	const requestAbility = (ability: AbilityInfo, targetId?: string) => {
+		if (!active) {
+			return;
+		}
+		const doc = abilityDocs.find((slot) => slot.slot === ability.slot);
+		const isAoe = Boolean(doc?.tags.includes('aoe')) || !ability.needsTarget;
+		const targetName = targetId
+			? (battle.units.find((unit) => unit.id === targetId)?.displayName ?? 'цель')
+			: null;
+		openConfirm({
+			title: ability.label,
+			detail: isAoe
+				? 'Действие затронет несколько целей или область.'
+				: targetName
+					? `Цель: ${targetName}`
+					: 'Подтвердите применение.',
+			isAoe,
+			payload: {
+				unitId: active.id,
+				action: 'ability',
+				slot: ability.slot,
+				targetId,
+			},
+		});
+	};
+
 	const handleAttackClick = () => {
 		if (!active || !isMyTurn || prompt) {
 			return;
 		}
 		if (battle.legalTargetIds.length === 1) {
-			onAction({ unitId: active.id, action: 'attack', targetId: battle.legalTargetIds[0] });
-			setPendingMode(null);
+			const targetId = battle.legalTargetIds[0]!;
+			const name = battle.units.find((unit) => unit.id === targetId)?.displayName ?? 'цель';
+			openConfirm({
+				title: 'Атака',
+				detail: `Цель: ${name}`,
+				isAoe: false,
+				payload: { unitId: active.id, action: 'attack', targetId },
+			});
 			return;
 		}
 		setPendingMode({ kind: 'attack' });
+		setConfirm(null);
 	};
 
 	const handleSkillClick = () => {
@@ -79,20 +146,27 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 			return;
 		}
 		if (!skillNeedsTarget) {
-			onAction({ unitId: active.id, action: 'skill' });
-			setPendingMode(null);
+			openConfirm({
+				title: skillLabel,
+				detail: 'Действие без выбора цели.',
+				isAoe: true,
+				payload: { unitId: active.id, action: 'skill' },
+			});
 			return;
 		}
 		if (battle.legalSkillTargetIds.length === 1) {
-			onAction({
-				unitId: active.id,
-				action: 'skill',
-				targetId: battle.legalSkillTargetIds[0],
+			const targetId = battle.legalSkillTargetIds[0]!;
+			const name = battle.units.find((unit) => unit.id === targetId)?.displayName ?? 'цель';
+			openConfirm({
+				title: skillLabel,
+				detail: `Цель: ${name}`,
+				isAoe: false,
+				payload: { unitId: active.id, action: 'skill', targetId },
 			});
-			setPendingMode(null);
 			return;
 		}
 		setPendingMode({ kind: 'skill' });
+		setConfirm(null);
 	};
 
 	const handleAbilityClick = (ability: AbilityInfo) => {
@@ -100,41 +174,42 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 			return;
 		}
 		if (!ability.needsTarget) {
-			onAction({ unitId: active.id, action: 'ability', slot: ability.slot });
-			setPendingMode(null);
+			requestAbility(ability);
 			return;
 		}
 		if (ability.legalTargetIds.length === 1) {
-			onAction({
-				unitId: active.id,
-				action: 'ability',
-				slot: ability.slot,
-				targetId: ability.legalTargetIds[0],
-			});
-			setPendingMode(null);
+			requestAbility(ability, ability.legalTargetIds[0]);
 			return;
 		}
 		setPendingMode({ kind: 'ability', slot: ability.slot });
+		setConfirm(null);
 	};
 
 	const handleUnitClick = (unit: BattleUnit) => {
-		if (!pendingMode || !active || !isMyTurn || prompt) {
+		if (pendingMode && active && isMyTurn && !prompt && highlightTargets.includes(unit.id)) {
+			if (pendingMode.kind === 'ability') {
+				const ability = abilities.find((item) => item.slot === pendingMode.slot);
+				if (ability) {
+					requestAbility(ability, unit.id);
+				}
+			} else if (pendingMode.kind === 'attack') {
+				openConfirm({
+					title: 'Атака',
+					detail: `Цель: ${unit.displayName}`,
+					isAoe: false,
+					payload: { unitId: active.id, action: 'attack', targetId: unit.id },
+				});
+			} else {
+				openConfirm({
+					title: skillLabel ?? 'Навык',
+					detail: `Цель: ${unit.displayName}`,
+					isAoe: false,
+					payload: { unitId: active.id, action: 'skill', targetId: unit.id },
+				});
+			}
 			return;
 		}
-		if (!highlightTargets.includes(unit.id)) {
-			return;
-		}
-		if (pendingMode.kind === 'ability') {
-			onAction({
-				unitId: active.id,
-				action: 'ability',
-				slot: pendingMode.slot,
-				targetId: unit.id,
-			});
-		} else {
-			onAction({ unitId: active.id, action: pendingMode.kind, targetId: unit.id });
-		}
-		setPendingMode(null);
+		setInspectUnit(unit);
 	};
 
 	const handlePromptChoice = (choiceId: string) => {
@@ -148,6 +223,7 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 			choice: choiceId,
 		});
 		setPendingMode(null);
+		setConfirm(null);
 	};
 
 	return (
@@ -165,24 +241,59 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 				)}
 			</Group>
 
-			<div className={styles.field}>
-				<TeamSide
-					title={`Игрок 1 · ${match.host.displayName}`}
-					units={hostUnits}
-					mirror
-					activeId={battle.activeUnitId}
-					legalTargets={highlightTargets}
-					onUnitClick={handleUnitClick}
-				/>
-				<TeamSide
-					title={`Игрок 2 · ${match.guest?.displayName ?? '…'}`}
-					units={guestUnits}
-					mirror={false}
-					activeId={battle.activeUnitId}
-					legalTargets={highlightTargets}
-					onUnitClick={handleUnitClick}
-				/>
+			<TurnOrderStrip entries={battle.turnOrder ?? []} />
+
+			<div className={styles.battlefield}>
+				<div className={styles.field}>
+					<TeamSide
+						title={`Игрок 1 · ${match.host.displayName}`}
+						units={hostUnits}
+						mirror
+						activeId={battle.activeUnitId}
+						legalTargets={highlightTargets}
+						onUnitClick={handleUnitClick}
+					/>
+					<TeamSide
+						title={`Игрок 2 · ${match.guest?.displayName ?? '…'}`}
+						units={guestUnits}
+						mirror={false}
+						activeId={battle.activeUnitId}
+						legalTargets={highlightTargets}
+						onUnitClick={handleUnitClick}
+					/>
+				</div>
+				<div className={styles.log} aria-live="polite">
+					<Text size="xs" c="var(--app-text-muted)" mb={6}>
+						Журнал
+					</Text>
+					{battle.log.map((line, index) => (
+						<div key={`${index}-${line}`}>{line}</div>
+					))}
+				</div>
 			</div>
+
+			{confirm && isMyTurn && (
+				<div className={styles.confirm} data-aoe={confirm.isAoe ? 'true' : undefined}>
+					<Text size="sm" fw={600}>
+						{confirm.title}
+					</Text>
+					<Text size="sm" c="var(--app-text-muted)">
+						{confirm.detail}
+					</Text>
+					<Group gap="sm" mt={8}>
+						<Button color="accent" loading={busy} onClick={commitConfirm}>
+							Подтвердить
+						</Button>
+						<Button
+							variant="default"
+							disabled={busy}
+							onClick={() => setConfirm(null)}
+						>
+							Отмена
+						</Button>
+					</Group>
+				</div>
+			)}
 
 			{battle.outcome === 'ongoing' && isMyTurn && active && prompt && (
 				<div className={styles.prompt}>
@@ -204,12 +315,18 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 				</div>
 			)}
 
-			{battle.outcome === 'ongoing' && isMyTurn && active && !prompt && (
+			{battle.outcome === 'ongoing' && isMyTurn && active && !prompt && !confirm && (
 				<div className={styles.actions}>
 					{isPilot ? (
 						abilities.map((ability) => {
 							const selecting =
 								pendingMode?.kind === 'ability' && pendingMode.slot === ability.slot;
+							const doc = abilityDocs.find((slot) => slot.slot === ability.slot);
+							const tip = ability.disabledReason
+								? ability.disabledReason
+								: doc
+									? `${doc.title}: ${doc.body}\n${doc.mechanics}`
+									: ability.label;
 							const button = (
 								<Button
 									key={ability.slot}
@@ -218,17 +335,21 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 									loading={busy}
 									disabled={Boolean(ability.disabledReason)}
 									onClick={() => handleAbilityClick(ability)}
+									leftSection={doc ? <AbilityTags tags={doc.tags} size={12} /> : undefined}
 								>
 									[{ability.slot}] {ability.label}
 									{selecting ? ' — цель' : ''}
 								</Button>
 							);
-							return ability.disabledReason ? (
-								<Tooltip key={ability.slot} label={ability.disabledReason}>
+							return (
+								<Tooltip
+									key={ability.slot}
+									label={<Text size="xs" style={{ whiteSpace: 'pre-wrap' }}>{tip}</Text>}
+									multiline
+									maw={280}
+								>
 									<span>{button}</span>
 								</Tooltip>
-							) : (
-								button
 							);
 						})
 					) : (
@@ -262,16 +383,30 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 						loading={busy}
 						onClick={() => {
 							setPendingMode(null);
+							setConfirm(null);
 							onAction({ unitId: active.id, action: 'defend' });
 						}}
 					>
 						Защита
 					</Button>
 					<Button
+						variant="light"
+						color="brand"
+						loading={busy}
+						onClick={() => {
+							setPendingMode(null);
+							setConfirm(null);
+							onAction({ unitId: active.id, action: 'move' });
+						}}
+					>
+						Сменить ряд
+					</Button>
+					<Button
 						variant="default"
 						loading={busy}
 						onClick={() => {
 							setPendingMode(null);
+							setConfirm(null);
 							onAction({ unitId: active.id, action: 'wait' });
 						}}
 					>
@@ -288,11 +423,7 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 				</Stack>
 			)}
 
-			<div className={styles.log} aria-live="polite">
-				{battle.log.map((line, index) => (
-					<div key={`${index}-${line}`}>{line}</div>
-				))}
-			</div>
+			<UnitInspectModal unit={inspectUnit} onClose={() => setInspectUnit(null)} />
 		</div>
 	);
 };
@@ -342,6 +473,14 @@ const TeamSide = ({
 	);
 };
 
+const sortRowUnits = (units: BattleUnit[]): BattleUnit[] =>
+	[...units].sort((a, b) => {
+		if (a.alive !== b.alive) {
+			return a.alive ? -1 : 1;
+		}
+		return a.column - b.column;
+	});
+
 const RowColumn = ({
 	label,
 	units,
@@ -354,53 +493,58 @@ const RowColumn = ({
 	activeId: string | null;
 	legalTargets: string[];
 	onUnitClick: (unit: BattleUnit) => void;
-}) => (
-	<div>
-		<Text size="xs" c="var(--app-text-muted)" mb={4}>
-			{label}
-		</Text>
-		<div className={styles.row}>
-			{units.length === 0 ? (
-				<Text size="sm" c="var(--app-text-muted)">
-					—
-				</Text>
-			) : (
-				units.map((unit) => (
-					<button
-						key={unit.id}
-						type="button"
-						className={styles.unit}
-						data-active={unit.id === activeId ? 'true' : undefined}
-						data-target={legalTargets.includes(unit.id) ? 'true' : undefined}
-						data-dead={unit.alive ? undefined : 'true'}
-						data-summon={unit.isSummon ? 'true' : undefined}
-						onClick={() => onUnitClick(unit)}
-					>
-						<Group gap={6} wrap="nowrap">
-							<HeroImage
-								code={unit.heroClassCode}
-								alt={unit.displayName}
-								w={28}
-								h={28}
-								radius={0}
-							/>
-							<Text size="sm" lineClamp={1}>
-								{unit.isSummon ? '✦ ' : ''}
-								{unit.displayName}
-								{unit.defending ? ' 🛡' : ''}
-								{unit.horseIsDead ? ' ✗конь' : ''}
+}) => {
+	const ordered = sortRowUnits(units);
+	return (
+		<div>
+			<Text size="xs" c="var(--app-text-muted)" mb={4}>
+				{label}
+			</Text>
+			<div className={styles.row}>
+				{ordered.length === 0 ? (
+					<Text size="sm" c="var(--app-text-muted)">
+						—
+					</Text>
+				) : (
+					ordered.map((unit) => (
+						<button
+							key={unit.id}
+							type="button"
+							className={styles.unit}
+							data-active={unit.id === activeId ? 'true' : undefined}
+							data-target={legalTargets.includes(unit.id) ? 'true' : undefined}
+							data-dead={unit.alive ? undefined : 'true'}
+							data-summon={unit.isSummon ? 'true' : undefined}
+							data-inspectable="true"
+							onClick={() => onUnitClick(unit)}
+						>
+							<Group gap={6} wrap="nowrap">
+								<HeroImage
+									code={unit.heroClassCode}
+									alt={unit.displayName}
+									w={28}
+									h={28}
+									radius={0}
+								/>
+								<Text size="sm" lineClamp={1}>
+									{unit.isSummon ? '✦ ' : ''}
+									{unit.displayName}
+									{unit.defending ? ' 🛡' : ''}
+									{unit.horseIsDead ? ' ✗конь' : ''}
+								</Text>
+							</Group>
+							<Text className={styles.hp}>
+								{unit.health}/{unit.maxHp}
+								{typeof unit.armor === 'number' ? ` · Бр ${unit.armor}` : ''}
 							</Text>
-						</Group>
-						<Text className={styles.hp}>
-							{unit.health}/{unit.maxHp}
-						</Text>
-						<UnitEffects effects={unit.effects ?? []} />
-					</button>
-				))
-			)}
+							<UnitEffects effects={unit.effects ?? []} />
+						</button>
+					))
+				)}
+			</div>
 		</div>
-	</div>
-);
+	);
+};
 
 const outcomeLabel = (battle: BattleState, playerId: string): string => {
 	if (battle.outcome === 'draw') {

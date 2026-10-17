@@ -1,7 +1,7 @@
-import { Anchor, Box, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { Anchor, Box, Group, Loader, Stack, Text, TextInput, Title } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
 	$heroes,
@@ -20,6 +20,25 @@ export const HeroesPage = () => {
 		isPending: $heroesPending,
 		isReady: $heroesReady,
 	});
+	const [query, setQuery] = useState('');
+	const filtered = useMemo(() => {
+		const q = query.trim().toLocaleLowerCase('ru');
+		if (!q) {
+			return heroes;
+		}
+		return heroes.filter((hero) => {
+			const hay = [
+				hero.displayName,
+				hero.code,
+				hero.roleSummary ?? '',
+				hero.description ?? '',
+			]
+				.join(' ')
+				.toLocaleLowerCase('ru');
+			return hay.includes(q);
+		});
+	}, [heroes, query]);
+
 	const showLoader = heroes.length === 0 && (isPending || !isReady);
 	const showEmpty = isReady && !isPending && !error && heroes.length === 0;
 	const showTable = heroes.length > 0;
@@ -34,8 +53,8 @@ export const HeroesPage = () => {
 				<Stack gap={6} maw={640}>
 					<Title order={1}>Реестр героев</Title>
 					<Text c="var(--app-text-muted)">
-						Двадцать четыре класса Sylvenarr: Origins. Сортируйте по статам и откройте карточку
-						перед набором отряда.
+						Классы Sylvenarr: Origins по алфавиту. Сортируйте по статам и откройте карточку перед
+						набором отряда.
 					</Text>
 					<Anchor component={Link} to="/heroes/effects" size="sm" c="brand" w="fit-content">
 						Кодекс эффектов
@@ -43,10 +62,21 @@ export const HeroesPage = () => {
 				</Stack>
 				{showTable && (
 					<Text size="sm" c="brand" ff="monospace">
-						{heroes.length} классов в каталоге
+						{filtered.length === heroes.length
+							? `${heroes.length} классов в каталоге`
+							: `${filtered.length} из ${heroes.length}`}
 					</Text>
 				)}
 			</Group>
+			{showTable && (
+				<TextInput
+					placeholder="Поиск по имени, коду, описанию…"
+					value={query}
+					onChange={(event) => setQuery(event.currentTarget.value)}
+					maw={360}
+					aria-label="Поиск героев"
+				/>
+			)}
 			{showLoader && (
 				<Group gap="sm">
 					<Loader color="brand" size="sm" />
@@ -65,9 +95,12 @@ export const HeroesPage = () => {
 					В каталоге пока нет классов — запустите seed на сервисе.
 				</Text>
 			)}
-			{showTable && (
+			{showTable && filtered.length === 0 && (
+				<Text c="var(--app-text-muted)">Ничего не найдено по запросу «{query.trim()}».</Text>
+			)}
+			{showTable && filtered.length > 0 && (
 				<Box style={{ overflowX: 'auto' }}>
-					<HeroesTable data={heroes} />
+					<HeroesTable data={filtered} />
 				</Box>
 			)}
 		</PageFrame>

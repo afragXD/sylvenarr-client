@@ -54,6 +54,25 @@ export type BattleUnit = {
 	isSummon: boolean;
 	horseIsDead: boolean;
 	mana: number;
+	damage: number;
+	armor: number;
+	initiative: number;
+	dodge: number;
+	luck: number;
+	accuracy: number;
+	power: number;
+	gold: number;
+	critBank: number;
+	ultaCharges: number;
+};
+
+export type TurnOrderEntry = {
+	unitId: string;
+	displayName: string;
+	heroClassCode: string;
+	team: 0 | 1;
+	alive: boolean;
+	isActive: boolean;
 };
 
 export type AbilityInfo = {
@@ -78,6 +97,7 @@ export type BattleState = {
 	outcome: 'ongoing' | 'host_win' | 'guest_win' | 'draw';
 	winnerPlayerId: string | null;
 	log: string[];
+	turnOrder: TurnOrderEntry[];
 	legalTargetIds: string[];
 	skillLabel: string | null;
 	legalSkillTargetIds: string[];

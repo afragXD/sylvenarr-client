@@ -199,7 +199,7 @@ export const MatchRoomPage = () => {
 
 	const handleBattleAction = async (input: {
 		unitId: string;
-		action: 'attack' | 'defend' | 'wait' | 'skill' | 'ability';
+		action: 'attack' | 'defend' | 'wait' | 'skill' | 'ability' | 'move';
 		targetId?: string;
 		slot?: 1 | 2 | 3 | 4 | 5;
 		choice?: string;

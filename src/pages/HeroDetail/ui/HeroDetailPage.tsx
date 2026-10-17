@@ -9,6 +9,7 @@ import { PageFrame } from '@/shared/ui/PageFrame';
 import { HeroAbilitiesSection } from './HeroAbilitiesSection';
 
 const statRows: ReadonlyArray<{ key: keyof StatSource; label: string }> = [
+	{ key: 'size', label: 'Клетки' },
 	{ key: 'health', label: 'Здоровье' },
 	{ key: 'damage', label: 'Урон' },
 	{ key: 'armor', label: 'Броня' },
@@ -23,6 +24,7 @@ const statRows: ReadonlyArray<{ key: keyof StatSource; label: string }> = [
 ];
 
 type StatSource = {
+	size: number;
 	health: number;
 	damage: number;
 	armor: number;
@@ -138,7 +140,12 @@ export const HeroDetailPage = () => {
 						</Stack>
 						<SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} spacing="xs">
 							{statRows.map((stat) => (
-								<StatCell key={stat.key} label={stat.label} value={hero[stat.key]} />
+								<StatCell
+									key={stat.key}
+									statKey={stat.key}
+									label={stat.label}
+									value={hero[stat.key]}
+								/>
 							))}
 						</SimpleGrid>
 						<HeroAbilitiesSection code={hero.code} isPlayable={hero.isPlayable} />
@@ -149,11 +156,11 @@ export const HeroDetailPage = () => {
 	);
 };
 
-const StatCell = ({ label, value }: { label: string; value: number }) => (
+const StatCell = ({ label, value, statKey }: { label: string; value: number; statKey: string }) => (
 	<Box className="sylvenarr-stat-cell">
 		<Text className="sylvenarr-stat-cell__label">{label}</Text>
 		<Text className="sylvenarr-stat-cell__value" style={{ fontVariantNumeric: 'tabular-nums' }}>
-			{value}
+			{statKey === 'size' ? (value > 1 ? 'II' : 'I') : value}
 		</Text>
 	</Box>
 );

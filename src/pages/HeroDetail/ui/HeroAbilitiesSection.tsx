@@ -1,7 +1,8 @@
-import { Anchor, Stack, Text, Title } from '@mantine/core';
+import { Anchor, Group, Stack, Text, Title } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 
 import { getHeroAbilities } from '@/entities/hero';
+import { AbilityTags } from '@/features/battle';
 
 import styles from './HeroAbilitiesSection.module.css';
 
@@ -36,16 +37,27 @@ export const HeroAbilitiesSection = ({ code, isPlayable }: HeroAbilitiesSectionP
 					<Text size="sm" c="var(--app-text-muted)" style={{ lineHeight: 1.5 }}>
 						{doc.passive.body}
 					</Text>
+					{doc.passive.mechanics && (
+						<Text size="xs" c="var(--app-text-muted)" mt={4} style={{ lineHeight: 1.45 }}>
+							{doc.passive.mechanics}
+						</Text>
+					)}
 				</div>
 			)}
 
 			{doc.slots.map((slot) => (
 				<div key={slot.slot} className={styles.entry}>
-					<Text size="sm" fw={600}>
-						[{slot.slot}] {slot.title}
-					</Text>
+					<Group gap={8} wrap="nowrap">
+						<AbilityTags tags={slot.tags} />
+						<Text size="sm" fw={600}>
+							[{slot.slot}] {slot.title}
+						</Text>
+					</Group>
 					<Text size="sm" c="var(--app-text-muted)" style={{ lineHeight: 1.5 }}>
 						{slot.body}
+					</Text>
+					<Text size="xs" c="var(--app-text-muted)" mt={4} style={{ lineHeight: 1.45 }}>
+						{slot.mechanics}
 					</Text>
 				</div>
 			))}

@@ -1,21 +1,37 @@
-export type HeroAbilitySlot = {
+import type { AbilityTag } from './abilityTags';
+import { PILOT_EXTRAS } from './heroAbilityExtras';
+
+export type { AbilityTag } from './abilityTags';
+
+type RawAbilitySlot = {
 	slot: 1 | 2 | 3 | 4 | 5;
 	title: string;
 	body: string;
 };
 
+export type HeroAbilitySlot = RawAbilitySlot & {
+	mechanics: string;
+	tags: AbilityTag[];
+};
+
 export type HeroAbilityDoc = {
-	passive?: { title: string; body: string };
+	passive?: { title: string; body: string; mechanics?: string };
 	slots: HeroAbilitySlot[];
 	/** Краткий блок для призывных существ без полноценных слотов. */
 	summonNote?: string;
 };
 
-const PILOTS: Record<string, HeroAbilityDoc> = {
+type RawHeroAbilityDoc = {
+	passive?: { title: string; body: string };
+	slots: RawAbilitySlot[];
+	summonNote?: string;
+};
+
+const PILOTS: Record<string, RawHeroAbilityDoc> = {
 	Knight: {
 		passive: {
 			title: 'Укрепление ряда',
-			body: 'В начале хода усиливает броню союзников на своём ряду. При падении ОЗ ниже половины конь гибнет — кавалерийская пика становится недоступна.',
+			body: 'В начале хода усиливает броню союзников на своём ряду (эффект Укрепление ряда). При падении ОЗ ниже половины конь гибнет — кавалерийская пика становится недоступна.',
 		},
 		slots: [
 			{
@@ -131,7 +147,7 @@ const PILOTS: Record<string, HeroAbilityDoc> = {
 			{
 				slot: 4,
 				title: 'Глубинная защита',
-				body: 'Огненный щит на себя и регенерация выбранному союзнику.',
+				body: 'Накладывает на себя эффект «Под охраной» (GUARDED) и регенерацию выбранному союзнику. Не связано с огненным оружием и кнопкой «Защита».',
 			},
 			{
 				slot: 5,
@@ -655,6 +671,10 @@ const PILOTS: Record<string, HeroAbilityDoc> = {
 		],
 	},
 	EvilTree: {
+		passive: {
+			title: 'Укрепление ряда',
+			body: 'В начале хода усиливает броню союзников на своём ряду (эффект Укрепление ряда).',
+		},
 		slots: [
 			{
 				slot: 1,
@@ -746,13 +766,34 @@ const PILOTS: Record<string, HeroAbilityDoc> = {
 /** Lite-слоты для не-пилотов (attack + skill, если есть). */
 const LITE_SKILL: Record<string, { title: string; body: string }> = {};
 
+function enrichDoc(code: string, raw: RawHeroAbilityDoc): HeroAbilityDoc {
+	const extras = PILOT_EXTRAS[code];
+	return {
+		summonNote: raw.summonNote,
+		passive: raw.passive
+			? {
+					...raw.passive,
+					mechanics: extras?.passiveMechanics,
+				}
+			: undefined,
+		slots: raw.slots.map((slot) => {
+			const extra = extras?.slots[slot.slot];
+			return {
+				...slot,
+				mechanics: extra?.mechanics ?? 'См. описание способности.',
+				tags: extra?.tags ?? (['attack'] as AbilityTag[]),
+			};
+		}),
+	};
+}
+
 /**
  * Документация способностей героя для карточки /heroes/$code.
  */
 export function getHeroAbilities(code: string, isPlayable: boolean): HeroAbilityDoc {
 	const pilot = PILOTS[code];
 	if (pilot) {
-		return pilot;
+		return enrichDoc(code, pilot);
 	}
 
 	if (!isPlayable) {
@@ -769,6 +810,8 @@ export function getHeroAbilities(code: string, isPlayable: boolean): HeroAbility
 			slot: 1,
 			title: 'Основная атака',
 			body: 'Стандартное действие хода по правилам стиля атаки класса (ближний / дальний / магия).',
+			mechanics: 'Урон по стилю атаки класса.',
+			tags: ['attack'],
 		},
 	];
 	if (skill) {
@@ -776,6 +819,8 @@ export function getHeroAbilities(code: string, isPlayable: boolean): HeroAbility
 			slot: 2,
 			title: skill.title,
 			body: skill.body,
+			mechanics: skill.body,
+			tags: ['attack'],
 		});
 	}
 	return { slots };

@@ -1,0 +1,42 @@
+.row {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.2rem;
+	flex-shrink: 0;
+}
+
+.tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.2rem;
+	height: 1.2rem;
+	border: 1px solid var(--app-border);
+	background: color-mix(in srgb, var(--app-surface) 80%, transparent);
+	color: var(--app-text-muted);
+}
+
+.tag[data-tag='buff'] {
+	border-color: color-mix(in srgb, var(--mantine-color-brand-5) 50%, var(--app-border));
+	color: color-mix(in srgb, var(--mantine-color-brand-6) 75%, var(--app-text));
+}
+
+.tag[data-tag='debuff'] {
+	border-color: color-mix(in srgb, var(--mantine-color-accent-filled) 45%, var(--app-border));
+	color: color-mix(in srgb, var(--mantine-color-accent-filled) 70%, var(--app-text));
+}
+
+.tag[data-tag='attack'],
+.tag[data-tag='aoe'] {
+	border-color: color-mix(in srgb, var(--app-text) 35%, var(--app-border));
+	color: var(--app-text);
+}
+
+.tag[data-tag='heal'] {
+	border-color: color-mix(in srgb, var(--mantine-color-brand-4) 40%, var(--app-border));
+	color: color-mix(in srgb, var(--mantine-color-brand-5) 60%, var(--app-text));
+}
+
+.tag[data-tag='summon'] {
+	border-color: color-mix(in srgb, var(--mantine-color-brand-6) 40%, var(--app-border));
+}

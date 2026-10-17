@@ -1,0 +1,58 @@
+.strip {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	padding: 0.5rem 0.65rem;
+	border: 1px solid var(--app-border);
+	background:
+		linear-gradient(
+			90deg,
+			color-mix(in srgb, var(--app-surface-muted) 40%, transparent),
+			var(--app-surface) 12%,
+			var(--app-surface) 88%,
+			color-mix(in srgb, var(--app-surface-muted) 40%, transparent)
+		);
+}
+
+.label {
+	letter-spacing: 0.02em;
+}
+
+.track {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: flex-end;
+	gap: 0.35rem;
+	overflow-x: auto;
+	padding-bottom: 0.15rem;
+}
+
+.portrait {
+	flex-shrink: 0;
+	border: 2px solid var(--app-border);
+	background: var(--app-surface-muted);
+	line-height: 0;
+	opacity: 0.85;
+	transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.portrait[data-team='0'] {
+	border-color: color-mix(in srgb, var(--mantine-color-brand-5) 55%, var(--app-border));
+}
+
+.portrait[data-team='1'] {
+	border-color: color-mix(in srgb, var(--mantine-color-accent-filled) 50%, var(--app-border));
+}
+
+.portrait[data-active='true'] {
+	opacity: 1;
+	transform: translateY(-2px);
+	outline: 2px solid var(--mantine-color-accent-filled);
+	outline-offset: 1px;
+	z-index: 1;
+}
+
+.portrait[data-dead='true'] {
+	opacity: 0.35;
+	filter: grayscale(0.7);
+}

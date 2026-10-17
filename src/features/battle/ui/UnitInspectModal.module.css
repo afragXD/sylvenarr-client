@@ -1,0 +1,14 @@
+.effects {
+	margin-top: 0.35rem;
+}
+
+.stat {
+	padding: 0.35rem 0.45rem;
+	border: 1px solid var(--app-border);
+	background: color-mix(in srgb, var(--app-surface-muted) 70%, transparent);
+}
+
+.block {
+	padding-top: 0.35rem;
+	border-top: 1px solid color-mix(in srgb, var(--app-border) 80%, transparent);
+}

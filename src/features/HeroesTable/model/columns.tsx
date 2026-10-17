@@ -40,6 +40,15 @@ export const heroesColumns = columnHelper.columns([
 			);
 		},
 	}),
+	columnHelper.accessor('size', {
+		id: 'size',
+		header: 'Клетки',
+		sortFn: 'basic',
+		cell: (info) => {
+			const size = info.getValue();
+			return size > 1 ? 'II' : 'I';
+		},
+	}),
 	columnHelper.accessor('health', {
 		header: 'Здоровье',
 		sortFn: 'basic',

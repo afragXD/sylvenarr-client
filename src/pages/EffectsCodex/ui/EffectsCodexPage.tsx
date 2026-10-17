@@ -1,5 +1,6 @@
-import { Anchor, Group, Stack, Text, Title, Tooltip } from '@mantine/core';
+import { Anchor, Group, Stack, Text, TextInput, Title, Tooltip } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
+import { useMemo, useState } from 'react';
 
 import { CODEX_L, type EffectMeta, listBuffs, listDebuffs } from '@/features/battle';
 import { PageFrame } from '@/shared/ui/PageFrame';
@@ -10,8 +11,29 @@ import styles from './EffectsCodexPage.module.css';
  * Справочник боевых эффектов (кодекс).
  */
 export const EffectsCodexPage = () => {
-	const buffs = listBuffs();
-	const debuffs = listDebuffs();
+	const [query, setQuery] = useState('');
+	const { filteredBuffs, filteredDebuffs, total, shown } = useMemo(() => {
+		const buffs = listBuffs();
+		const debuffs = listDebuffs();
+		const q = query.trim().toLocaleLowerCase('ru');
+		const match = (effect: EffectMeta) => {
+			if (!q) {
+				return true;
+			}
+			const hay = [effect.label, effect.description, effect.mechanics, effect.id]
+				.join(' ')
+				.toLocaleLowerCase('ru');
+			return hay.includes(q);
+		};
+		const nextBuffs = buffs.filter(match);
+		const nextDebuffs = debuffs.filter(match);
+		return {
+			filteredBuffs: nextBuffs,
+			filteredDebuffs: nextDebuffs,
+			total: buffs.length + debuffs.length,
+			shown: nextBuffs.length + nextDebuffs.length,
+		};
+	}, [query]);
 
 	return (
 		<PageFrame width="content">
@@ -59,8 +81,31 @@ export const EffectsCodexPage = () => {
 				</div>
 			</Stack>
 
-			<EffectSection title="Усиления" effects={buffs} />
-			<EffectSection title="Ослабления" effects={debuffs} />
+			<Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
+				<TextInput
+					placeholder="Поиск по названию, описанию, id…"
+					value={query}
+					onChange={(event) => setQuery(event.currentTarget.value)}
+					maw={360}
+					aria-label="Поиск эффектов"
+				/>
+				<Text size="sm" c="var(--app-text-muted)" ff="monospace">
+					{shown === total ? `${total} эффектов` : `${shown} из ${total}`}
+				</Text>
+			</Group>
+
+			{shown === 0 ? (
+				<Text c="var(--app-text-muted)">Ничего не найдено по запросу «{query.trim()}».</Text>
+			) : (
+				<>
+					{filteredBuffs.length > 0 && (
+						<EffectSection title="Усиления" effects={filteredBuffs} />
+					)}
+					{filteredDebuffs.length > 0 && (
+						<EffectSection title="Ослабления" effects={filteredDebuffs} />
+					)}
+				</>
+			)}
 		</PageFrame>
 	);
 };

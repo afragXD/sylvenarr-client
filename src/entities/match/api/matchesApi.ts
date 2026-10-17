@@ -123,7 +123,7 @@ export async function cancelMatch(id: string): Promise<Match> {
 export async function battleAction(input: {
 	readonly matchId: string;
 	readonly unitId: string;
-	readonly action: 'attack' | 'defend' | 'wait' | 'skill' | 'ability';
+	readonly action: 'attack' | 'defend' | 'wait' | 'skill' | 'ability' | 'move';
 	readonly targetId?: string;
 	readonly slot?: 1 | 2 | 3 | 4 | 5;
 	readonly choice?: string;
