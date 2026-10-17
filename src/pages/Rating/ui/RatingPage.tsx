@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { fetchRating, type RatingRow } from '@/entities/rating';
 import { ApiError } from '@/shared/api/http';
+import { getWinrateColor } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 export const RatingPage = () => {
@@ -97,7 +98,7 @@ export const RatingPage = () => {
 									</Table.Td>
 									<Table.Td
 										ff="monospace"
-										c="accent"
+										c={getWinrateColor(row.winrate)}
 										fw={600}
 										style={{ fontVariantNumeric: 'tabular-nums' }}
 									>

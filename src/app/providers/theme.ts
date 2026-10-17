@@ -14,7 +14,7 @@ const brand: MantineColorsTuple = [
 	'#6b552c',
 ];
 
-/** Ember — accent (рана / победа) */
+/** Ember — accent (рана / поражение) */
 const accent: MantineColorsTuple = [
 	'#faf0ee',
 	'#f0d6d1',

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { fetchMyMatches, type MatchHistoryItem } from '@/entities/match';
 import { ApiError } from '@/shared/api/http';
+import { getMatchResultColor } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 /**
@@ -87,7 +88,10 @@ export const MatchHistoryPage = () => {
 										{new Date(row.finishedAt).toLocaleString('ru-RU')}
 									</Table.Td>
 									<Table.Td fw={600}>{row.opponentName}</Table.Td>
-									<Table.Td c={row.result === 'win' ? 'accent' : undefined}>
+									<Table.Td
+										c={getMatchResultColor(row.result)}
+										fw={row.result === 'draw' ? undefined : 600}
+									>
 										{resultLabel(row.result)}
 									</Table.Td>
 									<Table.Td ff="monospace" size="sm">

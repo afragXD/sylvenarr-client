@@ -11,6 +11,7 @@ import {
 } from '@/entities/match';
 import { CombatStat, CombatStatRow } from '@/features/battle';
 import { ApiError } from '@/shared/api/http';
+import { getMatchResultColor } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 import styles from './MatchHistoryDetailPage.module.css';
@@ -68,7 +69,9 @@ export const MatchHistoryDetailPage = () => {
 				{detail && (
 					<>
 						<Stack gap={6} maw={720}>
-							<Title order={1}>{resultTitle(detail.result)}</Title>
+							<Title order={1} c={getMatchResultColor(detail.result)}>
+								{resultTitle(detail.result)}
+							</Title>
 							<Text c="var(--app-text-muted)">
 								Соперник: {detail.opponentName} ·{' '}
 								{new Date(detail.finishedAt).toLocaleString('ru-RU')}
