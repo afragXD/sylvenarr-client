@@ -3,6 +3,10 @@
 }
 
 .stat {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.15rem;
 	padding: 0.35rem 0.45rem;
 	border: 1px solid var(--app-border);
 	background: color-mix(in srgb, var(--app-surface-muted) 70%, transparent);

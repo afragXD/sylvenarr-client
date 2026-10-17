@@ -1,9 +1,23 @@
 import { Group, Modal, SimpleGrid, Stack, Text } from '@mantine/core';
+import {
+	Coins,
+	Crosshair,
+	Clover,
+	Gauge,
+	Heart,
+	Shield,
+	Sparkles,
+	Sword,
+	WandSparkles,
+	Zap,
+	type LucideIcon,
+} from 'lucide-react';
 
 import { getHeroAbilities, HeroImage } from '@/entities/hero';
 import type { BattleUnit } from '@/entities/match';
 
 import { AbilityTags } from './AbilityTags';
+import { CombatStat, CombatStatRow } from './CombatStat';
 import { UnitEffects } from './UnitEffects';
 import styles from './UnitInspectModal.module.css';
 
@@ -26,19 +40,19 @@ type NumericStatKey =
 	| 'critBank'
 	| 'ultaCharges';
 
-const STATS: ReadonlyArray<{ key: NumericStatKey; label: string }> = [
-	{ key: 'health', label: 'ОЗ' },
-	{ key: 'damage', label: 'Урон' },
-	{ key: 'armor', label: 'Броня' },
-	{ key: 'initiative', label: 'Инициатива' },
-	{ key: 'dodge', label: 'Уклонение' },
-	{ key: 'luck', label: 'Удача' },
-	{ key: 'accuracy', label: 'Точность' },
-	{ key: 'power', label: 'Сила магии' },
-	{ key: 'mana', label: 'Мана' },
-	{ key: 'gold', label: 'Золото' },
-	{ key: 'critBank', label: 'Крит-банк' },
-	{ key: 'ultaCharges', label: 'Заряды' },
+const STATS: ReadonlyArray<{ key: NumericStatKey; label: string; Icon: LucideIcon }> = [
+	{ key: 'health', label: 'ОЗ', Icon: Heart },
+	{ key: 'damage', label: 'Урон', Icon: Sword },
+	{ key: 'armor', label: 'Броня', Icon: Shield },
+	{ key: 'initiative', label: 'Инициатива', Icon: Gauge },
+	{ key: 'dodge', label: 'Уклонение', Icon: Sparkles },
+	{ key: 'luck', label: 'Удача', Icon: Clover },
+	{ key: 'accuracy', label: 'Точность', Icon: Crosshair },
+	{ key: 'power', label: 'Сила магии', Icon: WandSparkles },
+	{ key: 'mana', label: 'Мана', Icon: Zap },
+	{ key: 'gold', label: 'Золото', Icon: Coins },
+	{ key: 'critBank', label: 'Крит-банк', Icon: Sword },
+	{ key: 'ultaCharges', label: 'Заряды', Icon: Sparkles },
 ];
 
 /**
@@ -66,15 +80,25 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 							radius={0}
 						/>
 						<div>
-							<Text size="sm" c="var(--app-text-muted)">
-								{unit.heroClassCode}
-								{unit.isSummon ? ' · саммон' : ''}
-								{unit.defending ? ' · защита' : ''}
-								{!unit.alive ? ' · пал' : ''}
-							</Text>
-							<Text size="sm" mt={4}>
-								ОЗ {unit.health}/{unit.maxHp} · ряд {unit.row + 1}
-							</Text>
+							<Group gap={6} wrap="wrap">
+								<Text size="sm" c="var(--app-text-muted)">
+									{unit.heroClassCode}
+									{unit.isSummon ? ' · саммон' : ''}
+									{unit.defending ? ' · защита' : ''}
+								</Text>
+								{!unit.alive ? <CombatStat kind="fallen" size={14} /> : null}
+							</Group>
+							<CombatStatRow>
+								<CombatStat
+									kind="health"
+									value={`${unit.health}/${unit.maxHp}`}
+									size={14}
+									textSize="sm"
+								/>
+								<Text size="sm" c="var(--app-text-muted)">
+									ряд {unit.row + 1}
+								</Text>
+							</CombatStatRow>
 							<div className={styles.effects}>
 								<UnitEffects effects={unit.effects ?? []} />
 							</div>
@@ -84,11 +108,15 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 					<SimpleGrid cols={{ base: 3, sm: 4 }} spacing="xs">
 						{STATS.map((stat) => {
 							const value = unit[stat.key];
+							const Icon = stat.Icon;
 							return (
-								<div key={stat.key} className={styles.stat}>
-									<Text size="xs" c="var(--app-text-muted)">
-										{stat.label}
-									</Text>
+								<div
+									key={stat.key}
+									className={styles.stat}
+									title={stat.label}
+									aria-label={`${stat.label}: ${typeof value === 'number' ? value : '—'}`}
+								>
+									<Icon size={12} strokeWidth={2} aria-hidden />
 									<Text size="sm" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{typeof value === 'number' ? value : '—'}
 									</Text>

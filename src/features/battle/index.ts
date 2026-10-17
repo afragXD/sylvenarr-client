@@ -10,6 +10,7 @@ export {
 } from './model/effectMeta';
 export { AbilityTags } from './ui/AbilityTags';
 export { BattlePanel } from './ui/BattlePanel';
+export { CombatStat, CombatStatRow } from './ui/CombatStat';
 export { TurnOrderStrip } from './ui/TurnOrderStrip';
 export { UnitEffects } from './ui/UnitEffects';
 export { UnitInspectModal } from './ui/UnitInspectModal';

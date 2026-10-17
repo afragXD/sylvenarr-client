@@ -9,6 +9,7 @@ import {
 	type MatchHistoryTeam,
 	type MatchHistoryUnit,
 } from '@/entities/match';
+import { CombatStat, CombatStatRow } from '@/features/battle';
 import { ApiError } from '@/shared/api/http';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
@@ -149,13 +150,19 @@ const UnitCard = ({ unit }: { unit: MatchHistoryUnit }) => {
 					</Text>
 					{hasStats ? (
 						<>
-							<Text size="xs" c={unit.alive ? undefined : 'var(--app-text-muted)'}>
-								ОЗ {unit.health}/{unit.maxHp}
-								{unit.alive ? '' : ' · пал'}
-							</Text>
-							<Text size="xs" c="var(--app-text-muted)">
-								Урон {unit.damage} · Броня {unit.armor} · Иниц. {unit.initiative}
-							</Text>
+							<CombatStatRow>
+								<CombatStat
+									kind="health"
+									value={`${unit.health}/${unit.maxHp}`}
+									muted={!unit.alive}
+								/>
+								{!unit.alive ? <CombatStat kind="fallen" /> : null}
+							</CombatStatRow>
+							<CombatStatRow>
+								<CombatStat kind="damage" value={unit.damage} muted />
+								<CombatStat kind="armor" value={unit.armor} muted />
+								<CombatStat kind="initiative" value={unit.initiative} muted />
+							</CombatStatRow>
 						</>
 					) : (
 						<Text size="xs" c="var(--app-text-muted)">

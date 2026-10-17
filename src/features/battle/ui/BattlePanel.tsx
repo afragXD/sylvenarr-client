@@ -6,6 +6,7 @@ import type { AbilityInfo, BattleState, BattleUnit, Match } from '@/entities/mat
 
 import { AbilityTags } from './AbilityTags';
 import styles from './BattlePanel.module.css';
+import { CombatStat, CombatStatRow } from './CombatStat';
 import { TurnOrderStrip } from './TurnOrderStrip';
 import { UnitEffects } from './UnitEffects';
 import { UnitInspectModal } from './UnitInspectModal';
@@ -533,10 +534,13 @@ const RowColumn = ({
 									{unit.horseIsDead ? ' ✗конь' : ''}
 								</Text>
 							</Group>
-							<Text className={styles.hp}>
-								{unit.health}/{unit.maxHp}
-								{typeof unit.armor === 'number' ? ` · Бр ${unit.armor}` : ''}
-							</Text>
+							<CombatStatRow className={styles.hp}>
+								<CombatStat kind="health" value={`${unit.health}/${unit.maxHp}`} />
+								{typeof unit.armor === 'number' ? (
+									<CombatStat kind="armor" value={unit.armor} muted />
+								) : null}
+								{!unit.alive ? <CombatStat kind="fallen" /> : null}
+							</CombatStatRow>
 							<UnitEffects effects={unit.effects ?? []} />
 						</button>
 					))

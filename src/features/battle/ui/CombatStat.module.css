@@ -1,0 +1,23 @@
+.row {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.35rem 0.55rem;
+}
+
+.stat {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.2rem;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.2;
+}
+
+.icon {
+	flex-shrink: 0;
+	opacity: 0.9;
+}
+
+.fallen {
+	color: color-mix(in srgb, var(--app-text-muted) 70%, var(--mantine-color-red-6));
+}
