@@ -1,10 +1,11 @@
 /**
  * Цвета результата матча и винрейта для Mantine prop `c`.
+ * Победа / высокий WR — `moss` (не `brand`: латунь везде в UI).
  */
 
 export const getMatchResultColor = (result: 'win' | 'loss' | 'draw'): string | undefined => {
 	if (result === 'win') {
-		return 'brand';
+		return 'moss';
 	}
 	if (result === 'loss') {
 		return 'accent';
@@ -14,7 +15,7 @@ export const getMatchResultColor = (result: 'win' | 'loss' | 'draw'): string | u
 
 export const getWinrateColor = (winrate: number): string | undefined => {
 	if (winrate >= 60) {
-		return 'brand';
+		return 'moss';
 	}
 	if (winrate >= 50) {
 		return undefined;

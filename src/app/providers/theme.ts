@@ -28,12 +28,27 @@ const accent: MantineColorsTuple = [
 	'#6b2f26',
 ];
 
+/** Moss — победа / высокий винрейт (не brand: латунь занята UI) */
+const moss: MantineColorsTuple = [
+	'#f0f4ec',
+	'#dde6d4',
+	'#c0d1b0',
+	'#9fb88a',
+	'#84a36c',
+	'#6f9158',
+	'#5E7F4A',
+	'#4d683c',
+	'#3f5432',
+	'#324028',
+];
+
 export const theme = createTheme({
 	primaryColor: 'brand',
 	primaryShade: { light: 7, dark: 5 },
 	colors: {
 		brand,
 		accent,
+		moss,
 	},
 	fontFamily: '"Source Sans 3", system-ui, sans-serif',
 	fontFamilyMonospace: '"JetBrains Mono", ui-monospace, monospace',
