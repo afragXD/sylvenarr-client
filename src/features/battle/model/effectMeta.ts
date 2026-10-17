@@ -1,6 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
 import {
+	Ban,
 	Biohazard,
+	Brain,
 	Bug,
 	Clover,
 	Crosshair,
@@ -10,6 +12,7 @@ import {
 	Flame,
 	Focus,
 	Ghost,
+	Hand,
 	Heart,
 	HeartPulse,
 	HelpCircle,
@@ -61,7 +64,13 @@ export type EffectId =
 	| 'WEAKNESS'
 	| 'UNLUCKY'
 	| 'GALL'
-	| 'SANCTUM';
+	| 'SANCTUM'
+	| 'FIREDWEAPON'
+	| 'MIND_WARD'
+	| 'INVISIBLE'
+	| 'INTERDICT'
+	| 'MAGIC_SHACKLES'
+	| 'ENSLAVED';
 
 export type EffectKind = 'buff' | 'debuff';
 
@@ -94,6 +103,9 @@ const BUFF_ORDER: EffectId[] = [
 	'LUCKY',
 	'FOCUSED',
 	'SANCTUM',
+	'FIREDWEAPON',
+	'MIND_WARD',
+	'INVISIBLE',
 ];
 
 const DEBUFF_ORDER: EffectId[] = [
@@ -114,6 +126,9 @@ const DEBUFF_ORDER: EffectId[] = [
 	'WEAKNESS',
 	'UNLUCKY',
 	'GALL',
+	'INTERDICT',
+	'MAGIC_SHACKLES',
+	'ENSLAVED',
 ];
 
 const CATALOG: Record<EffectId, EffectMeta> = {
@@ -386,6 +401,60 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		exampleAtL: exampleAt('3 р.'),
 		Icon: Sparkles,
 		kind: 'buff',
+	},
+	FIREDWEAPON: {
+		id: 'FIREDWEAPON',
+		label: 'Огненное оружие',
+		description: 'Удары с шансом поджечь цель.',
+		mechanics: 'hit → шанс BURNING · (1 + ⌊L/6⌋) р.',
+		exampleAtL: exampleAt('1 р.'),
+		Icon: Flame,
+		kind: 'buff',
+	},
+	MIND_WARD: {
+		id: 'MIND_WARD',
+		label: 'Вард разума',
+		description: 'Защищает от контроля разума (помрачение и т.п.).',
+		mechanics: 'блок mind-control · 2 р.',
+		exampleAtL: exampleAt('2 р.'),
+		Icon: Brain,
+		kind: 'buff',
+	},
+	INVISIBLE: {
+		id: 'INVISIBLE',
+		label: 'Невидимость',
+		description: 'Повышает уклонение; ближняя атака бьёт как дальняя.',
+		mechanics: '+power уклонения · 2 р.',
+		exampleAtL: exampleAt('+25 уклонения · 2 р.'),
+		Icon: EyeOff,
+		kind: 'buff',
+	},
+	INTERDICT: {
+		id: 'INTERDICT',
+		label: 'Запрет лечения',
+		description: 'Цель временно не получает лечения.',
+		mechanics: 'heal → 0 · (2 + ⌊L/4⌋) р.',
+		exampleAtL: exampleAt('3 р.'),
+		Icon: Ban,
+		kind: 'debuff',
+	},
+	MAGIC_SHACKLES: {
+		id: 'MAGIC_SHACKLES',
+		label: 'Волшебные оковы',
+		description: 'Трата маны обжигает носителя.',
+		mechanics: 'spendMana → −cost×(10+⌊L/4⌋) ОЗ · (2 + ⌊L/6⌋) р.',
+		exampleAtL: exampleAt('2 МР → −22 ОЗ · 2 р.'),
+		Icon: Link,
+		kind: 'debuff',
+	},
+	ENSLAVED: {
+		id: 'ENSLAVED',
+		label: 'Порабощённый',
+		description: 'Временно сражается на стороне поработителя.',
+		mechanics: 'смена команды · 1 р., затем возврат',
+		exampleAtL: exampleAt('1 р.'),
+		Icon: Hand,
+		kind: 'debuff',
 	},
 };
 
