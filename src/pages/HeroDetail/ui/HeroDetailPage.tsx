@@ -7,6 +7,7 @@ import { $hero, $heroError, $heroPending, HeroImage, heroPageOpened } from '@/en
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 import { HeroAbilitiesSection } from './HeroAbilitiesSection';
+import { HeroSummonsSection } from './HeroSummonsSection';
 
 const statRows: ReadonlyArray<{ key: keyof StatSource; label: string }> = [
 	{ key: 'size', label: 'Клетки' },
@@ -150,6 +151,7 @@ export const HeroDetailPage = () => {
 							))}
 						</SimpleGrid>
 						<HeroAbilitiesSection code={hero.code} isPlayable={hero.isPlayable} />
+						<HeroSummonsSection summonerCode={hero.code} />
 					</Stack>
 				</Group>
 			)}

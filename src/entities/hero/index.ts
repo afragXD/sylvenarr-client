@@ -15,6 +15,8 @@ export type { AbilityTag } from './model/abilityTags';
 export { ABILITY_TAG_LABELS } from './model/abilityTags';
 export type { HeroAbilityDoc, HeroAbilitySlot } from './model/heroAbilities';
 export { getHeroAbilities } from './model/heroAbilities';
+export type { SummonerSummons, SummonRef } from './model/heroSummons';
+export { getSummonerSummons, SUMMONER_SUMMONS } from './model/heroSummons';
 export {
 	$heroes,
 	$heroesError,
