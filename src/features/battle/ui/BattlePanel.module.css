@@ -107,6 +107,16 @@
 	background: color-mix(in srgb, var(--app-surface-muted) 55%, var(--app-surface));
 }
 
+.promptOptions {
+	display: flex;
+	flex-direction: column;
+	gap: 0.65rem;
+}
+
+.promptOption {
+	min-width: 0;
+}
+
 .effects {
 	display: flex;
 	flex-wrap: nowrap;

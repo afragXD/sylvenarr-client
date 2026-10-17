@@ -87,7 +87,7 @@ export type PendingPrompt = {
 	unitId: string;
 	kind: string;
 	slot: 1 | 2 | 3 | 4 | 5;
-	options: { id: string; label: string }[];
+	options: { id: string; label: string; description?: string }[];
 };
 
 export type BattleState = {

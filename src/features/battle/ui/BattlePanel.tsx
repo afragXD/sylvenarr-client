@@ -97,45 +97,38 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 		setConfirm(null);
 	};
 
-	const requestAbility = (ability: AbilityInfo, targetId?: string) => {
+	/** Confirm-панель только для действий без цели (некого кликнуть на поле). */
+	const requestAbilityNoTarget = (ability: AbilityInfo) => {
 		if (!active) {
 			return;
 		}
 		const doc = abilityDocs.find((slot) => slot.slot === ability.slot);
-		const isAoe = Boolean(doc?.tags.includes('aoe')) || !ability.needsTarget;
-		const targetName = targetId
-			? (battle.units.find((unit) => unit.id === targetId)?.displayName ?? 'цель')
-			: null;
+		const isAoe = Boolean(doc?.tags.includes('aoe'));
 		openConfirm({
 			title: ability.label,
 			detail: isAoe
 				? 'Действие затронет несколько целей или область.'
-				: targetName
-					? `Цель: ${targetName}`
-					: 'Подтвердите применение.',
+				: 'Подтвердите применение.',
 			isAoe,
 			payload: {
 				unitId: active.id,
 				action: 'ability',
 				slot: ability.slot,
-				targetId,
 			},
 		});
+	};
+
+	const castNow = (payload: ConfirmState['payload']) => {
+		setPendingMode(null);
+		setConfirm(null);
+		onAction(payload);
 	};
 
 	const handleAttackClick = () => {
 		if (!active || !isMyTurn || prompt) {
 			return;
 		}
-		if (battle.legalTargetIds.length === 1) {
-			const targetId = battle.legalTargetIds[0]!;
-			const name = battle.units.find((unit) => unit.id === targetId)?.displayName ?? 'цель';
-			openConfirm({
-				title: 'Атака',
-				detail: `Цель: ${name}`,
-				isAoe: false,
-				payload: { unitId: active.id, action: 'attack', targetId },
-			});
+		if (battle.legalTargetIds.length === 0) {
 			return;
 		}
 		setPendingMode({ kind: 'attack' });
@@ -155,17 +148,6 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 			});
 			return;
 		}
-		if (battle.legalSkillTargetIds.length === 1) {
-			const targetId = battle.legalSkillTargetIds[0]!;
-			const name = battle.units.find((unit) => unit.id === targetId)?.displayName ?? 'цель';
-			openConfirm({
-				title: skillLabel,
-				detail: `Цель: ${name}`,
-				isAoe: false,
-				payload: { unitId: active.id, action: 'skill', targetId },
-			});
-			return;
-		}
 		setPendingMode({ kind: 'skill' });
 		setConfirm(null);
 	};
@@ -175,11 +157,7 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 			return;
 		}
 		if (!ability.needsTarget) {
-			requestAbility(ability);
-			return;
-		}
-		if (ability.legalTargetIds.length === 1) {
-			requestAbility(ability, ability.legalTargetIds[0]);
+			requestAbilityNoTarget(ability);
 			return;
 		}
 		setPendingMode({ kind: 'ability', slot: ability.slot });
@@ -191,22 +169,17 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 			if (pendingMode.kind === 'ability') {
 				const ability = abilities.find((item) => item.slot === pendingMode.slot);
 				if (ability) {
-					requestAbility(ability, unit.id);
+					castNow({
+						unitId: active.id,
+						action: 'ability',
+						slot: ability.slot,
+						targetId: unit.id,
+					});
 				}
 			} else if (pendingMode.kind === 'attack') {
-				openConfirm({
-					title: 'Атака',
-					detail: `Цель: ${unit.displayName}`,
-					isAoe: false,
-					payload: { unitId: active.id, action: 'attack', targetId: unit.id },
-				});
+				castNow({ unitId: active.id, action: 'attack', targetId: unit.id });
 			} else {
-				openConfirm({
-					title: skillLabel ?? 'Навык',
-					detail: `Цель: ${unit.displayName}`,
-					isAoe: false,
-					payload: { unitId: active.id, action: 'skill', targetId: unit.id },
-				});
+				castNow({ unitId: active.id, action: 'skill', targetId: unit.id });
 			}
 			return;
 		}
@@ -299,18 +272,27 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 			{battle.outcome === 'ongoing' && isMyTurn && active && prompt && (
 				<div className={styles.prompt}>
 					<Text size="sm" fw={600} mb={6}>
-						Выберите вариант
+						{prompt.kind === 'lich_final_form'
+							? 'Выберите финальную форму'
+							: 'Выберите вариант'}
 					</Text>
-					<div className={styles.actions}>
+					<div className={styles.promptOptions}>
 						{prompt.options.map((option) => (
-							<Button
-								key={option.id}
-								color="accent"
-								loading={busy}
-								onClick={() => handlePromptChoice(option.id)}
-							>
-								{option.label}
-							</Button>
+							<div key={option.id} className={styles.promptOption}>
+								<Button
+									color="accent"
+									loading={busy}
+									onClick={() => handlePromptChoice(option.id)}
+									fullWidth
+								>
+									{option.label}
+								</Button>
+								{option.description ? (
+									<Text size="xs" c="var(--app-text-muted)" mt={4}>
+										{option.description}
+									</Text>
+								) : null}
+							</div>
 						))}
 					</div>
 				</div>
