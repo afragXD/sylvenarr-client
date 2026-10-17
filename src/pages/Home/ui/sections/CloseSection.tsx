@@ -1,7 +1,14 @@
 import { Anchor, Box, Button, Group, Stack, Text, Title } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 
-import { APP_TITLE } from '@/shared/constants';
+import {
+	APP_TITLE,
+	AUTHOR_GITHUB_URL,
+	AUTHOR_NAME,
+	ORIGINAL_AUTHOR_NAME,
+	ORIGINAL_AUTHOR_URL,
+	ORIGINAL_BOT_URL,
+} from '@/shared/constants';
 import { RuneGateIcon } from '@/shared/ui/BrandMark';
 
 const footerLinks = [
@@ -11,6 +18,11 @@ const footerLinks = [
 	{ to: '/sign-in', label: 'Войти' },
 	{ to: '/privacy', label: 'Конфиденциальность' },
 ] as const;
+
+const externalAnchorProps = {
+	target: '_blank',
+	rel: 'noopener noreferrer',
+} as const;
 
 /**
  * Порог врат + подвал лендинга.
@@ -42,28 +54,60 @@ export const CloseSection = () => {
 			</Box>
 
 			<Box className="sylvenarr-landing-close__bar">
-				<Group justify="space-between" align="center" wrap="wrap" gap="md">
-					<Text className="sylvenarr-landing-close__brand">
-						{APP_TITLE}
-						<Text span className="sylvenarr-landing-close__edition">
-							{' '}
-							· Origins
+				<Stack gap="sm">
+					<Group justify="space-between" align="center" wrap="wrap" gap="md">
+						<Text className="sylvenarr-landing-close__brand">
+							{APP_TITLE}
+							<Text span className="sylvenarr-landing-close__edition">
+								{' '}
+								· Origins
+							</Text>
 						</Text>
-					</Text>
-					<Group gap={{ base: 'md', sm: 'xl' }} wrap="wrap">
-						{footerLinks.map((item) => (
-							<Anchor
-								key={item.to}
-								component={Link}
-								to={item.to}
-								className="sylvenarr-landing-close__link"
-								td="none"
-							>
-								{item.label}
-							</Anchor>
-						))}
+						<Group gap={{ base: 'md', sm: 'xl' }} wrap="wrap">
+							{footerLinks.map((item) => (
+								<Anchor
+									key={item.to}
+									component={Link}
+									to={item.to}
+									className="sylvenarr-landing-close__link"
+									td="none"
+								>
+									{item.label}
+								</Anchor>
+							))}
+						</Group>
 					</Group>
-				</Group>
+					<Text className="sylvenarr-landing-close__credits">
+						Автор:{' '}
+						<Anchor
+							href={AUTHOR_GITHUB_URL}
+							className="sylvenarr-landing-close__link"
+							td="none"
+							{...externalAnchorProps}
+						>
+							{AUTHOR_NAME}
+						</Anchor>
+						{' · '}
+						Основано на{' '}
+						<Anchor
+							href={ORIGINAL_BOT_URL}
+							className="sylvenarr-landing-close__link"
+							td="none"
+							{...externalAnchorProps}
+						>
+							Sylvenarr: Origins (VK-бот)
+						</Anchor>
+						{' by '}
+						<Anchor
+							href={ORIGINAL_AUTHOR_URL}
+							className="sylvenarr-landing-close__link"
+							td="none"
+							{...externalAnchorProps}
+						>
+							{ORIGINAL_AUTHOR_NAME}
+						</Anchor>
+					</Text>
+				</Stack>
 			</Box>
 		</Box>
 	);

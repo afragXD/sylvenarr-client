@@ -856,6 +856,14 @@
 	color: var(--mantine-color-brand-5);
 }
 
+.sylvenarr-landing-close__credits {
+	font-family: var(--mantine-font-family-monospace);
+	font-size: 0.72rem;
+	letter-spacing: 0.03em;
+	line-height: 1.45;
+	color: var(--app-text-muted);
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.sylvenarr-landing-close__signin {
 		transition: none;

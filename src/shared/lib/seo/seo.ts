@@ -1,4 +1,5 @@
 import {
+	APP_AUTHORS,
 	APP_DESCRIPTION,
 	APP_KEYWORDS,
 	APP_TITLE,
@@ -42,7 +43,7 @@ export const seo = ({
 		{ title: fullTitle },
 		{ name: 'description', content: description },
 		{ name: 'keywords', content: keywords },
-		{ name: 'author', content: APP_TITLE },
+		{ name: 'author', content: APP_AUTHORS },
 		{ name: 'theme-color', content: '#C4A35A' },
 		{
 			name: 'robots',

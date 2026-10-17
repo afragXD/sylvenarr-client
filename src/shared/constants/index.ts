@@ -5,6 +5,18 @@ export const APP_DESCRIPTION =
 
 export const APP_KEYWORDS = 'sylvenarr, origins, пошаговый pvp, герои, арена, драфт' as const;
 
+/** Автор веб-версии. */
+export const AUTHOR_NAME = 'Wormgod' as const;
+export const AUTHOR_GITHUB_URL = 'https://github.com/afragXD' as const;
+
+/** Автор оригинального VK-бота и репозиторий. */
+export const ORIGINAL_AUTHOR_NAME = 'enlacroix' as const;
+export const ORIGINAL_AUTHOR_URL = 'https://github.com/enlacroix' as const;
+export const ORIGINAL_BOT_URL = 'https://github.com/enlacroix/arenamsterbot' as const;
+
+/** Meta author (SEO): веб-версия + оригинал. */
+export const APP_AUTHORS = `${AUTHOR_NAME}, ${ORIGINAL_AUTHOR_NAME}` as const;
+
 /** Публичный origin сайта (без завершающего `/`). */
 export const SITE_URL = (import.meta.env.VITE_SITE_URL ?? 'http://localhost:3000').replace(
 	/\/$/,
