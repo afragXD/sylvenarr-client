@@ -8,6 +8,10 @@ export const Route = createFileRoute('/robots.txt')({
 			GET: () => {
 				const body = `User-agent: *
 Allow: /
+Disallow: /matches
+Disallow: /lobby
+Disallow: /sign-in
+Disallow: /sign-up
 
 Sitemap: ${SITE_URL}/sitemap.xml
 `;

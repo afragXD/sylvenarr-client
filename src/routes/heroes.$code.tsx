@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { fetchHeroByCode, getHeroPortraitUrl } from '@/entities/hero';
 import { HeroDetailPage } from '@/pages/HeroDetail';
 import { absoluteUrl } from '@/shared/constants';
-import { seo } from '@/shared/lib/seo/seo';
+import { breadcrumbJsonLd, heroJsonLd, seo } from '@/shared/lib/seo';
 
 export const Route = createFileRoute('/heroes/$code')({
 	loader: ({ params }) => fetchHeroByCode(params.code),
@@ -12,15 +12,26 @@ export const Route = createFileRoute('/heroes/$code')({
 		const description =
 			loaderData?.description?.trim() ||
 			loaderData?.roleSummary?.trim() ||
-			`Карточка героя ${title}`;
+			`Карточка героя ${title} в Sylvenarr: Origins — способности, роль и портрет.`;
+		const url = absoluteUrl(`/heroes/${params.code}`);
+		const image = getHeroPortraitUrl(params.code);
+
 		return {
 			meta: seo({
 				title,
 				description,
-				url: absoluteUrl(`/heroes/${params.code}`),
-				image: getHeroPortraitUrl(params.code),
+				url,
+				image,
 			}),
-			links: [{ rel: 'canonical', href: absoluteUrl(`/heroes/${params.code}`) }],
+			links: [{ rel: 'canonical', href: url }],
+			scripts: [
+				heroJsonLd({ name: title, description, url, image }),
+				breadcrumbJsonLd([
+					{ name: 'Главная', url: absoluteUrl('/') },
+					{ name: 'Герои', url: absoluteUrl('/heroes') },
+					{ name: title, url },
+				]),
+			],
 		};
 	},
 	component: HeroDetailPage,

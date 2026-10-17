@@ -21,11 +21,17 @@ type MetaTag =
 	| { name: string; content: string }
 	| { property: string; content: string };
 
+export const OG_IMAGE_PATH = '/og-image.png' as const;
+export const OG_IMAGE_WIDTH = 1200 as const;
+export const OG_IMAGE_HEIGHT = 630 as const;
+
+const defaultImage = () => absoluteUrl(OG_IMAGE_PATH);
+
 export const seo = ({
 	title = APP_TITLE,
 	description = APP_DESCRIPTION,
 	keywords = APP_KEYWORDS,
-	image = absoluteUrl('/favicon.svg'),
+	image = defaultImage(),
 	url = SITE_URL,
 	type = 'website',
 	noIndex = false,
@@ -50,24 +56,98 @@ export const seo = ({
 		{ property: 'og:url', content: url },
 		{ property: 'og:image', content: image },
 		{ property: 'og:image:alt', content: fullTitle },
-		{ name: 'twitter:card', content: 'summary' },
+		{ property: 'og:image:width', content: String(OG_IMAGE_WIDTH) },
+		{ property: 'og:image:height', content: String(OG_IMAGE_HEIGHT) },
+		{ name: 'twitter:card', content: 'summary_large_image' },
 		{ name: 'twitter:title', content: fullTitle },
 		{ name: 'twitter:description', content: description },
 		{ name: 'twitter:image', content: image },
 	];
 };
 
-export const websiteJsonLd = () => ({
+type JsonLdScript = {
+	type: 'application/ld+json';
+	children: string;
+};
+
+const jsonLd = (data: Record<string, unknown>): JsonLdScript => ({
 	type: 'application/ld+json',
-	children: JSON.stringify({
-		'@context': 'https://schema.org',
-		'@type': 'WebApplication',
-		name: APP_TITLE,
-		url: SITE_URL,
-		description: APP_DESCRIPTION,
-		applicationCategory: 'WebApplication',
-		operatingSystem: 'Web',
-		inLanguage: 'ru-RU',
-		image: absoluteUrl('/favicon.svg'),
-	}),
+	children: JSON.stringify(data),
 });
+
+/** Site-wide Organization + WebSite + WebApplication graph for the document root. */
+export const websiteJsonLd = (): JsonLdScript =>
+	jsonLd({
+		'@context': 'https://schema.org',
+		'@graph': [
+			{
+				'@type': 'Organization',
+				'@id': `${SITE_URL}/#organization`,
+				name: APP_TITLE,
+				url: SITE_URL,
+				logo: absoluteUrl('/favicon.svg'),
+				image: defaultImage(),
+			},
+			{
+				'@type': 'WebSite',
+				'@id': `${SITE_URL}/#website`,
+				name: APP_TITLE,
+				url: SITE_URL,
+				description: APP_DESCRIPTION,
+				inLanguage: 'ru-RU',
+				publisher: { '@id': `${SITE_URL}/#organization` },
+			},
+			{
+				'@type': 'WebApplication',
+				'@id': `${SITE_URL}/#app`,
+				name: APP_TITLE,
+				url: SITE_URL,
+				description: APP_DESCRIPTION,
+				applicationCategory: 'GameApplication',
+				operatingSystem: 'Web',
+				inLanguage: 'ru-RU',
+				image: defaultImage(),
+				isPartOf: { '@id': `${SITE_URL}/#website` },
+			},
+		],
+	});
+
+export type BreadcrumbItem = {
+	name: string;
+	url: string;
+};
+
+export const breadcrumbJsonLd = (items: BreadcrumbItem[]): JsonLdScript =>
+	jsonLd({
+		'@context': 'https://schema.org',
+		'@type': 'BreadcrumbList',
+		itemListElement: items.map((item, index) => ({
+			'@type': 'ListItem',
+			position: index + 1,
+			name: item.name,
+			item: item.url,
+		})),
+	});
+
+export type HeroJsonLdInput = {
+	name: string;
+	description: string;
+	url: string;
+	image: string;
+};
+
+/** Character-like Thing for a hero detail page. */
+export const heroJsonLd = ({ name, description, url, image }: HeroJsonLdInput): JsonLdScript =>
+	jsonLd({
+		'@context': 'https://schema.org',
+		'@type': 'Thing',
+		name,
+		description,
+		url,
+		image,
+		isPartOf: {
+			'@type': 'WebSite',
+			name: APP_TITLE,
+			url: SITE_URL,
+		},
+	});

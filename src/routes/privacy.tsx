@@ -8,7 +8,8 @@ export const Route = createFileRoute('/privacy')({
 	head: () => ({
 		meta: seo({
 			title: 'Конфиденциальность',
-			description: 'Какие данные и cookie использует Sylvenarr',
+			description:
+				'Политика конфиденциальности Sylvenarr: какие данные обрабатываются и как используются cookie.',
 			url: absoluteUrl('/privacy'),
 		}),
 		links: [{ rel: 'canonical', href: absoluteUrl('/privacy') }],

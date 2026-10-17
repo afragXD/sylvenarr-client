@@ -10,6 +10,7 @@ export const Route = createFileRoute('/matches/')({
 			title: 'Мои матчи',
 			description: 'История завершённых матчей',
 			url: absoluteUrl('/matches'),
+			noIndex: true,
 		}),
 		links: [{ rel: 'canonical', href: absoluteUrl('/matches') }],
 	}),

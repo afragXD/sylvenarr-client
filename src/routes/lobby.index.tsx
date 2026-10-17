@@ -10,6 +10,7 @@ export const Route = createFileRoute('/lobby/')({
 			title: 'Лобби',
 			description: 'Создание и вход в матч Sylvenarr',
 			url: absoluteUrl('/lobby'),
+			noIndex: true,
 		}),
 		links: [{ rel: 'canonical', href: absoluteUrl('/lobby') }],
 	}),

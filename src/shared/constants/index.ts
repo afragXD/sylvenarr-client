@@ -1,9 +1,9 @@
 export const APP_TITLE = 'Sylvenarr' as const;
 
 export const APP_DESCRIPTION =
-	'Sylvenarr: Origins — пошаговый PvP. Создайте аккаунт, выберите героя и выйдите на арену.' as const;
+	'Sylvenarr: Origins — пошаговый PvP-арена. Соберите отряд героев, выйдите в драфт и сразитесь с соперником.' as const;
 
-export const APP_KEYWORDS = 'sylvenarr' as const;
+export const APP_KEYWORDS = 'sylvenarr, origins, пошаговый pvp, герои, арена, драфт' as const;
 
 /** Публичный origin сайта (без завершающего `/`). */
 export const SITE_URL = (import.meta.env.VITE_SITE_URL ?? 'http://localhost:3000').replace(

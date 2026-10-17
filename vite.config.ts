@@ -15,9 +15,10 @@ const config = defineConfig({
 			prerender: {
 				enabled: false,
 			},
+			// Public sitemap is served by `src/routes/sitemap[.]xml.ts`
+			// (static pages + heroes; private routes excluded).
 			sitemap: {
-				enabled: true,
-				host: process.env.VITE_SITE_URL ?? 'http://localhost:3000',
+				enabled: false,
 			},
 		}),
 		nitro({ preset: 'bun' }),

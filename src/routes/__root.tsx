@@ -5,6 +5,7 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 
 import { AppProviders, AppShellLayout } from '@/app';
 import '@/app/styles';
+import { APP_DESCRIPTION, SITE_URL } from '@/shared/constants';
 import { seo, websiteJsonLd } from '@/shared/lib/seo';
 import { AppFonts } from '@/shared/ui/AppFonts';
 
@@ -18,17 +19,19 @@ export const Route = createRootRoute({
 			},
 			...seo({
 				title: 'Sylvenarr',
+				description: APP_DESCRIPTION,
+				url: SITE_URL,
 			}),
 		],
 		links: [
-			{ rel: 'icon', href: '/favicon.ico', sizes: 'any' },
 			{ rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
+			{ rel: 'apple-touch-icon', href: '/apple-touch-icon.png', sizes: '180x180' },
+			{ rel: 'manifest', href: '/site.webmanifest' },
 		],
 		scripts: [websiteJsonLd()],
 	}),
 	shellComponent: RootDocument,
 });
-
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="ru" {...mantineHtmlProps}>

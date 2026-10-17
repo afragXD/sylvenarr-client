@@ -8,7 +8,8 @@ export const Route = createFileRoute('/heroes/')({
 	head: () => ({
 		meta: seo({
 			title: 'Герои',
-			description: 'Каталог классов Sylvenarr: Origins',
+			description:
+				'Каталог героев Sylvenarr: Origins — роли, сильные стороны и карточки классов для арены.',
 			url: absoluteUrl('/heroes'),
 		}),
 		links: [{ rel: 'canonical', href: absoluteUrl('/heroes') }],

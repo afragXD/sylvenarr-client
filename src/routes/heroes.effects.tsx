@@ -8,7 +8,8 @@ export const Route = createFileRoute('/heroes/effects')({
 	head: () => ({
 		meta: seo({
 			title: 'Кодекс эффектов',
-			description: 'Справочник боевых эффектов Sylvenarr: Origins',
+			description:
+				'Справочник боевых эффектов Sylvenarr: Origins — баффы, дебаффы и статусные состояния.',
 			url: absoluteUrl('/heroes/effects'),
 		}),
 		links: [{ rel: 'canonical', href: absoluteUrl('/heroes/effects') }],
