@@ -18,6 +18,8 @@ type HeroImageProps = {
 	radius?: string | number;
 	bg?: string;
 	fit?: 'contain' | 'cover';
+	/** CSS object-position; по умолчанию center (как у Mantine Image). */
+	objectPosition?: string;
 };
 
 /**
@@ -32,6 +34,7 @@ export const HeroImage = ({
 	radius = 4,
 	bg = 'var(--app-surface)',
 	fit = 'contain',
+	objectPosition,
 }: HeroImageProps) => {
 	const primary = variant === 'character' ? getHeroCharacterUrl(code) : getHeroPortraitUrl(code);
 
@@ -57,6 +60,7 @@ export const HeroImage = ({
 			radius={radius}
 			fit={fit}
 			bg={bg}
+			style={objectPosition ? { objectPosition } : undefined}
 			onError={handleError}
 		/>
 	);

@@ -34,15 +34,25 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		},
 	},
 	OrcKing: {
-		passiveMechanics: 'Аура: при низкой удаче снимает удачу врагам в начале хода.',
+		passiveMechanics:
+			'В начале хода: если удача < −10 — случайный враг −(L−1) удачи.',
 		slots: {
 			1: { mechanics: 'Урон ×1.1×ярость; игнор брони 25%.', tags: ['attack'] },
-			2: { mechanics: 'Призыв гоблина (лимит саммонов).', tags: ['summon'] },
-			3: { mechanics: 'Клич: «Радость» союзнику · 2 р.', tags: ['buff'] },
-			4: { mechanics: 'Смена ряда / перестановка саммона.', tags: ['buff'] },
+			2: { mechanics: 'Призыв гоблина (лимит вызовов).', tags: ['summon'] },
+			3: {
+				mechanics:
+					'×0.75; игнор брони 50%; шанс сдвига ряда; шанс «Обездвиженный» · 2 р.',
+				tags: ['attack', 'debuff'],
+			},
+			4: {
+				mechanics:
+					'Два топора ×0.5; при попадании шанс «Головокружение» · 2 р.; −1…5 удачи.',
+				tags: ['attack', 'debuff'],
+			},
 			5: {
-				mechanics: '«Головокружение» врагу · 2 р. (−уклонение).',
-				tags: ['debuff'],
+				mechanics:
+					'«Радость» своему ряду · 2 р.; +броня себе; −0.06 накопленной ярости.',
+				tags: ['buff'],
 			},
 		},
 	},
@@ -53,8 +63,15 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['attack', 'aoe'],
 			},
 			2: { mechanics: 'Призыв/эволюция нежити (меню).', tags: ['summon'] },
-			3: { mechanics: 'Лечение/вампир по выбору.', tags: ['heal'] },
-			4: { mechanics: '«Ужас» ряду / цели.', tags: ['debuff', 'aoe'] },
+			3: {
+				mechanics:
+					'Саммону: усиление; союзнику: «Пьющий жизни» · 1 р.',
+				tags: ['buff', 'heal'],
+			},
+			4: {
+				mechanics: 'Одной цели: шанс «Ужас» · 2 р.',
+				tags: ['debuff'],
+			},
 			5: { mechanics: 'Жертва союзника → мана + усиление.', tags: ['buff'] },
 		},
 	},
@@ -78,92 +95,188 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		},
 	},
 	Assassin: {
+		passiveMechanics: 'В начале хода: откат тетради смерти −1.',
 		slots: {
 			1: { mechanics: 'Урон ×1.15; игнор брони 35%.', tags: ['attack'] },
-			2: { mechanics: 'Дротик → «Отравление» (заряды).', tags: ['debuff'] },
-			3: {
-				mechanics: 'Тетрадь смерти: шанс мгновенной смерти (%).',
-				tags: ['attack'],
+			2: {
+				mechanics: 'На себя: «Радость» · 2 р.; +2 урона.',
+				tags: ['buff'],
 			},
-			4: { mechanics: 'Копирует класс убитой цели.', tags: ['buff'] },
-			5: { mechanics: '«Хамелеон» · +уклонение.', tags: ['buff'] },
+			3: {
+				mechanics:
+					'Тетрадь: шанс → 1 ОЗ (+удача); провал — себе «Головокружение» · 3 р.',
+				tags: ['attack', 'debuff'],
+			},
+			4: {
+				mechanics: 'Дротик (−1 заряд): прямой урон + «Отравление» · 2 р.',
+				tags: ['attack', 'debuff'],
+			},
+			5: {
+				mechanics: '«Хамелеон» · 1 р.; рост шанса тетради; −удача.',
+				tags: ['buff'],
+			},
 		},
 	},
 	Paladin: {
 		slots: {
-			1: { mechanics: 'Удар ×1.05; двойной удар ~35%.', tags: ['attack'] },
+			1: { mechanics: 'Всегда 2 удара ×1.05.', tags: ['attack'] },
 			2: {
-				mechanics: 'Ульта: «Огненное оружие» союзнику (заряды).',
+				mechanics:
+					'Ульта (−1): себе «Сила» · 3 р. и «Под охраной» · 2 р.',
 				tags: ['buff'],
 			},
-			3: { mechanics: 'Лечение союзника.', tags: ['heal'] },
-			4: { mechanics: '«Благословение» союзнику.', tags: ['buff'] },
-			5: { mechanics: 'Рывок на фронт; ×1.25 против нежити.', tags: ['attack'] },
+			3: {
+				mechanics:
+					'2 МР: ×1.1; игнор брони 15%; шанс украсть урон/силу цели.',
+				tags: ['attack', 'debuff'],
+			},
+			4: {
+				mechanics:
+					'Рывок на фронт; «Ускорение» · 2 р.; ×1.25 против нежити.',
+				tags: ['attack', 'buff'],
+			},
+			5: {
+				mechanics:
+					'3 МР: себе «Регенерация» + «Под охраной»; смена ряда; лечение.',
+				tags: ['heal', 'buff'],
+			},
 		},
 	},
 	Abbess: {
 		slots: {
-			1: { mechanics: 'Магия; шанс запрета воскрешения.', tags: ['attack'] },
-			2: { mechanics: 'Лечение союзника.', tags: ['heal'] },
-			3: { mechanics: '«Каменная плоть» союзнику.', tags: ['buff'] },
-			4: { mechanics: 'Снятие ослаблений с ряда.', tags: ['heal', 'aoe'] },
+			1: {
+				mechanics:
+					'2 МР: урон; шанс «Замедление»; шанс запрета воскрешения.',
+				tags: ['attack', 'debuff'],
+			},
+			2: {
+				mechanics: '3 МР (задний ряд): лечение всем союзникам.',
+				tags: ['heal', 'aoe'],
+			},
+			3: {
+				mechanics: '3 МР: «Каменная плоть» союзнику · 3 р.',
+				tags: ['buff'],
+			},
+			4: {
+				mechanics: 'Снимает все эффекты с ряда цели (баффы и дебаффы).',
+				tags: ['heal', 'aoe'],
+			},
 			5: {
-				mechanics: 'Защита: пассивно «Удача» при кнопке «Защита».',
+				mechanics: 'Ряду цели: «Контрудар» · 3 р.',
 				tags: ['buff'],
 			},
 		},
 	},
 	Witch: {
 		slots: {
-			1: { mechanics: 'Выстрел (патроны).', tags: ['attack'] },
-			2: { mechanics: '«Замедление» / контроль.', tags: ['debuff'] },
-			3: { mechanics: '«Бес» — полиморф.', tags: ['debuff'] },
-			4: { mechanics: 'Бафф или проклятие по выбору.', tags: ['buff', 'debuff'] },
-			5: { mechanics: 'Перезарядка / особый выстрел.', tags: ['attack'] },
+			1: {
+				mechanics: 'Револьвер (−патрон; шанс 2-го выстрела) / каблук.',
+				tags: ['attack'],
+			},
+			2: {
+				mechanics: '3 МР: укус + вампиризм от урона.',
+				tags: ['attack', 'heal'],
+			},
+			3: {
+				mechanics: '«Метка» + «Смертный приговор» · 2 р.',
+				tags: ['debuff'],
+			},
+			4: {
+				mechanics: '4 МР: шанс снизить урон и силу цели (не под «Под охраной»).',
+				tags: ['debuff'],
+			},
+			5: {
+				mechanics: '4 МР: шанс «Бес» · 2 р. (полиморф).',
+				tags: ['debuff'],
+			},
 		},
 	},
 	Inquisitor: {
 		slots: {
-			1: {
-				mechanics: 'Удар; при защите получает «Контрудар».',
-				tags: ['attack'],
+			1: { mechanics: 'Удар булавой ×1.', tags: ['attack'] },
+			2: {
+				mechanics: '3 МР: молния + «Помехи» · 1 р.',
+				tags: ['attack', 'debuff'],
 			},
-			2: { mechanics: 'Кара ×1.25.', tags: ['attack'] },
-			3: { mechanics: 'Телекинез: смена ряда цели.', tags: ['debuff'] },
-			4: { mechanics: '«Помехи» / контроль разума.', tags: ['debuff'] },
-			5: { mechanics: '«Немота» / доп. давление.', tags: ['debuff'] },
+			3: {
+				mechanics: '3 МР: шанс смены ряда цели (не под «Под охраной»).',
+				tags: ['debuff'],
+			},
+			4: {
+				mechanics: '×1.25; шанс «Оглушение» или −броня.',
+				tags: ['attack', 'debuff'],
+			},
+			5: {
+				mechanics: '2 МР (задний ряд): ×0.9; шанс «Немота» · 2 р.',
+				tags: ['attack', 'debuff'],
+			},
 		},
 	},
 	Marauder: {
 		slots: {
 			1: {
-				mechanics: 'Выстрел; сильнее против цели с «Меткой».',
+				mechanics: 'Выстрел; ×1.25 против цели с «Меткой»; игнор брони 15%.',
 				tags: ['attack'],
 			},
-			2: { mechanics: 'Метка / прицел.', tags: ['debuff'] },
-			3: { mechanics: 'Смена ряда.', tags: ['buff'] },
-			4: { mechanics: 'Оборотень (ульта → Волк).', tags: ['buff'] },
-			5: { mechanics: 'Доп. выстрел / добивание.', tags: ['attack'] },
+			2: {
+				mechanics:
+					'Ряд цели ×0.5; шанс «Неудача» / «Замедление» · 2 р.',
+				tags: ['attack', 'aoe', 'debuff'],
+			},
+			3: {
+				mechanics: 'Мощный выстрел ×1.25; себе «Слабость» · 2 р.',
+				tags: ['attack', 'debuff'],
+			},
+			4: {
+				mechanics: 'Ульта (−1): превращение в Оборотня, на фронт.',
+				tags: ['buff'],
+			},
+			5: {
+				mechanics: '3 МР: прямой урон ОЗ; шанс сжечь ману цели.',
+				tags: ['attack', 'debuff'],
+			},
 		},
 	},
 	Werewolf: {
 		slots: {
-			1: { mechanics: 'Ближний удар; вампиризм ~20%.', tags: ['attack', 'heal'] },
-			2: { mechanics: 'Ярость / усиление.', tags: ['buff'] },
-			3: { mechanics: 'Удар по площади.', tags: ['attack', 'aoe'] },
-			4: { mechanics: 'Возврат в Мародёра.', tags: ['buff'] },
-			5: { mechanics: 'Доп. атака.', tags: ['attack'] },
+			1: {
+				mechanics: '×1.1; шанс «Слабость» · 2 р.',
+				tags: ['attack', 'debuff'],
+			},
+			2: {
+				mechanics: 'Укус (задний ряд): игнор брони 35%; вампиризм + МР.',
+				tags: ['attack', 'heal'],
+			},
+			3: {
+				mechanics: 'Возврат в Мародёра; +ОЗ.',
+				tags: ['heal', 'buff'],
+			},
+			4: {
+				mechanics: 'Колонне цели: «Желчь» · 3 р.',
+				tags: ['debuff', 'aoe'],
+			},
+			5: { mechanics: 'Базовые действия.', tags: ['buff'] },
 		},
 	},
 	Herbalist: {
 		slots: {
-			1: { mechanics: 'Слабый удар / поддержка.', tags: ['attack'] },
-			2: { mechanics: 'Лечение союзника.', tags: ['heal'] },
+			1: {
+				mechanics: 'Союзнику «Сила» · 1 р. (+доля его урона).',
+				tags: ['buff'],
+			},
+			2: {
+				mechanics:
+					'1 МР: ряду «Сила» + «Сосредоточение» · 2 р.',
+				tags: ['buff', 'aoe'],
+			},
 			3: {
-				mechanics: 'Снятие «Отравления» и других ослаблений.',
+				mechanics: 'Снимает ослабления с союзника.',
 				tags: ['heal'],
 			},
-			4: { mechanics: '«Регенерация» / бафф.', tags: ['buff', 'heal'] },
+			4: {
+				mechanics: 'Себе +10 ОЗ (мгновенное лечение).',
+				tags: ['heal'],
+			},
 			5: { mechanics: 'Базовые действия.', tags: ['buff'] },
 		},
 	},
@@ -192,51 +305,101 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		},
 	},
 	Demiurge: {
+		passiveMechanics:
+			'В начале хода: 50% «Под охраной» случайному союзнику · 2 р.',
 		slots: {
 			1: {
-				mechanics: 'Цепная магия по нескольким врагам.',
+				mechanics: '3 МР (фронт): молния + 2 цепочки ×0.5/×0.25.',
 				tags: ['attack', 'aoe'],
 			},
-			2: { mechanics: 'Фантом-копия (саммон).', tags: ['summon'] },
-			3: { mechanics: 'Бафф/щит союзнику.', tags: ['buff'] },
-			4: { mechanics: 'Контроль / дебафф.', tags: ['debuff'] },
-			5: { mechanics: 'Базовые действия.', tags: ['buff'] },
+			2: {
+				mechanics: '5 МР (задний ряд): фантом-копия цели.',
+				tags: ['summon'],
+			},
+			3: {
+				mechanics:
+					'2 МР: помрачение — шанс, что цель ударит своего союзника.',
+				tags: ['debuff', 'attack'],
+			},
+			4: { mechanics: 'Призыв эктоплазмы на свой ряд.', tags: ['summon'] },
+			5: {
+				mechanics: '3 МР: философский камень; шанс сохранить ход.',
+				tags: ['buff'],
+			},
 		},
 	},
 	Pyro: {
 		slots: {
-			1: { mechanics: 'Огнемёт: 2 случайные цели.', tags: ['attack', 'aoe'] },
+			1: {
+				mechanics: 'Огнемёт: 2 случайные цели; шанс «Поджог» · 2 р.',
+				tags: ['attack', 'aoe', 'debuff'],
+			},
 			2: {
-				mechanics: 'Сильнее против цели с «Поджогом».',
+				mechanics: 'Арбалет (задний ряд): сильнее против цели с «Поджогом».',
 				tags: ['attack'],
 			},
-			3: { mechanics: '«Огненное оружие» союзнику.', tags: ['buff'] },
-			4: { mechanics: 'Самосожжение / уход.', tags: ['attack', 'aoe'] },
-			5: { mechanics: 'Базовые действия.', tags: ['buff'] },
+			3: {
+				mechanics:
+					'«Поджог» всем на фронте · 2 р.; перемешать колонны врагов.',
+				tags: ['debuff', 'aoe'],
+			},
+			4: {
+				mechanics: 'Союзнику «Огненное оружие» · 1 р.',
+				tags: ['buff'],
+			},
+			5: {
+				mechanics:
+					'Самосожжение: себя убивает; цели «Ужас»/«Неудача»; бафф лидеру.',
+				tags: ['debuff', 'buff'],
+			},
 		},
 	},
 	Specter: {
+		passiveMechanics: 'В начале хода: −2 МР у лидера врагов.',
 		slots: {
 			1: {
-				mechanics: 'Удар разума + выбор второй цели «Оглушение».',
+				mechanics: 'До 2 целей: шанс «Оглушение» · 1 р. или урон.',
 				tags: ['attack', 'debuff'],
 			},
-			2: { mechanics: 'Ритуал / метка.', tags: ['debuff'] },
-			3: { mechanics: '«Кровотечение» / контроль.', tags: ['debuff'] },
-			4: { mechanics: 'Доп. давление.', tags: ['attack'] },
+			2: {
+				mechanics: 'Урон цели; себе «Под охраной» · 2 р.',
+				tags: ['attack', 'buff'],
+			},
+			3: {
+				mechanics: '«Метка» + «Неудача» · 2 р.',
+				tags: ['debuff'],
+			},
+			4: {
+				mechanics: 'Шанс «Кровотечение» · 2 р.',
+				tags: ['debuff'],
+			},
 			5: { mechanics: 'Базовые действия.', tags: ['buff'] },
 		},
 	},
 	Detective: {
 		slots: {
 			1: {
-				mechanics: 'Рапира; под «Невидимостью» бьёт как дальник.',
+				mechanics:
+					'Рапира ×1.1; игнор брони 25%; под «Невидимостью» бьёт как дальник.',
 				tags: ['attack'],
 			},
-			2: { mechanics: 'Яд случайному врагу (ульта).', tags: ['debuff'] },
-			3: { mechanics: '«Невидимость» на себя (ульта).', tags: ['buff'] },
-			4: { mechanics: 'Выпад с заднего ряда + смена ряда.', tags: ['attack'] },
-			5: { mechanics: 'Выстрел / перезарядка с фронта.', tags: ['attack'] },
+			2: {
+				mechanics: 'Ульта (−1): «Отравление» всем врагам · 2 р.',
+				tags: ['debuff', 'aoe'],
+			},
+			3: {
+				mechanics: 'Ульта (−1): «Невидимость» на себя · 2 р.',
+				tags: ['buff'],
+			},
+			4: {
+				mechanics:
+					'Выпад с заднего ряда + смена ряда; себе «Контрудар» · 2 р.',
+				tags: ['attack', 'buff'],
+			},
+			5: {
+				mechanics: 'Фронт: выстрел в упор / иначе перезарядка (+удача).',
+				tags: ['attack'],
+			},
 		},
 	},
 	GhostWarrior: {

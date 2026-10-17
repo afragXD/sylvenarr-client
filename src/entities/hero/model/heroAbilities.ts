@@ -166,7 +166,7 @@ const PILOTS: Record<string, RawHeroAbilityDoc> = {
 			{
 				slot: 2,
 				title: 'Звон смерти',
-				body: 'Краткий «мимик»: удача и прилив силы.',
+				body: 'Накладывает на себя «Радость» и повышает урон.',
 			},
 			{
 				slot: 3,
@@ -266,7 +266,7 @@ const PILOTS: Record<string, RawHeroAbilityDoc> = {
 			{
 				slot: 3,
 				title: 'Смертный приговор',
-				body: 'Метка и ослабление защиты цели.',
+				body: 'Накладывает «Метку» и «Смертный приговор» на цель.',
 			},
 			{
 				slot: 4,
@@ -294,7 +294,7 @@ const PILOTS: Record<string, RawHeroAbilityDoc> = {
 			{
 				slot: 2,
 				title: 'Пыточная молния',
-				body: 'Магия воздуха (3 МР): урон и ослабление силы цели.',
+				body: 'Магия воздуха (3 МР): урон и «Помехи» на цель.',
 			},
 			{
 				slot: 3,

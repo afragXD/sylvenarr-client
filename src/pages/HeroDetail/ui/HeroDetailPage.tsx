@@ -98,6 +98,7 @@ export const HeroDetailPage = () => {
 							h="100%"
 							radius={0}
 							bg="transparent"
+							objectPosition="top"
 						/>
 					</Box>
 					<Stack gap="lg" style={{ flex: '1 1 360px', minWidth: 0 }}>
