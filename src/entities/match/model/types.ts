@@ -34,6 +34,7 @@ export type MatchDraftState = {
 export type BattleEffectBrief = {
 	id: string;
 	rounds: number;
+	power?: number;
 };
 
 export type BattleUnit = {

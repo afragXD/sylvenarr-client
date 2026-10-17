@@ -46,6 +46,11 @@ const EffectBadge = ({ effect }: { effect: BattleEffectBrief }) => {
 						{meta.label}
 					</Text>
 					<Text size="xs">{meta.description}</Text>
+					{typeof effect.power === 'number' && effect.power !== 0 && (
+						<Text size="xs" c="dimmed">
+							Сила: {effect.power}
+						</Text>
+					)}
 					{roundsLabel && (
 						<Text size="xs" c="dimmed">
 							{roundsLabel}

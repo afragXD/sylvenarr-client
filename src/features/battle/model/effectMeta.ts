@@ -1,17 +1,34 @@
 import type { LucideIcon } from 'lucide-react';
 import {
+	Biohazard,
+	Bug,
+	Clover,
+	Crosshair,
 	Droplet,
 	Droplets,
+	EyeOff,
 	Flame,
+	Focus,
 	Ghost,
+	Heart,
 	HeartPulse,
 	HelpCircle,
 	Link,
+	Mountain,
 	Orbit,
 	Shield,
+	ShieldOff,
+	Skull,
 	Smile,
 	Sparkles,
+	Swords,
 	Sword,
+	ThumbsDown,
+	Timer,
+	VolumeX,
+	WifiOff,
+	Zap,
+	ZapOff,
 } from 'lucide-react';
 
 export type EffectId =
@@ -25,7 +42,26 @@ export type EffectId =
 	| 'HAPPY'
 	| 'CHAINED'
 	| 'FEAR'
-	| 'VAMPWEAPON';
+	| 'VAMPWEAPON'
+	| 'REGENHP'
+	| 'HASTE'
+	| 'CHAMELEON'
+	| 'PETRIFIED'
+	| 'SLOW'
+	| 'STONEFLESH'
+	| 'CONTR'
+	| 'MARKED'
+	| 'DEATHSENTENCE'
+	| 'INTERFERENCE'
+	| 'SILENCE'
+	| 'IMPISH'
+	| 'LUCKY'
+	| 'FOCUSED'
+	| 'STUNNED'
+	| 'WEAKNESS'
+	| 'UNLUCKY'
+	| 'GALL'
+	| 'SANCTUM';
 
 export type EffectKind = 'buff' | 'debuff';
 
@@ -33,25 +69,52 @@ export type EffectMeta = {
 	id: EffectId;
 	label: string;
 	description: string;
-	/** Формула для кодекса (видимый текст). */
 	mechanics: string;
-	/** Тултип: «Например при уровне L: …». */
 	exampleAtL: string;
 	Icon: LucideIcon;
 	kind: EffectKind;
 };
 
-/** Сколько иконок эффектов показывать на юните до бейджа +K. */
 export const MAX_VISIBLE_EFFECTS = 4;
-
-/** Условный уровень L в формулах кодекса (= PILOT_LVL на сервисе). */
 export const CODEX_L = 5;
 
 const exampleAt = (value: string): string => `Например при уровне ${CODEX_L}: ${value}`;
 
-const BUFF_ORDER: EffectId[] = ['GUARDED', 'STRENGTH', 'BLESSED', 'HAPPY', 'VAMPWEAPON'];
+const BUFF_ORDER: EffectId[] = [
+	'GUARDED',
+	'STRENGTH',
+	'BLESSED',
+	'HAPPY',
+	'VAMPWEAPON',
+	'REGENHP',
+	'HASTE',
+	'CHAMELEON',
+	'STONEFLESH',
+	'CONTR',
+	'LUCKY',
+	'FOCUSED',
+	'SANCTUM',
+];
 
-const DEBUFF_ORDER: EffectId[] = ['POISON', 'BURNING', 'BLEEDING', 'FATMAN', 'CHAINED', 'FEAR'];
+const DEBUFF_ORDER: EffectId[] = [
+	'POISON',
+	'BURNING',
+	'BLEEDING',
+	'FATMAN',
+	'CHAINED',
+	'FEAR',
+	'PETRIFIED',
+	'SLOW',
+	'MARKED',
+	'DEATHSENTENCE',
+	'INTERFERENCE',
+	'SILENCE',
+	'IMPISH',
+	'STUNNED',
+	'WEAKNESS',
+	'UNLUCKY',
+	'GALL',
+];
 
 const CATALOG: Record<EffectId, EffectMeta> = {
 	GUARDED: {
@@ -76,8 +139,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'BLESSED',
 		label: 'Благословение',
 		description: 'Усиливает получаемое лечение.',
-		mechanics: 'лечение ×1.5 · (1 + ⌊L/6⌋) р. — пока не применяется в бою',
-		exampleAtL: exampleAt('×1.5 лечения · 1 р. (пока не в бою)'),
+		mechanics: 'лечение ×(1 + power) · (1 + ⌊L/6⌋) р.',
+		exampleAtL: exampleAt('×1.5 лечения · 1 р.'),
 		Icon: Sparkles,
 		kind: 'buff',
 	},
@@ -139,7 +202,7 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'FEAR',
 		label: 'Ужас',
 		description: 'Штраф к урону от подавляющего страха.',
-		mechanics: '−3 урона · 2 р.',
+		mechanics: '−power к урону · 2 р. (снимается с откатом)',
 		exampleAtL: exampleAt('−3 урона · 2 р.'),
 		Icon: Ghost,
 		kind: 'debuff',
@@ -148,9 +211,180 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'VAMPWEAPON',
 		label: 'Пьющий жизни',
 		description: 'Оружие вампиризирует часть нанесённого урона.',
-		mechanics: '≈(0.5 + L/25) доли урона · (1 + ⌊L/7⌋) р. — пока не применяется в бою',
-		exampleAtL: exampleAt('≈0.7 доли · 1 р. (пока не в бою)'),
+		mechanics: 'heal ≈ power × урон · (1 + ⌊L/7⌋) р.',
+		exampleAtL: exampleAt('≈0.7 доли · 1 р.'),
 		Icon: HeartPulse,
+		kind: 'buff',
+	},
+	REGENHP: {
+		id: 'REGENHP',
+		label: 'Регенерация',
+		description: 'Восстанавливает ОЗ в начале хода.',
+		mechanics: 'heal ≈ 6%×maxHp×power за ход',
+		exampleAtL: exampleAt('несколько ОЗ каждый ход'),
+		Icon: Heart,
+		kind: 'buff',
+	},
+	HASTE: {
+		id: 'HASTE',
+		label: 'Ускорение',
+		description: 'Повышает инициативу.',
+		mechanics: '+power к инициативе · 2 р.',
+		exampleAtL: exampleAt('+20 инициативы · 2 р.'),
+		Icon: Zap,
+		kind: 'buff',
+	},
+	CHAMELEON: {
+		id: 'CHAMELEON',
+		label: 'Хамелеон',
+		description: 'Повышает уклонение.',
+		mechanics: '+power к уклонению · 1 р.',
+		exampleAtL: exampleAt('+20 уклонения · 1 р.'),
+		Icon: EyeOff,
+		kind: 'buff',
+	},
+	PETRIFIED: {
+		id: 'PETRIFIED',
+		label: 'Окаменение',
+		description: 'Каменная кожа: сильно повышает броню, часто со сковыванием.',
+		mechanics: '+power брони · 2 р.',
+		exampleAtL: exampleAt('+15 брони · 2 р.'),
+		Icon: Mountain,
+		kind: 'debuff',
+	},
+	SLOW: {
+		id: 'SLOW',
+		label: 'Замедление',
+		description: 'Снижает инициативу.',
+		mechanics: '−power к инициативе · 2 р.',
+		exampleAtL: exampleAt('−20 инициативы · 2 р.'),
+		Icon: Timer,
+		kind: 'debuff',
+	},
+	STONEFLESH: {
+		id: 'STONEFLESH',
+		label: 'Каменная плоть',
+		description: 'Временно усиливает броню союзника.',
+		mechanics: '+power брони · (2 + ⌊L/4⌋) р.',
+		exampleAtL: exampleAt('+30 брони · 3 р.'),
+		Icon: Mountain,
+		kind: 'buff',
+	},
+	CONTR: {
+		id: 'CONTR',
+		label: 'Контрудар',
+		description: 'Отвечает ближним ударом после получения урона.',
+		mechanics: '1 контрудар melee после hit · 2+ р.',
+		exampleAtL: exampleAt('контрудар · 3 р.'),
+		Icon: Swords,
+		kind: 'buff',
+	},
+	MARKED: {
+		id: 'MARKED',
+		label: 'Метка',
+		description: 'Цель помечена для добивания.',
+		mechanics: 'метка без статов · (2 + ⌊L/6⌋) р.',
+		exampleAtL: exampleAt('2 р.'),
+		Icon: Crosshair,
+		kind: 'debuff',
+	},
+	DEATHSENTENCE: {
+		id: 'DEATHSENTENCE',
+		label: 'Смертный приговор',
+		description: 'Ослабляет защиту (proxy резистов Разум/Смерть).',
+		mechanics: '−power к броне · 2 р.',
+		exampleAtL: exampleAt('−8 брони · 2 р.'),
+		Icon: Skull,
+		kind: 'debuff',
+	},
+	INTERFERENCE: {
+		id: 'INTERFERENCE',
+		label: 'Помехи',
+		description: 'Снижает силу магии.',
+		mechanics: '−power к силе · (1 + ⌊L/6⌋) р.',
+		exampleAtL: exampleAt('−доля силы · 1 р.'),
+		Icon: WifiOff,
+		kind: 'debuff',
+	},
+	SILENCE: {
+		id: 'SILENCE',
+		label: 'Немота',
+		description: 'Блокирует трату маны и магические способности.',
+		mechanics: 'запрет spendMana · 2 р.',
+		exampleAtL: exampleAt('2 р.'),
+		Icon: VolumeX,
+		kind: 'debuff',
+	},
+	IMPISH: {
+		id: 'IMPISH',
+		label: 'Бес',
+		description: 'Полиморф: без брони и со штрафом к урону; броня вернётся.',
+		mechanics: 'armor→0, −power урона · 2 р.',
+		exampleAtL: exampleAt('−5 урона · 2 р.'),
+		Icon: Bug,
+		kind: 'debuff',
+	},
+	LUCKY: {
+		id: 'LUCKY',
+		label: 'Удача',
+		description: 'Повышает удачу (крит/шансы).',
+		mechanics: '+power удачи · 2 р.',
+		exampleAtL: exampleAt('+20 удачи · 2 р.'),
+		Icon: Clover,
+		kind: 'buff',
+	},
+	FOCUSED: {
+		id: 'FOCUSED',
+		label: 'Сосредоточение',
+		description: 'Повышает точность.',
+		mechanics: '+power точности · 2 р.',
+		exampleAtL: exampleAt('+15 точности · 2 р.'),
+		Icon: Focus,
+		kind: 'buff',
+	},
+	STUNNED: {
+		id: 'STUNNED',
+		label: 'Оглушение',
+		description: 'Пропускает следующий ход.',
+		mechanics: 'skip turn · 1 р.',
+		exampleAtL: exampleAt('1 пропуск хода'),
+		Icon: ZapOff,
+		kind: 'debuff',
+	},
+	WEAKNESS: {
+		id: 'WEAKNESS',
+		label: 'Слабость',
+		description: 'Снижает физический урон.',
+		mechanics: '−power к урону · 2 р.',
+		exampleAtL: exampleAt('−30% урона · 2 р.'),
+		Icon: ShieldOff,
+		kind: 'debuff',
+	},
+	UNLUCKY: {
+		id: 'UNLUCKY',
+		label: 'Неудача',
+		description: 'Снижает удачу и шанс крита.',
+		mechanics: '−power к удаче · (1 + ⌊L/5⌋) р.',
+		exampleAtL: exampleAt('−20 удачи · 2 р.'),
+		Icon: ThumbsDown,
+		kind: 'debuff',
+	},
+	GALL: {
+		id: 'GALL',
+		label: 'Желчь',
+		description: 'DoT и разъедание брони.',
+		mechanics: 'DoT + −armor · (2 + ⌊L/5⌋) р.',
+		exampleAtL: exampleAt('DoT · 3 р.'),
+		Icon: Biohazard,
+		kind: 'debuff',
+	},
+	SANCTUM: {
+		id: 'SANCTUM',
+		label: 'Святилище',
+		description: 'Нельзя выбрать целью атаки и вражеских способностей.',
+		mechanics: 'untargetable · (2 + ⌊L/5⌋) р.',
+		exampleAtL: exampleAt('3 р.'),
+		Icon: Sparkles,
 		kind: 'buff',
 	},
 };
@@ -165,44 +399,26 @@ const FALLBACK: EffectMeta = {
 	kind: 'buff',
 };
 
-/**
- * Метаданные эффекта по id (с fallback для неизвестных).
- */
 export function getEffectMeta(id: string): EffectMeta {
 	const known = CATALOG[id as EffectId];
 	if (known) {
 		return known;
 	}
-	return {
-		...FALLBACK,
-		label: id || FALLBACK.label,
-	};
+	return { ...FALLBACK, label: id || FALLBACK.label };
 }
 
-/**
- * Все эффекты кодекса (баффы, затем дебаффы).
- */
 export function listEffectCatalog(): EffectMeta[] {
 	return [...listBuffs(), ...listDebuffs()];
 }
 
-/**
- * Усиления в стабильном порядке.
- */
 export function listBuffs(): EffectMeta[] {
 	return BUFF_ORDER.map((id) => CATALOG[id]);
 }
 
-/**
- * Ослабления в стабильном порядке.
- */
 export function listDebuffs(): EffectMeta[] {
 	return DEBUFF_ORDER.map((id) => CATALOG[id]);
 }
 
-/**
- * Строка для тултипа: оставшиеся раунды.
- */
 export function formatEffectRounds(rounds: number): string | null {
 	if (rounds <= 0) {
 		return null;
