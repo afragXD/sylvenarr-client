@@ -33,6 +33,10 @@ export type EffectMeta = {
 	id: EffectId;
 	label: string;
 	description: string;
+	/** Формула для кодекса (видимый текст). */
+	mechanics: string;
+	/** Тултип с подстановкой при CODEX_L. */
+	exampleAtL: string;
 	Icon: LucideIcon;
 	kind: EffectKind;
 };
@@ -40,11 +44,20 @@ export type EffectMeta = {
 /** Сколько иконок эффектов показывать на юните до бейджа +K. */
 export const MAX_VISIBLE_EFFECTS = 4;
 
+/** Условный уровень L в формулах кодекса (= PILOT_LVL на сервисе). */
+export const CODEX_L = 5;
+
+const BUFF_ORDER: EffectId[] = ['GUARDED', 'STRENGTH', 'BLESSED', 'HAPPY', 'VAMPWEAPON'];
+
+const DEBUFF_ORDER: EffectId[] = ['POISON', 'BURNING', 'BLEEDING', 'FATMAN', 'CHAINED', 'FEAR'];
+
 const CATALOG: Record<EffectId, EffectMeta> = {
 	GUARDED: {
 		id: 'GUARDED',
 		label: 'Под охраной',
 		description: 'Союзник прикрывает цель: повышенная защита на несколько раундов.',
+		mechanics: '+3 брони · 2 р.',
+		exampleAtL: 'Например: +3 брони · 2 р.',
 		Icon: Shield,
 		kind: 'buff',
 	},
@@ -52,6 +65,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'STRENGTH',
 		label: 'Сила',
 		description: 'Увеличивает наносимый урон.',
+		mechanics: '+(20 + 2L) урона · (1 + ⌊L/5⌋) р.',
+		exampleAtL: 'Например: +30 урона · 2 р.',
 		Icon: Sword,
 		kind: 'buff',
 	},
@@ -59,6 +74,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'BLESSED',
 		label: 'Благословение',
 		description: 'Усиливает получаемое лечение.',
+		mechanics: 'лечение ×1.5 · (1 + ⌊L/6⌋) р. — пока не применяется в бою',
+		exampleAtL: 'Например: ×1.5 лечения · 1 р. (пока не в бою)',
 		Icon: Sparkles,
 		kind: 'buff',
 	},
@@ -66,6 +83,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'POISON',
 		label: 'Отравление',
 		description: 'Наносит урон в начале хода носителя.',
+		mechanics: 'DoT max(1, round(power)) за ход; иначе 3',
+		exampleAtL: 'Например: 3 урона за ход',
 		Icon: Droplet,
 		kind: 'debuff',
 	},
@@ -73,6 +92,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'BURNING',
 		label: 'Поджог',
 		description: 'Наносит урон огнём в начале хода носителя.',
+		mechanics: 'DoT max(1, round(power)) за ход; иначе 3',
+		exampleAtL: 'Например: 3 урона за ход',
 		Icon: Flame,
 		kind: 'debuff',
 	},
@@ -80,6 +101,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'BLEEDING',
 		label: 'Кровотечение',
 		description: 'Наносит урон в начале хода носителя.',
+		mechanics: 'DoT max(1, round(power)) за ход; иначе 3',
+		exampleAtL: 'Например: 3 урона за ход',
 		Icon: Droplets,
 		kind: 'debuff',
 	},
@@ -87,6 +110,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'FATMAN',
 		label: 'Головокружение',
 		description: 'Снижает уклонение.',
+		mechanics: '−(15 + L) уклонения · 2 р.',
+		exampleAtL: 'Например: −20 уклонения · 2 р.',
 		Icon: Orbit,
 		kind: 'debuff',
 	},
@@ -94,6 +119,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'HAPPY',
 		label: 'Радость',
 		description: 'Повышает удачу.',
+		mechanics: '+(15 + 2L) удачи · 2 р.',
+		exampleAtL: 'Например: +25 удачи · 2 р.',
 		Icon: Smile,
 		kind: 'buff',
 	},
@@ -101,6 +128,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'CHAINED',
 		label: 'Обездвиженный',
 		description: 'Сковывает цель, ограничивая манёвр.',
+		mechanics: '2 р., без числового стата',
+		exampleAtL: 'Например: 2 р.',
 		Icon: Link,
 		kind: 'debuff',
 	},
@@ -108,6 +137,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'FEAR',
 		label: 'Ужас',
 		description: 'Штраф к урону от подавляющего страха.',
+		mechanics: '−3 урона · 2 р.',
+		exampleAtL: 'Например: −3 урона · 2 р.',
 		Icon: Ghost,
 		kind: 'debuff',
 	},
@@ -115,6 +146,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'VAMPWEAPON',
 		label: 'Пьющий жизни',
 		description: 'Оружие вампиризирует часть нанесённого урона.',
+		mechanics: '≈(0.5 + L/25) доли урона · (1 + ⌊L/7⌋) р. — пока не применяется в бою',
+		exampleAtL: 'Например: ≈0.7 доли · 1 р. (пока не в бою)',
 		Icon: HeartPulse,
 		kind: 'buff',
 	},
@@ -124,6 +157,8 @@ const FALLBACK: EffectMeta = {
 	id: 'GUARDED',
 	label: 'Неизвестный эффект',
 	description: 'Описание пока недоступно.',
+	mechanics: '—',
+	exampleAtL: 'Например: —',
 	Icon: HelpCircle,
 	kind: 'buff',
 };
@@ -143,10 +178,24 @@ export function getEffectMeta(id: string): EffectMeta {
 }
 
 /**
- * Все эффекты кодекса в стабильном порядке.
+ * Все эффекты кодекса (баффы, затем дебаффы).
  */
 export function listEffectCatalog(): EffectMeta[] {
-	return Object.values(CATALOG);
+	return [...listBuffs(), ...listDebuffs()];
+}
+
+/**
+ * Усиления в стабильном порядке.
+ */
+export function listBuffs(): EffectMeta[] {
+	return BUFF_ORDER.map((id) => CATALOG[id]);
+}
+
+/**
+ * Ослабления в стабильном порядке.
+ */
+export function listDebuffs(): EffectMeta[] {
+	return DEBUFF_ORDER.map((id) => CATALOG[id]);
 }
 
 /**

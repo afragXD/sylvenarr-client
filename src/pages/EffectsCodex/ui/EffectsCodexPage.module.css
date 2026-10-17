@@ -1,3 +1,29 @@
+.legend {
+	margin-top: 0.35rem;
+	padding: 0.65rem 0 0;
+	border-top: 1px solid color-mix(in srgb, var(--app-text) 12%, transparent);
+}
+
+.legendList {
+	list-style: none;
+	margin: 0.4rem 0 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+}
+
+.legendKey {
+	font-family: var(--mantine-font-family-monospace);
+	font-weight: 600;
+	color: var(--app-text);
+}
+
+.section {
+	margin-top: 1.5rem;
+	max-width: 40rem;
+}
+
 .list {
 	list-style: none;
 	margin: 0;
@@ -5,7 +31,6 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0;
-	max-width: 40rem;
 }
 
 .item {
@@ -37,4 +62,15 @@
 .item[data-kind="debuff"] .icon {
 	border-color: color-mix(in srgb, var(--mantine-color-accent-filled) 40%, var(--app-border));
 	color: color-mix(in srgb, var(--mantine-color-accent-filled) 70%, var(--app-text));
+}
+
+.mechanics {
+	display: inline-block;
+	max-width: 100%;
+	font-family: var(--mantine-font-family-monospace);
+	font-size: 0.8rem;
+	line-height: 1.45;
+	color: var(--app-text);
+	cursor: help;
+	border-bottom: 1px dotted color-mix(in srgb, var(--app-text) 35%, transparent);
 }
