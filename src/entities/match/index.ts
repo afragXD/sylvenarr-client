@@ -15,6 +15,7 @@ export type {
 	BattleEffectBrief,
 	BattleState,
 	BattleUnit,
+	ResistBrief,
 	Match,
 	MatchDraftPick,
 	MatchDraftState,
@@ -26,4 +27,5 @@ export type {
 	MatchStatus,
 	PendingPrompt,
 	TurnOrderEntry,
+	TurnOrderPhase,
 } from './model/types';

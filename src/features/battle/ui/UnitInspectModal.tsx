@@ -6,6 +6,7 @@ import {
 	Gauge,
 	Heart,
 	Shield,
+	ShieldBan,
 	Sparkles,
 	Sword,
 	WandSparkles,
@@ -14,7 +15,7 @@ import {
 } from 'lucide-react';
 
 import { getHeroAbilities, HeroImage } from '@/entities/hero';
-import type { BattleUnit } from '@/entities/match';
+import type { BattleUnit, ResistBrief } from '@/entities/match';
 
 import { AbilityTags } from './AbilityTags';
 import { CombatStat, CombatStatRow } from './CombatStat';
@@ -54,6 +55,16 @@ const STATS: ReadonlyArray<{ key: NumericStatKey; label: string; Icon: LucideIco
 	{ key: 'critBank', label: 'Крит-банк', Icon: Sword },
 	{ key: 'ultaCharges', label: 'Заряды', Icon: Sparkles },
 ];
+
+function formatResistValue(resist: ResistBrief): string {
+	if (resist.immune) {
+		return 'Иммунитет';
+	}
+	if (resist.wardCharges != null && resist.wardCharges > 0) {
+		return resist.value !== 0 ? `${resist.value}% · Щит×${resist.wardCharges}` : 'Щит';
+	}
+	return `${resist.value}%`;
+}
 
 /**
  * Инспектор юнита в бою: live-статы, эффекты, описание способностей.
@@ -124,6 +135,32 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 							);
 						})}
 					</SimpleGrid>
+
+					{(unit.resists?.length ?? 0) > 0 && (
+						<div className={styles.block}>
+							<Text size="sm" fw={600} mb={6}>
+								Сопротивления
+							</Text>
+							<div className={styles.resistGrid}>
+								{(unit.resists ?? []).map((resist) => (
+									<div
+										key={resist.source}
+										className={styles.resist}
+										title={resist.label}
+										aria-label={`${resist.label}: ${formatResistValue(resist)}`}
+									>
+										<ShieldBan size={12} strokeWidth={2} aria-hidden />
+										<Text size="xs" c="var(--app-text-muted)">
+											{resist.label}
+										</Text>
+										<Text size="sm" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
+											{formatResistValue(resist)}
+										</Text>
+									</div>
+								))}
+							</div>
+						</div>
+					)}
 
 					{doc.passive && (
 						<div className={styles.block}>

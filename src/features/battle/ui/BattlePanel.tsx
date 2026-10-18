@@ -215,7 +215,16 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 				)}
 			</Group>
 
-			<TurnOrderStrip entries={battle.turnOrder ?? []} />
+			<TurnOrderStrip
+				entries={battle.turnOrder ?? []}
+				stage={battle.stage}
+				onSelectUnit={(unitId) => {
+					const unit = battle.units.find((item) => item.id === unitId);
+					if (unit) {
+						setInspectUnit(unit);
+					}
+				}}
+			/>
 
 			<div className={styles.battlefield}>
 				<div className={styles.field}>

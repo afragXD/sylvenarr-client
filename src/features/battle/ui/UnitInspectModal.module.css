@@ -16,3 +16,23 @@
 	padding-top: 0.35rem;
 	border-top: 1px solid color-mix(in srgb, var(--app-border) 80%, transparent);
 }
+
+.resistGrid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.35rem 0.6rem;
+}
+
+@media (min-width: 36em) {
+	.resistGrid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+.resist {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.25rem 0.4rem;
+	padding: 0.2rem 0;
+}

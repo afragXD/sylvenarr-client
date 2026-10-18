@@ -37,6 +37,14 @@ export type BattleEffectBrief = {
 	power?: number;
 };
 
+export type ResistBrief = {
+	source: string;
+	label: string;
+	value: number;
+	wardCharges: number | null;
+	immune: boolean;
+};
+
 export type BattleUnit = {
 	id: string;
 	playerId: string;
@@ -64,7 +72,11 @@ export type BattleUnit = {
 	gold: number;
 	critBank: number;
 	ultaCharges: number;
+	/** Ненулевые сопротивления / варды / иммунитеты. */
+	resists?: ResistBrief[];
 };
+
+export type TurnOrderPhase = 'acted' | 'active' | 'waiting' | 'delayed' | 'dead';
 
 export type TurnOrderEntry = {
 	unitId: string;
@@ -73,6 +85,8 @@ export type TurnOrderEntry = {
 	team: 0 | 1;
 	alive: boolean;
 	isActive: boolean;
+	/** Фаза в шкале раунда; старше клиентов без поля — трактовать по isActive/alive. */
+	phase?: TurnOrderPhase;
 };
 
 export type AbilityInfo = {
