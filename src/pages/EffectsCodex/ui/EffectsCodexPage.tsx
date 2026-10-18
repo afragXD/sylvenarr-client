@@ -50,42 +50,42 @@ export const EffectsCodexPage = () => {
 				← К реестру
 			</Anchor>
 
-			<Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
-				<Stack gap={8} maw="56rem">
+			<Stack gap={8} maw="56rem">
+				<Group justify="space-between" align="baseline" wrap="wrap" gap="sm">
 					<Title order={1}>Кодекс эффектов</Title>
-					<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
-						Состояния, которые герои накладывают в бою. На поле они отмечены иконками на юните —
-						здесь полный список с пояснениями.
+					<Text size="sm" c="var(--app-text-muted)" ff="monospace">
+						{shown === total ? `${total} эффектов` : `${shown} из ${total}`}
 					</Text>
-					<div className={styles.legend}>
-						<Text size="sm" fw={600}>
-							Обозначения
-						</Text>
-						<ul className={styles.legendList}>
-							<li>
-								<Text size="sm" c="var(--app-text-muted)" component="span">
-									<span className={styles.legendKey}>L</span> — уровень героя в формулах. В
-									примерах тултипа для зависящих от L эффектов подставляется {CODEX_L}; в бою
-									используется живой уровень юнита.
-								</Text>
-							</li>
-							<li>
-								<Text size="sm" c="var(--app-text-muted)" component="span">
-									<span className={styles.legendKey}>р.</span> — длительность в раундах
-								</Text>
-							</li>
-							<li>
-								<Text size="sm" c="var(--app-text-muted)" component="span">
-									<span className={styles.legendKey}>⌊…⌋</span> — целая часть (округление вниз)
-								</Text>
-							</li>
-						</ul>
-					</div>
-				</Stack>
-				<Text size="sm" c="var(--app-text-muted)" ff="monospace">
-					{shown === total ? `${total} эффектов` : `${shown} из ${total}`}
+				</Group>
+				<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
+					Состояния, которые герои накладывают в бою. На поле они отмечены иконками на юните —
+					здесь полный список с пояснениями.
 				</Text>
-			</Group>
+				<div className={styles.legend}>
+					<Text size="sm" fw={600}>
+						Обозначения
+					</Text>
+					<ul className={styles.legendList}>
+						<li>
+							<Text size="sm" c="var(--app-text-muted)" component="span">
+								<span className={styles.legendKey}>L</span> — уровень героя в формулах. В
+								примерах тултипа для зависящих от L эффектов подставляется {CODEX_L}; в бою
+								используется живой уровень юнита.
+							</Text>
+						</li>
+						<li>
+							<Text size="sm" c="var(--app-text-muted)" component="span">
+								<span className={styles.legendKey}>р.</span> — длительность в раундах
+							</Text>
+						</li>
+						<li>
+							<Text size="sm" c="var(--app-text-muted)" component="span">
+								<span className={styles.legendKey}>⌊…⌋</span> — целая часть (округление вниз)
+							</Text>
+						</li>
+					</ul>
+				</div>
+			</Stack>
 
 			<TextInput
 				placeholder="Поиск по названию, описанию, id…"
