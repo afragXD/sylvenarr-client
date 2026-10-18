@@ -14,7 +14,13 @@ import {
 	type LucideIcon,
 } from 'lucide-react';
 
-import { getHeroAbilities, HeroImage } from '@/entities/hero';
+import {
+	formatAbilityPreview,
+	getAbilityPreview,
+	getHeroAbilities,
+	HeroImage,
+	previewCtxFromUnit,
+} from '@/entities/hero';
 import type { BattleUnit, ResistBrief } from '@/entities/match';
 
 import { AbilityTags } from './AbilityTags';
@@ -78,6 +84,11 @@ function formatResistValue(resist: ResistBrief): string {
  */
 export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 	const doc = unit ? getHeroAbilities(unit.heroClassCode, true) : null;
+	const previewCtx = unit ? previewCtxFromUnit(unit) : null;
+	const passivePreview =
+		unit && previewCtx
+			? formatAbilityPreview(getAbilityPreview(unit.heroClassCode, 'passive', previewCtx))
+			: null;
 
 	return (
 		<Modal
@@ -87,7 +98,7 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 			size="lg"
 			centered
 		>
-			{unit && doc && (
+			{unit && doc && previewCtx && (
 				<Stack gap="md">
 					<Group gap="md" align="flex-start" wrap="nowrap">
 						<HeroImage
@@ -188,25 +199,50 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 									{doc.passive.mechanics}
 								</Text>
 							)}
+							{passivePreview ? (
+								<Text
+									size="xs"
+									c="var(--app-text-muted)"
+									mt={4}
+									style={{ fontVariantNumeric: 'tabular-nums' }}
+								>
+									{passivePreview}
+								</Text>
+							) : null}
 						</div>
 					)}
 
-					{doc.slots.map((slot) => (
-						<div key={slot.slot} className={styles.block}>
-							<Group gap={8} wrap="nowrap">
-								<AbilityTags tags={slot.tags} />
-								<Text size="sm" fw={600}>
-									[{slot.slot}] {slot.title}
+					{doc.slots.map((slot) => {
+						const preview = formatAbilityPreview(
+							getAbilityPreview(unit.heroClassCode, slot.slot, previewCtx),
+						);
+						return (
+							<div key={slot.slot} className={styles.block}>
+								<Group gap={8} wrap="nowrap">
+									<AbilityTags tags={slot.tags} />
+									<Text size="sm" fw={600}>
+										[{slot.slot}] {slot.title}
+									</Text>
+								</Group>
+								<Text size="sm" c="var(--app-text-muted)">
+									{slot.body}
 								</Text>
-							</Group>
-							<Text size="sm" c="var(--app-text-muted)">
-								{slot.body}
-							</Text>
-							<Text size="xs" c="var(--app-text-muted)" mt={4}>
-								{slot.mechanics}
-							</Text>
-						</div>
-					))}
+								<Text size="xs" c="var(--app-text-muted)" mt={4}>
+									{slot.mechanics}
+								</Text>
+								{preview ? (
+									<Text
+										size="xs"
+										c="var(--app-text-muted)"
+										mt={4}
+										style={{ fontVariantNumeric: 'tabular-nums' }}
+									>
+										{preview}
+									</Text>
+								) : null}
+							</div>
+						);
+					})}
 				</Stack>
 			)}
 		</Modal>

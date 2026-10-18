@@ -1,7 +1,13 @@
 import { Button, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useState } from 'react';
 
-import { getHeroAbilities, HeroImage } from '@/entities/hero';
+import {
+	formatAbilityPreview,
+	getAbilityPreview,
+	getHeroAbilities,
+	HeroImage,
+	previewCtxFromUnit,
+} from '@/entities/hero';
 import type { AbilityInfo, BattleState, BattleUnit, Match } from '@/entities/match';
 
 import { AbilityTags } from './AbilityTags';
@@ -314,10 +320,20 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 							const selecting =
 								pendingMode?.kind === 'ability' && pendingMode.slot === ability.slot;
 							const doc = abilityDocs.find((slot) => slot.slot === ability.slot);
+							const preview =
+								active && doc
+									? formatAbilityPreview(
+											getAbilityPreview(
+												active.heroClassCode,
+												ability.slot,
+												previewCtxFromUnit(active),
+											),
+										)
+									: null;
 							const tip = ability.disabledReason
 								? ability.disabledReason
 								: doc
-									? `${doc.title}: ${doc.body}\n${doc.mechanics}`
+									? `${doc.title}: ${doc.body}\n${doc.mechanics}${preview ? `\n${preview}` : ''}`
 									: ability.label;
 							const button = (
 								<Button

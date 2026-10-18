@@ -13,6 +13,17 @@ export {
 } from './model/hero-detail';
 export type { AbilityTag } from './model/abilityTags';
 export { ABILITY_TAG_LABELS } from './model/abilityTags';
+export type {
+	AbilitySlotKey,
+	PreviewCtx,
+	PreviewPart,
+} from './model/abilityPreview';
+export {
+	formatAbilityPreview,
+	getAbilityPreview,
+	previewCtxFromHero,
+	previewCtxFromUnit,
+} from './model/abilityPreview';
 export type { HeroAbilityDoc, HeroAbilitySlot } from './model/heroAbilities';
 export { getHeroAbilities } from './model/heroAbilities';
 export type { SummonerSummons, SummonRef } from './model/heroSummons';

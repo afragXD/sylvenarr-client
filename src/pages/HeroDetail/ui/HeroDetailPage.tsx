@@ -150,7 +150,11 @@ export const HeroDetailPage = () => {
 								/>
 							))}
 						</SimpleGrid>
-						<HeroAbilitiesSection code={hero.code} isPlayable={hero.isPlayable} />
+						<HeroAbilitiesSection
+							code={hero.code}
+							isPlayable={hero.isPlayable}
+							hero={hero}
+						/>
 						<HeroSummonsSection summonerCode={hero.code} />
 					</Stack>
 				</Group>
