@@ -6,6 +6,7 @@ import {
 	fetchHeroByCode,
 	getSummonerSummons,
 	HeroImage,
+	isTransformForm,
 	type HeroClass,
 	type SummonRef,
 } from '@/entities/hero';
@@ -66,17 +67,21 @@ export const HeroSummonsSection = ({ summonerCode }: HeroSummonsSectionProps) =>
 		return null;
 	}
 
+	const formsOnly = config.entries.every((entry) => isTransformForm(entry.code));
+	const sectionTitle = formsOnly ? 'Боевые формы' : 'Призывы';
+	const loadingLabel = formsOnly ? 'Загрузка форм…' : 'Загрузка призывов…';
+
 	return (
 		<Stack gap="md" className={styles.section} maw="42rem">
 			<Title order={2} size="h3">
-				Призывы
+				{sectionTitle}
 			</Title>
 
 			{entries === null && (
 				<Group gap="sm">
 					<Loader color="brand" size="sm" />
 					<Text size="sm" c="var(--app-text-muted)">
-						Загрузка призывов…
+						{loadingLabel}
 					</Text>
 				</Group>
 			)}

@@ -50,49 +50,50 @@ export const EffectsCodexPage = () => {
 				← К реестру
 			</Anchor>
 
-			<Stack gap={8} maw="40rem">
-				<Title order={1}>Кодекс эффектов</Title>
-				<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
-					Состояния, которые герои накладывают в бою. На поле они отмечены иконками на юните — здесь
-					полный список с пояснениями.
-				</Text>
-				<div className={styles.legend}>
-					<Text size="sm" fw={600}>
-						Обозначения
-					</Text>
-					<ul className={styles.legendList}>
-						<li>
-							<Text size="sm" c="var(--app-text-muted)" component="span">
-								<span className={styles.legendKey}>L</span> — условный уровень героя в бою (сейчас
-								всегда {CODEX_L}; отдельного уровня у юнита пока нет)
-							</Text>
-						</li>
-						<li>
-							<Text size="sm" c="var(--app-text-muted)" component="span">
-								<span className={styles.legendKey}>р.</span> — длительность в раундах
-							</Text>
-						</li>
-						<li>
-							<Text size="sm" c="var(--app-text-muted)" component="span">
-								<span className={styles.legendKey}>⌊…⌋</span> — целая часть (округление вниз)
-							</Text>
-						</li>
-					</ul>
-				</div>
-			</Stack>
-
 			<Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
-				<TextInput
-					placeholder="Поиск по названию, описанию, id…"
-					value={query}
-					onChange={(event) => setQuery(event.currentTarget.value)}
-					maw={360}
-					aria-label="Поиск эффектов"
-				/>
+				<Stack gap={8} maw="40rem">
+					<Title order={1}>Кодекс эффектов</Title>
+					<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
+						Состояния, которые герои накладывают в бою. На поле они отмечены иконками на юните —
+						здесь полный список с пояснениями.
+					</Text>
+					<div className={styles.legend}>
+						<Text size="sm" fw={600}>
+							Обозначения
+						</Text>
+						<ul className={styles.legendList}>
+							<li>
+								<Text size="sm" c="var(--app-text-muted)" component="span">
+									<span className={styles.legendKey}>L</span> — уровень героя в формулах. В
+									примерах тултипа для зависящих от L эффектов подставляется {CODEX_L}; в бою
+									используется живой уровень юнита.
+								</Text>
+							</li>
+							<li>
+								<Text size="sm" c="var(--app-text-muted)" component="span">
+									<span className={styles.legendKey}>р.</span> — длительность в раундах
+								</Text>
+							</li>
+							<li>
+								<Text size="sm" c="var(--app-text-muted)" component="span">
+									<span className={styles.legendKey}>⌊…⌋</span> — целая часть (округление вниз)
+								</Text>
+							</li>
+						</ul>
+					</div>
+				</Stack>
 				<Text size="sm" c="var(--app-text-muted)" ff="monospace">
 					{shown === total ? `${total} эффектов` : `${shown} из ${total}`}
 				</Text>
 			</Group>
+
+			<TextInput
+				placeholder="Поиск по названию, описанию, id…"
+				value={query}
+				onChange={(event) => setQuery(event.currentTarget.value)}
+				maw={360}
+				aria-label="Поиск эффектов"
+			/>
 
 			{shown === 0 ? (
 				<Text c="var(--app-text-muted)">Ничего не найдено по запросу «{query.trim()}».</Text>

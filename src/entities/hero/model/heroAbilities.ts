@@ -1,5 +1,6 @@
 import type { AbilityTag } from './abilityTags';
 import { PILOT_EXTRAS } from './heroAbilityExtras';
+import { isTransformForm } from './heroKinds';
 
 export type { AbilityTag } from './abilityTags';
 
@@ -797,6 +798,13 @@ export function getHeroAbilities(code: string, isPlayable: boolean): HeroAbility
 	}
 
 	if (!isPlayable) {
+		if (isTransformForm(code)) {
+			return {
+				slots: [],
+				summonNote:
+					'Боевая форма: появляется только через превращение в бою, в драфте не выбирается.',
+			};
+		}
 		return {
 			slots: [],
 			summonNote:

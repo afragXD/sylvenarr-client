@@ -1,5 +1,6 @@
 import { Badge, Box, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 
+import { isTransformForm } from '../model/heroKinds';
 import type { HeroClass } from '../model/types';
 import { HeroImage } from './HeroImage';
 
@@ -59,6 +60,10 @@ export const HeroBriefContent = ({ hero }: HeroBriefContentProps) => (
 					{hero.isPlayable ? (
 						<Badge color="accent" variant="light" radius={0} tt="none">
 							Можно выбрать
+						</Badge>
+					) : isTransformForm(hero.code) ? (
+						<Badge color="gray" variant="outline" radius={0} tt="none">
+							Боевая форма
 						</Badge>
 					) : (
 						<Badge color="gray" variant="outline" radius={0} tt="none">

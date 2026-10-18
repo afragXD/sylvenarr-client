@@ -26,6 +26,7 @@ export {
 } from './model/abilityPreview';
 export type { HeroAbilityDoc, HeroAbilitySlot } from './model/heroAbilities';
 export { getHeroAbilities } from './model/heroAbilities';
+export { isTransformForm } from './model/heroKinds';
 export type { SummonerSummons, SummonRef } from './model/heroSummons';
 export { getSummonerSummons, SUMMONER_SUMMONS } from './model/heroSummons';
 export {

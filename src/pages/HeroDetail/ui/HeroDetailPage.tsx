@@ -3,7 +3,14 @@ import { Link, useParams } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
 import { useEffect } from 'react';
 
-import { $hero, $heroError, $heroPending, HeroImage, heroPageOpened } from '@/entities/hero';
+import {
+	$hero,
+	$heroError,
+	$heroPending,
+	HeroImage,
+	heroPageOpened,
+	isTransformForm,
+} from '@/entities/hero';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 import { HeroAbilitiesSection } from './HeroAbilitiesSection';
@@ -110,6 +117,10 @@ export const HeroDetailPage = () => {
 									<Badge color="accent" variant="light" radius={0} tt="none">
 										Можно выбрать
 									</Badge>
+								) : isTransformForm(hero.code) ? (
+									<Badge color="gray" variant="outline" radius={0} tt="none">
+										Боевая форма
+									</Badge>
 								) : (
 									<Badge color="gray" variant="outline" radius={0} tt="none">
 										Только призыв
@@ -127,7 +138,9 @@ export const HeroDetailPage = () => {
 							<Text size="sm" c="var(--app-text-muted)">
 								{hero.isPlayable
 									? 'Доступен при формировании отряда'
-									: 'Появляется только как призванное существо'}
+									: isTransformForm(hero.code)
+										? 'Появляется через превращение в бою'
+										: 'Появляется только как призванное существо'}
 							</Text>
 							{hero.description ? (
 								<Text size="md" maw="42rem" style={{ lineHeight: 1.55 }}>
