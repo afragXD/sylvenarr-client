@@ -3,35 +3,35 @@ import { Box, Stack, Text, Title } from '@mantine/core';
 const rows = [
 	{
 		mark: 'I',
-		title: 'Прогресс на вашем имени',
-		body: 'Профиль хранит отображаемое имя между сессиями — арена узнаёт вас снова.',
+		title: 'Два ряда',
+		body: 'Передний принимает удар, задний бьёт из глубины; юнита можно переставить.',
 	},
 	{
 		mark: 'II',
-		title: 'Рейтинг на аккаунте',
-		body: 'Победы и винрейт пишутся на профиль, а не на гостевую cookie-сессию.',
+		title: 'Ход по инициативе',
+		body: 'Атака, защита, способность или ожидание — кто быстрее, тот ходит раньше.',
 	},
 	{
 		mark: 'III',
-		title: 'Возврат к тем же матчам',
-		body: 'Один вход — тот же игрок в лобби и в таблице рейтинга.',
+		title: 'Эффекты и рост',
+		body: 'Баффы и дебаффы на поле; отряд усиливается по ходу боя.',
 	},
 ] as const;
 
 /**
- * Леджер ценности аккаунта — строки печати, не feature-cards.
+ * Леджер геймплея — строки печати, не feature-cards.
  */
-export const AccountSection = () => {
+export const GameplaySection = () => {
 	return (
 		<Box className="sylvenarr-landing-section" component="section">
 			<Stack gap={{ base: 'lg', md: 'xl' }}>
 				<Stack gap={10} maw={{ base: 560, lg: 720 }}>
-					<Text className="sylvenarr-landing-kicker">Аккаунт</Text>
+					<Text className="sylvenarr-landing-kicker">Геймплей</Text>
 					<Title order={2} className="sylvenarr-landing-h2">
-						Зачем входить
+						Как идёт дуэль
 					</Title>
 					<Text className="sylvenarr-landing-lead" c="var(--app-text-muted)">
-						Рейтинг и матчи привязаны к профилю — не к разовой сессии в браузере.
+						Пошаговый бой один на один: отряд, ряды, ходы по инициативе.
 					</Text>
 				</Stack>
 				<Box className="sylvenarr-ledger">
@@ -50,7 +50,7 @@ export const AccountSection = () => {
 					))}
 				</Box>
 				<Text className="sylvenarr-landing-meta" c="var(--app-text-muted)" ff="monospace">
-					Набор отряда уже открыт · бой — следующая фаза
+					Сначала реестр классов · потом лобби с другом
 				</Text>
 			</Stack>
 		</Box>

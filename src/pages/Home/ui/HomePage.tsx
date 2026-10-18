@@ -1,7 +1,7 @@
 import { Box } from '@mantine/core';
 
 import { HomeHero } from './HomeHero';
-import { AccountSection, CloseSection, PathSection, RosterSection } from './sections';
+import { CloseSection, GameplaySection, PathSection, RosterSection } from './sections';
 
 export const HomePage = () => {
 	return (
@@ -9,7 +9,7 @@ export const HomePage = () => {
 			<HomeHero />
 			<PathSection />
 			<RosterSection />
-			<AccountSection />
+			<GameplaySection />
 			<CloseSection />
 		</Box>
 	);

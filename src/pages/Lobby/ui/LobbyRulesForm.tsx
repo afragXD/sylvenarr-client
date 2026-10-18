@@ -57,7 +57,7 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 			<Stack gap={4}>
 				<Text fw={650}>Правила матча</Text>
 				<Text size="sm" c="var(--app-text-muted)" style={{ lineHeight: 1.45 }}>
-					Влияют на этот матч; последние значения запоминаются.
+					Влияют на этот матч. Последние значения запоминаются.
 				</Text>
 			</Stack>
 

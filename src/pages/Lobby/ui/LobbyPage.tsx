@@ -95,7 +95,7 @@ export const LobbyPage = () => {
 			<Stack gap={6} maw={640}>
 				<Title order={1}>Лобби</Title>
 				<Text c="var(--app-text-muted)">
-					Создайте матч и передайте код другу. После входа начнётся draft отряда.
+					Создайте матч и передайте код другу. После входа начнётся набор отряда.
 				</Text>
 			</Stack>
 

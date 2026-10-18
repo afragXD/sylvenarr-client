@@ -51,7 +51,7 @@ export const EffectsCodexPage = () => {
 			</Anchor>
 
 			<Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
-				<Stack gap={8} maw="40rem">
+				<Stack gap={8} maw="56rem">
 					<Title order={1}>Кодекс эффектов</Title>
 					<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
 						Состояния, которые герои накладывают в бою. На поле они отмечены иконками на юните —
