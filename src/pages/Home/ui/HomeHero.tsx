@@ -34,8 +34,9 @@ export const HomeHero = () => {
 				>
 					<BrandMark variant="hero" size={56} />
 					<Text className="sylvenarr-hero-supporting" c="var(--app-text-muted)">
-						Пошаговый PvP под вашим именем. Войдите через OAuth, выберите класс из реестра и выйдите к
-						вратам арены.
+						Соревновательная онлайн-арена в жанре тёмного технофэнтези — с отголосками Disciples&nbsp;II,
+						Heroes of Might and Magic&nbsp;III и Darkest Dungeon. Наберите отряд из двадцати четырёх
+						классов с уникальными способностями и победите соперника в пошаговой дуэли.
 					</Text>
 					<Group className="sylvenarr-hero-cta" gap="sm" mt="md">
 						<Button component={Link} to="/sign-in" color="brand" size="lg">

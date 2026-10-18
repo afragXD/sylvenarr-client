@@ -123,17 +123,7 @@ export type BattleState = {
 	units: BattleUnit[];
 };
 
-export type MatchRules = {
-	initialTeamSize: number;
-	maxTeamSize: number;
-	maxRowSize: number;
-	maxRounds: number;
-	healthBonus: number;
-	fairEnabled: boolean;
-	fairFrequency: number;
-	shopSize: number;
-	goldBonus: number;
-};
+export type { HeroDupesMode, MatchRules } from './matchRules';
 
 export type Match = {
 	id: string;

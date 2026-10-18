@@ -15,9 +15,10 @@ const parseMatch = (data: unknown): Match => {
 	}
 	return {
 		...(data as unknown as Match),
-		rules: isRecord(data.rules)
-			? (data.rules as Match['rules'])
-			: { ...DEFAULT_MATCH_RULES },
+		rules: {
+			...DEFAULT_MATCH_RULES,
+			...(isRecord(data.rules) ? (data.rules as Partial<MatchRules>) : {}),
+		},
 	};
 };
 

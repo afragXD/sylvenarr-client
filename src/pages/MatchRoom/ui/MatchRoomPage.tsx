@@ -252,6 +252,18 @@ export const MatchRoomPage = () => {
 			if (!hero || mySize + hero.size > match.draft.initialTeamSize) {
 				return;
 			}
+			const ownHas = [...match.draft.hostPicks, ...match.draft.guestPicks].some(
+				(pick) => pick.playerId === player.id && pick.heroClassCode === hero.code,
+			);
+			const matchHas = [...match.draft.hostPicks, ...match.draft.guestPicks].some(
+				(pick) => pick.heroClassCode === hero.code,
+			);
+			if (
+				(match.rules.heroDupes === 'uniqueTeam' && ownHas) ||
+				(match.rules.heroDupes === 'uniqueMatch' && matchHas)
+			) {
+				return;
+			}
 			setIsBusy(true);
 			setError(null);
 			void draftPick({ matchId: match.id, heroCode: activeData.heroCode, row })
@@ -463,12 +475,29 @@ export const MatchRoomPage = () => {
 										.map((hero) => {
 											const freeSlots = match.draft.initialTeamSize - mySize;
 											const fits = hero.size <= freeSlots;
-											const disabled = !isMyTurn || isBusy || !fits;
+											const ownCodes = new Set(
+												[...match.draft.hostPicks, ...match.draft.guestPicks]
+													.filter((pick) => pick.playerId === player?.id)
+													.map((pick) => pick.heroClassCode),
+											);
+											const allCodes = new Set(
+												[...match.draft.hostPicks, ...match.draft.guestPicks].map(
+													(pick) => pick.heroClassCode,
+												),
+											);
+											const blockedByDupes =
+												(match.rules.heroDupes === 'uniqueTeam' && ownCodes.has(hero.code)) ||
+												(match.rules.heroDupes === 'uniqueMatch' && allCodes.has(hero.code));
+											const disabled = !isMyTurn || isBusy || !fits || blockedByDupes;
 											const disabledReason = !isMyTurn
 												? 'Сейчас ход соперника'
-												: !fits
-													? `Не хватает места: нужно ${hero.size}, свободно ${freeSlots}`
-													: undefined;
+												: blockedByDupes
+													? match.rules.heroDupes === 'uniqueMatch'
+														? 'Этот класс уже выбран в матче'
+														: 'Этот класс уже есть в вашем отряде'
+													: !fits
+														? `Не хватает места: нужно ${hero.size}, свободно ${freeSlots}`
+														: undefined;
 											return (
 												<DraftHeroCard
 													key={hero.code}

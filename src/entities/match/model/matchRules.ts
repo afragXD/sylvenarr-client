@@ -1,3 +1,11 @@
+export type HeroDupesMode = 'allow' | 'uniqueTeam' | 'uniqueMatch';
+
+const HERO_DUPES_MODES: ReadonlySet<string> = new Set([
+	'allow',
+	'uniqueTeam',
+	'uniqueMatch',
+]);
+
 export type MatchRules = {
 	initialTeamSize: number;
 	maxTeamSize: number;
@@ -9,6 +17,8 @@ export type MatchRules = {
 	fairFrequency: number;
 	shopSize: number;
 	goldBonus: number;
+	/** Дубли классов в draft (не касается саммонов/эволюций). */
+	heroDupes: HeroDupesMode;
 };
 
 export const DEFAULT_MATCH_RULES: MatchRules = {
@@ -21,6 +31,7 @@ export const DEFAULT_MATCH_RULES: MatchRules = {
 	fairFrequency: 5,
 	shopSize: 8,
 	goldBonus: 1,
+	heroDupes: 'allow',
 };
 
 export const MATCH_RULES_LIMITS = {
@@ -71,6 +82,12 @@ export function healthPercentToBonus(percent: number): number {
 	return Math.round(percent) / 100;
 }
 
+function normalizeHeroDupes(value: unknown): HeroDupesMode {
+	return typeof value === 'string' && HERO_DUPES_MODES.has(value)
+		? (value as HeroDupesMode)
+		: DEFAULT_MATCH_RULES.heroDupes;
+}
+
 export type ValidateMatchRulesResult =
 	| { ok: true; rules: MatchRules }
 	| { ok: false; message: string };
@@ -89,6 +106,7 @@ export function validateMatchRules(input: MatchRules): ValidateMatchRulesResult 
 		fairFrequency,
 		shopSize,
 		goldBonus,
+		heroDupes,
 	} = input;
 
 	if (
@@ -161,6 +179,7 @@ export function validateMatchRules(input: MatchRules): ValidateMatchRulesResult 
 				MATCH_RULES_LIMITS.goldBonus.max,
 				Math.max(MATCH_RULES_LIMITS.goldBonus.min, goldBonus),
 			),
+			heroDupes: normalizeHeroDupes(heroDupes),
 		},
 	};
 }
@@ -195,5 +214,12 @@ export function applyPreset(id: Exclude<RulesPresetId, 'custom'>, base: MatchRul
 
 export function formatRulesSummary(rules: MatchRules): string {
 	const hp = healthBonusToPercent(rules.healthBonus);
-	return `Отряд ${rules.initialTeamSize}/${rules.maxTeamSize} · ряд ${rules.maxRowSize} · ${rules.maxRounds} р. · ОЗ ${hp}%`;
+	const base = `Отряд ${rules.initialTeamSize}/${rules.maxTeamSize} · ряд ${rules.maxRowSize} · ${rules.maxRounds} р. · ОЗ ${hp}%`;
+	if (rules.heroDupes === 'uniqueTeam') {
+		return `${base} · без дублей`;
+	}
+	if (rules.heroDupes === 'uniqueMatch') {
+		return `${base} · уникальны в матче`;
+	}
+	return base;
 }

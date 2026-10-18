@@ -63,8 +63,6 @@
 }
 
 .fairBlock {
-	opacity: 0.55;
-	pointer-events: none;
 	border-top: 1px solid var(--app-border);
 	padding-top: 1rem;
 	display: flex;

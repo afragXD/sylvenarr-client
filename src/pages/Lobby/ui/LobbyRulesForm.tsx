@@ -1,4 +1,4 @@
-import { SegmentedControl, Slider, Stack, Text } from '@mantine/core';
+import { Collapse, SegmentedControl, Slider, Stack, Switch, Text } from '@mantine/core';
 import { useMemo } from 'react';
 
 import {
@@ -7,6 +7,7 @@ import {
 	detectPreset,
 	healthBonusToPercent,
 	healthPercentToBonus,
+	type HeroDupesMode,
 	type MatchRules,
 	validateMatchRules,
 } from '@/entities/match';
@@ -24,6 +25,12 @@ const PRESET_DATA = [
 	{ value: 'siege', label: 'Осада' },
 	{ value: 'custom', label: 'Свой' },
 ] as const;
+
+const HERO_DUPES_DATA: { value: HeroDupesMode; label: string }[] = [
+	{ value: 'allow', label: 'Можно' },
+	{ value: 'uniqueTeam', label: 'Не у себя' },
+	{ value: 'uniqueMatch', label: 'В матче' },
+];
 
 const intSeg = (min: number, max: number) =>
 	Array.from({ length: max - min + 1 }, (_, index) => {
@@ -112,6 +119,18 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 						))}
 					</div>
 				</div>
+				<div className={styles.field}>
+					<span className={styles.fieldLabel}>Дубли классов</span>
+					<SegmentedControl
+						fullWidth
+						value={rules.heroDupes}
+						onChange={(value) => patch({ heroDupes: value as HeroDupesMode })}
+						data={HERO_DUPES_DATA}
+					/>
+					<Text size="sm" c="var(--app-text-muted)" style={{ lineHeight: 1.4 }}>
+						Только набор отряда. Призывы и эволюции в бою не ограничиваются.
+					</Text>
+				</div>
 				{!validation.ok && (
 					<Text c="red" size="sm" role="alert">
 						{validation.message}
@@ -162,60 +181,58 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 				</div>
 			</Stack>
 
-			<div className={styles.fairBlock} aria-disabled>
+			<div className={styles.fairBlock}>
 				<p className={styles.sectionTitle}>Ярмарка · фаза 4.1</p>
-				<div className={styles.field}>
-					<span className={styles.fieldLabel}>Ярмарка</span>
-					<SegmentedControl
-						fullWidth
-						value={rules.fairEnabled ? 'on' : 'off'}
-						data={[
-							{ value: 'off', label: 'Выкл' },
-							{ value: 'on', label: 'Вкл' },
-						]}
-						disabled
-					/>
-				</div>
-				<div className={styles.field}>
-					<span className={styles.fieldLabel}>Частота (раз в N раундов)</span>
-					<div className={styles.sliderRow}>
-						<Slider
-							style={{ flex: 1 }}
-							min={MATCH_RULES_LIMITS.fairFrequency.min}
-							max={MATCH_RULES_LIMITS.fairFrequency.max}
-							value={rules.fairFrequency}
-							disabled
-						/>
-						<span className={styles.sliderValue}>{rules.fairFrequency}</span>
-					</div>
-				</div>
-				<div className={styles.field}>
-					<span className={styles.fieldLabel}>Товаров в лавке</span>
-					<div className={styles.sliderRow}>
-						<Slider
-							style={{ flex: 1 }}
-							min={MATCH_RULES_LIMITS.shopSize.min}
-							max={MATCH_RULES_LIMITS.shopSize.max}
-							value={rules.shopSize}
-							disabled
-						/>
-						<span className={styles.sliderValue}>{rules.shopSize}</span>
-					</div>
-				</div>
-				<div className={styles.field}>
-					<span className={styles.fieldLabel}>Множитель золота</span>
-					<div className={styles.sliderRow}>
-						<Slider
-							style={{ flex: 1 }}
-							min={MATCH_RULES_LIMITS.goldBonus.min}
-							max={MATCH_RULES_LIMITS.goldBonus.max}
-							step={MATCH_RULES_LIMITS.goldBonus.step}
-							value={rules.goldBonus}
-							disabled
-						/>
-						<span className={styles.sliderValue}>×{rules.goldBonus}</span>
-					</div>
-				</div>
+				<Switch
+					label="Ярмарка"
+					description="Настройки сохраняются, в бою пока не используются"
+					checked={rules.fairEnabled}
+					onChange={(event) => patch({ fairEnabled: event.currentTarget.checked })}
+				/>
+				<Collapse expanded={rules.fairEnabled}>
+					<Stack gap="sm" pt="sm">
+						<div className={styles.field}>
+							<span className={styles.fieldLabel}>Частота (раз в N раундов)</span>
+							<div className={styles.sliderRow}>
+								<Slider
+									style={{ flex: 1 }}
+									min={MATCH_RULES_LIMITS.fairFrequency.min}
+									max={MATCH_RULES_LIMITS.fairFrequency.max}
+									value={rules.fairFrequency}
+									onChange={(value) => patch({ fairFrequency: value })}
+								/>
+								<span className={styles.sliderValue}>{rules.fairFrequency}</span>
+							</div>
+						</div>
+						<div className={styles.field}>
+							<span className={styles.fieldLabel}>Товаров в лавке</span>
+							<div className={styles.sliderRow}>
+								<Slider
+									style={{ flex: 1 }}
+									min={MATCH_RULES_LIMITS.shopSize.min}
+									max={MATCH_RULES_LIMITS.shopSize.max}
+									value={rules.shopSize}
+									onChange={(value) => patch({ shopSize: value })}
+								/>
+								<span className={styles.sliderValue}>{rules.shopSize}</span>
+							</div>
+						</div>
+						<div className={styles.field}>
+							<span className={styles.fieldLabel}>Множитель золота</span>
+							<div className={styles.sliderRow}>
+								<Slider
+									style={{ flex: 1 }}
+									min={MATCH_RULES_LIMITS.goldBonus.min}
+									max={MATCH_RULES_LIMITS.goldBonus.max}
+									step={MATCH_RULES_LIMITS.goldBonus.step}
+									value={rules.goldBonus}
+									onChange={(value) => patch({ goldBonus: value })}
+								/>
+								<span className={styles.sliderValue}>×{rules.goldBonus}</span>
+							</div>
+						</div>
+					</Stack>
+				</Collapse>
 			</div>
 		</div>
 	);
