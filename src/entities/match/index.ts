@@ -10,6 +10,19 @@ export {
 	joinMatch,
 	moveDraftPick,
 } from './api/matchesApi';
+export { loadLobbyRulesPrefs, saveLobbyRulesPrefs } from './model/lobbyRulesPrefs';
+export type { RulesPresetId } from './model/matchRules';
+export {
+	DEFAULT_MATCH_RULES,
+	MATCH_RULES_LIMITS,
+	RULES_PRESETS,
+	applyPreset,
+	detectPreset,
+	formatRulesSummary,
+	healthBonusToPercent,
+	healthPercentToBonus,
+	validateMatchRules,
+} from './model/matchRules';
 export type {
 	AbilityInfo,
 	BattleEffectBrief,
@@ -24,6 +37,7 @@ export type {
 	MatchHistoryTeam,
 	MatchHistoryUnit,
 	MatchPlayerBrief,
+	MatchRules,
 	MatchStatus,
 	PendingPrompt,
 	TurnOrderEntry,

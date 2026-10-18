@@ -2,10 +2,19 @@ import { Anchor, Box, Button, Group, Stack, Text, TextInput, Title } from '@mant
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
-import { createMatch, joinMatch } from '@/entities/match';
+import {
+	createMatch,
+	joinMatch,
+	loadLobbyRulesPrefs,
+	saveLobbyRulesPrefs,
+	type MatchRules,
+	validateMatchRules,
+} from '@/entities/match';
 import { fetchCurrentPlayer, type Player } from '@/entities/player';
 import { ApiError } from '@/shared/api/http';
 import { PageFrame } from '@/shared/ui/PageFrame';
+
+import { LobbyRulesForm } from './LobbyRulesForm';
 
 export const LobbyPage = () => {
 	const navigate = useNavigate();
@@ -14,6 +23,7 @@ export const LobbyPage = () => {
 	const [inviteInput, setInviteInput] = useState('');
 	const [error, setError] = useState<string | null>(null);
 	const [isBusy, setIsBusy] = useState(false);
+	const [rules, setRules] = useState<MatchRules>(() => loadLobbyRulesPrefs());
 
 	useEffect(() => {
 		let isMounted = true;
@@ -43,10 +53,16 @@ export const LobbyPage = () => {
 		if (!player) {
 			return;
 		}
+		const validated = validateMatchRules(rules);
+		if (!validated.ok) {
+			setError(validated.message);
+			return;
+		}
 		setIsBusy(true);
 		setError(null);
 		try {
-			const created = await createMatch();
+			const created = await createMatch(validated.rules);
+			saveLobbyRulesPrefs(validated.rules);
 			await navigate({ to: '/lobby/$matchId', params: { matchId: created.id } });
 		} catch (err) {
 			setError(err instanceof ApiError ? err.message : 'Ошибка создания матча');
@@ -71,6 +87,8 @@ export const LobbyPage = () => {
 		}
 	};
 
+	const canCreate = validateMatchRules(rules).ok;
+
 	return (
 		<PageFrame width="wide">
 			<Stack gap={6} maw={640}>
@@ -94,17 +112,21 @@ export const LobbyPage = () => {
 			)}
 
 			{player && (
-				<Stack gap="md" maw={440} w={{ base: '100%', md: 440 }}>
+				<Stack gap="lg" maw={520} w={{ base: '100%', md: 520 }}>
 					<Text size="sm" c="var(--app-text-muted)">
 						Вы:{' '}
 						<Text span fw={600} c="var(--app-text)">
 							{player.displayName}
 						</Text>
 					</Text>
+
+					<LobbyRulesForm rules={rules} onChange={setRules} />
+
 					<Button
 						className="sylvenarr-plate-btn"
 						color="brand"
 						loading={isBusy}
+						disabled={!canCreate}
 						onClick={() => void handleCreate()}
 					>
 						Создать матч

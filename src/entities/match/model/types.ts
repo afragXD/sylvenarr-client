@@ -123,6 +123,18 @@ export type BattleState = {
 	units: BattleUnit[];
 };
 
+export type MatchRules = {
+	initialTeamSize: number;
+	maxTeamSize: number;
+	maxRowSize: number;
+	maxRounds: number;
+	healthBonus: number;
+	fairEnabled: boolean;
+	fairFrequency: number;
+	shopSize: number;
+	goldBonus: number;
+};
+
 export type Match = {
 	id: string;
 	status: MatchStatus;
@@ -132,6 +144,7 @@ export type Match = {
 	createdAt: string;
 	finishedAt: string | null;
 	winnerPlayerId: string | null;
+	rules: MatchRules;
 	draft: MatchDraftState;
 	battle: BattleState | null;
 };

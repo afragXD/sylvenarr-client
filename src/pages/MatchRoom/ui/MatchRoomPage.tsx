@@ -10,6 +10,7 @@ import {
 	draftPick,
 	draftRandom,
 	fetchMatchById,
+	formatRulesSummary,
 	type Match,
 	type MatchDraftPick,
 	moveDraftPick,
@@ -331,6 +332,11 @@ export const MatchRoomPage = () => {
 								Статус: {statusLabel(match.status)}. Код:{' '}
 								<InviteCodeChip code={match.inviteCode} compact />
 							</Text>
+							{match.rules && (
+								<Text size="sm" c="var(--app-text-muted)" ff="monospace">
+									{formatRulesSummary(match.rules)}
+								</Text>
+							)}
 						</Stack>
 						{isHost && (match.status === 'waiting' || match.status === 'drafting') && (
 							<Button

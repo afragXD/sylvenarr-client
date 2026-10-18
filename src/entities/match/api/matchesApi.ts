@@ -1,6 +1,7 @@
 import { apiFetchJson } from '@/shared/api/http';
 
-import type { Match, MatchHistoryDetail, MatchHistoryItem } from '../model/types';
+import { DEFAULT_MATCH_RULES } from '../model/matchRules';
+import type { Match, MatchHistoryDetail, MatchHistoryItem, MatchRules } from '../model/types';
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
 	typeof value === 'object' && value !== null;
@@ -12,14 +13,27 @@ const parseMatch = (data: unknown): Match => {
 	if (!isRecord(data.draft)) {
 		throw new Error('Некорректный draft state матча');
 	}
-	return data as unknown as Match;
+	return {
+		...(data as unknown as Match),
+		rules: isRecord(data.rules)
+			? (data.rules as Match['rules'])
+			: { ...DEFAULT_MATCH_RULES },
+	};
 };
 
 /**
- * Создаёт лобби.
+ * Создаёт лобби с правилами матча.
  */
-export async function createMatch(): Promise<Match> {
-	return apiFetchJson('/matches', { method: 'POST' }, parseMatch, 'Не удалось создать матч');
+export async function createMatch(rules?: MatchRules): Promise<Match> {
+	return apiFetchJson(
+		'/matches',
+		{
+			method: 'POST',
+			body: JSON.stringify(rules ? { rules } : {}),
+		},
+		parseMatch,
+		'Не удалось создать матч',
+	);
 }
 
 /**
