@@ -71,8 +71,3 @@
 	flex-direction: column;
 	gap: 0.85rem;
 }
-
-.actions {
-	display: flex;
-	justify-content: flex-end;
-}

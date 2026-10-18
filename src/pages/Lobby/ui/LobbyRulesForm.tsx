@@ -1,8 +1,7 @@
-import { Button, SegmentedControl, Slider, Stack, Text } from '@mantine/core';
+import { SegmentedControl, Slider, Stack, Text } from '@mantine/core';
 import { useMemo } from 'react';
 
 import {
-	DEFAULT_MATCH_RULES,
 	MATCH_RULES_LIMITS,
 	applyPreset,
 	detectPreset,
@@ -217,17 +216,6 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 						<span className={styles.sliderValue}>×{rules.goldBonus}</span>
 					</div>
 				</div>
-			</div>
-
-			<div className={styles.actions}>
-				<Button
-					variant="subtle"
-					color="gray"
-					size="compact-sm"
-					onClick={() => onChange({ ...DEFAULT_MATCH_RULES })}
-				>
-					Сбросить
-				</Button>
 			</div>
 		</div>
 	);

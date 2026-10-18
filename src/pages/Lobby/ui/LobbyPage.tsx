@@ -14,6 +14,7 @@ import { fetchCurrentPlayer, type Player } from '@/entities/player';
 import { ApiError } from '@/shared/api/http';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
+import styles from './LobbyPage.module.css';
 import { LobbyRulesForm } from './LobbyRulesForm';
 
 export const LobbyPage = () => {
@@ -112,64 +113,73 @@ export const LobbyPage = () => {
 			)}
 
 			{player && (
-				<Stack gap="lg" maw={520} w={{ base: '100%', md: 520 }}>
-					<Text size="sm" c="var(--app-text-muted)">
-						Вы:{' '}
-						<Text span fw={600} c="var(--app-text)">
-							{player.displayName}
-						</Text>
-					</Text>
-
+				<div className={styles.layout}>
 					<LobbyRulesForm rules={rules} onChange={setRules} />
 
-					<Button
-						className="sylvenarr-plate-btn"
-						color="brand"
-						loading={isBusy}
-						disabled={!canCreate}
-						onClick={() => void handleCreate()}
-					>
-						Создать матч
-					</Button>
-					<Group align="flex-end" gap="sm" wrap="nowrap">
-						<TextInput
-							label="Код приглашения"
-							value={inviteInput}
-							onChange={(event) => setInviteInput(event.currentTarget.value.toUpperCase())}
-							placeholder="ABC123"
-							style={{ flex: 1, minWidth: 0 }}
-							styles={{
-								input: {
-									fontFamily: 'var(--mantine-font-family-monospace)',
-									letterSpacing: '0.08em',
-								},
-							}}
-						/>
-						<Button
-							variant="light"
-							color="accent"
-							loading={isBusy}
-							disabled={inviteInput.trim().length < 4}
-							onClick={() => void handleJoin()}
-						>
-							Войти в матч
-						</Button>
-					</Group>
-					{error && (
-						<Text c="red" role="alert">
-							{error}
+					<div className={`sylvenarr-panel ${styles.actions}`}>
+						<Text size="sm" c="var(--app-text-muted)">
+							Вы:{' '}
+							<Text span fw={600} c="var(--app-text)">
+								{player.displayName}
+							</Text>
 						</Text>
-					)}
-				</Stack>
-			)}
 
-			{sessionChecked && player && (
-				<Text size="sm" c="var(--app-text-muted)">
-					Не тот аккаунт?{' '}
-					<Anchor component={Link} to="/sign-in" c="brand" fw={600}>
-						Сменить вход
-					</Anchor>
-				</Text>
+						<Button
+							className="sylvenarr-plate-btn"
+							color="brand"
+							loading={isBusy}
+							disabled={!canCreate}
+							onClick={() => void handleCreate()}
+						>
+							Создать матч
+						</Button>
+
+						<Stack gap="sm">
+							<Text size="sm" fw={600}>
+								Уже есть код?
+							</Text>
+							<Group align="flex-end" gap="sm" wrap="nowrap">
+								<TextInput
+									label="Код приглашения"
+									value={inviteInput}
+									onChange={(event) =>
+										setInviteInput(event.currentTarget.value.toUpperCase())
+									}
+									placeholder="ABC123"
+									style={{ flex: 1, minWidth: 0 }}
+									styles={{
+										input: {
+											fontFamily: 'var(--mantine-font-family-monospace)',
+											letterSpacing: '0.08em',
+										},
+									}}
+								/>
+								<Button
+									variant="light"
+									color="accent"
+									loading={isBusy}
+									disabled={inviteInput.trim().length < 4}
+									onClick={() => void handleJoin()}
+								>
+									Войти
+								</Button>
+							</Group>
+						</Stack>
+
+						{error && (
+							<Text c="red" role="alert">
+								{error}
+							</Text>
+						)}
+
+						<Text size="sm" c="var(--app-text-muted)">
+							Не тот аккаунт?{' '}
+							<Anchor component={Link} to="/sign-in" c="brand" fw={600}>
+								Сменить вход
+							</Anchor>
+						</Text>
+					</div>
+				</div>
 			)}
 		</PageFrame>
 	);
