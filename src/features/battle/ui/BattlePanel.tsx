@@ -527,15 +527,9 @@ const RowColumn = ({
 									</Text>
 								</Group>
 								{typeof unit.lvl === 'number' ? (
-									<Text
-										size="xs"
-										c="var(--app-text-muted)"
-										title="Уровень"
-										aria-label={`Уровень ${unit.lvl}`}
-										style={{ fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}
-									>
-										{unit.lvl}
-									</Text>
+									<span className={styles.lvl} title="Уровень" aria-label={`Уровень ${unit.lvl}`}>
+										Ур.{unit.lvl}
+									</span>
 								) : null}
 							</Group>
 							<CombatStatRow className={styles.hp}>

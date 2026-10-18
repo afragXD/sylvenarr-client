@@ -5,7 +5,6 @@ import {
 	Clover,
 	Gauge,
 	Heart,
-	Layers,
 	Shield,
 	ShieldBan,
 	Sparkles,
@@ -43,8 +42,13 @@ type NumericStatKey =
 	| 'critBank'
 	| 'ultaCharges';
 
-const STATS: ReadonlyArray<{ key: NumericStatKey; label: string; Icon: LucideIcon }> = [
-	{ key: 'lvl', label: 'Уровень', Icon: Layers },
+const STATS: ReadonlyArray<{
+	key: NumericStatKey;
+	label: string;
+	Icon?: LucideIcon;
+	abbrev?: string;
+}> = [
+	{ key: 'lvl', label: 'Уровень', abbrev: 'Ур.' },
 	{ key: 'health', label: 'ОЗ', Icon: Heart },
 	{ key: 'damage', label: 'Урон', Icon: Sword },
 	{ key: 'armor', label: 'Броня', Icon: Shield },
@@ -130,7 +134,13 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 									title={stat.label}
 									aria-label={`${stat.label}: ${typeof value === 'number' ? value : '—'}`}
 								>
-									<Icon size={12} strokeWidth={2} aria-hidden />
+									{stat.abbrev ? (
+										<Text size="xs" fw={700} c="var(--app-text-muted)" aria-hidden>
+											{stat.abbrev}
+										</Text>
+									) : Icon ? (
+										<Icon size={12} strokeWidth={2} aria-hidden />
+									) : null}
 									<Text size="sm" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
 										{typeof value === 'number' ? value : '—'}
 									</Text>

@@ -89,6 +89,16 @@
 	filter: grayscale(0.4);
 }
 
+.lvl {
+	flex-shrink: 0;
+	font-size: 0.72rem;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.02em;
+	color: var(--app-text-muted);
+	line-height: 1.2;
+}
+
 .hp {
 	font-variant-numeric: tabular-nums;
 	font-size: 0.78rem;
