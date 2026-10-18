@@ -27,19 +27,20 @@ function resolvePhase(entry: TurnOrderEntry): TurnOrderPhase {
 }
 
 function entryTitle(entry: TurnOrderEntry, phase: TurnOrderPhase): string {
+	const lvlPart = typeof entry.lvl === 'number' ? ` · ур. ${entry.lvl}` : '';
 	if (phase === 'delayed') {
-		return `${entry.displayName} · ожидает`;
+		return `${entry.displayName}${lvlPart} · ожидает`;
 	}
 	if (phase === 'acted') {
-		return `${entry.displayName} · уже ходил`;
+		return `${entry.displayName}${lvlPart} · уже ходил`;
 	}
 	if (phase === 'active') {
-		return `${entry.displayName} · сейчас`;
+		return `${entry.displayName}${lvlPart} · сейчас`;
 	}
 	if (phase === 'dead') {
-		return `${entry.displayName} · пал`;
+		return `${entry.displayName}${lvlPart} · пал`;
 	}
-	return entry.displayName;
+	return `${entry.displayName}${lvlPart}`;
 }
 
 /**

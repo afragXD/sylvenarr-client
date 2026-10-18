@@ -162,6 +162,9 @@ const UnitCard = ({ unit }: { unit: MatchHistoryUnit }) => {
 								{!unit.alive ? <CombatStat kind="fallen" /> : null}
 							</CombatStatRow>
 							<CombatStatRow>
+								{typeof unit.lvl === 'number' ? (
+									<CombatStat kind="level" value={unit.lvl} muted />
+								) : null}
 								<CombatStat kind="damage" value={unit.damage} muted />
 								<CombatStat kind="armor" value={unit.armor} muted />
 								<CombatStat kind="initiative" value={unit.initiative} muted />

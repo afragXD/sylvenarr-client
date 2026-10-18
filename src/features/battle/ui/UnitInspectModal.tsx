@@ -5,6 +5,7 @@ import {
 	Clover,
 	Gauge,
 	Heart,
+	Layers,
 	Shield,
 	ShieldBan,
 	Sparkles,
@@ -28,6 +29,7 @@ type UnitInspectModalProps = {
 };
 
 type NumericStatKey =
+	| 'lvl'
 	| 'health'
 	| 'damage'
 	| 'armor'
@@ -42,6 +44,7 @@ type NumericStatKey =
 	| 'ultaCharges';
 
 const STATS: ReadonlyArray<{ key: NumericStatKey; label: string; Icon: LucideIcon }> = [
+	{ key: 'lvl', label: 'Уровень', Icon: Layers },
 	{ key: 'health', label: 'ОЗ', Icon: Heart },
 	{ key: 'damage', label: 'Урон', Icon: Sword },
 	{ key: 'armor', label: 'Броня', Icon: Shield },

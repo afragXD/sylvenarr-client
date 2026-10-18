@@ -510,20 +510,33 @@ const RowColumn = ({
 							data-inspectable="true"
 							onClick={() => onUnitClick(unit)}
 						>
-							<Group gap={6} wrap="nowrap">
-								<HeroImage
-									code={unit.heroClassCode}
-									alt={unit.displayName}
-									w={28}
-									h={28}
-									radius={0}
-								/>
-								<Text size="sm" lineClamp={1}>
-									{unit.isSummon ? '✦ ' : ''}
-									{unit.displayName}
-									{unit.defending ? ' 🛡' : ''}
-									{unit.horseIsDead ? ' ✗конь' : ''}
-								</Text>
+							<Group gap={6} wrap="nowrap" justify="space-between" w="100%">
+								<Group gap={6} wrap="nowrap" style={{ minWidth: 0 }}>
+									<HeroImage
+										code={unit.heroClassCode}
+										alt={unit.displayName}
+										w={28}
+										h={28}
+										radius={0}
+									/>
+									<Text size="sm" lineClamp={1}>
+										{unit.isSummon ? '✦ ' : ''}
+										{unit.displayName}
+										{unit.defending ? ' 🛡' : ''}
+										{unit.horseIsDead ? ' ✗конь' : ''}
+									</Text>
+								</Group>
+								{typeof unit.lvl === 'number' ? (
+									<Text
+										size="xs"
+										c="var(--app-text-muted)"
+										title="Уровень"
+										aria-label={`Уровень ${unit.lvl}`}
+										style={{ fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}
+									>
+										{unit.lvl}
+									</Text>
+								) : null}
 							</Group>
 							<CombatStatRow className={styles.hp}>
 								<CombatStat kind="health" value={`${unit.health}/${unit.maxHp}`} />

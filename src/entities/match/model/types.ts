@@ -72,6 +72,8 @@ export type BattleUnit = {
 	gold: number;
 	critBank: number;
 	ultaCharges: number;
+	/** Уровень юнита в бою. */
+	lvl?: number;
 	/** Ненулевые сопротивления / варды / иммунитеты. */
 	resists?: ResistBrief[];
 };
@@ -87,6 +89,7 @@ export type TurnOrderEntry = {
 	isActive: boolean;
 	/** Фаза в шкале раунда; старше клиентов без поля — трактовать по isActive/alive. */
 	phase?: TurnOrderPhase;
+	lvl?: number;
 };
 
 export type AbilityInfo = {
@@ -153,6 +156,7 @@ export type MatchHistoryUnit = {
 	damage: number;
 	armor: number;
 	initiative: number;
+	lvl?: number;
 };
 
 export type MatchHistoryTeam = {

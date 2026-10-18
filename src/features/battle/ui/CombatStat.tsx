@@ -1,16 +1,17 @@
 import { Text } from '@mantine/core';
-import { Gauge, Heart, HeartOff, Shield, Sword, type LucideIcon } from 'lucide-react';
+import { Gauge, Heart, HeartOff, Layers, Shield, Sword, type LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 import styles from './CombatStat.module.css';
 
-type CombatStatKind = 'health' | 'damage' | 'armor' | 'initiative' | 'fallen';
+type CombatStatKind = 'health' | 'damage' | 'armor' | 'initiative' | 'level' | 'fallen';
 
 const META: Record<CombatStatKind, { Icon: LucideIcon; label: string }> = {
 	health: { Icon: Heart, label: 'ОЗ' },
 	damage: { Icon: Sword, label: 'Урон' },
 	armor: { Icon: Shield, label: 'Броня' },
 	initiative: { Icon: Gauge, label: 'Инициатива' },
+	level: { Icon: Layers, label: 'Ур.' },
 	fallen: { Icon: HeartOff, label: 'Пал' },
 };
 
