@@ -13,6 +13,8 @@ export type MatchRules = {
 	maxRounds: number;
 	/** Множитель стартового HP (0.5 = 50%). */
 	healthBonus: number;
+	/** Стартовый уровень юнитов в бою (1–30). */
+	startingLevel: number;
 	fairEnabled: boolean;
 	fairFrequency: number;
 	shopSize: number;
@@ -27,6 +29,7 @@ export const DEFAULT_MATCH_RULES: MatchRules = {
 	maxRowSize: 3,
 	maxRounds: 20,
 	healthBonus: 0.5,
+	startingLevel: 1,
 	fairEnabled: false,
 	fairFrequency: 5,
 	shopSize: 8,
@@ -40,6 +43,7 @@ export const MATCH_RULES_LIMITS = {
 	maxRowSize: { min: 1, max: 4 },
 	maxRounds: { min: 5, max: 40, step: 5 },
 	healthPercent: { min: 25, max: 100, step: 5 },
+	startingLevel: { min: 1, max: 30, step: 1 },
 	fairFrequency: { min: 3, max: 10 },
 	shopSize: { min: 4, max: 12 },
 	goldBonus: { min: 0.5, max: 2, step: 0.25 },
@@ -49,7 +53,15 @@ export type RulesPresetId = 'classic' | 'fast' | 'siege' | 'custom';
 
 export const RULES_PRESETS: Record<
 	Exclude<RulesPresetId, 'custom'>,
-	Pick<MatchRules, 'initialTeamSize' | 'maxTeamSize' | 'maxRowSize' | 'maxRounds' | 'healthBonus'>
+	Pick<
+		MatchRules,
+		| 'initialTeamSize'
+		| 'maxTeamSize'
+		| 'maxRowSize'
+		| 'maxRounds'
+		| 'healthBonus'
+		| 'startingLevel'
+	>
 > = {
 	classic: {
 		initialTeamSize: 3,
@@ -57,6 +69,7 @@ export const RULES_PRESETS: Record<
 		maxRowSize: 3,
 		maxRounds: 20,
 		healthBonus: 0.5,
+		startingLevel: 1,
 	},
 	fast: {
 		initialTeamSize: 3,
@@ -64,6 +77,7 @@ export const RULES_PRESETS: Record<
 		maxRowSize: 3,
 		maxRounds: 10,
 		healthBonus: 0.35,
+		startingLevel: 1,
 	},
 	siege: {
 		initialTeamSize: 3,
@@ -71,6 +85,7 @@ export const RULES_PRESETS: Record<
 		maxRowSize: 3,
 		maxRounds: 30,
 		healthBonus: 0.75,
+		startingLevel: 1,
 	},
 };
 
@@ -102,6 +117,7 @@ export function validateMatchRules(input: MatchRules): ValidateMatchRulesResult 
 		maxRowSize,
 		maxRounds,
 		healthBonus,
+		startingLevel,
 		fairEnabled,
 		fairFrequency,
 		shopSize,
@@ -145,6 +161,13 @@ export function validateMatchRules(input: MatchRules): ValidateMatchRulesResult 
 	) {
 		return { ok: false, message: 'Некорректное стартовое здоровье' };
 	}
+	if (
+		!Number.isInteger(startingLevel) ||
+		startingLevel < MATCH_RULES_LIMITS.startingLevel.min ||
+		startingLevel > MATCH_RULES_LIMITS.startingLevel.max
+	) {
+		return { ok: false, message: 'Некорректный стартовый уровень' };
+	}
 	if (initialTeamSize > maxTeamSize) {
 		return {
 			ok: false,
@@ -166,6 +189,7 @@ export function validateMatchRules(input: MatchRules): ValidateMatchRulesResult 
 			maxRowSize,
 			maxRounds,
 			healthBonus: healthPercentToBonus(pct),
+			startingLevel,
 			fairEnabled: Boolean(fairEnabled),
 			fairFrequency: Math.min(
 				MATCH_RULES_LIMITS.fairFrequency.max,
@@ -192,7 +216,8 @@ export function detectPreset(rules: MatchRules): RulesPresetId {
 			rules.maxTeamSize === preset.maxTeamSize &&
 			rules.maxRowSize === preset.maxRowSize &&
 			rules.maxRounds === preset.maxRounds &&
-			healthBonusToPercent(rules.healthBonus) === healthBonusToPercent(preset.healthBonus)
+			healthBonusToPercent(rules.healthBonus) === healthBonusToPercent(preset.healthBonus) &&
+			rules.startingLevel === preset.startingLevel
 		) {
 			return id;
 		}
@@ -214,7 +239,9 @@ export function applyPreset(id: Exclude<RulesPresetId, 'custom'>, base: MatchRul
 
 export function formatRulesSummary(rules: MatchRules): string {
 	const hp = healthBonusToPercent(rules.healthBonus);
-	const base = `Отряд ${rules.initialTeamSize}/${rules.maxTeamSize} · ряд ${rules.maxRowSize} · ${rules.maxRounds} р. · ОЗ ${hp}%`;
+	const lvl =
+		rules.startingLevel > 1 ? ` · ур. ${rules.startingLevel}` : '';
+	const base = `Отряд ${rules.initialTeamSize}/${rules.maxTeamSize} · ряд ${rules.maxRowSize} · ${rules.maxRounds} р. · ОЗ ${hp}%${lvl}`;
 	if (rules.heroDupes === 'uniqueTeam') {
 		return `${base} · без дублей`;
 	}

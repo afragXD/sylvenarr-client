@@ -2,14 +2,41 @@
 	margin-top: 0.35rem;
 }
 
+.effectsInline {
+	display: flex;
+	flex-direction: column;
+	gap: 0.45rem;
+}
+
+.effectInlineRow {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.45rem;
+}
+
 .stat {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 0.15rem;
-	padding: 0.35rem 0.45rem;
-	border: 1px solid var(--app-border);
-	background: color-mix(in srgb, var(--app-surface-muted) 70%, transparent);
+	gap: 0.12rem;
+	padding: 0.45rem 0.55rem;
+}
+
+.statLabel {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.statValue {
+	font-variant-numeric: tabular-nums;
+	line-height: 1.15;
+}
+
+.statHint {
+	font-size: 0.68rem;
+	line-height: 1.3;
+	color: var(--app-text-muted);
 }
 
 .block {

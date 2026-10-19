@@ -133,6 +133,18 @@ export async function cancelMatch(id: string): Promise<Match> {
 }
 
 /**
+ * Сдаться в бою.
+ */
+export async function surrenderMatch(id: string): Promise<Match> {
+	return apiFetchJson(
+		`/matches/${encodeURIComponent(id)}/battle/surrender`,
+		{ method: 'POST' },
+		parseMatch,
+		'Не удалось сдаться',
+	);
+}
+
+/**
  * Действие юнита в бою.
  */
 export async function battleAction(input: {

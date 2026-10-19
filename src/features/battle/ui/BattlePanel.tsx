@@ -1,5 +1,6 @@
-import { Button, Group, Stack, Text, Tooltip } from '@mantine/core';
-import { useState } from 'react';
+import { Button, Group, Modal, Stack, Text, Tooltip } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { useEffect, useRef, useState } from 'react';
 
 import {
 	formatAbilityPreview,
@@ -10,6 +11,7 @@ import {
 } from '@/entities/hero';
 import type { AbilityInfo, BattleState, BattleUnit, Match } from '@/entities/match';
 
+import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
 import { AbilityTags } from './AbilityTags';
 import styles from './BattlePanel.module.css';
 import { CombatStat, CombatStatRow } from './CombatStat';
@@ -30,6 +32,7 @@ type BattlePanelProps = {
 		slot?: 1 | 2 | 3 | 4 | 5;
 		choice?: string;
 	}) => void;
+	onSurrender: () => void;
 };
 
 type PendingMode =
@@ -53,18 +56,33 @@ type ConfirmState = {
 /**
  * Поле боя: очередь, лог справа, слоты 1–5, подтверждение, инспектор.
  */
-export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProps) => {
+export const BattlePanel = ({ match, playerId, busy, onAction, onSurrender }: BattlePanelProps) => {
 	const battle = match.battle;
 	const [pendingMode, setPendingMode] = useState<PendingMode>(null);
 	const [confirm, setConfirm] = useState<ConfirmState | null>(null);
-	const [inspectUnit, setInspectUnit] = useState<BattleUnit | null>(null);
+	const [inspectUnitId, setInspectUnitId] = useState<string | null>(null);
+	const [surrenderOpened, surrenderHandlers] = useDisclosure(false);
+	const wasMyTurnRef = useRef(false);
+
+	const isMyTurn =
+		Boolean(battle) && battle!.turnPlayerId === playerId && battle!.outcome === 'ongoing';
+
+	useEffect(() => {
+		if (isMyTurn && !wasMyTurnRef.current) {
+			playYourTurnSound();
+		}
+		wasMyTurnRef.current = isMyTurn;
+	}, [isMyTurn]);
 
 	if (!battle) {
 		return <Text c="var(--app-text-muted)">Загрузка боя…</Text>;
 	}
 
-	const isMyTurn = battle.turnPlayerId === playerId && battle.outcome === 'ongoing';
 	const active = battle.units.find((unit) => unit.id === battle.activeUnitId) ?? null;
+	const inspectUnit =
+		inspectUnitId === null
+			? null
+			: (battle.units.find((unit) => unit.id === inspectUnitId) ?? null);
 	const hostUnits = battle.units.filter((unit) => unit.team === 0);
 	const guestUnits = battle.units.filter((unit) => unit.team === 1);
 	const abilities = battle.abilities ?? [];
@@ -189,7 +207,7 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 			}
 			return;
 		}
-		setInspectUnit(unit);
+		setInspectUnitId(unit.id);
 	};
 
 	const handlePromptChoice = (choiceId: string) => {
@@ -207,28 +225,39 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 	};
 
 	return (
-		<div className={styles.panel}>
+		<div className={styles.panel} onPointerDownCapture={unlockTurnAudio}>
 			<Group justify="space-between" wrap="wrap">
 				<Text fw={600}>
 					Раунд {battle.stage}
 					{battle.outcome === 'ongoing' ? (isMyTurn ? ' · ваш ход' : ' · ход соперника') : ''}
 				</Text>
-				{active && battle.outcome === 'ongoing' && (
-					<Text size="sm" c="var(--app-text-muted)">
-						Ходит: {active.displayName}
-						{typeof active.mana === 'number' && active.mana > 0 ? ` · МР ${active.mana}` : ''}
-					</Text>
-				)}
+				<Group gap="sm" wrap="wrap">
+					{active && battle.outcome === 'ongoing' && (
+						<Text size="sm" c="var(--app-text-muted)">
+							Ходит: {active.displayName}
+							{typeof active.mana === 'number' && active.mana > 0 ? ` · МР ${active.mana}` : ''}
+						</Text>
+					)}
+					{battle.outcome === 'ongoing' && (
+						<Button
+							variant="subtle"
+							color="red"
+							radius={0}
+							size="compact-sm"
+							disabled={busy}
+							onClick={surrenderHandlers.open}
+						>
+							Сдаться
+						</Button>
+					)}
+				</Group>
 			</Group>
 
 			<TurnOrderStrip
 				entries={battle.turnOrder ?? []}
 				stage={battle.stage}
 				onSelectUnit={(unitId) => {
-					const unit = battle.units.find((item) => item.id === unitId);
-					if (unit) {
-						setInspectUnit(unit);
-					}
+					setInspectUnitId(unitId);
 				}}
 			/>
 
@@ -431,7 +460,35 @@ export const BattlePanel = ({ match, playerId, busy, onAction }: BattlePanelProp
 				</Stack>
 			)}
 
-			<UnitInspectModal unit={inspectUnit} onClose={() => setInspectUnit(null)} />
+			<UnitInspectModal unit={inspectUnit} onClose={() => setInspectUnitId(null)} />
+
+			<Modal
+				opened={surrenderOpened}
+				onClose={surrenderHandlers.close}
+				title="Сдаться"
+				centered
+				radius={0}
+			>
+				<Text size="sm" mb="md">
+					Матч завершится поражением.
+				</Text>
+				<Group justify="flex-end" gap="sm">
+					<Button variant="default" radius={0} onClick={surrenderHandlers.close} disabled={busy}>
+						Отмена
+					</Button>
+					<Button
+						color="red"
+						radius={0}
+						loading={busy}
+						onClick={() => {
+							surrenderHandlers.close();
+							onSurrender();
+						}}
+					>
+						Сдаться
+					</Button>
+				</Group>
+			</Modal>
 		</div>
 	);
 };

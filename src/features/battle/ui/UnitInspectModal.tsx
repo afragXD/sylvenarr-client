@@ -51,22 +51,22 @@ type NumericStatKey =
 const STATS: ReadonlyArray<{
 	key: NumericStatKey;
 	label: string;
+	hint: string;
 	Icon?: LucideIcon;
-	abbrev?: string;
 }> = [
-	{ key: 'lvl', label: 'Уровень', abbrev: 'Ур.' },
-	{ key: 'health', label: 'ОЗ', Icon: Heart },
-	{ key: 'damage', label: 'Урон', Icon: Sword },
-	{ key: 'armor', label: 'Броня', Icon: Shield },
-	{ key: 'initiative', label: 'Инициатива', Icon: Gauge },
-	{ key: 'dodge', label: 'Уклонение', Icon: Sparkles },
-	{ key: 'luck', label: 'Удача', Icon: Clover },
-	{ key: 'accuracy', label: 'Точность', Icon: Crosshair },
-	{ key: 'power', label: 'Сила магии', Icon: WandSparkles },
-	{ key: 'mana', label: 'Мана', Icon: Zap },
-	{ key: 'gold', label: 'Золото', Icon: Coins },
-	{ key: 'critBank', label: 'Крит-банк', Icon: Sword },
-	{ key: 'ultaCharges', label: 'Заряды', Icon: Sparkles },
+	{ key: 'lvl', label: 'Уровень', hint: 'Сила приростов и способностей' },
+	{ key: 'health', label: 'ОЗ', hint: 'Запас жизни', Icon: Heart },
+	{ key: 'damage', label: 'Урон', hint: 'Сила обычной атаки', Icon: Sword },
+	{ key: 'armor', label: 'Броня', hint: 'Снижает входящий урон', Icon: Shield },
+	{ key: 'initiative', label: 'Инициатива', hint: 'Порядок хода в раунде', Icon: Gauge },
+	{ key: 'dodge', label: 'Уклонение', hint: 'Шанс избежать удара', Icon: Sparkles },
+	{ key: 'luck', label: 'Удача', hint: 'Критические и особые броски', Icon: Clover },
+	{ key: 'accuracy', label: 'Точность', hint: 'Шанс попасть по цели', Icon: Crosshair },
+	{ key: 'power', label: 'Сила магии', hint: 'Мощность заклинаний', Icon: WandSparkles },
+	{ key: 'mana', label: 'Мана', hint: 'Ресурс для способностей', Icon: Zap },
+	{ key: 'gold', label: 'Золото', hint: 'Трофеи юнита', Icon: Coins },
+	{ key: 'critBank', label: 'Крит-банк', hint: 'Накопленный критический запас', Icon: Sword },
+	{ key: 'ultaCharges', label: 'Заряды', hint: 'Заряды ультимативной способности', Icon: Sparkles },
 ];
 
 function formatResistValue(resist: ResistBrief): string {
@@ -97,6 +97,7 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 			title={unit?.displayName ?? ''}
 			size="lg"
 			centered
+			radius={0}
 		>
 			{unit && doc && previewCtx && (
 				<Stack gap="md">
@@ -128,49 +129,47 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 									ряд {unit.row + 1}
 								</Text>
 							</CombatStatRow>
-							<div className={styles.effects}>
-								<UnitEffects effects={unit.effects ?? []} />
-							</div>
+							{(unit.effects?.length ?? 0) > 0 ? (
+								<div className={styles.effects}>
+									<UnitEffects effects={unit.effects ?? []} variant="inline" />
+								</div>
+							) : null}
 						</div>
 					</Group>
 
-					<SimpleGrid cols={{ base: 3, sm: 4 }} spacing="xs">
+					<SimpleGrid cols={{ base: 2, sm: 3 }} spacing="xs">
 						{STATS.map((stat) => {
 							const value = unit[stat.key];
 							const Icon = stat.Icon;
 							return (
 								<div
 									key={stat.key}
-									className={styles.stat}
-									title={stat.label}
-									aria-label={`${stat.label}: ${typeof value === 'number' ? value : '—'}`}
+									className={`sylvenarr-stat-cell ${styles.stat}`}
+									aria-label={`${stat.label}: ${typeof value === 'number' ? value : '—'}. ${stat.hint}`}
 								>
-									{stat.abbrev ? (
-										<Text size="xs" fw={700} c="var(--app-text-muted)" aria-hidden>
-											{stat.abbrev}
-										</Text>
-									) : Icon ? (
-										<Icon size={12} strokeWidth={2} aria-hidden />
-									) : null}
-									<Text size="sm" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
+									<span className={`sylvenarr-stat-cell__label ${styles.statLabel}`}>
+										{Icon ? <Icon size={11} strokeWidth={2} aria-hidden /> : null}
+										{stat.label}
+									</span>
+									<span className={`sylvenarr-stat-cell__value ${styles.statValue}`}>
 										{typeof value === 'number' ? value : '—'}
-									</Text>
+									</span>
+									<span className={styles.statHint}>{stat.hint}</span>
 								</div>
 							);
 						})}
 					</SimpleGrid>
 
-					{(unit.resists?.length ?? 0) > 0 && (
-						<div className={styles.block}>
-							<Text size="sm" fw={600} mb={6}>
-								Сопротивления
-							</Text>
+					<div className={styles.block}>
+						<Text size="sm" fw={600} mb={6}>
+							Сопротивления
+						</Text>
+						{(unit.resists?.length ?? 0) > 0 ? (
 							<div className={styles.resistGrid}>
 								{(unit.resists ?? []).map((resist) => (
 									<div
 										key={resist.source}
 										className={styles.resist}
-										title={resist.label}
 										aria-label={`${resist.label}: ${formatResistValue(resist)}`}
 									>
 										<ShieldBan size={12} strokeWidth={2} aria-hidden />
@@ -183,8 +182,12 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 									</div>
 								))}
 							</div>
-						</div>
-					)}
+						) : (
+							<Text size="sm" c="var(--app-text-muted)">
+								Нет особых сопротивлений
+							</Text>
+						)}
+					</div>
 
 					{doc.passive && (
 						<div className={styles.block}>

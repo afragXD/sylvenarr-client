@@ -14,6 +14,7 @@ import {
 	type Match,
 	type MatchDraftPick,
 	moveDraftPick,
+	surrenderMatch,
 } from '@/entities/match';
 import { fetchCurrentPlayer, type Player } from '@/entities/player';
 import { BattlePanel } from '@/features/battle';
@@ -220,6 +221,22 @@ export const MatchRoomPage = () => {
 		}
 	};
 
+	const handleSurrender = async () => {
+		if (!match) {
+			return;
+		}
+		setIsBusy(true);
+		setError(null);
+		try {
+			const next = await surrenderMatch(match.id);
+			setMatch(next);
+		} catch (err) {
+			setError(err instanceof ApiError ? err.message : 'Ошибка сдачи');
+		} finally {
+			setIsBusy(false);
+		}
+	};
+
 	const handleDragEnd = (event: DragEndEvent) => {
 		if (!match || !player || isBusy) {
 			return;
@@ -390,6 +407,7 @@ export const MatchRoomPage = () => {
 									playerId={player.id}
 									busy={isBusy}
 									onAction={(input) => void handleBattleAction(input)}
+									onSurrender={() => void handleSurrender()}
 								/>
 								{match.status === 'finished' && (
 									<Group gap="sm">

@@ -54,4 +54,19 @@ describe('matchRules client', () => {
 			formatRulesSummary({ ...DEFAULT_MATCH_RULES, heroDupes: 'uniqueMatch' }),
 		).toContain('уникальны в матче');
 	});
+
+	test('rejects startingLevel out of range', () => {
+		expect(validateMatchRules({ ...DEFAULT_MATCH_RULES, startingLevel: 0 }).ok).toBe(
+			false,
+		);
+		expect(validateMatchRules({ ...DEFAULT_MATCH_RULES, startingLevel: 31 }).ok).toBe(
+			false,
+		);
+	});
+
+	test('formatRulesSummary shows starting level when above 1', () => {
+		expect(
+			formatRulesSummary({ ...DEFAULT_MATCH_RULES, startingLevel: 10 }),
+		).toContain('ур. 10');
+	});
 });

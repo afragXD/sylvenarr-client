@@ -1,3 +1,7 @@
+import type { HeroDupesMode, MatchRules } from './matchRules';
+
+export type { HeroDupesMode, MatchRules };
+
 export type MatchStatus =
 	| 'waiting'
 	| 'ready'
@@ -122,8 +126,6 @@ export type BattleState = {
 	pendingPrompt: PendingPrompt | null;
 	units: BattleUnit[];
 };
-
-export type { HeroDupesMode, MatchRules } from './matchRules';
 
 export type Match = {
 	id: string;

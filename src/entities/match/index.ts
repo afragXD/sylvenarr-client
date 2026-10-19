@@ -9,6 +9,7 @@ export {
 	fetchMyMatches,
 	joinMatch,
 	moveDraftPick,
+	surrenderMatch,
 } from './api/matchesApi';
 export { loadLobbyRulesPrefs, saveLobbyRulesPrefs } from './model/lobbyRulesPrefs';
 export type { HeroDupesMode, RulesPresetId } from './model/matchRules';

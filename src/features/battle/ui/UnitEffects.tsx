@@ -4,17 +4,56 @@ import type { BattleEffectBrief } from '@/entities/match';
 import { formatEffectRounds, getEffectMeta, MAX_VISIBLE_EFFECTS } from '../model/effectMeta';
 
 import styles from './BattlePanel.module.css';
+import inspectStyles from './UnitInspectModal.module.css';
 
 type UnitEffectsProps = {
 	effects: BattleEffectBrief[];
+	/** compact — иконки с tooltip (поле); inline — подписи в инспекторе. */
+	variant?: 'compact' | 'inline';
 };
 
 /**
- * Компактная полоса эффектов на юните: до 4 иконок + overflow +K.
+ * Полоса эффектов: compact на поле, inline в модалке инспектора.
  */
-export const UnitEffects = ({ effects }: UnitEffectsProps) => {
+export const UnitEffects = ({ effects, variant = 'compact' }: UnitEffectsProps) => {
 	if (effects.length === 0) {
 		return null;
+	}
+
+	if (variant === 'inline') {
+		return (
+			<div className={inspectStyles.effectsInline}>
+				{effects.map((effect) => {
+					const meta = getEffectMeta(effect.id);
+					const roundsLabel = formatEffectRounds(effect.rounds);
+					const Icon = meta.Icon;
+					return (
+						<div key={effect.id} className={inspectStyles.effectInlineRow} data-kind={meta.kind}>
+							<span className={styles.effectTag} data-kind={meta.kind} aria-hidden>
+								<Icon size={12} strokeWidth={2} />
+								{effect.rounds > 0 ? (
+									<span className={styles.effectRounds}>{effect.rounds}</span>
+								) : null}
+							</span>
+							<div>
+								<Text size="sm" fw={600}>
+									{meta.label}
+									{roundsLabel ? ` · ${roundsLabel.toLowerCase()}` : ''}
+								</Text>
+								<Text size="xs" c="var(--app-text-muted)" style={{ lineHeight: 1.4 }}>
+									{meta.description}
+								</Text>
+								{typeof effect.power === 'number' && effect.power !== 0 ? (
+									<Text size="xs" c="var(--app-text-muted)">
+										Сила: {effect.power}
+									</Text>
+								) : null}
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		);
 	}
 
 	const visible = effects.slice(0, MAX_VISIBLE_EFFECTS);

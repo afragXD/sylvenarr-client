@@ -220,6 +220,25 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 						<span className={styles.sliderValue}>{rules.maxRounds}</span>
 					</div>
 				</div>
+				<div className={styles.field}>
+					<span className={styles.fieldLabel}>Стартовый уровень</span>
+					<div className={styles.sliderRow}>
+						<Slider
+							style={{ flex: 1 }}
+							min={MATCH_RULES_LIMITS.startingLevel.min}
+							max={MATCH_RULES_LIMITS.startingLevel.max}
+							step={MATCH_RULES_LIMITS.startingLevel.step}
+							value={rules.startingLevel}
+							onChange={(value) => patch({ startingLevel: value })}
+							marks={[
+								{ value: 1, label: '1' },
+								{ value: 15, label: '15' },
+								{ value: 30, label: '30' },
+							]}
+						/>
+						<span className={styles.sliderValue}>{rules.startingLevel}</span>
+					</div>
+				</div>
 			</Stack>
 
 			<div className={styles.fairBlock}>
