@@ -1,7 +1,9 @@
 export {
+	acceptDraw,
 	battleAction,
 	cancelMatch,
 	createMatch,
+	declineDraw,
 	draftPick,
 	draftRandom,
 	fetchMatchById,
@@ -9,6 +11,7 @@ export {
 	fetchMyMatches,
 	joinMatch,
 	moveDraftPick,
+	offerDraw,
 	surrenderMatch,
 } from './api/matchesApi';
 export { loadLobbyRulesPrefs, saveLobbyRulesPrefs } from './model/lobbyRulesPrefs';

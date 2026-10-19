@@ -5,8 +5,10 @@ import { useEffect, useState } from 'react';
 
 import { fetchHeroes, type HeroClass } from '@/entities/hero';
 import {
+	acceptDraw,
 	battleAction,
 	cancelMatch,
+	declineDraw,
 	draftPick,
 	draftRandom,
 	fetchMatchById,
@@ -14,6 +16,7 @@ import {
 	type Match,
 	type MatchDraftPick,
 	moveDraftPick,
+	offerDraw,
 	surrenderMatch,
 } from '@/entities/match';
 import { fetchCurrentPlayer, type Player } from '@/entities/player';
@@ -237,6 +240,54 @@ export const MatchRoomPage = () => {
 		}
 	};
 
+	const handleOfferDraw = async () => {
+		if (!match) {
+			return;
+		}
+		setIsBusy(true);
+		setError(null);
+		try {
+			const next = await offerDraw(match.id);
+			setMatch(next);
+		} catch (err) {
+			setError(err instanceof ApiError ? err.message : 'Ошибка предложения ничьей');
+		} finally {
+			setIsBusy(false);
+		}
+	};
+
+	const handleAcceptDraw = async () => {
+		if (!match) {
+			return;
+		}
+		setIsBusy(true);
+		setError(null);
+		try {
+			const next = await acceptDraw(match.id);
+			setMatch(next);
+		} catch (err) {
+			setError(err instanceof ApiError ? err.message : 'Ошибка принятия ничьей');
+		} finally {
+			setIsBusy(false);
+		}
+	};
+
+	const handleDeclineDraw = async () => {
+		if (!match) {
+			return;
+		}
+		setIsBusy(true);
+		setError(null);
+		try {
+			const next = await declineDraw(match.id);
+			setMatch(next);
+		} catch (err) {
+			setError(err instanceof ApiError ? err.message : 'Ошибка отклонения ничьей');
+		} finally {
+			setIsBusy(false);
+		}
+	};
+
 	const handleDragEnd = (event: DragEndEvent) => {
 		if (!match || !player || isBusy) {
 			return;
@@ -408,6 +459,9 @@ export const MatchRoomPage = () => {
 									busy={isBusy}
 									onAction={(input) => void handleBattleAction(input)}
 									onSurrender={() => void handleSurrender()}
+									onOfferDraw={() => void handleOfferDraw()}
+									onAcceptDraw={() => void handleAcceptDraw()}
+									onDeclineDraw={() => void handleDeclineDraw()}
 								/>
 								{match.status === 'finished' && (
 									<Group gap="sm">

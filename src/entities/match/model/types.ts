@@ -117,6 +117,7 @@ export type BattleState = {
 	turnPlayerId: string | null;
 	outcome: 'ongoing' | 'host_win' | 'guest_win' | 'draw';
 	winnerPlayerId: string | null;
+	drawOfferByPlayerId: string | null;
 	log: string[];
 	turnOrder: TurnOrderEntry[];
 	legalTargetIds: string[];

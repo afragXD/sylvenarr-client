@@ -145,6 +145,42 @@ export async function surrenderMatch(id: string): Promise<Match> {
 }
 
 /**
+ * Предложить ничью.
+ */
+export async function offerDraw(id: string): Promise<Match> {
+	return apiFetchJson(
+		`/matches/${encodeURIComponent(id)}/battle/draw/offer`,
+		{ method: 'POST' },
+		parseMatch,
+		'Не удалось предложить ничью',
+	);
+}
+
+/**
+ * Принять ничью.
+ */
+export async function acceptDraw(id: string): Promise<Match> {
+	return apiFetchJson(
+		`/matches/${encodeURIComponent(id)}/battle/draw/accept`,
+		{ method: 'POST' },
+		parseMatch,
+		'Не удалось принять ничью',
+	);
+}
+
+/**
+ * Отклонить ничью.
+ */
+export async function declineDraw(id: string): Promise<Match> {
+	return apiFetchJson(
+		`/matches/${encodeURIComponent(id)}/battle/draw/decline`,
+		{ method: 'POST' },
+		parseMatch,
+		'Не удалось отклонить ничью',
+	);
+}
+
+/**
  * Действие юнита в бою.
  */
 export async function battleAction(input: {

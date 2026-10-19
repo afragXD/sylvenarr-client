@@ -33,6 +33,9 @@ type BattlePanelProps = {
 		choice?: string;
 	}) => void;
 	onSurrender: () => void;
+	onOfferDraw: () => void;
+	onAcceptDraw: () => void;
+	onDeclineDraw: () => void;
 };
 
 type PendingMode =
@@ -56,7 +59,16 @@ type ConfirmState = {
 /**
  * Поле боя: очередь, лог справа, слоты 1–5, подтверждение, инспектор.
  */
-export const BattlePanel = ({ match, playerId, busy, onAction, onSurrender }: BattlePanelProps) => {
+export const BattlePanel = ({
+	match,
+	playerId,
+	busy,
+	onAction,
+	onSurrender,
+	onOfferDraw,
+	onAcceptDraw,
+	onDeclineDraw,
+}: BattlePanelProps) => {
 	const battle = match.battle;
 	const [pendingMode, setPendingMode] = useState<PendingMode>(null);
 	const [confirm, setConfirm] = useState<ConfirmState | null>(null);
@@ -83,6 +95,9 @@ export const BattlePanel = ({ match, playerId, busy, onAction, onSurrender }: Ba
 		inspectUnitId === null
 			? null
 			: (battle.units.find((unit) => unit.id === inspectUnitId) ?? null);
+	const drawOfferBy = battle.drawOfferByPlayerId ?? null;
+	const myDrawOffer = drawOfferBy === playerId;
+	const opponentDrawOffer = Boolean(drawOfferBy) && drawOfferBy !== playerId;
 	const hostUnits = battle.units.filter((unit) => unit.team === 0);
 	const guestUnits = battle.units.filter((unit) => unit.team === 1);
 	const abilities = battle.abilities ?? [];
@@ -238,6 +253,23 @@ export const BattlePanel = ({ match, playerId, busy, onAction, onSurrender }: Ba
 							{typeof active.mana === 'number' && active.mana > 0 ? ` · МР ${active.mana}` : ''}
 						</Text>
 					)}
+					{battle.outcome === 'ongoing' && !drawOfferBy && (
+						<Button
+							variant="subtle"
+							color="brand"
+							radius={0}
+							size="compact-sm"
+							disabled={busy}
+							onClick={onOfferDraw}
+						>
+							Предложить ничью
+						</Button>
+					)}
+					{battle.outcome === 'ongoing' && myDrawOffer && (
+						<Text size="sm" c="var(--app-text-muted)">
+							Ожидание ответа…
+						</Text>
+					)}
 					{battle.outcome === 'ongoing' && (
 						<Button
 							variant="subtle"
@@ -252,6 +284,22 @@ export const BattlePanel = ({ match, playerId, busy, onAction, onSurrender }: Ba
 					)}
 				</Group>
 			</Group>
+
+			{battle.outcome === 'ongoing' && opponentDrawOffer && (
+				<div className={styles.confirm}>
+					<Text size="sm" fw={600}>
+						Соперник предлагает ничью
+					</Text>
+					<Group gap="sm" mt={8}>
+						<Button color="brand" radius={0} loading={busy} onClick={onAcceptDraw}>
+							Принять
+						</Button>
+						<Button variant="default" radius={0} disabled={busy} onClick={onDeclineDraw}>
+							Отклонить
+						</Button>
+					</Group>
+				</div>
+			)}
 
 			<TurnOrderStrip
 				entries={battle.turnOrder ?? []}
