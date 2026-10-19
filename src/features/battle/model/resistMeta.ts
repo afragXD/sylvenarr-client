@@ -38,7 +38,7 @@ export function formatResistValue(resist: ResistBrief): string {
 	}
 	const percent = resist.value > 0 ? `${resist.value}%` : resist.value < 0 ? `−${Math.abs(resist.value)}%` : '';
 	if (resist.wardCharges != null && resist.wardCharges > 0) {
-		return percent ? `${percent} · Щит×${resist.wardCharges}` : `Щит×${resist.wardCharges}`;
+		return percent ? `${percent} · Вард×${resist.wardCharges}` : `Вард×${resist.wardCharges}`;
 	}
 	return percent || '0%';
 }

@@ -111,7 +111,7 @@ export function getHeroBaseResists(code: string): BaseResistEntry[] {
 	return BASE_RESISTS[code] ?? [];
 }
 
-/** Краткий формат значения: «25% · Щит×1», «Щит×2», «Иммунитет», «−20%». */
+/** Краткий формат значения: «25% · Вард×1», «Вард×2», «Иммунитет», «−20%». */
 export function formatBaseResistValue(resist: BaseResistEntry): string {
 	if (resist.immune) {
 		return 'Иммунитет';
@@ -119,12 +119,12 @@ export function formatBaseResistValue(resist: BaseResistEntry): string {
 	const percent =
 		resist.value > 0 ? `${resist.value}%` : resist.value < 0 ? `−${Math.abs(resist.value)}%` : '';
 	if (resist.wardCharges != null && resist.wardCharges > 0) {
-		return percent ? `${percent} · Щит×${resist.wardCharges}` : `Щит×${resist.wardCharges}`;
+		return percent ? `${percent} · Вард×${resist.wardCharges}` : `Вард×${resist.wardCharges}`;
 	}
 	return percent || '0%';
 }
 
-/** Одна строка для краткой карточки: «Огонь Щит×1 · Смерть 25%»; null если нет. */
+/** Одна строка для краткой карточки: «Огонь Вард×1 · Смерть 25%»; null если нет. */
 export function formatBaseResistsLine(code: string): string | null {
 	const resists = getHeroBaseResists(code);
 	if (resists.length === 0) {
