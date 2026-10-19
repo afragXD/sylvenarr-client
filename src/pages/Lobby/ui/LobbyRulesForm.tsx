@@ -1,4 +1,4 @@
-import { Collapse, SegmentedControl, Slider, Stack, Switch, Text } from '@mantine/core';
+import { SegmentedControl, Slider, Stack, Switch, Text } from '@mantine/core';
 import { useMemo } from 'react';
 
 import {
@@ -27,9 +27,9 @@ const PRESET_DATA = [
 ] as const;
 
 const HERO_DUPES_DATA: { value: HeroDupesMode; label: string }[] = [
-	{ value: 'allow', label: 'Можно' },
-	{ value: 'uniqueTeam', label: 'Не у себя' },
-	{ value: 'uniqueMatch', label: 'В матче' },
+	{ value: 'allow', label: 'Разрешён' },
+	{ value: 'uniqueTeam', label: 'Один на отряд' },
+	{ value: 'uniqueMatch', label: 'Один на матч' },
 ];
 
 const intSeg = (min: number, max: number) =>
@@ -37,6 +37,52 @@ const intSeg = (min: number, max: number) =>
 		const value = String(min + index);
 		return { value, label: value };
 	});
+
+type RowColumnProps = {
+	label: string;
+	slotCount: number;
+	front?: boolean;
+};
+
+const RowColumn = ({ label, slotCount, front = false }: RowColumnProps) => (
+	<div className={styles.rowColumn}>
+		<span className={styles.rowColumnLabel}>{label}</span>
+		<div className={front ? `${styles.rowSlots} ${styles.rowSlotsFront}` : styles.rowSlots}>
+			{Array.from({ length: slotCount }, (_, index) => (
+				<span key={index} className={front ? `${styles.slot} ${styles.slotFront}` : styles.slot} />
+			))}
+		</div>
+	</div>
+);
+
+type SidePreviewProps = {
+	title: string;
+	mirror: boolean;
+	slotCount: number;
+};
+
+const SidePreview = ({ title, mirror, slotCount }: SidePreviewProps) => {
+	const left = mirror ? (
+		<RowColumn label="Зад" slotCount={slotCount} />
+	) : (
+		<RowColumn label="Перед" slotCount={slotCount} front />
+	);
+	const right = mirror ? (
+		<RowColumn label="Перед" slotCount={slotCount} front />
+	) : (
+		<RowColumn label="Зад" slotCount={slotCount} />
+	);
+
+	return (
+		<div className={styles.sidePreview}>
+			<span className={styles.sideTitle}>{title}</span>
+			<div className={styles.sideRows}>
+				{left}
+				{right}
+			</div>
+		</div>
+	);
+};
 
 /**
  * Форма правил матча: пресеты, сегменты квот, слайдеры боя, заглушка ярмарки.
@@ -110,17 +156,12 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 						data={intSeg(MATCH_RULES_LIMITS.maxRowSize.min, MATCH_RULES_LIMITS.maxRowSize.max)}
 					/>
 					<div className={styles.rowsPreview} aria-hidden>
-						{['Перед', 'Зад'].map((label) => (
-							<div key={label} className={styles.rowLine}>
-								{Array.from({ length: rules.maxRowSize }, (_, index) => (
-									<span key={index} className={styles.slot} title={label} />
-								))}
-							</div>
-						))}
+						<SidePreview title="Вы" mirror slotCount={rules.maxRowSize} />
+						<SidePreview title="Соперник" mirror={false} slotCount={rules.maxRowSize} />
 					</div>
 				</div>
 				<div className={styles.field}>
-					<span className={styles.fieldLabel}>Дубли классов</span>
+					<span className={styles.fieldLabel}>Повтор класса</span>
 					<SegmentedControl
 						fullWidth
 						value={rules.heroDupes}
@@ -128,7 +169,7 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 						data={HERO_DUPES_DATA}
 					/>
 					<Text size="sm" c="var(--app-text-muted)" style={{ lineHeight: 1.4 }}>
-						Только набор отряда. Призывы и эволюции в бою не ограничиваются.
+						Только при наборе отряда. Призывы и эволюции в бою не ограничиваются.
 					</Text>
 				</div>
 				{!validation.ok && (
@@ -182,57 +223,8 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 			</Stack>
 
 			<div className={styles.fairBlock}>
-				<p className={styles.sectionTitle}>Ярмарка · фаза 4.1</p>
-				<Switch
-					label="Ярмарка"
-					description="Настройки сохраняются, в бою пока не используются"
-					checked={rules.fairEnabled}
-					onChange={(event) => patch({ fairEnabled: event.currentTarget.checked })}
-				/>
-				<Collapse expanded={rules.fairEnabled}>
-					<Stack gap="sm" pt="sm">
-						<div className={styles.field}>
-							<span className={styles.fieldLabel}>Частота (раз в N раундов)</span>
-							<div className={styles.sliderRow}>
-								<Slider
-									style={{ flex: 1 }}
-									min={MATCH_RULES_LIMITS.fairFrequency.min}
-									max={MATCH_RULES_LIMITS.fairFrequency.max}
-									value={rules.fairFrequency}
-									onChange={(value) => patch({ fairFrequency: value })}
-								/>
-								<span className={styles.sliderValue}>{rules.fairFrequency}</span>
-							</div>
-						</div>
-						<div className={styles.field}>
-							<span className={styles.fieldLabel}>Товаров в лавке</span>
-							<div className={styles.sliderRow}>
-								<Slider
-									style={{ flex: 1 }}
-									min={MATCH_RULES_LIMITS.shopSize.min}
-									max={MATCH_RULES_LIMITS.shopSize.max}
-									value={rules.shopSize}
-									onChange={(value) => patch({ shopSize: value })}
-								/>
-								<span className={styles.sliderValue}>{rules.shopSize}</span>
-							</div>
-						</div>
-						<div className={styles.field}>
-							<span className={styles.fieldLabel}>Множитель золота</span>
-							<div className={styles.sliderRow}>
-								<Slider
-									style={{ flex: 1 }}
-									min={MATCH_RULES_LIMITS.goldBonus.min}
-									max={MATCH_RULES_LIMITS.goldBonus.max}
-									step={MATCH_RULES_LIMITS.goldBonus.step}
-									value={rules.goldBonus}
-									onChange={(value) => patch({ goldBonus: value })}
-								/>
-								<span className={styles.sliderValue}>×{rules.goldBonus}</span>
-							</div>
-						</div>
-					</Stack>
-				</Collapse>
+				<p className={styles.sectionTitle}>Ярмарка</p>
+				<Switch label="Ярмарка" description="В разработке" checked={false} disabled />
 			</div>
 		</div>
 	);

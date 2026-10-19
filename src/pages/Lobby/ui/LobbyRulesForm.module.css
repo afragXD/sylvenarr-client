@@ -44,22 +44,70 @@
 }
 
 .rowsPreview {
-	display: flex;
-	flex-direction: column;
-	gap: 0.35rem;
-	margin-top: 0.35rem;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.75rem;
+	margin-top: 0.5rem;
 }
 
-.rowLine {
+.sidePreview {
 	display: flex;
+	flex-direction: column;
 	gap: 0.3rem;
+	min-width: 0;
+}
+
+.sideTitle {
+	font-size: 0.72rem;
+	color: var(--app-text-muted);
+	line-height: 1.2;
+}
+
+.sideRows {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.35rem;
+}
+
+.rowColumn {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	min-width: 0;
+}
+
+.rowColumnLabel {
+	font-size: 0.65rem;
+	color: var(--app-text-muted);
+	line-height: 1.2;
+	text-align: center;
+}
+
+.rowSlots {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	align-items: stretch;
+	padding: 0.25rem;
+	border: 1px dashed color-mix(in srgb, var(--app-text) 18%, transparent);
+	background: color-mix(in srgb, var(--app-text) 3%, transparent);
+	min-height: 2.5rem;
+}
+
+.rowSlotsFront {
+	background: color-mix(in srgb, var(--app-text) 8%, transparent);
+	border-color: color-mix(in srgb, var(--app-text) 28%, transparent);
 }
 
 .slot {
-	width: 1.35rem;
-	height: 1.1rem;
+	height: 0.7rem;
+	width: 100%;
 	border: 1px solid var(--app-border);
 	background: color-mix(in srgb, var(--app-text) 6%, transparent);
+}
+
+.slotFront {
+	background: color-mix(in srgb, var(--app-text) 12%, transparent);
 }
 
 .fairBlock {
