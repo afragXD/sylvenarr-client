@@ -120,11 +120,11 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 	Paladin: {
 		slots: {
 			1: { mechanics: 'Всегда 2 удара ×1.05.', tags: ['attack'] },
-			2: {
-				mechanics:
-					'Ульта (−1): себе «Сила» · 3 р. и «Под охраной» · 2 р.',
-				tags: ['buff'],
-			},
+		2: {
+			mechanics:
+				'Ульта (−1): «Огненное оружие» · 2+⌊L/5⌋ р. и вард от Огня (1 заряд).',
+			tags: ['buff'],
+		},
 			3: {
 				mechanics:
 					'2 МР: ×1.1; игнор брони 15%; шанс украсть урон/силу цели.',
@@ -135,11 +135,11 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 					'Рывок на фронт; «Ускорение» · 2 р.; ×1.25 против нежити.',
 				tags: ['attack', 'buff'],
 			},
-			5: {
-				mechanics:
-					'3 МР: себе «Регенерация» + «Под охраной»; смена ряда; лечение.',
-				tags: ['heal', 'buff'],
-			},
+		5: {
+			mechanics:
+				'3 МР: себе «Регенерация» + сопротивление оглушению 50% · 3 р.; смена ряда; лечение.',
+			tags: ['heal', 'buff'],
+		},
 		},
 	},
 	Abbess: {
@@ -153,10 +153,10 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				mechanics: '3 МР (задний ряд): лечение всем союзникам.',
 				tags: ['heal', 'aoe'],
 			},
-			3: {
-				mechanics: '3 МР: «Каменная плоть» союзнику · 3 р.',
-				tags: ['buff'],
-			},
+		3: {
+			mechanics: '3 МР: «Каменная плоть» союзнику · 3 р.; варды от случайных источников себе и цели.',
+			tags: ['buff'],
+		},
 			4: {
 				mechanics: 'Снимает все эффекты с ряда цели (баффы и дебаффы).',
 				tags: ['heal', 'aoe'],
@@ -361,10 +361,10 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				mechanics: 'До 2 целей: шанс «Оглушение» · 1 р. или урон.',
 				tags: ['attack', 'debuff'],
 			},
-			2: {
-				mechanics: 'Урон цели; себе «Под охраной» · 2 р.',
-				tags: ['attack', 'buff'],
-			},
+		2: {
+			mechanics: 'Вард от Оружия цели (1 заряд); урон цели 3L+15.',
+			tags: ['attack', 'buff'],
+		},
 			3: {
 				mechanics: '«Метка» + «Неудача» · 2 р.',
 				tags: ['debuff'],
@@ -416,7 +416,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 	},
 	GoldGolem: {
 		passiveMechanics:
-			'50%: «Вард разума» случайному союзнику (не себе) в начале хода.',
+			'50%: вард от понижения уровня случайному союзнику (не себе) в начале хода.',
 		slots: {
 			1: {
 				mechanics: '×0.9, игнор брони 20%; шанс «Оглушение» 20+L%.',
@@ -474,15 +474,18 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				mechanics: '«Запрет лечения» · 2+⌊L/4⌋ р. (лечение → 0).',
 				tags: ['debuff'],
 			},
-			4: {
-				mechanics:
-					'3 МР: случайно «Сила» / «Радость» / «Ускорение» · 2 р.',
-				tags: ['buff'],
-			},
-			5: { mechanics: 'Базовые действия.', tags: ['buff'] },
+		4: {
+			mechanics:
+				'3 МР: случайно «Сила» / «Радость» / «Ускорение» · 2 р.',
+			tags: ['buff'],
+		},
+		5: {
+			mechanics: '4 МР: levelup союзника на +2+L уровней.',
+			tags: ['buff'],
 		},
 	},
-	Mermaid: {
+},
+Mermaid: {
 		slots: {
 			1: {
 				mechanics:

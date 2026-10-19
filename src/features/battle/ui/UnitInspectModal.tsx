@@ -4,6 +4,7 @@ import {
 	Crosshair,
 	Clover,
 	Gauge,
+	Ghost,
 	Heart,
 	Shield,
 	ShieldBan,
@@ -21,7 +22,9 @@ import {
 	HeroImage,
 	previewCtxFromUnit,
 } from '@/entities/hero';
-import type { BattleUnit, ResistBrief } from '@/entities/match';
+import type { BattleUnit } from '@/entities/match';
+
+import { describeResist, formatResistValue } from '../model/resistMeta';
 
 import { AbilityTags } from './AbilityTags';
 import { CombatStat, CombatStatRow } from './CombatStat';
@@ -46,7 +49,8 @@ type NumericStatKey =
 	| 'mana'
 	| 'gold'
 	| 'critBank'
-	| 'ultaCharges';
+	| 'ultaCharges'
+	| 'morale';
 
 const STATS: ReadonlyArray<{
 	key: NumericStatKey;
@@ -67,16 +71,11 @@ const STATS: ReadonlyArray<{
 	{ key: 'gold', label: 'Золото', hint: 'Трофеи юнита', Icon: Coins },
 	{ key: 'critBank', label: 'Крит-банк', hint: 'Накопленный критический запас', Icon: Sword },
 	{ key: 'ultaCharges', label: 'Заряды', hint: 'Заряды ультимативной способности', Icon: Sparkles },
+	{ key: 'morale', label: 'Мораль', hint: 'Боевой дух (каталожный показатель)', Icon: Ghost },
 ];
 
-function formatResistValue(resist: ResistBrief): string {
-	if (resist.immune) {
-		return 'Иммунитет';
-	}
-	if (resist.wardCharges != null && resist.wardCharges > 0) {
-		return resist.value !== 0 ? `${resist.value}% · Щит×${resist.wardCharges}` : 'Щит';
-	}
-	return `${resist.value}%`;
+function formatMorale(value: number): string {
+	return value > 0 ? `+${value}` : String(value);
 }
 
 /**
@@ -129,11 +128,15 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 									ряд {unit.row + 1}
 								</Text>
 							</CombatStatRow>
-							{(unit.effects?.length ?? 0) > 0 ? (
-								<div className={styles.effects}>
-									<UnitEffects effects={unit.effects ?? []} variant="inline" />
-								</div>
-							) : null}
+						{(unit.effects?.length ?? 0) > 0 || (unit.resists?.length ?? 0) > 0 ? (
+							<div className={styles.effects}>
+								<UnitEffects
+									effects={unit.effects ?? []}
+									resists={unit.resists ?? []}
+									variant="inline"
+								/>
+							</div>
+						) : null}
 						</div>
 					</Group>
 
@@ -141,18 +144,24 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 						{STATS.map((stat) => {
 							const value = unit[stat.key];
 							const Icon = stat.Icon;
+							const display =
+								stat.key === 'morale' && typeof value === 'number'
+									? formatMorale(value)
+									: typeof value === 'number'
+										? value
+										: '—';
 							return (
 								<div
 									key={stat.key}
 									className={`sylvenarr-stat-cell ${styles.stat}`}
-									aria-label={`${stat.label}: ${typeof value === 'number' ? value : '—'}. ${stat.hint}`}
+									aria-label={`${stat.label}: ${display}. ${stat.hint}`}
 								>
 									<span className={`sylvenarr-stat-cell__label ${styles.statLabel}`}>
 										{Icon ? <Icon size={11} strokeWidth={2} aria-hidden /> : null}
 										{stat.label}
 									</span>
 									<span className={`sylvenarr-stat-cell__value ${styles.statValue}`}>
-										{typeof value === 'number' ? value : '—'}
+										{display}
 									</span>
 									<span className={styles.statHint}>{stat.hint}</span>
 								</div>
@@ -170,7 +179,8 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 									<div
 										key={resist.source}
 										className={styles.resist}
-										aria-label={`${resist.label}: ${formatResistValue(resist)}`}
+										aria-label={`${resist.label}: ${formatResistValue(resist)}. ${describeResist(resist)}`}
+										title={describeResist(resist)}
 									>
 										<ShieldBan size={12} strokeWidth={2} aria-hidden />
 										<Text size="xs" c="var(--app-text-muted)">
@@ -178,6 +188,9 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 										</Text>
 										<Text size="sm" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
 											{formatResistValue(resist)}
+										</Text>
+										<Text size="xs" c="var(--app-text-muted)" className={styles.resistHint}>
+											{describeResist(resist)}
 										</Text>
 									</div>
 								))}

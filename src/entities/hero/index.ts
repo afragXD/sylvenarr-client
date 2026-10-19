@@ -26,6 +26,12 @@ export {
 } from './model/abilityPreview';
 export type { HeroAbilityDoc, HeroAbilitySlot } from './model/heroAbilities';
 export { getHeroAbilities } from './model/heroAbilities';
+export type { BaseResistEntry } from './model/heroBaseResists';
+export {
+	formatBaseResistsLine,
+	formatBaseResistValue,
+	getHeroBaseResists,
+} from './model/heroBaseResists';
 export { isTransformForm } from './model/heroKinds';
 export type { SummonerSummons, SummonRef } from './model/heroSummons';
 export { getSummonerSummons, SUMMONER_SUMMONS } from './model/heroSummons';

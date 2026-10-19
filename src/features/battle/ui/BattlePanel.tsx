@@ -11,6 +11,7 @@ import {
 } from '@/entities/hero';
 import type { AbilityInfo, BattleState, BattleUnit, Match } from '@/entities/match';
 
+import { previewWeaponAttack, type AttackPreview } from '../lib/attackPreview';
 import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
 import { AbilityTags } from './AbilityTags';
 import styles from './BattlePanel.module.css';
@@ -75,6 +76,7 @@ export const BattlePanel = ({
 	const [inspectUnitId, setInspectUnitId] = useState<string | null>(null);
 	const [surrenderOpened, surrenderHandlers] = useDisclosure(false);
 	const wasMyTurnRef = useRef(false);
+	const logRef = useRef<HTMLDivElement>(null);
 
 	const isMyTurn =
 		Boolean(battle) && battle!.turnPlayerId === playerId && battle!.outcome === 'ongoing';
@@ -85,6 +87,15 @@ export const BattlePanel = ({
 		}
 		wasMyTurnRef.current = isMyTurn;
 	}, [isMyTurn]);
+
+	// Автопрокрутка журнала к последним событиям.
+	const logLines = battle?.log;
+	useEffect(() => {
+		const el = logRef.current;
+		if (el && logLines) {
+			el.scrollTop = el.scrollHeight;
+		}
+	}, [logLines]);
 
 	if (!battle) {
 		return <Text c="var(--app-text-muted)">Загрузка боя…</Text>;
@@ -239,6 +250,14 @@ export const BattlePanel = ({
 		setConfirm(null);
 	};
 
+	/** Оценка базовой атаки по цели при выборе «Атака» (для hover-попапа). */
+	const attackPreviewFor = (unit: BattleUnit): AttackPreview | null => {
+		if (!active || pendingMode?.kind !== 'attack' || !highlightTargets.includes(unit.id)) {
+			return null;
+		}
+		return previewWeaponAttack(active, unit);
+	};
+
 	return (
 		<div className={styles.panel} onPointerDownCapture={unlockTurnAudio}>
 			<Group justify="space-between" wrap="wrap">
@@ -318,6 +337,7 @@ export const BattlePanel = ({
 						activeId={battle.activeUnitId}
 						legalTargets={highlightTargets}
 						onUnitClick={handleUnitClick}
+						attackPreviewFor={attackPreviewFor}
 					/>
 					<TeamSide
 						title={`Игрок 2 · ${match.guest?.displayName ?? '…'}`}
@@ -326,9 +346,10 @@ export const BattlePanel = ({
 						activeId={battle.activeUnitId}
 						legalTargets={highlightTargets}
 						onUnitClick={handleUnitClick}
+						attackPreviewFor={attackPreviewFor}
 					/>
 				</div>
-				<div className={styles.log} aria-live="polite">
+				<div className={styles.log} aria-live="polite" ref={logRef}>
 					<Text size="xs" c="var(--app-text-muted)" mb={6}>
 						Журнал
 					</Text>
@@ -548,6 +569,7 @@ const TeamSide = ({
 	activeId,
 	legalTargets,
 	onUnitClick,
+	attackPreviewFor,
 }: {
 	title: string;
 	units: BattleUnit[];
@@ -555,6 +577,7 @@ const TeamSide = ({
 	activeId: string | null;
 	legalTargets: string[];
 	onUnitClick: (unit: BattleUnit) => void;
+	attackPreviewFor: (unit: BattleUnit) => AttackPreview | null;
 }) => {
 	const front = units.filter((unit) => unit.row === 0);
 	const back = units.filter((unit) => unit.row === 1);
@@ -573,6 +596,7 @@ const TeamSide = ({
 					activeId={activeId}
 					legalTargets={legalTargets}
 					onUnitClick={onUnitClick}
+					attackPreviewFor={attackPreviewFor}
 				/>
 				<RowColumn
 					label={rightLabel}
@@ -580,6 +604,7 @@ const TeamSide = ({
 					activeId={activeId}
 					legalTargets={legalTargets}
 					onUnitClick={onUnitClick}
+					attackPreviewFor={attackPreviewFor}
 				/>
 			</div>
 		</div>
@@ -600,12 +625,14 @@ const RowColumn = ({
 	activeId,
 	legalTargets,
 	onUnitClick,
+	attackPreviewFor,
 }: {
 	label: string;
 	units: BattleUnit[];
 	activeId: string | null;
 	legalTargets: string[];
 	onUnitClick: (unit: BattleUnit) => void;
+	attackPreviewFor: (unit: BattleUnit) => AttackPreview | null;
 }) => {
 	const ordered = sortRowUnits(units);
 	return (
@@ -619,50 +646,93 @@ const RowColumn = ({
 						—
 					</Text>
 				) : (
-					ordered.map((unit) => (
-						<button
-							key={unit.id}
-							type="button"
-							className={styles.unit}
-							data-active={unit.id === activeId ? 'true' : undefined}
-							data-target={legalTargets.includes(unit.id) ? 'true' : undefined}
-							data-dead={unit.alive ? undefined : 'true'}
-							data-summon={unit.isSummon ? 'true' : undefined}
-							data-inspectable="true"
-							onClick={() => onUnitClick(unit)}
-						>
-							<Group gap={6} wrap="nowrap" justify="space-between" w="100%">
-								<Group gap={6} wrap="nowrap" style={{ minWidth: 0 }}>
-									<HeroImage
-										code={unit.heroClassCode}
-										alt={unit.displayName}
-										w={28}
-										h={28}
-										radius={0}
-									/>
-									<Text size="sm" lineClamp={1}>
-										{unit.isSummon ? '✦ ' : ''}
-										{unit.displayName}
-										{unit.defending ? ' 🛡' : ''}
-										{unit.horseIsDead ? ' ✗конь' : ''}
-									</Text>
+					ordered.map((unit) => {
+						const preview = attackPreviewFor(unit);
+						const button = (
+							<button
+								key={unit.id}
+								type="button"
+								className={styles.unit}
+								data-active={unit.id === activeId ? 'true' : undefined}
+								data-target={legalTargets.includes(unit.id) ? 'true' : undefined}
+								data-dead={unit.alive ? undefined : 'true'}
+								data-summon={unit.isSummon ? 'true' : undefined}
+								data-inspectable="true"
+								onClick={() => onUnitClick(unit)}
+							>
+								<Group gap={6} wrap="nowrap" justify="space-between" w="100%">
+									<Group gap={6} wrap="nowrap" style={{ minWidth: 0 }}>
+										<HeroImage
+											code={unit.heroClassCode}
+											alt={unit.displayName}
+											w={28}
+											h={28}
+											radius={0}
+										/>
+										<Text size="sm" lineClamp={1}>
+											{unit.isSummon ? '✦ ' : ''}
+											{unit.displayName}
+											{unit.defending ? ' 🛡' : ''}
+											{unit.horseIsDead ? ' ✗конь' : ''}
+										</Text>
+									</Group>
+									{typeof unit.lvl === 'number' ? (
+										<span className={styles.lvl} title="Уровень" aria-label={`Уровень ${unit.lvl}`}>
+											Ур.{unit.lvl}
+										</span>
+									) : null}
 								</Group>
-								{typeof unit.lvl === 'number' ? (
-									<span className={styles.lvl} title="Уровень" aria-label={`Уровень ${unit.lvl}`}>
-										Ур.{unit.lvl}
-									</span>
-								) : null}
-							</Group>
-							<CombatStatRow className={styles.hp}>
-								<CombatStat kind="health" value={`${unit.health}/${unit.maxHp}`} />
-								{typeof unit.armor === 'number' ? (
-									<CombatStat kind="armor" value={unit.armor} muted />
-								) : null}
-								{!unit.alive ? <CombatStat kind="fallen" /> : null}
-							</CombatStatRow>
-							<UnitEffects effects={unit.effects ?? []} />
-						</button>
-					))
+								<CombatStatRow className={styles.hp}>
+									<CombatStat kind="health" value={`${unit.health}/${unit.maxHp}`} />
+									{typeof unit.armor === 'number' ? (
+										<CombatStat kind="armor" value={unit.armor} muted />
+									) : null}
+									{unit.alive && unit.mana > 0 ? (
+										<CombatStat kind="mana" value={unit.mana} muted />
+									) : null}
+									{!unit.alive ? <CombatStat kind="fallen" /> : null}
+								</CombatStatRow>
+								<UnitEffects effects={unit.effects ?? []} resists={unit.resists ?? []} />
+							</button>
+						);
+						if (!preview) {
+							return button;
+						}
+						return (
+							<Tooltip
+								key={unit.id}
+								multiline
+								w={220}
+								withArrow
+								label={
+									<Stack gap={2}>
+										<Text size="xs" fw={600}>
+											Оценка атаки
+										</Text>
+										{preview.blockedLabel ? (
+											<Text size="xs">Удар заблокирован: {preview.blockedLabel}</Text>
+										) : (
+											<Text size="xs">
+												≈{preview.minDamage}–{preview.maxDamage} урона
+											</Text>
+										)}
+										<Text size="xs" c="dimmed">
+											Попадание {preview.hitChance}% · крит{' '}
+											{preview.critChance === null ? 'гарантирован' : `${preview.critChance}%`}
+										</Text>
+										{preview.resistValue !== 0 ? (
+											<Text size="xs" c="dimmed">
+												Резист цели: {preview.resistValue > 0 ? '−' : '+'}
+												{Math.abs(preview.resistValue)}% урона
+											</Text>
+										) : null}
+									</Stack>
+								}
+							>
+								{button}
+							</Tooltip>
+						);
+					})
 				)}
 			</div>
 		</div>

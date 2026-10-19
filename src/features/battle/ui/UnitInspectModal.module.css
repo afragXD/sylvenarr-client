@@ -63,3 +63,8 @@
 	gap: 0.25rem 0.4rem;
 	padding: 0.2rem 0;
 }
+
+.resistHint {
+	flex-basis: 100%;
+	line-height: 1.35;
+}

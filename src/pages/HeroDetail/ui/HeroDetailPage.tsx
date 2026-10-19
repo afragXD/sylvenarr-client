@@ -14,6 +14,7 @@ import {
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 import { HeroAbilitiesSection } from './HeroAbilitiesSection';
+import { HeroResistsSection } from './HeroResistsSection';
 import { HeroSummonsSection } from './HeroSummonsSection';
 
 const statRows: ReadonlyArray<{ key: keyof StatSource; label: string }> = [
@@ -163,6 +164,7 @@ export const HeroDetailPage = () => {
 								/>
 							))}
 						</SimpleGrid>
+						<HeroResistsSection code={hero.code} />
 						<HeroAbilitiesSection
 							code={hero.code}
 							isPlayable={hero.isPlayable}

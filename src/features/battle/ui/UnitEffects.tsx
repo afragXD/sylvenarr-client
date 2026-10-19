@@ -1,28 +1,49 @@
 import { Stack, Text, Tooltip } from '@mantine/core';
-import type { BattleEffectBrief } from '@/entities/match';
+import { ShieldCheck } from 'lucide-react';
+import type { BattleEffectBrief, ResistBrief } from '@/entities/match';
 
 import { formatEffectRounds, getEffectMeta, MAX_VISIBLE_EFFECTS } from '../model/effectMeta';
+import { describeResist, listWards } from '../model/resistMeta';
 
 import styles from './BattlePanel.module.css';
 import inspectStyles from './UnitInspectModal.module.css';
 
 type UnitEffectsProps = {
 	effects: BattleEffectBrief[];
+	/** Варды юнита (resists с зарядами > 0) — бейджи щитов рядом с эффектами. */
+	resists?: ResistBrief[];
 	/** compact — иконки с tooltip (поле); inline — подписи в инспекторе. */
 	variant?: 'compact' | 'inline';
 };
 
 /**
- * Полоса эффектов: compact на поле, inline в модалке инспектора.
+ * Полоса эффектов и вардов: compact на поле, inline в модалке инспектора.
  */
-export const UnitEffects = ({ effects, variant = 'compact' }: UnitEffectsProps) => {
-	if (effects.length === 0) {
+export const UnitEffects = ({ effects, resists, variant = 'compact' }: UnitEffectsProps) => {
+	const wards = listWards(resists);
+	if (effects.length === 0 && wards.length === 0) {
 		return null;
 	}
 
 	if (variant === 'inline') {
 		return (
 			<div className={inspectStyles.effectsInline}>
+				{wards.map((ward) => (
+					<div key={`ward-${ward.source}`} className={inspectStyles.effectInlineRow} data-kind="buff">
+						<span className={styles.effectTag} data-kind="buff" aria-hidden>
+							<ShieldCheck size={12} strokeWidth={2} />
+							<span className={styles.effectRounds}>{ward.wardCharges}</span>
+						</span>
+						<div>
+							<Text size="sm" fw={600}>
+								Вард — {ward.label}
+							</Text>
+							<Text size="xs" c="var(--app-text-muted)" style={{ lineHeight: 1.4 }}>
+								{describeResist(ward)}
+							</Text>
+						</div>
+					</div>
+				))}
 				{effects.map((effect) => {
 					const meta = getEffectMeta(effect.id);
 					const roundsLabel = formatEffectRounds(effect.rounds);
@@ -61,6 +82,9 @@ export const UnitEffects = ({ effects, variant = 'compact' }: UnitEffectsProps) 
 
 	return (
 		<div className={styles.effects}>
+			{wards.map((ward) => (
+				<WardBadge key={`ward-${ward.source}`} ward={ward} />
+			))}
 			{visible.map((effect) => (
 				<EffectBadge key={effect.id} effect={effect} />
 			))}
@@ -68,6 +92,27 @@ export const UnitEffects = ({ effects, variant = 'compact' }: UnitEffectsProps) 
 		</div>
 	);
 };
+
+const WardBadge = ({ ward }: { ward: ResistBrief }) => (
+	<Tooltip
+		multiline
+		w={220}
+		withArrow
+		label={
+			<Stack gap={4}>
+				<Text size="sm" fw={600}>
+					Вард — {ward.label}
+				</Text>
+				<Text size="xs">{describeResist(ward)}</Text>
+			</Stack>
+		}
+	>
+		<span className={styles.effectTag} data-kind="buff">
+			<ShieldCheck size={12} strokeWidth={2} aria-hidden />
+			<span className={styles.effectRounds}>{ward.wardCharges}</span>
+		</span>
+	</Tooltip>
+);
 
 const EffectBadge = ({ effect }: { effect: BattleEffectBrief }) => {
 	const meta = getEffectMeta(effect.id);

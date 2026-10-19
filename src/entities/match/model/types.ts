@@ -78,6 +78,8 @@ export type BattleUnit = {
 	ultaCharges: number;
 	/** Уровень юнита в бою. */
 	lvl?: number;
+	/** Боевой дух (каталожный, display-only). */
+	morale?: number;
 	/** Ненулевые сопротивления / варды / иммунитеты. */
 	resists?: ResistBrief[];
 };

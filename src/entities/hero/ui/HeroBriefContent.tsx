@@ -1,5 +1,6 @@
 import { Badge, Box, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 
+import { formatBaseResistsLine } from '../model/heroBaseResists';
 import { isTransformForm } from '../model/heroKinds';
 import type { HeroClass } from '../model/types';
 import { HeroImage } from './HeroImage';
@@ -40,7 +41,9 @@ type HeroBriefContentProps = {
 /**
  * Краткая карточка героя для модалки draft.
  */
-export const HeroBriefContent = ({ hero }: HeroBriefContentProps) => (
+export const HeroBriefContent = ({ hero }: HeroBriefContentProps) => {
+	const resistsLine = formatBaseResistsLine(hero.code);
+	return (
 	<Group align="stretch" gap="lg" wrap="wrap" preventGrowOverflow={false} w="100%">
 		<Box w={{ base: '100%', sm: 200 }} maw={220} style={{ flexShrink: 0, aspectRatio: '7 / 9' }}>
 			<HeroImage
@@ -95,6 +98,12 @@ export const HeroBriefContent = ({ hero }: HeroBriefContentProps) => (
 					</Box>
 				))}
 			</SimpleGrid>
+			{resistsLine ? (
+				<Text size="xs" c="var(--app-text-muted)" style={{ lineHeight: 1.5 }}>
+					Сопротивления и варды: {resistsLine}
+				</Text>
+			) : null}
 		</Stack>
 	</Group>
-);
+	);
+};

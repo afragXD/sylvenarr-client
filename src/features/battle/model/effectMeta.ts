@@ -61,6 +61,7 @@ export type EffectId =
 	| 'LUCKY'
 	| 'FOCUSED'
 	| 'STUNNED'
+	| 'STUN_IMMUNE'
 	| 'WEAKNESS'
 	| 'UNLUCKY'
 	| 'GALL'
@@ -112,6 +113,7 @@ const BUFF_ORDER: EffectId[] = [
 	'MIND_WARD',
 	'INVISIBLE',
 	'ROW_FORTIFY',
+	'STUN_IMMUNE',
 ];
 
 const DEBUFF_ORDER: EffectId[] = [
@@ -168,27 +170,27 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	POISON: {
 		id: 'POISON',
 		label: 'Отравление',
-		description: 'Наносит урон в начале хода носителя.',
-		mechanics: 'урон за ход: max(1, round(power)); иначе 3',
-		exampleAtL: exampleTypical('3 урона за ход'),
+		description: 'Наносит урон смертью в начале хода носителя; сила эффекта — множитель.',
+		mechanics: '(4–6 + раунды×6) × сила за ход',
+		exampleAtL: exampleTypical('≈25 урона за ход при силе 1.5'),
 		Icon: Droplet,
 		kind: 'debuff',
 	},
 	BURNING: {
 		id: 'BURNING',
 		label: 'Поджог',
-		description: 'Наносит урон огнём в начале хода носителя.',
-		mechanics: 'урон за ход: max(1, round(power)); иначе 3',
-		exampleAtL: exampleTypical('3 урона за ход'),
+		description: 'Наносит урон огнём в начале хода носителя; сила эффекта — множитель.',
+		mechanics: '(4–6 + 15) × сила за ход',
+		exampleAtL: exampleTypical('≈26 урона за ход при силе 1.3'),
 		Icon: Flame,
 		kind: 'debuff',
 	},
 	BLEEDING: {
 		id: 'BLEEDING',
 		label: 'Кровотечение',
-		description: 'Наносит урон в начале хода носителя.',
-		mechanics: 'урон за ход: max(1, round(power)); иначе 3',
-		exampleAtL: exampleTypical('3 урона за ход'),
+		description: 'Наносит урон смертью в начале хода носителя; сила эффекта — множитель.',
+		mechanics: '(4 + раунды×3 + L) × сила за ход',
+		exampleAtL: exampleTypical('≈20 урона за ход при силе 1.3'),
 		Icon: Droplets,
 		kind: 'debuff',
 	},
@@ -372,6 +374,15 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		Icon: ZapOff,
 		kind: 'debuff',
 	},
+	STUN_IMMUNE: {
+		id: 'STUN_IMMUNE',
+		label: 'Сопротивление оглушению',
+		description: 'После пережитого оглушения цель нельзя оглушить повторно.',
+		mechanics: '100% сопротивление оглушению · 2 р. после стана',
+		exampleAtL: exampleTypical('2 р.'),
+		Icon: Shield,
+		kind: 'buff',
+	},
 	WEAKNESS: {
 		id: 'WEAKNESS',
 		label: 'Слабость',
@@ -393,9 +404,9 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	GALL: {
 		id: 'GALL',
 		label: 'Желчь',
-		description: 'Урон каждый ход и разъедание брони.',
-		mechanics: 'урон за ход + −броня · (2 + ⌊L/5⌋) р.',
-		exampleAtL: exampleAtL('урон за ход · 3 р.'),
+		description: 'Урон водой каждый ход и разъедание брони.',
+		mechanics: '20 × сила за ход + −броня · (2 + ⌊L/5⌋) р.',
+		exampleAtL: exampleAtL('≈25 урона за ход · 3 р.'),
 		Icon: Biohazard,
 		kind: 'debuff',
 	},

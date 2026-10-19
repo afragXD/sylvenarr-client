@@ -1,10 +1,10 @@
 import { Text } from '@mantine/core';
-import { Gauge, Heart, HeartOff, Shield, Sword, type LucideIcon } from 'lucide-react';
+import { Gauge, Heart, HeartOff, Shield, Sword, Zap, type LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 import styles from './CombatStat.module.css';
 
-type CombatStatKind = 'health' | 'damage' | 'armor' | 'initiative' | 'level' | 'fallen';
+type CombatStatKind = 'health' | 'damage' | 'armor' | 'initiative' | 'level' | 'fallen' | 'mana';
 
 const META: Record<
 	CombatStatKind,
@@ -17,6 +17,7 @@ const META: Record<
 	// Как Lv./Ур. в RPG — текст читается однозначнее любой иконки.
 	level: { label: 'Уровень', abbrev: 'Ур.' },
 	fallen: { Icon: HeartOff, label: 'Пал' },
+	mana: { Icon: Zap, label: 'Мана' },
 };
 
 type CombatStatProps = {

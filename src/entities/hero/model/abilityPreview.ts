@@ -188,6 +188,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		3: (ctx) => [
 			{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 4), label: 'р. запрет лечения' },
 		],
+		5: (ctx) => [{ kind: 'text', value: `+${2 + ctx.lvl} уровней цели` }],
 	},
 	Mermaid: {
 		1: mermaidBreeze,
