@@ -7,7 +7,6 @@ import {
 	Ghost,
 	Heart,
 	Shield,
-	ShieldBan,
 	Sparkles,
 	Sword,
 	WandSparkles,
@@ -24,10 +23,17 @@ import {
 } from '@/entities/hero';
 import type { BattleUnit } from '@/entities/match';
 
-import { describeResist, formatResistValue } from '../model/resistMeta';
+import {
+	describeResist,
+	formatResistPercent,
+	formatWardCharges,
+	listPercentResists,
+	listWards,
+} from '../model/resistMeta';
 
 import { AbilityTags } from './AbilityTags';
 import { CombatStat, CombatStatRow } from './CombatStat';
+import { ElementIcon, WardIcon } from './DamageSourceIcon';
 import { UnitEffects } from './UnitEffects';
 import styles from './UnitInspectModal.module.css';
 
@@ -169,38 +175,90 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 						})}
 					</SimpleGrid>
 
-					<div className={styles.block}>
-						<Text size="sm" fw={600} mb={6}>
-							Сопротивления
-						</Text>
-						{(unit.resists?.length ?? 0) > 0 ? (
-							<div className={styles.resistGrid}>
-								{(unit.resists ?? []).map((resist) => (
-									<div
-										key={resist.source}
-										className={styles.resist}
-										aria-label={`${resist.label}: ${formatResistValue(resist)}. ${describeResist(resist)}`}
-										title={describeResist(resist)}
-									>
-										<ShieldBan size={12} strokeWidth={2} aria-hidden />
-										<Text size="xs" c="var(--app-text-muted)">
-											{resist.label}
+					{(() => {
+						const wards = listWards(unit.resists);
+						const percents = listPercentResists(unit.resists);
+						if (wards.length === 0 && percents.length === 0) {
+							return (
+								<div className={styles.block}>
+									<Text size="sm" fw={600} mb={6}>
+										Сопротивления
+									</Text>
+									<Text size="sm" c="var(--app-text-muted)">
+										Нет особых сопротивлений
+									</Text>
+								</div>
+							);
+						}
+						return (
+							<>
+								{wards.length > 0 ? (
+									<div className={styles.block}>
+										<Text size="sm" fw={600} mb={6}>
+											Варды
 										</Text>
-										<Text size="sm" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
-											{formatResistValue(resist)}
-										</Text>
-										<Text size="xs" c="var(--app-text-muted)" className={styles.resistHint}>
-											{describeResist(resist)}
-										</Text>
+										<div className={styles.resistGrid}>
+											{wards.map((ward) => {
+												const charges = formatWardCharges(ward);
+												return (
+													<div
+														key={`ward-${ward.source}`}
+														className={styles.resist}
+														aria-label={`Вард — ${ward.label}${charges ? ` · ${charges}` : ''}. ${describeResist(ward)}`}
+														title={describeResist(ward)}
+													>
+														<WardIcon source={ward.source} size={14} />
+														<Text size="xs" c="var(--app-text-muted)">
+															Вард — {ward.label}
+														</Text>
+														{charges ? (
+															<Text size="sm" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
+																{charges}
+															</Text>
+														) : null}
+														<Text size="xs" c="var(--app-text-muted)" className={styles.resistHint}>
+															{describeResist(ward)}
+														</Text>
+													</div>
+												);
+											})}
+										</div>
 									</div>
-								))}
-							</div>
-						) : (
-							<Text size="sm" c="var(--app-text-muted)">
-								Нет особых сопротивлений
-							</Text>
-						)}
-					</div>
+								) : null}
+								{percents.length > 0 ? (
+									<div className={styles.block}>
+										<Text size="sm" fw={600} mb={6}>
+											Сопротивления
+										</Text>
+										<div className={styles.resistGrid}>
+											{percents.map((resist) => {
+												const percent = formatResistPercent(resist);
+												return (
+													<div
+														key={`resist-${resist.source}`}
+														className={styles.resist}
+														aria-label={`${resist.label}: ${percent}. ${describeResist(resist)}`}
+														title={describeResist(resist)}
+													>
+														<ElementIcon source={resist.source} size={12} />
+														<Text size="xs" c="var(--app-text-muted)">
+															{resist.label}
+														</Text>
+														<Text size="sm" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
+															{percent}
+														</Text>
+														<Text size="xs" c="var(--app-text-muted)" className={styles.resistHint}>
+															{describeResist(resist)}
+														</Text>
+													</div>
+												);
+											})}
+										</div>
+									</div>
+								) : null}
+							</>
+						);
+					})()}
 
 					{doc.passive && (
 						<div className={styles.block}>

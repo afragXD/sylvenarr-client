@@ -111,24 +111,62 @@ export function getHeroBaseResists(code: string): BaseResistEntry[] {
 	return BASE_RESISTS[code] ?? [];
 }
 
-/** Краткий формат значения: «25% · Вард×1», «Вард×2», «Иммунитет», «−20%». */
-export function formatBaseResistValue(resist: BaseResistEntry): string {
+/** Только % / иммунитет (без варда). */
+export function formatBaseResistPercent(resist: BaseResistEntry): string {
 	if (resist.immune) {
 		return 'Иммунитет';
 	}
-	const percent =
-		resist.value > 0 ? `${resist.value}%` : resist.value < 0 ? `−${Math.abs(resist.value)}%` : '';
-	if (resist.wardCharges != null && resist.wardCharges > 0) {
-		return percent ? `${percent} · Вард×${resist.wardCharges}` : `Вард×${resist.wardCharges}`;
+	if (resist.value > 0) {
+		return `${resist.value}%`;
 	}
-	return percent || '0%';
+	if (resist.value < 0) {
+		return `−${Math.abs(resist.value)}%`;
+	}
+	return '0%';
 }
 
-/** Одна строка для краткой карточки: «Огонь Вард×1 · Смерть 25%»; null если нет. */
+/** «Вард×N» или null. */
+export function formatBaseWardCharges(resist: BaseResistEntry): string | null {
+	if (resist.wardCharges == null || resist.wardCharges <= 0) {
+		return null;
+	}
+	return `Вард×${resist.wardCharges}`;
+}
+
+/**
+ * Короткое значение: процент/иммун, иначе вард (не склеивает оба).
+ * Предпочтительно formatBaseResistPercent / formatBaseWardCharges.
+ */
+export function formatBaseResistValue(resist: BaseResistEntry): string {
+	const ward = formatBaseWardCharges(resist);
+	if (resist.immune || resist.value !== 0) {
+		return formatBaseResistPercent(resist);
+	}
+	return ward ?? '0%';
+}
+
+/** Варды базового набора. */
+export function listBaseWards(resists: BaseResistEntry[]): BaseResistEntry[] {
+	return resists.filter((resist) => resist.wardCharges != null && resist.wardCharges > 0);
+}
+
+/** %-сопротивления / иммунитеты базового набора. */
+export function listBasePercentResists(resists: BaseResistEntry[]): BaseResistEntry[] {
+	return resists.filter((resist) => resist.immune || resist.value !== 0);
+}
+
+/** Одна строка для краткой карточки: варды и % отдельно; null если нет. */
 export function formatBaseResistsLine(code: string): string | null {
 	const resists = getHeroBaseResists(code);
 	if (resists.length === 0) {
 		return null;
 	}
-	return resists.map((resist) => `${resist.label} ${formatBaseResistValue(resist)}`).join(' · ');
+	const parts: string[] = [];
+	for (const resist of listBaseWards(resists)) {
+		parts.push(`${resist.label} ${formatBaseWardCharges(resist)}`);
+	}
+	for (const resist of listBasePercentResists(resists)) {
+		parts.push(`${resist.label} ${formatBaseResistPercent(resist)}`);
+	}
+	return parts.length > 0 ? parts.join(' · ') : null;
 }

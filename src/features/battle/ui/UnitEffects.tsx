@@ -1,10 +1,10 @@
 import { Stack, Text, Tooltip } from '@mantine/core';
-import { ShieldCheck } from 'lucide-react';
 import type { BattleEffectBrief, ResistBrief } from '@/entities/match';
 
 import { formatEffectRounds, getEffectMeta, MAX_VISIBLE_EFFECTS } from '../model/effectMeta';
-import { describeResist, listWards } from '../model/resistMeta';
+import { describeResist, formatWardCharges, listWards } from '../model/resistMeta';
 
+import { WardIcon } from './DamageSourceIcon';
 import styles from './BattlePanel.module.css';
 import inspectStyles from './UnitInspectModal.module.css';
 
@@ -31,7 +31,7 @@ export const UnitEffects = ({ effects, resists, variant = 'compact' }: UnitEffec
 				{wards.map((ward) => (
 					<div key={`ward-${ward.source}`} className={inspectStyles.effectInlineRow} data-kind="buff">
 						<span className={styles.effectTag} data-kind="buff" aria-hidden>
-							<ShieldCheck size={12} strokeWidth={2} />
+							<WardIcon source={ward.source} size={14} />
 							<span className={styles.effectRounds}>{ward.wardCharges}</span>
 						</span>
 						<div>
@@ -93,26 +93,34 @@ export const UnitEffects = ({ effects, resists, variant = 'compact' }: UnitEffec
 	);
 };
 
-const WardBadge = ({ ward }: { ward: ResistBrief }) => (
-	<Tooltip
-		multiline
-		w={220}
-		withArrow
-		label={
-			<Stack gap={4}>
-				<Text size="sm" fw={600}>
-					Вард — {ward.label}
-				</Text>
-				<Text size="xs">{describeResist(ward)}</Text>
-			</Stack>
-		}
-	>
-		<span className={styles.effectTag} data-kind="buff">
-			<ShieldCheck size={12} strokeWidth={2} aria-hidden />
-			<span className={styles.effectRounds}>{ward.wardCharges}</span>
-		</span>
-	</Tooltip>
-);
+const WardBadge = ({ ward }: { ward: ResistBrief }) => {
+	const charges = formatWardCharges(ward);
+	return (
+		<Tooltip
+			multiline
+			w={220}
+			withArrow
+			label={
+				<Stack gap={4}>
+					<Text size="sm" fw={600}>
+						Вард — {ward.label}
+						{charges ? ` · ${charges}` : ''}
+					</Text>
+					<Text size="xs">{describeResist(ward)}</Text>
+				</Stack>
+			}
+		>
+			<span
+				className={styles.effectTag}
+				data-kind="buff"
+				aria-label={`Вард — ${ward.label}${ward.wardCharges ? ` · ${ward.wardCharges}` : ''}`}
+			>
+				<WardIcon source={ward.source} size={14} />
+				<span className={styles.effectRounds}>{ward.wardCharges}</span>
+			</span>
+		</Tooltip>
+	);
+};
 
 const EffectBadge = ({ effect }: { effect: BattleEffectBrief }) => {
 	const meta = getEffectMeta(effect.id);
@@ -160,11 +168,10 @@ const OverflowBadge = ({ effects }: { effects: BattleEffectBrief[] }) => (
 			<Stack gap={4}>
 				{effects.map((effect) => {
 					const meta = getEffectMeta(effect.id);
-					const roundsLabel = formatEffectRounds(effect.rounds);
-					const line = roundsLabel ? `${meta.label} · ${roundsLabel.toLowerCase()}` : meta.label;
 					return (
 						<Text key={effect.id} size="xs">
-							{line}
+							{meta.label}
+							{effect.rounds > 0 ? ` · ${formatEffectRounds(effect.rounds)}` : ''}
 						</Text>
 					);
 				})}

@@ -1,0 +1,19 @@
+.wardIcon {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	line-height: 0;
+}
+
+.wardShield {
+	display: block;
+}
+
+.wardElement {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	pointer-events: none;
+}

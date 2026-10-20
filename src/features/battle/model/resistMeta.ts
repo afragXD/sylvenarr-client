@@ -30,17 +30,39 @@ export function resistSourceDescription(source: string): string | null {
 }
 
 /**
- * Короткое значение резиста: проценты со знаком, вард с числом зарядов, иммунитет.
+ * Только % / иммунитет (без варда).
  */
-export function formatResistValue(resist: ResistBrief): string {
+export function formatResistPercent(resist: ResistBrief): string {
 	if (resist.immune) {
 		return 'Иммунитет';
 	}
-	const percent = resist.value > 0 ? `${resist.value}%` : resist.value < 0 ? `−${Math.abs(resist.value)}%` : '';
-	if (resist.wardCharges != null && resist.wardCharges > 0) {
-		return percent ? `${percent} · Вард×${resist.wardCharges}` : `Вард×${resist.wardCharges}`;
+	if (resist.value > 0) {
+		return `${resist.value}%`;
 	}
-	return percent || '0%';
+	if (resist.value < 0) {
+		return `−${Math.abs(resist.value)}%`;
+	}
+	return '0%';
+}
+
+/** «Вард×N» или null, если зарядов нет. */
+export function formatWardCharges(resist: ResistBrief): string | null {
+	if (resist.wardCharges == null || resist.wardCharges <= 0) {
+		return null;
+	}
+	return `Вард×${resist.wardCharges}`;
+}
+
+/**
+ * Короткое значение для совместимости: процент или вард (не склеивает оба).
+ * Предпочтительно formatResistPercent / formatWardCharges.
+ */
+export function formatResistValue(resist: ResistBrief): string {
+	const ward = formatWardCharges(resist);
+	if (resist.immune || resist.value !== 0) {
+		return formatResistPercent(resist);
+	}
+	return ward ?? '0%';
 }
 
 /**
@@ -83,4 +105,9 @@ function plural(count: number): string {
 /** Варды юнита для бейджей рядом с эффектами. */
 export function listWards(resists: ResistBrief[] | undefined): ResistBrief[] {
 	return (resists ?? []).filter((resist) => resist.wardCharges != null && resist.wardCharges > 0);
+}
+
+/** Сопротивления с ненулевым % или иммунитетом (вард сам по себе не считается). */
+export function listPercentResists(resists: ResistBrief[] | undefined): ResistBrief[] {
+	return (resists ?? []).filter((resist) => resist.immune || resist.value !== 0);
 }
