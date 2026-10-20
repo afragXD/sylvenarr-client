@@ -45,10 +45,14 @@ export const RatingPage = () => {
 
 	return (
 		<PageFrame width="wide">
-			<Stack gap={6} maw={640}>
+			<Stack gap={8} maw={720}>
 				<Title order={1}>Рейтинг</Title>
 				<Text c="var(--app-text-muted)">
-					ПТС как в Heroes III: старт {START_PTS}, обмен по силе соперника, пол 0.
+					У каждого игрока есть очки рейтинга (ПТС). Новый игрок начинает с {START_PTS}.
+					После боя победитель получает очки, проигравший теряет — сколько именно, зависит
+					от разницы в рейтинге: победа над более сильным соперником даёт больше, над
+					слабым — меньше. Ничья немного сдвигает очки в сторону выравнивания. Ниже нуля
+					рейтинг опуститься не может.
 				</Text>
 			</Stack>
 			{isLoading && (
@@ -81,9 +85,9 @@ export const RatingPage = () => {
 								<Table.Th w={80}>#</Table.Th>
 								<Table.Th>Игрок</Table.Th>
 								<Table.Th>ПТС</Table.Th>
-								<Table.Th>W</Table.Th>
-								<Table.Th>L</Table.Th>
-								<Table.Th>D</Table.Th>
+								<Table.Th>Победы</Table.Th>
+								<Table.Th>Поражения</Table.Th>
+								<Table.Th>Ничьи</Table.Th>
 							</Table.Tr>
 						</Table.Thead>
 						<Table.Tbody>
