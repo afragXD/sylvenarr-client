@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 import {
 	fetchHeroByCode,
 	getSummonerSummons,
+	type HeroClass,
 	HeroImage,
 	isTransformForm,
-	type HeroClass,
 	type SummonRef,
 } from '@/entities/hero';
 
@@ -99,13 +99,7 @@ export const HeroSummonsSection = ({ summonerCode }: HeroSummonsSectionProps) =>
 						/>
 						<Stack gap={4} style={{ minWidth: 0 }}>
 							<Group gap={8} wrap="wrap">
-								<Anchor
-									component={Link}
-									to={`/heroes/${ref.code}`}
-									c="brand"
-									fw={600}
-									size="sm"
-								>
+								<Anchor component={Link} to={`/heroes/${ref.code}`} c="brand" fw={600} size="sm">
 									{hero?.displayName ?? ref.code}
 								</Anchor>
 								{ref.note && (

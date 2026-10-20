@@ -1,17 +1,21 @@
 import { AppShell } from '@mantine/core';
 
 import { CookieNotice } from '@/shared/ui/CookieNotice';
+import { Footer } from '@/widgets/Footer';
 import { Header } from '@/widgets/Header';
 
 import type { AppShellLayoutProps } from '../model/types';
 
 export const AppShellLayout = ({ children }: AppShellLayoutProps) => {
 	return (
-		<AppShell header={{ height: 64 }} padding={0}>
-			<AppShell.Header withBorder={false}>
+		<AppShell header={{ height: 72, offset: 0 }} padding={0} withBorder={false}>
+			<AppShell.Header withBorder={false} style={{ background: 'transparent' }}>
 				<Header />
 			</AppShell.Header>
-			<AppShell.Main>{children}</AppShell.Main>
+			<AppShell.Main>
+				{children}
+				<Footer />
+			</AppShell.Main>
 			<CookieNotice />
 		</AppShell>
 	);

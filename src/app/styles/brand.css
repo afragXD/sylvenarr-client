@@ -1,10 +1,11 @@
-/* ——— Shared CRPG chrome ——— */
+/* ——— Shared CRPG chrome (BG3-inspired) ——— */
 
 .sylvenarr-page-veil {
 	position: relative;
 	isolation: isolate;
-	/* AppShell header = 64px */
-	min-height: calc(100dvh - 64px);
+	min-height: 100dvh;
+	padding-top: 4.5rem;
+	background: #000;
 }
 
 .sylvenarr-page-veil::before {
@@ -15,21 +16,15 @@
 	z-index: 0;
 	background:
 		radial-gradient(
-			ellipse 80% 55% at 50% -10%,
-			color-mix(in srgb, var(--mantine-color-brand-6) 12%, transparent),
+			ellipse 70% 45% at 50% -5%,
+			color-mix(in srgb, var(--smoke) 55%, transparent),
+			transparent 60%
+		),
+		radial-gradient(
+			ellipse 50% 40% at 100% 80%,
+			color-mix(in srgb, var(--wine) 22%, transparent),
 			transparent 55%
-		),
-		radial-gradient(
-			ellipse 70% 50% at 100% 100%,
-			color-mix(in srgb, var(--mantine-color-accent-9) 18%, transparent),
-			transparent 50%
-		),
-		radial-gradient(
-			ellipse 60% 40% at 0% 80%,
-			color-mix(in srgb, var(--mantine-color-brand-9) 22%, transparent),
-			transparent 45%
 		);
-	opacity: 0.9;
 }
 
 .sylvenarr-page-veil > * {
@@ -39,833 +34,94 @@
 
 .sylvenarr-panel {
 	position: relative;
-	background: var(--app-surface);
-	border: 1px solid var(--app-border);
-	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 22%, transparent),
-		0 0 0 1px color-mix(in srgb, var(--app-border) 70%, transparent);
+	background: color-mix(in srgb, var(--app-surface) 88%, #000);
+	border: 1px solid color-mix(in srgb, var(--brass) 55%, transparent);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brass) 22%, transparent);
 	padding: clamp(1.25rem, 3vw, 2rem);
-}
-
-.sylvenarr-panel::before,
-.sylvenarr-panel::after {
-	content: "";
-	position: absolute;
-	width: 10px;
-	height: 10px;
-	border-color: var(--mantine-color-brand-6);
-	border-style: solid;
-	pointer-events: none;
-}
-
-.sylvenarr-panel::before {
-	top: -1px;
-	left: -1px;
-	border-width: 2px 0 0 2px;
-}
-
-.sylvenarr-panel::after {
-	right: -1px;
-	bottom: -1px;
-	border-width: 0 2px 2px 0;
-}
-
-.sylvenarr-plate-btn.mantine-Button-root,
-.sylvenarr-hero-cta .mantine-Button-root[data-variant="filled"],
-.sylvenarr-plate-btn .mantine-Button-root {
-	border-radius: 0;
-	font-family: var(--mantine-font-family-headings);
-	font-weight: 600;
-	letter-spacing: 0.04em;
-	border: 1px solid color-mix(in srgb, var(--mantine-color-brand-4) 70%, var(--app-border));
-	box-shadow:
-		inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent),
-		inset 0 -2px 0 color-mix(in srgb, #000 35%, transparent),
-		inset 3px 0 0 var(--mantine-color-accent-6);
-	transition:
-		filter 140ms ease,
-		border-color 140ms ease,
-		background-color 140ms ease;
-}
-
-.sylvenarr-hero-cta .mantine-Button-root[data-variant="default"] {
-	border-radius: 0;
-	font-family: var(--mantine-font-family-headings);
-	letter-spacing: 0.03em;
-	border: 1px solid var(--app-border);
-	background: color-mix(in srgb, var(--app-surface) 88%, var(--app-surface-muted));
-	box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 8%, transparent);
-}
-
-.sylvenarr-hero-cta .mantine-Button-root:hover,
-.sylvenarr-plate-btn.mantine-Button-root:hover {
-	filter: brightness(1.06);
-}
-
-.sylvenarr-header {
-	background: var(--app-surface);
-	border-bottom: 1px solid var(--app-border);
-	box-shadow:
-		inset 0 -1px 0 color-mix(in srgb, var(--mantine-color-brand-6) 45%, transparent),
-		0 8px 24px color-mix(in srgb, #000 35%, transparent);
-}
-
-.sylvenarr-header .mantine-Anchor-root {
-	font-family: var(--mantine-font-family-headings);
-	letter-spacing: 0.04em;
-	font-size: 0.85rem;
-	transition: color 120ms ease;
-}
-
-.sylvenarr-header .mantine-Anchor-root:hover {
-	color: var(--mantine-color-brand-5);
-}
-
-.sylvenarr-header-theme.mantine-ActionIcon-root {
-	border: 1px solid var(--app-border);
-	background: color-mix(in srgb, var(--app-surface) 92%, var(--mantine-color-brand-6));
-	box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
-	transition:
-		border-color 120ms ease,
-		background-color 120ms ease;
-}
-
-.sylvenarr-header-theme.mantine-ActionIcon-root:hover {
-	border-color: var(--mantine-color-brand-5);
-	background: color-mix(in srgb, var(--mantine-color-brand-6) 14%, var(--app-surface));
-}
-
-.sylvenarr-header-theme.mantine-ActionIcon-root:focus-visible {
-	outline: 2px solid var(--mantine-color-brand-5);
-	outline-offset: 2px;
-}
-
-.sylvenarr-header-avatar {
-	display: inline-flex;
-	line-height: 0;
-	padding: 0;
-	border: 1px solid var(--app-border);
-	border-radius: 999px;
-	outline: none;
-	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 35%, transparent);
-	transition:
-		border-color 120ms ease,
-		box-shadow 120ms ease;
-}
-
-.sylvenarr-header-avatar:hover,
-.sylvenarr-header-avatar:focus-visible {
-	border-color: var(--mantine-color-brand-5);
-	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-5) 55%, transparent),
-		0 0 0 2px color-mix(in srgb, var(--mantine-color-brand-6) 28%, transparent);
-}
-
-.sylvenarr-header-signin.mantine-Button-root {
-	height: 36px;
-	border: 1px solid color-mix(in srgb, var(--mantine-color-brand-4) 70%, var(--app-border));
-	box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 14%, transparent);
-}
-
-.sylvenarr-header-menu.mantine-Menu-dropdown {
-	border: 1px solid var(--app-border);
-	background: var(--app-surface);
-	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 22%, transparent),
-		0 12px 28px color-mix(in srgb, #000 40%, transparent);
-}
-
-.sylvenarr-oauth-icon-btn.mantine-ActionIcon-root {
-	border: 1px solid var(--app-border);
-	background: var(--app-surface);
-	border-radius: 8px;
-	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 22%, transparent),
-		inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
-	transition:
-		border-color 120ms ease,
-		background-color 120ms ease,
-		filter 120ms ease;
-}
-
-.sylvenarr-oauth-icon-btn.mantine-ActionIcon-root:hover {
-	border-color: var(--mantine-color-brand-5);
-	background: color-mix(in srgb, var(--mantine-color-brand-6) 12%, var(--app-surface));
-}
-
-.sylvenarr-oauth-icon-btn.mantine-ActionIcon-root:focus-visible {
-	outline: 2px solid var(--mantine-color-brand-5);
-	outline-offset: 2px;
-}
-
-.sylvenarr-oauth-icon-btn--yandex.mantine-ActionIcon-root {
-	color: #fff;
-	background: #fc3f1d;
-	border-color: color-mix(in srgb, #8a1e0c 55%, #fc3f1d);
-	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, #fff 18%, transparent),
-		inset 0 -1px 0 color-mix(in srgb, #000 18%, transparent);
-}
-
-.sylvenarr-oauth-icon-btn--yandex.mantine-ActionIcon-root:hover {
-	background: #e63516;
-	border-color: color-mix(in srgb, #6e1609 50%, #e63516);
-	filter: brightness(1.04);
-}
-
-.sylvenarr-oauth-icon-btn--yandex.mantine-ActionIcon-root:focus-visible {
-	outline: 2px solid color-mix(in srgb, #fc3f1d 70%, #fff);
-	outline-offset: 2px;
 }
 
 .sylvenarr-plaque {
 	position: relative;
 	background: var(--app-surface);
-	border: 1px solid var(--app-border);
-	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 28%, transparent),
-		0 0 0 1px color-mix(in srgb, #000 40%, transparent);
+	border: 1px solid color-mix(in srgb, var(--brass) 45%, transparent);
 	padding: 4px;
 }
 
 .sylvenarr-stat-cell {
 	background: var(--app-surface);
-	border: 1px solid var(--app-border);
+	border: 1px solid color-mix(in srgb, var(--brass) 35%, transparent);
 	padding: 0.75rem 0.9rem;
-	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 12%, transparent);
 }
 
 .sylvenarr-stat-cell__label {
-	font-family: var(--mantine-font-family-monospace);
+	font-family: var(--mantine-font-family-headings);
 	font-size: 0.72rem;
-	letter-spacing: 0.04em;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 	color: var(--app-text-muted);
 }
 
 .sylvenarr-stat-cell__value {
 	font-family: var(--mantine-font-family-headings);
 	font-size: 1.15rem;
-	font-weight: 600;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
 	color: var(--app-text);
 }
-
-/* ——— Hero ——— */
-
-@keyframes sylvenarr-hero-in {
-	from {
-		opacity: 0;
-		transform: translateY(10px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
-.sylvenarr-hero-shell {
-	position: relative;
-	overflow: hidden;
-	background: var(--mantine-color-body);
-	isolation: isolate;
-}
-
-.sylvenarr-hero-shell::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	pointer-events: none;
-	z-index: 2;
-	background:
-		radial-gradient(
-			ellipse 55% 70% at 78% 55%,
-			transparent 20%,
-			color-mix(in srgb, var(--mantine-color-body) 55%, transparent) 70%,
-			var(--mantine-color-body) 100%
-		),
-		radial-gradient(
-			ellipse 90% 60% at 20% 100%,
-			color-mix(in srgb, #000 55%, transparent),
-			transparent 60%
-		);
-}
-
-.sylvenarr-hero-copy {
-	animation: sylvenarr-hero-in 0.65s ease-out both;
-	position: relative;
-	z-index: 3;
-	padding-left: 1.25rem;
-}
-
-.sylvenarr-hero-copy::before {
-	content: "";
-	position: absolute;
-	left: 0;
-	top: 0.35rem;
-	bottom: 0.35rem;
-	width: 2px;
-	background: linear-gradient(
-		to bottom,
-		var(--mantine-color-brand-6),
-		var(--mantine-color-accent-6) 55%,
-		transparent
-	);
-}
-
-.sylvenarr-hero-supporting {
-	line-height: 1.55;
-	font-size: clamp(1.1rem, 1.7vw, 1.35rem);
-	max-width: 34ch;
-}
-
-.sylvenarr-hero-cta {
-	position: relative;
-	z-index: 3;
-}
-
-.sylvenarr-hero-cta .mantine-Button-root {
-	border-radius: 0;
-	transition:
-		filter 140ms ease,
-		background-color 140ms ease,
-		border-color 140ms ease;
-}
-
-.sylvenarr-hero-plane {
-	animation: sylvenarr-hero-in 0.85s ease-out 0.06s both;
-	background-image: var(--sylvenarr-hero-art);
-	background-repeat: no-repeat;
-	background-size: auto min(100%, 920px);
-	background-position: right 2% bottom;
-	mask-image: linear-gradient(to left, #000 38%, transparent 90%);
-	z-index: 1;
-	filter: saturate(0.92) contrast(1.05);
-}
-
-@media (max-width: 48em) {
-	.sylvenarr-hero-plane {
-		background-size: auto min(78vh, 560px);
-		background-position: right -8% bottom;
-		opacity: 0.45;
-		mask-image: linear-gradient(to top, #000 28%, transparent 85%);
-	}
-
-	.sylvenarr-hero-shell::after {
-		background:
-			linear-gradient(to top, var(--mantine-color-body) 8%, transparent 55%),
-			radial-gradient(
-				ellipse 90% 50% at 50% 100%,
-				color-mix(in srgb, #000 50%, transparent),
-				transparent 70%
-			);
-	}
-}
-
-@media (min-width: 80em) {
-	.sylvenarr-hero-plane {
-		background-size: auto min(100%, 1040px);
-		background-position: right 3% bottom;
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.sylvenarr-hero-copy,
-	.sylvenarr-hero-plane {
-		animation: none;
-	}
-
-	.sylvenarr-hero-cta .mantine-Button-root,
-	.sylvenarr-plate-btn.mantine-Button-root {
-		transition: none;
-	}
-}
-
-/* ——— App chrome ——— */
 
 .sylvenarr-registry-table {
 	--table-border-color: var(--app-border);
 	background: var(--app-surface);
-	border: 1px solid var(--app-border);
-	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 14%, transparent);
+	border: 1px solid color-mix(in srgb, var(--brass) 40%, transparent);
 }
 
 .sylvenarr-registry-table thead th {
 	font-family: var(--mantine-font-family-headings);
-	font-weight: 600;
-	letter-spacing: 0.04em;
+	font-weight: 700;
+	letter-spacing: 0.06em;
 	font-size: 0.82rem;
-	border-bottom: 2px solid color-mix(in srgb, var(--mantine-color-brand-6) 65%, var(--app-border));
+	text-transform: uppercase;
+	border-bottom: 2px solid color-mix(in srgb, var(--brass) 65%, var(--app-border));
 	background: color-mix(in srgb, var(--app-surface-muted) 80%, var(--app-surface));
 }
 
 .sylvenarr-registry-table tbody tr:hover {
-	background: color-mix(in srgb, var(--mantine-color-accent-9) 22%, var(--app-surface));
+	background: color-mix(in srgb, var(--wine) 28%, var(--app-surface));
 }
 
 .sylvenarr-status-rail {
 	background: var(--app-surface);
-	border: 1px solid var(--app-border);
-	border-left: 3px solid var(--mantine-color-brand-6);
+	border: 1px solid color-mix(in srgb, var(--brass) 40%, transparent);
+	border-left: 3px solid var(--brass);
 	padding: 1rem 1.15rem;
-	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 16%, transparent);
 }
 
-/* ——— Landing ——— */
-
-.sylvenarr-landing-section {
-	position: relative;
-	padding-block: clamp(2.25rem, 5vw, 4rem);
-	padding-inline: clamp(1.25rem, 5vw, 6rem);
-}
-
-.sylvenarr-landing-section::after {
-	content: "";
-	position: absolute;
-	left: clamp(1.25rem, 5vw, 6rem);
-	right: clamp(1.25rem, 5vw, 6rem);
-	bottom: 0;
-	height: 1px;
-	background: linear-gradient(
-		to right,
-		var(--mantine-color-brand-6),
-		var(--app-border) 28%,
-		transparent 88%
-	);
-	opacity: 0.85;
-}
-
-.sylvenarr-landing-section:last-child::after {
-	display: none;
-}
-
-.sylvenarr-landing-kicker {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.65rem;
+.sylvenarr-plate-btn.mantine-Button-root {
+	border-radius: 0;
 	font-family: var(--mantine-font-family-headings);
-	font-size: 0.92rem;
-	font-weight: 600;
-	color: var(--mantine-color-brand-5);
-	letter-spacing: 0.02em;
-}
-
-.sylvenarr-landing-kicker::before {
-	content: "";
-	width: 1.25rem;
-	height: 2px;
-	background: var(--mantine-color-accent-6);
-}
-
-.sylvenarr-landing-h2 {
-	letter-spacing: 0.01em;
-	font-size: clamp(1.85rem, 3.2vw, 2.85rem);
-	line-height: 1.12;
-	max-width: 16ch;
-}
-
-.sylvenarr-landing-h3 {
-	font-family: var(--mantine-font-family-headings);
-	font-size: clamp(1.15rem, 1.6vw, 1.45rem);
-	line-height: 1.25;
-	letter-spacing: 0.01em;
-}
-
-.sylvenarr-landing-lead {
-	font-size: clamp(1.02rem, 1.3vw, 1.22rem);
-	line-height: 1.5;
-	max-width: 42ch;
-}
-
-.sylvenarr-landing-body {
-	font-size: clamp(0.98rem, 1.15vw, 1.12rem);
-	line-height: 1.55;
-}
-
-.sylvenarr-landing-meta {
-	font-size: 0.85rem;
-	letter-spacing: 0.04em;
-}
-
-.sylvenarr-landing-link {
-	font-family: var(--mantine-font-family-headings);
-	font-size: 0.95rem;
-	letter-spacing: 0.03em;
-	border-bottom: 1px solid color-mix(in srgb, var(--mantine-color-brand-6) 55%, transparent);
-	padding-bottom: 2px;
-}
-
-.sylvenarr-landing-link:hover {
-	border-bottom-color: var(--mantine-color-accent-6);
-	color: var(--mantine-color-accent-5);
-}
-
-/* Path: quest steps in panel */
-.sylvenarr-path-rail {
-	display: grid;
-	gap: 0;
-	background: var(--app-surface);
-	border: 1px solid var(--app-border);
-	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 18%, transparent);
-	border-left: 3px solid var(--mantine-color-brand-6);
-	padding: 0.25rem 0;
-}
-
-.sylvenarr-landing-step-n {
-	font-family: var(--mantine-font-family-headings);
-	font-size: clamp(1.35rem, 2.2vw, 1.9rem);
-	font-weight: 600;
-	line-height: 1;
-	color: color-mix(in srgb, var(--mantine-color-brand-6) 55%, var(--app-text-muted));
-	letter-spacing: 0.04em;
-	min-width: 2.5ch;
-}
-
-.sylvenarr-path-step {
-	position: relative;
-	display: grid;
-	grid-template-columns: auto 1fr;
-	gap: 0.35rem 1.5rem;
-	padding: 1.2rem 1.25rem 1.2rem 1.5rem;
-	border-bottom: 1px solid color-mix(in srgb, var(--app-border) 80%, transparent);
-}
-
-.sylvenarr-path-step .sylvenarr-landing-step-n {
-	grid-row: 1 / span 2;
-	align-self: start;
-}
-
-.sylvenarr-path-step .sylvenarr-landing-body {
-	grid-column: 2;
-}
-
-.sylvenarr-path-step:last-child {
-	border-bottom: none;
-}
-
-.sylvenarr-path-step::before {
-	content: "";
-	position: absolute;
-	left: -2px;
-	top: 1.45rem;
-	width: 8px;
-	height: 8px;
-	background: var(--app-surface);
-	border: 2px solid var(--mantine-color-brand-6);
-	transform: rotate(45deg);
-}
-
-.sylvenarr-path-step:nth-child(2)::before {
-	border-color: color-mix(in srgb, var(--mantine-color-brand-6) 70%, var(--mantine-color-accent-6));
-}
-
-.sylvenarr-path-step:nth-child(3)::before {
-	border-color: var(--mantine-color-accent-6);
-}
-
-@media (min-width: 62em) {
-	.sylvenarr-path-step {
-		grid-template-columns: 5rem minmax(12rem, 18rem) 1fr;
-		align-items: baseline;
-		padding: 1.5rem 1.75rem 1.5rem 2rem;
-		gap: 1.25rem 2rem;
-	}
-
-	.sylvenarr-path-step .sylvenarr-landing-step-n,
-	.sylvenarr-path-step .sylvenarr-landing-body {
-		grid-row: auto;
-		grid-column: auto;
-	}
-
-	.sylvenarr-path-step .sylvenarr-landing-body {
-		max-width: 36ch;
-	}
-}
-
-/* Roster: character plaques */
-.sylvenarr-roster-wall {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
-	gap: 12px;
-}
-
-@media (min-width: 48em) {
-	.sylvenarr-roster-wall {
-		grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
-		gap: 14px;
-	}
-}
-
-@media (min-width: 80em) {
-	.sylvenarr-roster-wall {
-		grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
-		gap: 16px;
-	}
-}
-
-.sylvenarr-roster-seal {
-	display: flex;
-	flex-direction: column;
-	text-decoration: none;
-	color: inherit;
-	background: var(--app-surface);
-	border: 1px solid var(--app-border);
-	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 30%, transparent),
-		0 0 0 1px color-mix(in srgb, #000 35%, transparent);
-	transition:
-		border-color 140ms ease,
-		box-shadow 140ms ease;
-}
-
-.sylvenarr-roster-seal__art {
-	aspect-ratio: 1;
-	line-height: 0;
-	overflow: hidden;
-	background: color-mix(in srgb, var(--app-surface-muted) 80%, #000);
-}
-
-.sylvenarr-roster-seal__art .mantine-Image-root,
-.sylvenarr-roster-seal__art img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.sylvenarr-roster-seal__code {
-	font-family: var(--mantine-font-family-headings);
-	font-size: 0.72rem;
-	letter-spacing: 0.02em;
-	padding: 0.5rem 0.55rem;
-	color: var(--app-text-muted);
-	border-top: 1px solid var(--app-border);
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	background: color-mix(in srgb, var(--app-surface) 70%, var(--app-surface-muted));
-}
-
-.sylvenarr-roster-seal:hover {
-	border-color: var(--mantine-color-brand-5);
-	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-5) 55%, transparent),
-		0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 40%, transparent);
-}
-
-.sylvenarr-roster-seal:hover .sylvenarr-roster-seal__code {
-	color: var(--mantine-color-brand-4);
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.sylvenarr-roster-seal {
-		transition: border-color 140ms ease;
-	}
-}
-
-/* Account: etched ledger tome */
-.sylvenarr-ledger {
-	background: var(--app-surface);
-	border: 1px solid var(--app-border);
-	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 16%, transparent);
-	padding: 0.25rem 1.25rem;
-}
-
-.sylvenarr-ledger-mark {
-	font-family: var(--mantine-font-family-headings);
-	font-size: 0.95rem;
-	color: var(--mantine-color-accent-5);
+	font-weight: 700;
 	letter-spacing: 0.06em;
-	padding-top: 0.35rem;
+	text-transform: uppercase;
+	border: 1px solid color-mix(in srgb, var(--brass) 70%, var(--app-border));
 }
 
-.sylvenarr-ledger-row {
-	display: grid;
-	grid-template-columns: 3rem 1fr;
-	gap: 0.35rem 1.25rem;
-	padding: 1.15rem 0;
-	border-bottom: 1px solid var(--app-border);
-	align-items: start;
+.sylvenarr-oauth-icon-btn.mantine-ActionIcon-root {
+	border: 1px solid color-mix(in srgb, var(--brass) 40%, transparent);
+	background: var(--app-surface);
+	border-radius: 0;
 }
 
-.sylvenarr-ledger-row .sylvenarr-ledger-mark {
-	grid-row: 1 / span 2;
+.sylvenarr-oauth-icon-btn--yandex.mantine-ActionIcon-root {
+	color: #fff;
+	background: #fc3f1d;
+	border-color: color-mix(in srgb, #8a1e0c 55%, #fc3f1d);
 }
 
-.sylvenarr-ledger-row .sylvenarr-landing-body {
-	grid-column: 2;
+.sylvenarr-oauth-icon-btn--yandex.mantine-ActionIcon-root:hover {
+	background: #e63516;
 }
 
-.sylvenarr-ledger-row:last-child {
-	border-bottom: none;
-}
-
-@media (min-width: 62em) {
-	.sylvenarr-ledger-row {
-		grid-template-columns: 4rem minmax(14rem, 22rem) 1fr;
-		gap: 1.5rem 2.5rem;
-		padding: 1.4rem 0;
-		align-items: baseline;
-	}
-
-	.sylvenarr-ledger-row .sylvenarr-ledger-mark,
-	.sylvenarr-ledger-row .sylvenarr-landing-body {
-		grid-row: auto;
-		grid-column: auto;
-	}
-}
-
-/* Close: threshold / gate + site bar */
-.sylvenarr-landing-close {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	padding: 0;
-	border-top: 1px solid var(--app-border);
-	background:
-		radial-gradient(
-			ellipse 70% 55% at 50% 35%,
-			color-mix(in srgb, var(--mantine-color-brand-9) 28%, transparent),
-			transparent 65%
-		),
-		linear-gradient(
-			to bottom,
-			color-mix(in srgb, var(--app-surface) 55%, var(--mantine-color-body)),
-			var(--mantine-color-body) 70%
-		);
-}
-
-.sylvenarr-landing-close::after {
-	display: none;
-}
-
-.sylvenarr-landing-close__gate {
-	position: relative;
-	padding: clamp(3rem, 8vw, 5.5rem) clamp(1.25rem, 5vw, 6rem) clamp(2.5rem, 6vw, 4rem);
-}
-
-.sylvenarr-landing-close__gate::before {
-	content: "";
-	position: absolute;
-	inset: 1.25rem clamp(1.25rem, 5vw, 6rem) 0.5rem;
-	border: 1px solid color-mix(in srgb, var(--app-border) 65%, var(--mantine-color-brand-6));
-	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 22%, transparent),
-		inset 0 40px 80px color-mix(in srgb, #000 22%, transparent);
-	pointer-events: none;
-	clip-path: polygon(
-		0 0,
-		calc(100% - 32px) 0,
-		100% 32px,
-		100% 100%,
-		32px 100%,
-		0 calc(100% - 32px)
-	);
-}
-
-.sylvenarr-landing-close__gate::after {
-	content: "";
-	position: absolute;
-	top: 1.25rem;
-	left: 50%;
-	width: min(12rem, 40%);
-	height: 2px;
-	transform: translateX(-50%);
-	background: linear-gradient(to right, transparent, var(--mantine-color-brand-6), transparent);
-	pointer-events: none;
-}
-
-.sylvenarr-landing-close__inner {
-	position: relative;
-	z-index: 1;
-	max-width: 36rem;
-	margin-inline: auto;
-	text-align: center;
-}
-
-.sylvenarr-landing-close__emblem {
-	display: inline-flex;
-	color: var(--mantine-color-brand-5);
-	filter: drop-shadow(0 0 12px color-mix(in srgb, var(--mantine-color-brand-6) 35%, transparent));
-}
-
-.sylvenarr-landing-close__title {
-	font-size: clamp(1.85rem, 3.4vw, 2.75rem);
-	line-height: 1.15;
-	letter-spacing: 0.02em;
-	max-width: 16ch;
-	text-wrap: balance;
-}
-
-.sylvenarr-landing-close__lead {
-	font-size: clamp(1.02rem, 1.3vw, 1.2rem);
-	line-height: 1.5;
-	max-width: 34ch;
-}
-
-.sylvenarr-landing-close__signin {
-	font-family: var(--mantine-font-family-headings);
-	font-size: 0.95rem;
-	letter-spacing: 0.02em;
-	color: var(--app-text-muted);
-	text-decoration: none;
-	border-bottom: 1px solid color-mix(in srgb, var(--mantine-color-brand-6) 40%, transparent);
-	padding-bottom: 2px;
-	transition:
-		color 140ms ease,
-		border-color 140ms ease;
-}
-
-.sylvenarr-landing-close__signin:hover {
-	color: var(--mantine-color-brand-4);
-	border-bottom-color: var(--mantine-color-brand-5);
-}
-
-.sylvenarr-landing-close__bar {
-	position: relative;
-	z-index: 1;
-	margin-top: auto;
-	padding: 1rem clamp(1.25rem, 5vw, 6rem);
-	border-top: 1px solid color-mix(in srgb, var(--app-border) 80%, var(--mantine-color-brand-6));
-	background: color-mix(in srgb, var(--app-surface) 88%, #000);
-	box-shadow: inset 0 1px 0 color-mix(in srgb, var(--mantine-color-brand-6) 28%, transparent);
-}
-
-.sylvenarr-landing-close__brand {
-	font-family: var(--mantine-font-family-headings);
-	font-weight: 600;
-	font-size: 0.95rem;
-	letter-spacing: 0.04em;
-	color: var(--app-text);
-}
-
-.sylvenarr-landing-close__edition {
-	font-family: var(--mantine-font-family-monospace);
-	font-weight: 500;
-	font-size: 0.78rem;
-	letter-spacing: 0.06em;
-	color: var(--app-text-muted);
-}
-
-.sylvenarr-landing-close__link {
-	font-family: var(--mantine-font-family-headings);
-	font-size: 0.82rem;
-	letter-spacing: 0.04em;
-	color: var(--app-text-muted);
-	transition: color 120ms ease;
-}
-
-.sylvenarr-landing-close__link:hover {
-	color: var(--mantine-color-brand-5);
-}
-
-.sylvenarr-landing-close__credits {
-	font-family: var(--mantine-font-family-monospace);
-	font-size: 0.72rem;
-	letter-spacing: 0.03em;
-	line-height: 1.45;
-	color: var(--app-text-muted);
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.sylvenarr-landing-close__signin {
-		transition: none;
-	}
+/* tabular numbers for combat / rating */
+.sylvenarr-tabular {
+	font-variant-numeric: tabular-nums;
 }

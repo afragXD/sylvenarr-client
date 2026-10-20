@@ -1,16 +1,22 @@
-import { Box } from '@mantine/core';
-
-import { HomeHero } from './HomeHero';
-import { CloseSection, GameplaySection, PathSection, RosterSection } from './sections';
+import classes from './HomePage.module.css';
+import {
+	CloseBanner,
+	FaqSection,
+	HeroBanner,
+	HeroesShowcase,
+	MechanicsSection,
+	NewsSection,
+} from './sections';
 
 export const HomePage = () => {
 	return (
-		<Box className="sylvenarr-page-veil">
-			<HomeHero />
-			<PathSection />
-			<RosterSection />
-			<GameplaySection />
-			<CloseSection />
-		</Box>
+		<div className={classes.page}>
+			<HeroBanner />
+			<HeroesShowcase />
+			<MechanicsSection />
+			<NewsSection />
+			<FaqSection />
+			<CloseBanner />
+		</div>
 	);
 };

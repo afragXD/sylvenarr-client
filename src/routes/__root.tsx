@@ -36,7 +36,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="ru" {...mantineHtmlProps}>
 			<head>
-				<ColorSchemeScript defaultColorScheme="auto" />
+				<ColorSchemeScript forceColorScheme="dark" />
 				<AppFonts />
 				<HeadContent />
 			</head>

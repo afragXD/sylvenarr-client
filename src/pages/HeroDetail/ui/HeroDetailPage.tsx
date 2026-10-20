@@ -1,35 +1,34 @@
-import { Anchor, Badge, Box, Group, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core';
-import { Link, useParams } from '@tanstack/react-router';
+import { Anchor, Group, Loader, Stack, Text } from '@mantine/core';
+import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import {
 	$hero,
 	$heroError,
+	$heroes,
 	$heroPending,
-	HeroImage,
+	getHeroCharacterUrl,
+	getHeroPortraitUrl,
+	heroesPageMounted,
 	heroPageOpened,
 	isTransformForm,
 } from '@/entities/hero';
+import { ArtFade } from '@/shared/ui/ArtFade';
+import { OrnateFrame } from '@/shared/ui/OrnateFrame';
 import { PageFrame } from '@/shared/ui/PageFrame';
+import { PortraitRail } from '@/shared/ui/PortraitRail';
 
 import { HeroAbilitiesSection } from './HeroAbilitiesSection';
+import classes from './HeroDetailPage.module.css';
 import { HeroResistsSection } from './HeroResistsSection';
 import { HeroSummonsSection } from './HeroSummonsSection';
 
-const statRows: ReadonlyArray<{ key: keyof StatSource; label: string }> = [
-	{ key: 'size', label: 'Клетки' },
-	{ key: 'health', label: 'Здоровье' },
-	{ key: 'damage', label: 'Урон' },
-	{ key: 'armor', label: 'Броня' },
+const highlightStats: ReadonlyArray<{ key: keyof StatSource; label: string }> = [
+	{ key: 'size', label: 'Ряд / слоты' },
+	{ key: 'damage', label: 'Атака' },
 	{ key: 'initiative', label: 'Инициатива' },
-	{ key: 'dodge', label: 'Уклонение' },
-	{ key: 'luck', label: 'Удача' },
-	{ key: 'morale', label: 'Мораль' },
-	{ key: 'mana', label: 'Мана' },
-	{ key: 'power', label: 'Сила магии' },
-	{ key: 'accuracy', label: 'Точность' },
-	{ key: 'gold', label: 'Золото' },
+	{ key: 'health', label: 'Здоровье' },
 ];
 
 type StatSource = {
@@ -49,18 +48,50 @@ type StatSource = {
 
 export const HeroDetailPage = () => {
 	const { code } = useParams({ from: '/heroes/$code' });
-	const { hero, error, isPending } = useUnit({
+	const navigate = useNavigate();
+	const { hero, error, isPending, heroes } = useUnit({
 		hero: $hero,
 		error: $heroError,
 		isPending: $heroPending,
+		heroes: $heroes,
 	});
+
+	useEffect(() => {
+		heroesPageMounted();
+	}, []);
 
 	useEffect(() => {
 		heroPageOpened(code);
 	}, [code]);
 
+	const railItems = useMemo(
+		() =>
+			heroes
+				.filter((item) => item.isPlayable)
+				.map((item) => ({
+					id: item.code,
+					label: item.displayName,
+					src: getHeroPortraitUrl(item.code),
+				})),
+		[heroes],
+	);
+
+	const statusLabel = hero
+		? hero.isPlayable
+			? 'Доступен в драфте'
+			: isTransformForm(hero.code)
+				? 'Боевая форма'
+				: 'Только призыв'
+		: '';
+
 	return (
-		<PageFrame width="wide">
+		<PageFrame
+			width="wide"
+			eyebrow="Класс арены"
+			title={hero?.displayName ?? 'Герой'}
+			lead={hero?.roleSummary || 'Карточка класса: роль, лор и характеристики.'}
+			scene="/scenes/effects.png"
+		>
 			<Anchor
 				component={Link}
 				to="/heroes"
@@ -87,102 +118,88 @@ export const HeroDetailPage = () => {
 				</Text>
 			)}
 			{hero && !isPending && (
-				<Group
-					align="stretch"
-					gap={{ base: 'lg', md: 40 }}
-					wrap="wrap"
-					preventGrowOverflow={false}
-					w="100%"
-				>
-					<Box
-						w={{ base: '100%', sm: 280, md: 320 }}
-						maw={350}
-						style={{ flexShrink: 0, aspectRatio: '7 / 9' }}
-					>
-						<HeroImage
-							code={hero.code}
-							alt={hero.displayName}
-							variant="character"
-							w="100%"
-							h="100%"
-							radius={0}
-							bg="transparent"
-							objectPosition="top"
-						/>
-					</Box>
-					<Stack gap="lg" style={{ flex: '1 1 360px', minWidth: 0 }}>
-						<Stack gap={10}>
-							<Group gap="sm" align="center">
-								<Title order={1}>{hero.displayName}</Title>
-								{hero.isPlayable ? (
-									<Badge color="accent" variant="light" radius={0} tt="none">
-										Можно выбрать
-									</Badge>
-								) : isTransformForm(hero.code) ? (
-									<Badge color="gray" variant="outline" radius={0} tt="none">
-										Боевая форма
-									</Badge>
-								) : (
-									<Badge color="gray" variant="outline" radius={0} tt="none">
-										Только призыв
-									</Badge>
-								)}
-							</Group>
-							<Text
-								ff="monospace"
-								size="sm"
-								c="var(--app-text-muted)"
-								style={{ letterSpacing: '0.04em' }}
-							>
-								{hero.code}
-							</Text>
-							<Text size="sm" c="var(--app-text-muted)">
-								{hero.isPlayable
-									? 'Доступен при формировании отряда'
-									: isTransformForm(hero.code)
-										? 'Появляется через превращение в бою'
-										: 'Появляется только как призванное существо'}
-							</Text>
-							{hero.description ? (
-								<Text size="md" maw="42rem" style={{ lineHeight: 1.55 }}>
-									{hero.description}
-								</Text>
-							) : null}
+				<>
+					<div className={classes.layout}>
+						<div className={classes.copy}>
+							<span className={classes.role}>{statusLabel}</span>
+							<h2 className={classes.name}>{hero.displayName}</h2>
+							{hero.description ? <p className={classes.lore}>{hero.description}</p> : null}
 							{hero.roleSummary ? (
 								<Text size="sm" c="var(--app-text-muted)" maw="42rem" style={{ lineHeight: 1.5 }}>
 									{hero.roleSummary}
 								</Text>
 							) : null}
-						</Stack>
-						<SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} spacing="xs">
-							{statRows.map((stat) => (
-								<StatCell
-									key={stat.key}
-									statKey={stat.key}
-									label={stat.label}
-									value={hero[stat.key]}
-								/>
-							))}
-						</SimpleGrid>
+							<OrnateFrame variant="panel" className={classes.stats}>
+								{highlightStats.map((stat) => (
+									<div key={stat.key}>
+										<span className={classes.statLabel}>{stat.label}</span>
+										<span className={classes.statValue}>
+											{stat.key === 'size' ? (hero.size > 1 ? 'II' : 'I') : hero[stat.key]}
+										</span>
+									</div>
+								))}
+							</OrnateFrame>
+						</div>
+						<div className={classes.artWrap}>
+							<ArtFade src={getHeroCharacterUrl(hero.code)} mask="splash" alt={hero.displayName} />
+						</div>
+						{railItems.length > 0 ? (
+							<PortraitRail
+								items={railItems}
+								selectedId={hero.isPlayable ? hero.code : (railItems[0]?.id ?? hero.code)}
+								onSelect={(nextCode) => {
+									void navigate({ to: '/heroes/$code', params: { code: nextCode } });
+								}}
+								label="Классы арены"
+							/>
+						) : null}
+					</div>
+					<div className={classes.sections}>
+						<OrnateFrame variant="panel">
+							<Stack gap="md" p="md">
+								<Text
+									ff="var(--mantine-font-family-headings)"
+									tt="uppercase"
+									style={{ letterSpacing: '0.08em' }}
+								>
+									Полные характеристики
+								</Text>
+								<Group gap="md" wrap="wrap">
+									{(
+										[
+											['size', 'Клетки'],
+											['health', 'Здоровье'],
+											['damage', 'Урон'],
+											['armor', 'Броня'],
+											['initiative', 'Инициатива'],
+											['dodge', 'Уклонение'],
+											['luck', 'Удача'],
+											['morale', 'Мораль'],
+											['mana', 'Мана'],
+											['power', 'Сила магии'],
+											['accuracy', 'Точность'],
+											['gold', 'Золото'],
+										] as const
+									).map(([key, label]) => (
+										<div key={key} className="sylvenarr-stat-cell">
+											<Text className="sylvenarr-stat-cell__label">{label}</Text>
+											<Text
+												className="sylvenarr-stat-cell__value"
+												style={{ fontVariantNumeric: 'tabular-nums' }}
+											>
+												{key === 'size' ? (hero.size > 1 ? 'II' : 'I') : hero[key]}
+											</Text>
+										</div>
+									))}
+								</Group>
+							</Stack>
+						</OrnateFrame>
 						<HeroResistsSection code={hero.code} />
-						<HeroAbilitiesSection
-							code={hero.code}
-							isPlayable={hero.isPlayable}
-							hero={hero}
-						/>
+						<HeroAbilitiesSection code={hero.code} isPlayable={hero.isPlayable} hero={hero} />
 						<HeroSummonsSection summonerCode={hero.code} />
-					</Stack>
-				</Group>
+					</div>
+				</>
 			)}
 		</PageFrame>
 	);
 };
-
-const StatCell = ({ label, value, statKey }: { label: string; value: number; statKey: string }) => (
-	<Box className="sylvenarr-stat-cell">
-		<Text className="sylvenarr-stat-cell__label">{label}</Text>
-		<Text className="sylvenarr-stat-cell__value" style={{ fontVariantNumeric: 'tabular-nums' }}>
-			{statKey === 'size' ? (value > 1 ? 'II' : 'I') : value}
-		</Text>
-	</Box>
-);

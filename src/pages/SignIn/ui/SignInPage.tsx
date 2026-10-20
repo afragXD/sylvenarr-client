@@ -1,12 +1,8 @@
-import { Alert, Box, Group, Stack, Text, Title } from '@mantine/core';
+import { Alert, Box, Group, Stack, Text } from '@mantine/core';
 import { Link, useSearch } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
-import {
-	type AuthProvider,
-	fetchAuthProviders,
-	fetchCurrentPlayer,
-} from '@/entities/player';
+import { type AuthProvider, fetchAuthProviders, fetchCurrentPlayer } from '@/entities/player';
 import { OAuthProviderButton } from '@/shared/ui/oauth';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
@@ -50,16 +46,15 @@ export const SignInPage = () => {
 	}, []);
 
 	return (
-		<PageFrame width="form">
+		<PageFrame
+			width="form"
+			eyebrow="Арена"
+			title="Войти"
+			lead="Вход только через Яндекс. Рейтинг и история матчей закрепляются за вами."
+			scene="/scenes/battle.png"
+		>
 			<Box className="sylvenarr-panel">
-				<Stack gap={6}>
-					<Title order={1}>Войти</Title>
-					<Text c="var(--app-text-muted)">
-						Вход в Sylvenarr только через OAuth. Создавать матчи и заходить в лобби могут
-						авторизованные игроки.
-					</Text>
-				</Stack>
-				<Stack gap="md" mt="lg">
+				<Stack gap="md">
 					{authError && (
 						<Alert color="red" title="Не удалось войти" role="alert">
 							Попробуйте ещё раз. Если ошибка повторяется — проверьте настройки OAuth.

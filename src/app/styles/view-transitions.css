@@ -15,12 +15,3 @@
 ::view-transition-new(root) {
 	z-index: 2;
 }
-
-/* При переходе к светлой теме сжимаем тёмный old-слой — он должен быть сверху */
-html[data-theme-transition="to-light"]::view-transition-old(root) {
-	z-index: 2;
-}
-
-html[data-theme-transition="to-light"]::view-transition-new(root) {
-	z-index: 1;
-}

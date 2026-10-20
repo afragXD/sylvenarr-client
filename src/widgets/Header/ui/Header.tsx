@@ -1,28 +1,16 @@
-import {
-	Anchor,
-	Avatar,
-	Box,
-	Button,
-	Group,
-	Menu,
-	Stack,
-	Text,
-	UnstyledButton,
-} from '@mantine/core';
+import { Avatar, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
+import { useWindowScroll } from '@mantine/hooks';
 import { Link } from '@tanstack/react-router';
 import { LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { fetchCurrentPlayer, logoutPlayer, type Player } from '@/entities/player';
-import { ThemeToggle } from '@/features/ThemeToggle';
-import { BrandMark } from '@/shared/ui/BrandMark';
+import { APP_TITLE } from '@/shared/constants';
+import { RuneGateIcon } from '@/shared/ui/BrandMark';
+import { OrnateLink } from '@/shared/ui/OrnateButton';
+import { SiteMenu } from '@/widgets/SiteMenu';
 
-const navItems = [
-	{ to: '/heroes', label: 'Герои' },
-	{ to: '/lobby', label: 'Лобби' },
-	{ to: '/matches', label: 'Матчи' },
-	{ to: '/rating', label: 'Рейтинг' },
-] as const;
+import classes from './Header.module.css';
 
 const initialsFromName = (name: string): string => {
 	const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -38,6 +26,9 @@ const initialsFromName = (name: string): string => {
 export const Header = () => {
 	const [player, setPlayer] = useState<Player | null>(null);
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
+	const [menuOpen, setMenuOpen] = useState(false);
+	const [scroll] = useWindowScroll();
+	const compact = scroll.y > 80;
 
 	useEffect(() => {
 		void fetchCurrentPlayer()
@@ -59,96 +50,105 @@ export const Header = () => {
 		}
 	};
 
-	return (
-		<Box className="sylvenarr-header" h="100%" px={{ base: 16, sm: 28, md: 40, lg: 56, xl: 72 }}>
-			<Group h="100%" justify="space-between" wrap="nowrap" gap="md" w="100%">
-				<Group gap={{ base: 'md', md: 'xl' }} wrap="nowrap">
-					<BrandMark size={26} />
-					<Group gap={{ base: 'md', md: 'lg' }} visibleFrom="sm">
-						{navItems.map((item) => (
-							<Anchor
-								key={item.to}
-								component={Link}
-								to={item.to}
-								c="var(--app-text-muted)"
-								size="sm"
-								td="none"
-								fw={500}
-							>
-								{item.label}
-							</Anchor>
-						))}
-					</Group>
-				</Group>
+	const playTo = player ? '/lobby' : '/sign-in';
 
-				<Group gap="sm" wrap="nowrap" align="center">
-					<ThemeToggle />
-					{player ? (
-						<Menu shadow="md" width={240} position="bottom-end" radius={0}>
-							<Menu.Target>
-								<UnstyledButton aria-label="Меню аккаунта" className="sylvenarr-header-avatar">
-									<Avatar
-										src={player.avatarUrl}
-										alt={player.displayName}
-										radius="xl"
-										size={36}
-										color="brand"
-									>
-										{initialsFromName(player.displayName)}
-									</Avatar>
-								</UnstyledButton>
-							</Menu.Target>
-							<Menu.Dropdown className="sylvenarr-header-menu">
-								<Menu.Label>
-									<Group gap="sm" wrap="nowrap" align="flex-start">
-										<Avatar src={player.avatarUrl} alt="" radius="xl" size={32} color="brand">
+	return (
+		<>
+			<div className={classes.header}>
+				<div className={classes.inner}>
+					<div className={classes.left}>
+						<Link
+							to="/"
+							className={[classes.brand, compact ? classes.brandCompact : null]
+								.filter(Boolean)
+								.join(' ')}
+							aria-label={APP_TITLE}
+						>
+							<RuneGateIcon size={compact ? 36 : 52} />
+							{!compact ? <span className={classes.wordmark}>{APP_TITLE}</span> : null}
+						</Link>
+						<button
+							type="button"
+							className={classes.burger}
+							aria-label="Открыть меню"
+							aria-expanded={menuOpen}
+							onClick={() => setMenuOpen(true)}
+						>
+							<span />
+							<span />
+							<span />
+						</button>
+					</div>
+
+					<div className={classes.right}>
+						<OrnateLink to={playTo} variant="parchment" size="sm" withDiamonds={false}>
+							Играть
+						</OrnateLink>
+						{player ? (
+							<Menu shadow="md" width={240} position="bottom-end" radius={0}>
+								<Menu.Target>
+									<UnstyledButton aria-label="Меню аккаунта" className={classes.avatar}>
+										<Avatar
+											src={player.avatarUrl}
+											alt={player.displayName}
+											radius="xl"
+											size={36}
+											color="brand"
+										>
 											{initialsFromName(player.displayName)}
 										</Avatar>
-										<Stack gap={2} style={{ minWidth: 0 }}>
-											<Text size="sm" fw={600} c="var(--app-text)" lineClamp={1}>
-												{player.displayName}
-											</Text>
-											{player.email ? (
-												<Text size="xs" c="var(--app-text-muted)" lineClamp={1}>
-													{player.email}
+									</UnstyledButton>
+								</Menu.Target>
+								<Menu.Dropdown className={classes.menu}>
+									<Menu.Label>
+										<Group gap="sm" wrap="nowrap" align="flex-start">
+											<Avatar src={player.avatarUrl} alt="" radius="xl" size={32} color="brand">
+												{initialsFromName(player.displayName)}
+											</Avatar>
+											<Stack gap={2} style={{ minWidth: 0 }}>
+												<Text size="sm" fw={600} c="var(--app-text)" lineClamp={1}>
+													{player.displayName}
 												</Text>
-											) : null}
-										</Stack>
-									</Group>
-								</Menu.Label>
-								<Menu.Divider />
-								<Menu.Item component={Link} to="/lobby">
-									Лобби
-								</Menu.Item>
-								<Menu.Item component={Link} to="/rating">
-									Рейтинг
-								</Menu.Item>
-								<Menu.Divider />
-								<Menu.Item
-									color="red"
-									leftSection={<LogOut size={14} />}
-									disabled={isLoggingOut}
-									onClick={() => void handleLogout()}
-								>
-									Выйти
-								</Menu.Item>
-							</Menu.Dropdown>
-						</Menu>
-					) : (
-						<Button
-							component={Link}
-							to="/sign-in"
-							variant="light"
-							color="brand"
-							size="compact-sm"
-							radius={0}
-							className="sylvenarr-header-signin"
-						>
-							Войти
-						</Button>
-					)}
-				</Group>
-			</Group>
-		</Box>
+												{player.email ? (
+													<Text size="xs" c="var(--app-text-muted)" lineClamp={1}>
+														{player.email}
+													</Text>
+												) : null}
+											</Stack>
+										</Group>
+									</Menu.Label>
+									<Menu.Divider />
+									<Menu.Item component={Link} to="/lobby">
+										Лобби
+									</Menu.Item>
+									<Menu.Item component={Link} to="/rating">
+										Рейтинг
+									</Menu.Item>
+									{player.role === 'admin' ? (
+										<Menu.Item component={Link} to="/admin/news">
+											Управление новостями
+										</Menu.Item>
+									) : null}
+									<Menu.Divider />
+									<Menu.Item
+										color="red"
+										leftSection={<LogOut size={14} />}
+										disabled={isLoggingOut}
+										onClick={() => void handleLogout()}
+									>
+										Выйти
+									</Menu.Item>
+								</Menu.Dropdown>
+							</Menu>
+						) : null}
+					</div>
+				</div>
+			</div>
+			<SiteMenu
+				opened={menuOpen}
+				onClose={() => setMenuOpen(false)}
+				isAdmin={player?.role === 'admin'}
+			/>
+		</>
 	);
 };

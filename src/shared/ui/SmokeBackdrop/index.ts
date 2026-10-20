@@ -1,0 +1,1 @@
+export { SmokeBackdrop } from './SmokeBackdrop';

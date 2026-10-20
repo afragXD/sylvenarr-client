@@ -1,8 +1,11 @@
+export type PlayerRole = 'player' | 'admin';
+
 export type Player = {
 	id: string;
 	displayName: string;
 	email: string | null;
 	avatarUrl: string | null;
+	role: PlayerRole;
 	providers: string[];
 	createdAt: string;
 };

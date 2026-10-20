@@ -1,5 +1,5 @@
-import { API_BASE_URL } from '@/shared/constants';
 import { apiFetchJson } from '@/shared/api/http';
+import { API_BASE_URL } from '@/shared/constants';
 
 import type { AuthProvider, Player } from '../model/types';
 
@@ -13,11 +13,13 @@ const parsePlayer = (data: unknown): Player => {
 	const providers = Array.isArray(data.providers)
 		? data.providers.filter((item): item is string => typeof item === 'string')
 		: [];
+	const role = data.role === 'admin' ? 'admin' : 'player';
 	return {
 		id: data.id,
 		displayName: data.displayName,
 		email: typeof data.email === 'string' ? data.email : null,
 		avatarUrl: typeof data.avatarUrl === 'string' ? data.avatarUrl : null,
+		role,
 		providers,
 		createdAt: String(data.createdAt),
 	};
@@ -61,10 +63,5 @@ export function getOAuthStartUrl(providerId: string): string {
  * Выход: очистка cookie сессии на API.
  */
 export async function logoutPlayer(): Promise<void> {
-	await apiFetchJson(
-		'/auth/logout',
-		{ method: 'POST' },
-		() => undefined,
-		'Не удалось выйти',
-	);
+	await apiFetchJson('/auth/logout', { method: 'POST' }, () => undefined, 'Не удалось выйти');
 }

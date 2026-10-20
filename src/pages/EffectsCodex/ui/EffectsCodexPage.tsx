@@ -1,18 +1,21 @@
-import { Anchor, Group, Stack, Text, TextInput, Title, Tooltip } from '@mantine/core';
-import { Link } from '@tanstack/react-router';
+import { Group, Stack, Text, TextInput } from '@mantine/core';
 import { useMemo, useState } from 'react';
 
 import { CODEX_L, type EffectMeta, listBuffs, listDebuffs } from '@/features/battle';
+import { GoldRule } from '@/shared/ui/GoldRule';
+import { OrnateFrame } from '@/shared/ui/OrnateFrame';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 import styles from './EffectsCodexPage.module.css';
 
 /**
- * Справочник боевых эффектов (кодекс).
+ * Справочник боевых эффектов (кодекс) — сетка и детальная панель.
  */
 export const EffectsCodexPage = () => {
 	const [query, setQuery] = useState('');
-	const { filteredBuffs, filteredDebuffs, total, shown } = useMemo(() => {
+	const [selectedId, setSelectedId] = useState<string | null>(null);
+
+	const { filteredBuffs, filteredDebuffs, all, total, shown } = useMemo(() => {
 		const buffs = listBuffs();
 		const debuffs = listDebuffs();
 		const q = query.trim().toLocaleLowerCase('ru');
@@ -27,117 +30,129 @@ export const EffectsCodexPage = () => {
 		};
 		const nextBuffs = buffs.filter(match);
 		const nextDebuffs = debuffs.filter(match);
+		const merged = [...nextBuffs, ...nextDebuffs];
 		return {
 			filteredBuffs: nextBuffs,
 			filteredDebuffs: nextDebuffs,
+			all: merged,
 			total: buffs.length + debuffs.length,
-			shown: nextBuffs.length + nextDebuffs.length,
+			shown: merged.length,
 		};
 	}, [query]);
 
+	const selected = all.find((effect) => effect.id === selectedId) ?? all[0] ?? null;
+
 	return (
-		<PageFrame width="content">
-			<Anchor
-				component={Link}
-				to="/heroes"
-				c="brand"
-				td="none"
-				size="sm"
-				fw={500}
-				w="fit-content"
-				display="inline-block"
-			>
-				← К реестру
-			</Anchor>
-
-			<Stack gap={8} maw="56rem">
-				<Group justify="space-between" align="baseline" wrap="wrap" gap="sm">
-					<Title order={1}>Кодекс эффектов</Title>
-					<Text size="sm" c="var(--app-text-muted)" ff="monospace">
-						{shown === total ? `${total} эффектов` : `${shown} из ${total}`}
-					</Text>
-				</Group>
-				<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
-					Состояния, которые герои накладывают в бою. На поле они отмечены иконками на юните —
-					здесь полный список с пояснениями.
+		<PageFrame
+			width="wide"
+			eyebrow="Справочник"
+			title="Кодекс эффектов"
+			lead="Баффы и дебаффы поля боя: как работают и что снимают."
+			scene="/scenes/effects.png"
+		>
+			<Group justify="space-between" align="center" wrap="wrap" gap="md">
+				<Text size="sm" c="var(--app-text-muted)" className="sylvenarr-tabular">
+					{shown === total ? `${total} эффектов` : `${shown} из ${total}`}
 				</Text>
-				<div className={styles.legend}>
-					<Text size="sm" fw={600}>
-						Обозначения
-					</Text>
-					<ul className={styles.legendList}>
-						<li>
-							<Text size="sm" c="var(--app-text-muted)" component="span">
-								<span className={styles.legendKey}>L</span> — уровень героя в формулах. В
-								примерах тултипа для зависящих от L эффектов подставляется {CODEX_L}; в бою
-								используется живой уровень юнита.
-							</Text>
-						</li>
-						<li>
-							<Text size="sm" c="var(--app-text-muted)" component="span">
-								<span className={styles.legendKey}>р.</span> — длительность в раундах
-							</Text>
-						</li>
-						<li>
-							<Text size="sm" c="var(--app-text-muted)" component="span">
-								<span className={styles.legendKey}>⌊…⌋</span> — целая часть (округление вниз)
-							</Text>
-						</li>
-					</ul>
-				</div>
-			</Stack>
-
-			<TextInput
-				placeholder="Поиск по названию, описанию, id…"
-				value={query}
-				onChange={(event) => setQuery(event.currentTarget.value)}
-				maw={360}
-				aria-label="Поиск эффектов"
-			/>
+				<TextInput
+					placeholder="Поиск по названию, описанию, id…"
+					value={query}
+					onChange={(event) => setQuery(event.currentTarget.value)}
+					maw={360}
+					aria-label="Поиск эффектов"
+				/>
+			</Group>
 
 			{shown === 0 ? (
 				<Text c="var(--app-text-muted)">Ничего не найдено по запросу «{query.trim()}».</Text>
 			) : (
-				<>
-					{filteredBuffs.length > 0 && (
-						<EffectSection title="Усиления" effects={filteredBuffs} />
-					)}
-					{filteredDebuffs.length > 0 && (
-						<EffectSection title="Ослабления" effects={filteredDebuffs} />
-					)}
-				</>
+				<div className={styles.layout}>
+					<OrnateFrame variant="tabbed" tabLabel="Эффекты" className={styles.gridPanel}>
+						{filteredBuffs.length > 0 ? (
+							<EffectGrid
+								title="Усиления"
+								effects={filteredBuffs}
+								selectedId={selected?.id ?? null}
+								onSelect={setSelectedId}
+							/>
+						) : null}
+						{filteredDebuffs.length > 0 ? (
+							<EffectGrid
+								title="Ослабления"
+								effects={filteredDebuffs}
+								selectedId={selected?.id ?? null}
+								onSelect={setSelectedId}
+							/>
+						) : null}
+					</OrnateFrame>
+
+					{selected ? (
+						<OrnateFrame
+							variant="medallion"
+							className={styles.detailPanel}
+							medallion={(() => {
+								const Icon = selected.Icon;
+								return <Icon size={28} strokeWidth={1.6} />;
+							})()}
+						>
+							<Stack gap="sm" className={styles.detailBody}>
+								<span className={styles.kind}>
+									{selected.kind === 'buff' ? 'Усиление' : 'Ослабление'}
+								</span>
+								<h2 className={styles.detailTitle}>{selected.label}</h2>
+								<GoldRule align="start" />
+								<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
+									{selected.description}
+								</Text>
+								<p className={styles.mechanics}>{selected.mechanics}</p>
+								<Text size="sm" c="var(--app-text-muted)">
+									Пример при L={CODEX_L}: {selected.exampleAtL}
+								</Text>
+							</Stack>
+						</OrnateFrame>
+					) : null}
+				</div>
 			)}
 		</PageFrame>
 	);
 };
 
-const EffectSection = ({ title, effects }: { title: string; effects: EffectMeta[] }) => (
-	<section className={styles.section}>
-		<Title order={2} size="h3" mb="sm">
-			{title}
-		</Title>
-		<ul className={styles.list}>
+const EffectGrid = ({
+	title,
+	effects,
+	selectedId,
+	onSelect,
+}: {
+	title: string;
+	effects: EffectMeta[];
+	selectedId: string | null;
+	onSelect: (id: string) => void;
+}) => (
+	<div className={styles.group}>
+		<p className={styles.groupTitle}>{title}</p>
+		<div className={styles.iconGrid} role="listbox" aria-label={title}>
 			{effects.map((effect) => {
 				const Icon = effect.Icon;
+				const selected = effect.id === selectedId;
 				return (
-					<li key={effect.id} className={styles.item} data-kind={effect.kind}>
-						<Group gap="sm" align="flex-start" wrap="nowrap">
-							<span className={styles.icon} aria-hidden>
-								<Icon size={18} strokeWidth={1.75} />
-							</span>
-							<Stack gap={4} style={{ minWidth: 0 }}>
-								<Text fw={600}>{effect.label}</Text>
-								<Text size="sm" c="var(--app-text-muted)" style={{ lineHeight: 1.5 }}>
-									{effect.description}
-								</Text>
-								<Tooltip label={effect.exampleAtL} multiline w={260} withArrow>
-									<span className={styles.mechanics}>{effect.mechanics}</span>
-								</Tooltip>
-							</Stack>
-						</Group>
-					</li>
+					<button
+						key={effect.id}
+						type="button"
+						role="option"
+						aria-selected={selected}
+						aria-label={effect.label}
+						className={styles.iconBtn}
+						data-kind={effect.kind}
+						data-selected={selected || undefined}
+						onClick={() => onSelect(effect.id)}
+					>
+						<span className={styles.icon} aria-hidden>
+							<Icon size={20} strokeWidth={1.75} />
+						</span>
+						<span className={styles.iconLabel}>{effect.label}</span>
+					</button>
 				);
 			})}
-		</ul>
-	</section>
+		</div>
+	</div>
 );

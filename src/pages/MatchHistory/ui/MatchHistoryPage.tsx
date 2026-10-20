@@ -1,10 +1,11 @@
-import { Anchor, Box, Loader, Stack, Table, Text, Title } from '@mantine/core';
+import { Anchor, Box, Loader, Table, Text } from '@mantine/core';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { fetchMyMatches, type MatchHistoryItem } from '@/entities/match';
 import { ApiError } from '@/shared/api/http';
 import { getMatchResultColor } from '@/shared/lib/stats';
+import { OrnateFrame } from '@/shared/ui/OrnateFrame';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 /**
@@ -40,11 +41,13 @@ export const MatchHistoryPage = () => {
 	}, []);
 
 	return (
-		<PageFrame width="wide">
-			<Stack gap={6} maw={640}>
-				<Title order={1}>Мои матчи</Title>
-				<Text c="var(--app-text-muted)">Завершённые бои: соперник, результат, длительность.</Text>
-			</Stack>
+		<PageFrame
+			width="wide"
+			eyebrow="Арена"
+			title="Мои матчи"
+			lead="Завершённые бои: соперник, результат, длительность."
+			scene="/scenes/battle.png"
+		>
 			{loading && <Loader color="brand" size="sm" />}
 			{error && (
 				<Text c="red" role="alert">
@@ -60,48 +63,50 @@ export const MatchHistoryPage = () => {
 				</Text>
 			)}
 			{rows.length > 0 && (
-				<Box style={{ overflowX: 'auto' }}>
-					<Table
-						className="sylvenarr-registry-table"
-						horizontalSpacing="md"
-						verticalSpacing="sm"
-						style={{ borderCollapse: 'collapse', minWidth: 560 }}
-					>
-						<Table.Thead>
-							<Table.Tr>
-								<Table.Th>Дата</Table.Th>
-								<Table.Th>Соперник</Table.Th>
-								<Table.Th>Результат</Table.Th>
-								<Table.Th>Время боя</Table.Th>
-							</Table.Tr>
-						</Table.Thead>
-						<Table.Tbody>
-							{rows.map((row) => (
-								<Table.Tr
-									key={row.id}
-									style={{ borderBottom: '1px solid var(--app-border)', cursor: 'pointer' }}
-									onClick={() =>
-										void navigate({ to: '/matches/$matchId', params: { matchId: row.id } })
-									}
-								>
-									<Table.Td c="var(--app-text-muted)" ff="monospace" size="sm">
-										{new Date(row.finishedAt).toLocaleString('ru-RU')}
-									</Table.Td>
-									<Table.Td fw={600}>{row.opponentName}</Table.Td>
-									<Table.Td
-										c={getMatchResultColor(row.result)}
-										fw={row.result === 'draw' ? undefined : 600}
-									>
-										{resultLabel(row.result)}
-									</Table.Td>
-									<Table.Td ff="monospace" size="sm">
-										{formatDuration(row.durationSeconds)}
-									</Table.Td>
+				<OrnateFrame variant="panel">
+					<Box style={{ overflowX: 'auto' }} p="sm">
+						<Table
+							className="sylvenarr-registry-table"
+							horizontalSpacing="md"
+							verticalSpacing="sm"
+							style={{ borderCollapse: 'collapse', minWidth: 560 }}
+						>
+							<Table.Thead>
+								<Table.Tr>
+									<Table.Th>Дата</Table.Th>
+									<Table.Th>Соперник</Table.Th>
+									<Table.Th>Результат</Table.Th>
+									<Table.Th>Время боя</Table.Th>
 								</Table.Tr>
-							))}
-						</Table.Tbody>
-					</Table>
-				</Box>
+							</Table.Thead>
+							<Table.Tbody>
+								{rows.map((row) => (
+									<Table.Tr
+										key={row.id}
+										style={{ borderBottom: '1px solid var(--app-border)', cursor: 'pointer' }}
+										onClick={() =>
+											void navigate({ to: '/matches/$matchId', params: { matchId: row.id } })
+										}
+									>
+										<Table.Td c="var(--app-text-muted)" className="sylvenarr-tabular" size="sm">
+											{new Date(row.finishedAt).toLocaleString('ru-RU')}
+										</Table.Td>
+										<Table.Td fw={600}>{row.opponentName}</Table.Td>
+										<Table.Td
+											c={getMatchResultColor(row.result)}
+											fw={row.result === 'draw' ? undefined : 600}
+										>
+											{resultLabel(row.result)}
+										</Table.Td>
+										<Table.Td className="sylvenarr-tabular" size="sm">
+											{formatDuration(row.durationSeconds)}
+										</Table.Td>
+									</Table.Tr>
+								))}
+							</Table.Tbody>
+						</Table>
+					</Box>
+				</OrnateFrame>
 			)}
 		</PageFrame>
 	);

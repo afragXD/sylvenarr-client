@@ -45,15 +45,14 @@ export const PrivacyPage = () => {
 	const mail = <Anchor href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</Anchor>;
 
 	return (
-		<PageFrame width="content" gap="xl">
-			<Stack gap={6} maw={760}>
-				<Title order={1}>Политика конфиденциальности</Title>
-				<Text c="var(--app-text-muted)">
-					Как сайт {APP_TITLE} ({siteHost}) обрабатывает персональные данные и использует cookie.
-					Редакция от {REVISION_DATE}.
-				</Text>
-			</Stack>
-
+		<PageFrame
+			width="content"
+			gap="xl"
+			eyebrow="Документы"
+			title="Политика конфиденциальности"
+			lead={`Как ${APP_TITLE} (${siteHost}) обрабатывает данные и cookie. Редакция от ${REVISION_DATE}.`}
+			scene="/scenes/hero.png"
+		>
 			<Section index={1} title="Общие положения">
 				<Text>
 					Настоящая политика составлена в соответствии с Федеральным законом от 27.07.2006 № 152-ФЗ

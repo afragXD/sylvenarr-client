@@ -1,0 +1,60 @@
+.root {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	overflow: hidden;
+	z-index: 0;
+}
+
+.layer {
+	position: absolute;
+	inset: -10%;
+	background-repeat: repeat;
+	opacity: 0.55;
+	mix-blend-mode: screen;
+}
+
+.gradient {
+	position: absolute;
+	inset: 0;
+}
+
+.default .gradient {
+	background:
+		radial-gradient(
+			ellipse 70% 50% at 20% 10%,
+			color-mix(in srgb, var(--smoke) 55%, transparent),
+			transparent 70%
+		),
+		radial-gradient(
+			ellipse 60% 45% at 90% 80%,
+			color-mix(in srgb, var(--smoke-deep) 70%, transparent),
+			transparent 65%
+		),
+		radial-gradient(
+			ellipse 50% 40% at 50% 100%,
+			color-mix(in srgb, #000 80%, transparent),
+			transparent 55%
+		),
+		#000;
+}
+
+.wine .gradient {
+	background:
+		radial-gradient(
+			ellipse 70% 55% at 15% 20%,
+			color-mix(in srgb, var(--wine) 55%, transparent),
+			transparent 70%
+		),
+		radial-gradient(
+			ellipse 55% 50% at 85% 70%,
+			color-mix(in srgb, #2a0a0c 75%, transparent),
+			transparent 60%
+		),
+		radial-gradient(ellipse 80% 40% at 50% 100%, #000, transparent 50%), #0a0405;
+}
+
+.wine .layer {
+	opacity: 0.35;
+	mix-blend-mode: soft-light;
+}

@@ -5,8 +5,8 @@ import {
 	formatAbilityPreview,
 	getAbilityPreview,
 	getHeroAbilities,
-	previewCtxFromHero,
 	type HeroClass,
+	previewCtxFromHero,
 } from '@/entities/hero';
 import { AbilityTags } from '@/features/battle';
 

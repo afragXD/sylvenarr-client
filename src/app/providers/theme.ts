@@ -1,34 +1,34 @@
 import { type CSSVariablesResolver, createTheme, type MantineColorsTuple } from '@mantine/core';
 
-/** Brass — brand / primary (CRPG metal) */
+/** Brass — brand / primary (латунь BG3) */
 const brand: MantineColorsTuple = [
-	'#f7f1e4',
-	'#ebe0c4',
-	'#dccfa0',
-	'#cdb87a',
-	'#c4a866',
-	'#c4a35a',
-	'#C4A35A',
+	'#f5f0e4',
+	'#ebe2ce',
+	'#ddcfb0',
+	'#cbb48c',
+	'#c4a878',
+	'#b8954a',
+	'#CBB48C',
 	'#a88948',
 	'#8a6f3a',
-	'#6b552c',
+	'#5c4a28',
 ];
 
-/** Ember — accent (рана / поражение) */
+/** Wine — accent (поражение / меню) */
 const accent: MantineColorsTuple = [
-	'#faf0ee',
-	'#f0d6d1',
-	'#e3ada4',
-	'#d58274',
-	'#c96555',
-	'#c45c48',
-	'#C45C48',
-	'#a84c3c',
-	'#8c3f32',
-	'#6b2f26',
+	'#f5e8e8',
+	'#e8cfcf',
+	'#d4a0a3',
+	'#b86a6e',
+	'#8e3a3e',
+	'#6e2024',
+	'#4E1418',
+	'#3e1014',
+	'#2e0c10',
+	'#1e080a',
 ];
 
-/** Moss — победа / высокий винрейт (не brand: латунь занята UI) */
+/** Moss — победа / высокий винрейт */
 const moss: MantineColorsTuple = [
 	'#f0f4ec',
 	'#dde6d4',
@@ -44,32 +44,39 @@ const moss: MantineColorsTuple = [
 
 export const theme = createTheme({
 	primaryColor: 'brand',
-	primaryShade: { light: 7, dark: 5 },
+	primaryShade: { light: 6, dark: 6 },
 	colors: {
 		brand,
 		accent,
 		moss,
 	},
-	fontFamily: '"Source Sans 3", system-ui, sans-serif',
-	fontFamilyMonospace: '"JetBrains Mono", ui-monospace, monospace',
+	fontFamily: '"Alegreya Sans", system-ui, sans-serif',
+	fontFamilyMonospace: '"Alegreya Sans", system-ui, sans-serif',
 	headings: {
-		fontFamily: 'Cinzel, "Times New Roman", serif',
-		fontWeight: '600',
+		fontFamily: '"Alegreya SC", "Times New Roman", serif',
+		fontWeight: '700',
+		sizes: {
+			h1: { fontSize: 'clamp(2rem, 4vw, 2.75rem)', lineHeight: '1.15' },
+			h2: { fontSize: 'clamp(1.65rem, 3vw, 2.25rem)', lineHeight: '1.2' },
+			h3: { fontSize: 'clamp(1.25rem, 2vw, 1.5rem)', lineHeight: '1.25' },
+			h4: { fontSize: '1.15rem', lineHeight: '1.3' },
+		},
 	},
 	defaultRadius: 0,
 	other: {
-		appBgLight: '#E7DFD0',
-		appBgDark: '#0B0A09',
-		appSurfaceLight: '#F4EFE6',
-		appSurfaceDark: '#1A1714',
-		appSurfaceMutedLight: '#D9D0C0',
-		appSurfaceMutedDark: '#252018',
-		appTextLight: '#1A1510',
-		appTextDark: '#E8E0D0',
-		appTextMutedLight: '#5C5348',
-		appTextMutedDark: '#A89B88',
-		appBorderLight: '#B8A88E',
-		appBorderDark: '#4A3F2E',
+		appBg: '#000000',
+		appSurface: '#1A130E',
+		appSurfaceMuted: '#2A1F17',
+		appText: '#F2ECE2',
+		appTextMuted: 'rgba(242, 236, 226, 0.65)',
+		appBorder: '#4A3F2E',
+		brass: '#CBB48C',
+		copper: '#E9C08F',
+		parchment: '#EFE2CC',
+		parchmentInk: '#2B2219',
+		wine: '#4E1418',
+		smoke: '#2A1F17',
+		smokeDeep: '#1A130E',
 	},
 	components: {
 		Button: {
@@ -78,8 +85,10 @@ export const theme = createTheme({
 			},
 			styles: {
 				root: {
-					fontWeight: 600,
-					letterSpacing: '0.02em',
+					fontFamily: '"Alegreya SC", "Times New Roman", serif',
+					fontWeight: 700,
+					letterSpacing: '0.04em',
+					textTransform: 'uppercase',
 				},
 			},
 		},
@@ -88,27 +97,40 @@ export const theme = createTheme({
 				radius: 0,
 			},
 		},
+		ActionIcon: {
+			defaultProps: {
+				radius: 0,
+			},
+		},
 	},
 });
 
 export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
-	variables: {},
+	variables: {
+		'--brass': theme.other.brass,
+		'--copper': theme.other.copper,
+		'--parchment': theme.other.parchment,
+		'--parchment-ink': theme.other.parchmentInk,
+		'--wine': theme.other.wine,
+		'--smoke': theme.other.smoke,
+		'--smoke-deep': theme.other.smokeDeep,
+	},
 	light: {
-		'--mantine-color-body': theme.other.appBgLight,
-		'--mantine-color-text': theme.other.appTextLight,
-		'--app-surface': theme.other.appSurfaceLight,
-		'--app-surface-muted': theme.other.appSurfaceMutedLight,
-		'--app-text': theme.other.appTextLight,
-		'--app-text-muted': theme.other.appTextMutedLight,
-		'--app-border': theme.other.appBorderLight,
+		'--mantine-color-body': theme.other.appBg,
+		'--mantine-color-text': theme.other.appText,
+		'--app-surface': theme.other.appSurface,
+		'--app-surface-muted': theme.other.appSurfaceMuted,
+		'--app-text': theme.other.appText,
+		'--app-text-muted': theme.other.appTextMuted,
+		'--app-border': theme.other.appBorder,
 	},
 	dark: {
-		'--mantine-color-body': theme.other.appBgDark,
-		'--mantine-color-text': theme.other.appTextDark,
-		'--app-surface': theme.other.appSurfaceDark,
-		'--app-surface-muted': theme.other.appSurfaceMutedDark,
-		'--app-text': theme.other.appTextDark,
-		'--app-text-muted': theme.other.appTextMutedDark,
-		'--app-border': theme.other.appBorderDark,
+		'--mantine-color-body': theme.other.appBg,
+		'--mantine-color-text': theme.other.appText,
+		'--app-surface': theme.other.appSurface,
+		'--app-surface-muted': theme.other.appSurfaceMuted,
+		'--app-text': theme.other.appText,
+		'--app-text-muted': theme.other.appTextMuted,
+		'--app-border': theme.other.appBorder,
 	},
 });

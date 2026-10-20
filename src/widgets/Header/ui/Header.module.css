@@ -1,0 +1,109 @@
+.header {
+	position: relative;
+	height: 100%;
+	display: flex;
+	align-items: flex-start;
+	padding-top: 0.85rem;
+	background: linear-gradient(to bottom, color-mix(in srgb, #000 72%, transparent), transparent);
+}
+
+.inner {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	width: 100%;
+	gap: 1rem;
+}
+
+.left,
+.right {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.7rem;
+	color: var(--app-text);
+	text-decoration: none;
+	transform-origin: left top;
+	transition: transform 220ms ease;
+}
+
+.brandCompact {
+	transform: scale(0.72);
+}
+
+.wordmark {
+	font-family: var(--mantine-font-family-headings);
+	font-weight: 700;
+	font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	line-height: 1;
+}
+
+.burger {
+	display: inline-flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 5px;
+	width: 40px;
+	height: 40px;
+	padding: 8px;
+	border: 1px solid color-mix(in srgb, var(--brass) 40%, transparent);
+	background: color-mix(in srgb, #000 35%, transparent);
+	color: var(--brass);
+	cursor: pointer;
+}
+
+.burger:hover,
+.burger:focus-visible {
+	background: color-mix(in srgb, var(--brass) 14%, transparent);
+	outline: none;
+}
+
+.burger span {
+	display: block;
+	height: 2px;
+	background: currentColor;
+}
+
+.burger span:nth-child(1) {
+	width: 100%;
+}
+
+.burger span:nth-child(2) {
+	width: 70%;
+}
+
+.burger span:nth-child(3) {
+	width: 85%;
+}
+
+.avatar {
+	display: inline-flex;
+	line-height: 0;
+	padding: 0;
+	border: 1px solid color-mix(in srgb, var(--brass) 45%, transparent);
+	border-radius: 999px;
+	outline: none;
+}
+
+.avatar:hover,
+.avatar:focus-visible {
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--brass) 35%, transparent);
+}
+
+.menu {
+	border: 1px solid color-mix(in srgb, var(--brass) 45%, transparent);
+	background: var(--app-surface);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.brand {
+		transition: none;
+	}
+}

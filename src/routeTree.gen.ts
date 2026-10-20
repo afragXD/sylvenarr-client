@@ -13,12 +13,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as HeroesRouteImport } from './routes/heroes'
 import { Route as LobbyRouteImport } from './routes/lobby'
 import { Route as MatchesRouteImport } from './routes/matches'
+import { Route as NewsRouteImport } from './routes/news'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RatingRouteImport } from './routes/rating'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AdminNewsRouteImport } from './routes/admin.news'
 import { Route as HeroesIndexRouteImport } from './routes/heroes.index'
 import { Route as HeroesCodeRouteImport } from './routes/heroes.$code'
 import { Route as HeroesEffectsRouteImport } from './routes/heroes.effects'
@@ -26,6 +28,11 @@ import { Route as LobbyIndexRouteImport } from './routes/lobby.index'
 import { Route as LobbyMatchIdRouteImport } from './routes/lobby.$matchId'
 import { Route as MatchesIndexRouteImport } from './routes/matches.index'
 import { Route as MatchesMatchIdRouteImport } from './routes/matches.$matchId'
+import { Route as NewsIndexRouteImport } from './routes/news.index'
+import { Route as NewsSlugRouteImport } from './routes/news.$slug'
+import { Route as AdminNewsIndexRouteImport } from './routes/admin.news.index'
+import { Route as AdminNewsIdRouteImport } from './routes/admin.news.$id'
+import { Route as AdminNewsNewRouteImport } from './routes/admin.news.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -45,6 +52,11 @@ const LobbyRoute = LobbyRouteImport.update({
 const MatchesRoute = MatchesRouteImport.update({
   id: '/matches',
   path: '/matches',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsRoute = NewsRouteImport.update({
+  id: '/news',
+  path: '/news',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -75,6 +87,11 @@ const SignUpRoute = SignUpRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminNewsRoute = AdminNewsRouteImport.update({
+  id: '/admin/news',
+  path: '/admin/news',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HeroesIndexRoute = HeroesIndexRouteImport.update({
@@ -112,25 +129,57 @@ const MatchesMatchIdRoute = MatchesMatchIdRouteImport.update({
   path: '/$matchId',
   getParentRoute: () => MatchesRoute,
 } as any)
+const NewsIndexRoute = NewsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NewsRoute,
+} as any)
+const NewsSlugRoute = NewsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => NewsRoute,
+} as any)
+const AdminNewsIndexRoute = AdminNewsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminNewsRoute,
+} as any)
+const AdminNewsIdRoute = AdminNewsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminNewsRoute,
+} as any)
+const AdminNewsNewRoute = AdminNewsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminNewsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/heroes': typeof HeroesRouteWithChildren
   '/lobby': typeof LobbyRouteWithChildren
   '/matches': typeof MatchesRouteWithChildren
+  '/news': typeof NewsRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/news': typeof AdminNewsRouteWithChildren
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/heroes/': typeof HeroesIndexRoute
   '/lobby/': typeof LobbyIndexRoute
   '/matches/': typeof MatchesIndexRoute
+  '/news/': typeof NewsIndexRoute
+  '/admin/news/$id': typeof AdminNewsIdRoute
+  '/admin/news/new': typeof AdminNewsNewRoute
+  '/admin/news/': typeof AdminNewsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -144,9 +193,14 @@ export interface FileRoutesByTo {
   '/heroes/effects': typeof HeroesEffectsRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/heroes': typeof HeroesIndexRoute
   '/lobby': typeof LobbyIndexRoute
   '/matches': typeof MatchesIndexRoute
+  '/news': typeof NewsIndexRoute
+  '/admin/news/$id': typeof AdminNewsIdRoute
+  '/admin/news/new': typeof AdminNewsNewRoute
+  '/admin/news': typeof AdminNewsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -154,19 +208,26 @@ export interface FileRoutesById {
   '/heroes': typeof HeroesRouteWithChildren
   '/lobby': typeof LobbyRouteWithChildren
   '/matches': typeof MatchesRouteWithChildren
+  '/news': typeof NewsRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/news': typeof AdminNewsRouteWithChildren
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/heroes/': typeof HeroesIndexRoute
   '/lobby/': typeof LobbyIndexRoute
   '/matches/': typeof MatchesIndexRoute
+  '/news/': typeof NewsIndexRoute
+  '/admin/news/$id': typeof AdminNewsIdRoute
+  '/admin/news/new': typeof AdminNewsNewRoute
+  '/admin/news/': typeof AdminNewsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -175,19 +236,26 @@ export interface FileRouteTypes {
     | '/heroes'
     | '/lobby'
     | '/matches'
+    | '/news'
     | '/privacy'
     | '/rating'
     | '/robots.txt'
     | '/sign-in'
     | '/sign-up'
     | '/sitemap.xml'
+    | '/admin/news'
     | '/heroes/$code'
     | '/heroes/effects'
     | '/lobby/$matchId'
     | '/matches/$matchId'
+    | '/news/$slug'
     | '/heroes/'
     | '/lobby/'
     | '/matches/'
+    | '/news/'
+    | '/admin/news/$id'
+    | '/admin/news/new'
+    | '/admin/news/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -201,28 +269,40 @@ export interface FileRouteTypes {
     | '/heroes/effects'
     | '/lobby/$matchId'
     | '/matches/$matchId'
+    | '/news/$slug'
     | '/heroes'
     | '/lobby'
     | '/matches'
+    | '/news'
+    | '/admin/news/$id'
+    | '/admin/news/new'
+    | '/admin/news'
   id:
     | '__root__'
     | '/'
     | '/heroes'
     | '/lobby'
     | '/matches'
+    | '/news'
     | '/privacy'
     | '/rating'
     | '/robots.txt'
     | '/sign-in'
     | '/sign-up'
     | '/sitemap.xml'
+    | '/admin/news'
     | '/heroes/$code'
     | '/heroes/effects'
     | '/lobby/$matchId'
     | '/matches/$matchId'
+    | '/news/$slug'
     | '/heroes/'
     | '/lobby/'
     | '/matches/'
+    | '/news/'
+    | '/admin/news/$id'
+    | '/admin/news/new'
+    | '/admin/news/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -230,12 +310,14 @@ export interface RootRouteChildren {
   HeroesRoute: typeof HeroesRouteWithChildren
   LobbyRoute: typeof LobbyRouteWithChildren
   MatchesRoute: typeof MatchesRouteWithChildren
+  NewsRoute: typeof NewsRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   RatingRoute: typeof RatingRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AdminNewsRoute: typeof AdminNewsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -266,6 +348,13 @@ declare module '@tanstack/react-router' {
       path: '/matches'
       fullPath: '/matches'
       preLoaderRoute: typeof MatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/news': {
+      id: '/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -308,6 +397,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/news': {
+      id: '/admin/news'
+      path: '/admin/news'
+      fullPath: '/admin/news'
+      preLoaderRoute: typeof AdminNewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/heroes/': {
@@ -359,6 +455,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MatchesMatchIdRouteImport
       parentRoute: typeof MatchesRoute
     }
+    '/news/': {
+      id: '/news/'
+      path: '/'
+      fullPath: '/news/'
+      preLoaderRoute: typeof NewsIndexRouteImport
+      parentRoute: typeof NewsRoute
+    }
+    '/news/$slug': {
+      id: '/news/$slug'
+      path: '/$slug'
+      fullPath: '/news/$slug'
+      preLoaderRoute: typeof NewsSlugRouteImport
+      parentRoute: typeof NewsRoute
+    }
+    '/admin/news/': {
+      id: '/admin/news/'
+      path: '/'
+      fullPath: '/admin/news/'
+      preLoaderRoute: typeof AdminNewsIndexRouteImport
+      parentRoute: typeof AdminNewsRoute
+    }
+    '/admin/news/$id': {
+      id: '/admin/news/$id'
+      path: '/$id'
+      fullPath: '/admin/news/$id'
+      preLoaderRoute: typeof AdminNewsIdRouteImport
+      parentRoute: typeof AdminNewsRoute
+    }
+    '/admin/news/new': {
+      id: '/admin/news/new'
+      path: '/new'
+      fullPath: '/admin/news/new'
+      preLoaderRoute: typeof AdminNewsNewRouteImport
+      parentRoute: typeof AdminNewsRoute
+    }
   }
 }
 
@@ -402,17 +533,47 @@ const MatchesRouteChildren: MatchesRouteChildren = {
 const MatchesRouteWithChildren =
   MatchesRoute._addFileChildren(MatchesRouteChildren)
 
+interface NewsRouteChildren {
+  NewsSlugRoute: typeof NewsSlugRoute
+  NewsIndexRoute: typeof NewsIndexRoute
+}
+
+const NewsRouteChildren: NewsRouteChildren = {
+  NewsSlugRoute: NewsSlugRoute,
+  NewsIndexRoute: NewsIndexRoute,
+}
+
+const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
+
+interface AdminNewsRouteChildren {
+  AdminNewsIdRoute: typeof AdminNewsIdRoute
+  AdminNewsNewRoute: typeof AdminNewsNewRoute
+  AdminNewsIndexRoute: typeof AdminNewsIndexRoute
+}
+
+const AdminNewsRouteChildren: AdminNewsRouteChildren = {
+  AdminNewsIdRoute: AdminNewsIdRoute,
+  AdminNewsNewRoute: AdminNewsNewRoute,
+  AdminNewsIndexRoute: AdminNewsIndexRoute,
+}
+
+const AdminNewsRouteWithChildren = AdminNewsRoute._addFileChildren(
+  AdminNewsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HeroesRoute: HeroesRouteWithChildren,
   LobbyRoute: LobbyRouteWithChildren,
   MatchesRoute: MatchesRouteWithChildren,
+  NewsRoute: NewsRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   RatingRoute: RatingRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AdminNewsRoute: AdminNewsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

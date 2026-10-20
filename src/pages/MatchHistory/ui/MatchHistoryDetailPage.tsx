@@ -53,7 +53,13 @@ export const MatchHistoryDetailPage = () => {
 	}, [matchId]);
 
 	return (
-		<PageFrame width="wide">
+		<PageFrame
+			width="wide"
+			eyebrow="Арена"
+			title="Карточка матча"
+			lead="Составы, статы и лог завершённого боя."
+			scene="/scenes/battle.png"
+		>
 			<Stack gap="md">
 				<Anchor component={Link} to="/matches" c="brand" size="sm">
 					← Мои матчи

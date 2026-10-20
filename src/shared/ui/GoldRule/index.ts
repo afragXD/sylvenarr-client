@@ -1,0 +1,1 @@
+export { GoldRule } from './GoldRule';

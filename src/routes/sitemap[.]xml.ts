@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { fetchHeroes } from '@/entities/hero/api/heroesApi';
+import { fetchNewsList } from '@/entities/news';
 import { absoluteUrl } from '@/shared/constants';
 
-const STATIC_PATHS = ['/', '/heroes', '/heroes/effects', '/rating', '/privacy'] as const;
+const STATIC_PATHS = ['/', '/heroes', '/heroes/effects', '/rating', '/privacy', '/news'] as const;
 
 const escapeXml = (value: string): string =>
 	value
@@ -35,9 +36,19 @@ export const Route = createFileRoute('/sitemap.xml')({
 					// Sitemap still useful without dynamic hero URLs if API is down.
 				}
 
+				let newsEntries: string[] = [];
+				try {
+					const news = await fetchNewsList({ limit: 50 });
+					newsEntries = news.items.map((item) =>
+						urlEntry(absoluteUrl(`/news/${item.slug}`), '0.6'),
+					);
+				} catch {
+					// ignore
+				}
+
 				const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
-${[...staticEntries, ...heroEntries].join('\n')}
+${[...staticEntries, ...heroEntries, ...newsEntries].join('\n')}
 </urlset>
 `;
 

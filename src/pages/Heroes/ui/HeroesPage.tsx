@@ -1,4 +1,4 @@
-import { Anchor, Box, Group, Loader, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Anchor, Box, Group, Loader, Stack, Text, TextInput } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -27,12 +27,7 @@ export const HeroesPage = () => {
 			return heroes;
 		}
 		return heroes.filter((hero) => {
-			const hay = [
-				hero.displayName,
-				hero.code,
-				hero.roleSummary ?? '',
-				hero.description ?? '',
-			]
+			const hay = [hero.displayName, hero.code, hero.roleSummary ?? '', hero.description ?? '']
 				.join(' ')
 				.toLocaleLowerCase('ru');
 			return hay.includes(q);
@@ -48,20 +43,21 @@ export const HeroesPage = () => {
 	}, []);
 
 	return (
-		<PageFrame width="wide">
+		<PageFrame
+			width="wide"
+			eyebrow="Каталог"
+			title="Реестр героев"
+			lead="Двадцать четыре класса: статы, роли и кого брать в отряд."
+			scene="/scenes/effects.png"
+		>
 			<Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
 				<Stack gap={6} maw={640}>
-					<Title order={1}>Реестр героев</Title>
-					<Text c="var(--app-text-muted)">
-						Классы Sylvenarr: Origins по алфавиту. Сортируйте по статам и откройте карточку перед
-						набором отряда.
-					</Text>
 					<Anchor component={Link} to="/heroes/effects" size="sm" c="brand" w="fit-content">
 						Кодекс эффектов
 					</Anchor>
 				</Stack>
 				{showTable && (
-					<Text size="sm" c="brand" ff="monospace">
+					<Text size="sm" c="brand" className="sylvenarr-tabular">
 						{filtered.length === heroes.length
 							? `${heroes.length} классов в каталоге`
 							: `${filtered.length} из ${heroes.length}`}
