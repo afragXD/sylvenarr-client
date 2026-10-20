@@ -8,7 +8,7 @@ export const Route = createFileRoute('/rating')({
 	head: () => ({
 		meta: seo({
 			title: 'Рейтинг',
-			description: 'Таблица рейтинга игроков Sylvenarr: Origins — лидеры арены и текущий сезон.',
+			description: 'Таблица ПТС игроков Sylvenarr: Origins — рейтинг как в Heroes III.',
 			url: absoluteUrl('/rating'),
 		}),
 		links: [{ rel: 'canonical', href: absoluteUrl('/rating') }],

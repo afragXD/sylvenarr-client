@@ -38,3 +38,20 @@ export const getWinrateColor = (winrate: number): string => {
 	}
 	return lerpRgb(WINRATE_MID, WINRATE_HIGH, (t - 0.5) / 0.5);
 };
+
+/** Нулевой уровень ПТС (Heroes III / StickyFingaz). */
+export const START_PTS = 1500;
+
+/**
+ * Цвет ПТС относительно нулевого уровня 1500:
+ * ниже — accent, на уровне — muted, выше — moss.
+ */
+export const getPtsColor = (pts: number): string => {
+	if (pts > START_PTS) {
+		return 'moss';
+	}
+	if (pts < START_PTS) {
+		return 'accent';
+	}
+	return 'var(--app-text-muted)';
+};

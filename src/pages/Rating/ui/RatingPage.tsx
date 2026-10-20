@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { fetchRating, type RatingRow } from '@/entities/rating';
 import { ApiError } from '@/shared/api/http';
-import { getWinrateColor } from '@/shared/lib/stats';
+import { getPtsColor, START_PTS } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 const TOP_RANK_ICONS: Record<number, { Icon: LucideIcon; color: string }> = {
@@ -47,7 +47,9 @@ export const RatingPage = () => {
 		<PageFrame width="wide">
 			<Stack gap={6} maw={640}>
 				<Title order={1}>Рейтинг</Title>
-				<Text c="var(--app-text-muted)">Победы / игры / винрейт (после завершения боёв).</Text>
+				<Text c="var(--app-text-muted)">
+					ПТС как в Heroes III: старт {START_PTS}, обмен по силе соперника, пол 0.
+				</Text>
 			</Stack>
 			{isLoading && (
 				<Group gap="sm">
@@ -63,7 +65,7 @@ export const RatingPage = () => {
 				</Text>
 			)}
 			{!isLoading && !error && rows.length === 0 && (
-				<Text c="var(--app-text-muted)">Пока нет записей — бои появятся в следующих фазах.</Text>
+				<Text c="var(--app-text-muted)">Пока нет записей — сыграйте первый бой.</Text>
 			)}
 			{!isLoading && rows.length > 0 && (
 				<Box style={{ overflowX: 'auto' }}>
@@ -78,9 +80,10 @@ export const RatingPage = () => {
 							<Table.Tr>
 								<Table.Th w={80}>#</Table.Th>
 								<Table.Th>Игрок</Table.Th>
-								<Table.Th>Победы</Table.Th>
-								<Table.Th>Игры</Table.Th>
-								<Table.Th>Винрейт</Table.Th>
+								<Table.Th>ПТС</Table.Th>
+								<Table.Th>W</Table.Th>
+								<Table.Th>L</Table.Th>
+								<Table.Th>D</Table.Th>
 							</Table.Tr>
 						</Table.Thead>
 						<Table.Tbody>
@@ -110,6 +113,14 @@ export const RatingPage = () => {
 											</Group>
 										</Table.Td>
 										<Table.Td fw={600}>{row.displayName}</Table.Td>
+										<Table.Td
+											ff="monospace"
+											c={getPtsColor(row.pts)}
+											fw={700}
+											style={{ fontVariantNumeric: 'tabular-nums' }}
+										>
+											{row.pts}
+										</Table.Td>
 										<Table.Td ff="monospace" style={{ fontVariantNumeric: 'tabular-nums' }}>
 											{row.wins}
 										</Table.Td>
@@ -118,15 +129,14 @@ export const RatingPage = () => {
 											c="var(--app-text-muted)"
 											style={{ fontVariantNumeric: 'tabular-nums' }}
 										>
-											{row.games}
+											{row.losses}
 										</Table.Td>
 										<Table.Td
 											ff="monospace"
-											c={getWinrateColor(row.winrate)}
-											fw={600}
+											c="var(--app-text-muted)"
 											style={{ fontVariantNumeric: 'tabular-nums' }}
 										>
-											{row.winrate}%
+											{row.draws}
 										</Table.Td>
 									</Table.Tr>
 								);

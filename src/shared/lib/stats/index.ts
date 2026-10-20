@@ -1,1 +1,1 @@
-export { getMatchResultColor, getWinrateColor } from './colors';
+export { getMatchResultColor, getPtsColor, getWinrateColor, START_PTS } from './colors';
