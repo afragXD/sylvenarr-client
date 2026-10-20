@@ -90,7 +90,6 @@ export const HeroDetailPage = () => {
 			eyebrow="Класс арены"
 			title={hero?.displayName ?? 'Герой'}
 			lead={hero?.roleSummary || 'Карточка класса: роль, лор и характеристики.'}
-			scene="/scenes/effects.png"
 		>
 			<Anchor
 				component={Link}

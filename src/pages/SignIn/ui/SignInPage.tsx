@@ -51,7 +51,6 @@ export const SignInPage = () => {
 			eyebrow="Арена"
 			title="Войти"
 			lead="Вход только через Яндекс. Рейтинг и история матчей закрепляются за вами."
-			scene="/scenes/battle.png"
 		>
 			<Box className="sylvenarr-panel">
 				<Stack gap="md">

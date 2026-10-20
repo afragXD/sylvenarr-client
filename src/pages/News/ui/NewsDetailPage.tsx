@@ -52,7 +52,6 @@ export const NewsDetailPage = () => {
 			title={item.title}
 			eyebrow={NEWS_CATEGORY_LABEL[item.category]}
 			lead={item.summary}
-			scene={item.coverUrl ?? '/scenes/hero.png'}
 			width="content"
 		>
 			<Stack gap="md" maw="42rem">

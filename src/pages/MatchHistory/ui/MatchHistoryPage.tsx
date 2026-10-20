@@ -46,7 +46,7 @@ export const MatchHistoryPage = () => {
 			eyebrow="Арена"
 			title="Мои матчи"
 			lead="Завершённые бои: соперник, результат, длительность."
-			scene="/scenes/battle.png"
+			scene="/scenes/battle.webp"
 		>
 			{loading && <Loader color="brand" size="sm" />}
 			{error && (

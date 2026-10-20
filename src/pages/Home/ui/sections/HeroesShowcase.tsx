@@ -51,14 +51,16 @@ export const HeroesShowcase = () => {
 			{current ? (
 				<div className={classes.showcase}>
 					<div className={classes.showcaseCopy}>
-						<span className={classes.role}>{current.roleSummary || 'Класс арены'}</span>
+						<span className={classes.role}>Класс арены</span>
 						<h3 className={classes.name}>{current.displayName}</h3>
 						<p className={classes.lore}>
-							{current.description || 'Откройте карточку класса перед драфтом.'}
+							{current.roleSummary ||
+								current.description ||
+								'Откройте карточку класса перед драфтом.'}
 						</p>
 						<OrnateFrame variant="panel" className={classes.stats}>
 							<div>
-								<span className={classes.statLabel}>Ряд / слоты</span>
+								<span className={classes.statLabel}>Слоты в отряде</span>
 								<span className={classes.statValue}>{current.size}</span>
 							</div>
 							<div>

@@ -40,13 +40,13 @@ export const NewsSection = () => {
 		<section className={classes.section} aria-labelledby="news-heading">
 			<SectionHeading title="Хроника разработки" id="news-heading" align="center" />
 			{feature ? (
-				<div className={classes.newsFeature}>
+				<Link to="/news/$slug" params={{ slug: feature.slug }} className={classes.newsFeature}>
 					{feature.coverUrl ? (
 						<ArtFade src={feature.coverUrl} mask="splash" className={classes.newsCover} alt="" />
 					) : (
 						<div className={classes.newsCover} />
 					)}
-					<div>
+					<div className={classes.newsFeatureCopy}>
 						<p className={classes.newsMeta}>
 							{NEWS_CATEGORY_LABEL[feature.category]}
 							{feature.publishedAt ? ` — ${formatDate(feature.publishedAt)}` : ''}
@@ -55,19 +55,28 @@ export const NewsSection = () => {
 							{feature.title}
 						</h3>
 						<p className={classes.lore}>{feature.summary}</p>
-						<div style={{ marginTop: '1rem' }}>
-							<OrnateLink to={`/news/${feature.slug}`} size="sm">
-								Читать
-							</OrnateLink>
-						</div>
+						<span className={classes.newsRead}>Читать →</span>
 					</div>
-				</div>
+				</Link>
 			) : null}
 			{cards.length > 0 ? (
 				<div className={classes.newsGrid}>
 					{cards.map((item) => (
-						<Link key={item.id} to={`/news/${item.slug}`} className={classes.newsLink}>
+						<Link
+							key={item.id}
+							to="/news/$slug"
+							params={{ slug: item.slug }}
+							className={classes.newsLink}
+						>
 							<OrnateFrame variant="card">
+								{item.coverUrl ? (
+									<img
+										src={item.coverUrl}
+										alt=""
+										className={classes.newsCardCover}
+										loading="lazy"
+									/>
+								) : null}
 								<span className={classes.newsMeta}>
 									{NEWS_CATEGORY_LABEL[item.category]}
 									{item.publishedAt ? ` — ${formatDate(item.publishedAt)}` : ''}

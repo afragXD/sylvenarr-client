@@ -1,5 +1,6 @@
 import { Accordion } from '@mantine/core';
 
+import { MarkdownBody } from '@/shared/ui/MarkdownBody';
 import { OrnateFrame } from '@/shared/ui/OrnateFrame';
 import { SectionHeading } from '@/shared/ui/SectionHeading';
 
@@ -15,7 +16,9 @@ export const FaqSection = () => {
 					{FAQ_ITEMS.map((item) => (
 						<Accordion.Item key={item.question} value={item.question} className={classes.faqItem}>
 							<Accordion.Control>{item.question}</Accordion.Control>
-							<Accordion.Panel>{item.answer}</Accordion.Panel>
+							<Accordion.Panel>
+								<MarkdownBody className={classes.faqAnswer}>{item.answer}</MarkdownBody>
+							</Accordion.Panel>
 						</Accordion.Item>
 					))}
 				</Accordion>

@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { HomePage } from '@/pages/Home';
-import { FAQ_ITEMS } from '@/pages/Home/model/faq';
+import { FAQ_ITEMS, faqAnswerPlain } from '@/pages/Home/model/faq';
 import { APP_DESCRIPTION, absoluteUrl } from '@/shared/constants';
 import { seo } from '@/shared/lib/seo';
 
@@ -17,7 +17,7 @@ const faqJsonLd = {
 			name: item.question,
 			acceptedAnswer: {
 				'@type': 'Answer',
-				text: item.answer,
+				text: faqAnswerPlain(item.answer),
 			},
 		})),
 	}),

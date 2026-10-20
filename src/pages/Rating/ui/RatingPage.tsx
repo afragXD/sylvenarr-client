@@ -49,7 +49,6 @@ export const RatingPage = () => {
 			eyebrow="Арена"
 			title="Рейтинг ПТС"
 			lead={`Все начинают с ${START_PTS}. Победа над сильным даёт больше, ничья тоже считается.`}
-			scene="/scenes/battle.png"
 		>
 			<Stack gap={10} maw={720}>
 				<Stack gap={8}>

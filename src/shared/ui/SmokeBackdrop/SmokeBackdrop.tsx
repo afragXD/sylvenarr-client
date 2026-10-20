@@ -5,19 +5,34 @@ const NOISE =
 
 type SmokeBackdropProps = {
 	variant?: 'default' | 'wine';
+	/** Клубящийся туман у краёв, как на главной BG3. */
+	fog?: boolean;
+	/** Без непрозрачной основы — чтобы класть туман поверх картинки. */
+	overlay?: boolean;
 	className?: string;
 };
 
 /**
  * Процедурный дым на чёрной / винной основе.
  */
-export const SmokeBackdrop = ({ variant = 'default', className }: SmokeBackdropProps) => {
+export const SmokeBackdrop = ({
+	variant = 'default',
+	fog = false,
+	overlay = false,
+	className,
+}: SmokeBackdropProps) => {
 	const rootClass = [classes.root, classes[variant], className].filter(Boolean).join(' ');
 
 	return (
 		<div className={rootClass} aria-hidden>
-			<div className={classes.gradient} />
-			<div className={classes.layer} style={{ backgroundImage: NOISE }} />
+			{overlay ? null : <div className={classes.gradient} />}
+			{fog ? (
+				<>
+					<div className={`${classes.fog} ${classes.fogFar}`} />
+					<div className={`${classes.fog} ${classes.fogNear}`} />
+				</>
+			) : null}
+			{overlay ? null : <div className={classes.layer} style={{ backgroundImage: NOISE }} />}
 		</div>
 	);
 };

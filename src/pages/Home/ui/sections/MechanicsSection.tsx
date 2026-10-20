@@ -32,9 +32,11 @@ export const MechanicsSection = () => {
 					</div>
 				</OrnateFrame>
 				<OrnateFrame variant="medallion" medallion={<span aria-hidden>⚔</span>}>
-					<SectionHeading title={active.title} order={3} withRule align="start" />
-					<p className={classes.detailBody}>{active.body}</p>
-					<img className={classes.detailScene} src={active.scene} alt="" />
+					<div className={classes.detail}>
+						<SectionHeading title={active.title} order={3} withRule align="start" />
+						<p className={classes.detailBody}>{active.body}</p>
+						<img className={classes.detailScene} src={active.scene} alt={active.sceneAlt} />
+					</div>
 				</OrnateFrame>
 			</div>
 		</section>

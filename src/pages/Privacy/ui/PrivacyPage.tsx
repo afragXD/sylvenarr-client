@@ -51,7 +51,6 @@ export const PrivacyPage = () => {
 			eyebrow="Документы"
 			title="Политика конфиденциальности"
 			lead={`Как ${APP_TITLE} (${siteHost}) обрабатывает данные и cookie. Редакция от ${REVISION_DATE}.`}
-			scene="/scenes/hero.png"
 		>
 			<Section index={1} title="Общие положения">
 				<Text>

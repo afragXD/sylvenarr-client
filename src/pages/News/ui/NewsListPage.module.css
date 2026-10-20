@@ -1,0 +1,65 @@
+.link {
+	display: block;
+	color: inherit;
+	text-decoration: none;
+}
+
+.title {
+	color: var(--app-text);
+	transition: color 160ms ease;
+}
+
+.link:hover .title,
+.link:focus-visible .title {
+	color: var(--copper);
+}
+
+.link:focus-visible {
+	outline: 1px solid var(--copper);
+	outline-offset: 4px;
+}
+
+.feature {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	gap: clamp(1rem, 3vw, 2rem);
+	align-items: center;
+}
+
+.featureCover {
+	display: block;
+	width: 100%;
+	aspect-ratio: 16 / 10;
+	object-fit: cover;
+	border: 1px solid color-mix(in srgb, var(--brass) 35%, transparent);
+}
+
+.read {
+	font-family: var(--mantine-font-family-headings);
+	font-size: 0.85rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--brass);
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 1rem;
+}
+
+.cardCover {
+	display: block;
+	width: calc(100% + 2.2rem);
+	margin: -1rem -1.1rem 0.25rem;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	object-position: center top;
+	border-bottom: 1px solid color-mix(in srgb, var(--brass) 35%, transparent);
+}
+
+@media (max-width: 48em) {
+	.feature {
+		grid-template-columns: 1fr;
+	}
+}

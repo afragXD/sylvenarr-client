@@ -1,4 +1,4 @@
-import { Group, Stack, Text, TextInput } from '@mantine/core';
+import { Stack, Text, TextInput } from '@mantine/core';
 import { useMemo, useState } from 'react';
 
 import { CODEX_L, type EffectMeta, listBuffs, listDebuffs } from '@/features/battle';
@@ -42,49 +42,57 @@ export const EffectsCodexPage = () => {
 
 	const selected = all.find((effect) => effect.id === selectedId) ?? all[0] ?? null;
 
+	const toolbar = (
+		<div className={styles.listToolbar}>
+			<TextInput
+				placeholder="Поиск по названию, описанию, id…"
+				value={query}
+				onChange={(event) => setQuery(event.currentTarget.value)}
+				aria-label="Поиск эффектов"
+				className={styles.search}
+			/>
+			<Text size="sm" c="var(--app-text-muted)" className="sylvenarr-tabular">
+				{shown === total ? `${total} эффектов` : `${shown} из ${total}`}
+			</Text>
+		</div>
+	);
+
 	return (
 		<PageFrame
 			width="wide"
 			eyebrow="Справочник"
 			title="Кодекс эффектов"
 			lead="Баффы и дебаффы поля боя: как работают и что снимают."
-			scene="/scenes/effects.png"
+			scene="/scenes/effects.webp"
 		>
-			<Group justify="space-between" align="center" wrap="wrap" gap="md">
-				<Text size="sm" c="var(--app-text-muted)" className="sylvenarr-tabular">
-					{shown === total ? `${total} эффектов` : `${shown} из ${total}`}
-				</Text>
-				<TextInput
-					placeholder="Поиск по названию, описанию, id…"
-					value={query}
-					onChange={(event) => setQuery(event.currentTarget.value)}
-					maw={360}
-					aria-label="Поиск эффектов"
-				/>
-			</Group>
-
 			{shown === 0 ? (
-				<Text c="var(--app-text-muted)">Ничего не найдено по запросу «{query.trim()}».</Text>
+				<div className={styles.listColumn}>
+					{toolbar}
+					<Text c="var(--app-text-muted)">Ничего не найдено по запросу «{query.trim()}».</Text>
+				</div>
 			) : (
 				<div className={styles.layout}>
-					<OrnateFrame variant="tabbed" tabLabel="Эффекты" className={styles.gridPanel}>
-						{filteredBuffs.length > 0 ? (
-							<EffectGrid
-								title="Усиления"
-								effects={filteredBuffs}
-								selectedId={selected?.id ?? null}
-								onSelect={setSelectedId}
-							/>
-						) : null}
-						{filteredDebuffs.length > 0 ? (
-							<EffectGrid
-								title="Ослабления"
-								effects={filteredDebuffs}
-								selectedId={selected?.id ?? null}
-								onSelect={setSelectedId}
-							/>
-						) : null}
-					</OrnateFrame>
+					<div className={styles.listColumn}>
+						{toolbar}
+						<OrnateFrame variant="tabbed" tabLabel="Эффекты" className={styles.gridPanel}>
+							{filteredBuffs.length > 0 ? (
+								<EffectGrid
+									title="Усиления"
+									effects={filteredBuffs}
+									selectedId={selected?.id ?? null}
+									onSelect={setSelectedId}
+								/>
+							) : null}
+							{filteredDebuffs.length > 0 ? (
+								<EffectGrid
+									title="Ослабления"
+									effects={filteredDebuffs}
+									selectedId={selected?.id ?? null}
+									onSelect={setSelectedId}
+								/>
+							) : null}
+						</OrnateFrame>
+					</div>
 
 					{selected ? (
 						<OrnateFrame

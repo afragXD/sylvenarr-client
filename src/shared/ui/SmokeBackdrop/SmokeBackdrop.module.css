@@ -58,3 +58,52 @@
 	opacity: 0.35;
 	mix-blend-mode: soft-light;
 }
+
+/* Клубы дыма: гуще у нижнего края и по бокам, центр остаётся чистым. */
+.fog {
+	--puff: #7d6c5a;
+	position: absolute;
+	inset: -15% -25%;
+	filter: blur(28px);
+	will-change: transform;
+}
+
+.fogFar {
+	opacity: 0.7;
+	background:
+		radial-gradient(ellipse 22% 16% at 8% 92%, var(--puff), transparent 70%),
+		radial-gradient(ellipse 26% 14% at 30% 98%, var(--puff), transparent 70%),
+		radial-gradient(ellipse 24% 18% at 55% 94%, var(--puff), transparent 70%),
+		radial-gradient(ellipse 28% 15% at 80% 97%, var(--puff), transparent 70%),
+		radial-gradient(ellipse 18% 22% at 98% 70%, var(--puff), transparent 70%),
+		radial-gradient(ellipse 16% 20% at 2% 40%, var(--puff), transparent 70%);
+	animation: fogDrift 38s ease-in-out infinite alternate;
+}
+
+.fogNear {
+	opacity: 0.5;
+	filter: blur(40px);
+	background:
+		radial-gradient(ellipse 30% 12% at 18% 86%, var(--puff), transparent 72%),
+		radial-gradient(ellipse 34% 10% at 62% 88%, var(--puff), transparent 72%),
+		radial-gradient(ellipse 20% 16% at 92% 30%, var(--puff), transparent 72%),
+		radial-gradient(ellipse 26% 9% at 72% 70%, var(--puff), transparent 72%),
+		radial-gradient(ellipse 18% 8% at 58% 26%, var(--puff), transparent 72%),
+		radial-gradient(ellipse 22% 10% at 40% 8%, var(--puff), transparent 72%);
+	animation: fogDrift 52s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes fogDrift {
+	from {
+		transform: translate3d(-3%, 0, 0) scale(1);
+	}
+	to {
+		transform: translate3d(3%, -2%, 0) scale(1.06);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fog {
+		animation: none;
+	}
+}

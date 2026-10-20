@@ -48,7 +48,6 @@ export const HeroesPage = () => {
 			eyebrow="Каталог"
 			title="Реестр героев"
 			lead="Двадцать четыре класса: статы, роли и кого брать в отряд."
-			scene="/scenes/effects.png"
 		>
 			<Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
 				<Stack gap={6} maw={640}>

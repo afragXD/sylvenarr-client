@@ -1,4 +1,3 @@
-import { ArtFade } from '@/shared/ui/ArtFade';
 import { OrnateLink } from '@/shared/ui/OrnateButton';
 import { SmokeBackdrop } from '@/shared/ui/SmokeBackdrop';
 
@@ -8,8 +7,11 @@ export const HeroBanner = () => {
 	return (
 		<section className={classes.hero} aria-label="Sylvenarr">
 			<div className={classes.heroScene} aria-hidden>
-				<SmokeBackdrop />
-				<ArtFade src="/scenes/hero.png" mask="bottom" alt="" />
+				<div className={classes.heroShot}>
+					<img src="/scenes/battle.webp" alt="" draggable={false} />
+				</div>
+				<div className={classes.heroShade} />
+				<SmokeBackdrop fog overlay />
 			</div>
 			<div className={classes.heroCopy}>
 				<h1 className={classes.heroTitle}>

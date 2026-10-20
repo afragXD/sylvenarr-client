@@ -1,12 +1,5 @@
 import classes from './HomePage.module.css';
-import {
-	CloseBanner,
-	FaqSection,
-	HeroBanner,
-	HeroesShowcase,
-	MechanicsSection,
-	NewsSection,
-} from './sections';
+import { FaqSection, HeroBanner, HeroesShowcase, MechanicsSection, NewsSection } from './sections';
 
 export const HomePage = () => {
 	return (
@@ -16,7 +9,6 @@ export const HomePage = () => {
 			<MechanicsSection />
 			<NewsSection />
 			<FaqSection />
-			<CloseBanner />
 		</div>
 	);
 };

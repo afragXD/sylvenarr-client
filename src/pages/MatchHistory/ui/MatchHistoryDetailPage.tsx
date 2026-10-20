@@ -58,7 +58,7 @@ export const MatchHistoryDetailPage = () => {
 			eyebrow="Арена"
 			title="Карточка матча"
 			lead="Составы, статы и лог завершённого боя."
-			scene="/scenes/battle.png"
+			scene="/scenes/battle.webp"
 		>
 			<Stack gap="md">
 				<Anchor component={Link} to="/matches" c="brand" size="sm">

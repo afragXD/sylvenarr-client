@@ -7,7 +7,7 @@ type MarkdownBodyProps = {
 };
 
 /**
- * Минимальный markdown: абзацы, **жирный**, # / ## заголовки, ссылки [text](url).
+ * Минимальный markdown: абзацы, **жирный**, # / ## заголовки, ссылки [text](url), картинки ![alt](url).
  * Без сырого HTML.
  */
 export const MarkdownBody = ({ children, className }: MarkdownBodyProps) => {
@@ -18,6 +18,27 @@ export const MarkdownBody = ({ children, className }: MarkdownBodyProps) => {
 			{blocks.map((block, index) => {
 				const key = `${index}-${block.slice(0, 24)}`;
 				const trimmed = block.trim();
+				const imageOnly = /^!\[([^\]]*)\]\(([^)]+)\)$/.exec(trimmed);
+				if (imageOnly) {
+					return (
+						<img
+							key={key}
+							src={imageOnly[2]}
+							alt={imageOnly[1]}
+							loading="lazy"
+							style={{
+								display: 'block',
+								width: '100%',
+								maxHeight: 420,
+								objectFit: 'contain',
+								objectPosition: 'center top',
+								margin: '0.75rem 0 1.25rem',
+								border: '1px solid color-mix(in srgb, var(--brass) 35%, transparent)',
+								background: '#050403',
+							}}
+						/>
+					);
+				}
 				if (trimmed.startsWith('## ')) {
 					return (
 						<Title key={key} order={3} c="var(--app-text)" mb="sm" mt="md">
@@ -62,8 +83,15 @@ const renderInline = (text: string): ReactNode[] => {
 		} else {
 			const linkMatch = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(token);
 			if (linkMatch) {
+				const href = linkMatch[2];
+				const external = /^https?:\/\//i.test(href);
 				nodes.push(
-					<a key={`a-${i}`} href={linkMatch[2]} style={{ color: 'var(--copper)' }}>
+					<a
+						key={`a-${i}`}
+						href={href}
+						style={{ color: 'var(--copper)' }}
+						{...(external ? { target: '_blank', rel: 'noreferrer' } : {})}
+					>
 						{linkMatch[1]}
 					</a>,
 				);

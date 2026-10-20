@@ -7,17 +7,22 @@
 
 .section {
 	position: relative;
-	padding: clamp(2.5rem, 7vw, 5rem) clamp(1.25rem, 5vw, 4.5rem);
+	display: flex;
+	flex-direction: column;
+	gap: clamp(1.5rem, 3vw, 2.25rem);
+	padding: clamp(1.75rem, 4vw, 3rem) clamp(1.25rem, 5vw, 4.5rem);
+	max-width: 88rem;
+	margin-inline: auto;
 	z-index: 1;
 }
 
 .hero {
 	position: relative;
-	min-height: 100dvh;
+	min-height: min(100dvh, 56rem);
 	display: flex;
 	align-items: center;
 	overflow: hidden;
-	padding: clamp(5rem, 12vw, 7rem) clamp(1.25rem, 5vw, 4.5rem) clamp(3rem, 8vw, 5rem);
+	padding: clamp(6rem, 12vw, 8rem) clamp(1.25rem, 5vw, 4.5rem) clamp(3rem, 7vw, 5rem);
 }
 
 .heroScene {
@@ -26,12 +31,33 @@
 	z-index: 0;
 }
 
-.heroScene img {
+/* Скриншот уходит вправо и тонет в тумане, чтобы его интерфейс не спорил с заголовком. */
+.heroShot {
+	position: absolute;
+	top: 50%;
+	right: -6%;
+	width: min(70vw, 1180px);
+	transform: translateY(-50%) perspective(1400px) rotateY(-14deg);
+	transform-origin: right center;
+	mask-image: radial-gradient(ellipse 58% 62% at 55% 50%, #000 35%, transparent 75%);
+	-webkit-mask-image: radial-gradient(ellipse 58% 62% at 55% 50%, #000 35%, transparent 75%);
+	animation: heroReveal 1.4s ease-out both;
+}
+
+.heroShot img {
+	display: block;
 	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	opacity: 0.55;
-	animation: heroReveal 1.1s ease-out both;
+	height: auto;
+	filter: blur(0.6px) brightness(0.8) saturate(0.85) sepia(0.2);
+}
+
+.heroShade {
+	position: absolute;
+	inset: 0;
+	background:
+		linear-gradient(90deg, #000 0%, color-mix(in srgb, #000 92%, transparent) 28%, transparent 58%),
+		radial-gradient(ellipse 50% 60% at 62% 50%, transparent 40%, #000 100%),
+		linear-gradient(to top, #000 0%, transparent 30%);
 }
 
 .heroCopy {
@@ -149,7 +175,6 @@
 }
 
 .moreHeroes {
-	margin-top: 1.5rem;
 	display: flex;
 	justify-content: center;
 }
@@ -200,32 +225,79 @@
 	text-transform: uppercase;
 }
 
+.detail {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
 .detailBody {
-	margin: 0.85rem 0 1rem;
+	margin: 0;
 	color: var(--app-text-muted);
 	line-height: 1.55;
-	max-width: 42ch;
+	max-width: 52ch;
 }
 
 .detailScene {
+	display: block;
 	width: 100%;
-	aspect-ratio: 16 / 9;
-	object-fit: cover;
-	border: 1px solid color-mix(in srgb, var(--brass) 35%, transparent);
+	height: clamp(14rem, 30vw, 22rem);
+	object-fit: contain;
+	object-position: center top;
 }
 
 .newsFeature {
 	display: grid;
 	grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-	gap: 1.75rem;
+	gap: clamp(1.25rem, 3vw, 2.5rem);
 	align-items: center;
-	margin-bottom: 1.75rem;
+	color: inherit;
+	text-decoration: none;
+}
+
+.newsFeature:hover .name,
+.newsFeature:focus-visible .name {
+	color: var(--copper);
+}
+
+.newsFeature:focus-visible {
+	outline: 1px solid var(--copper);
+	outline-offset: 6px;
+}
+
+.newsFeatureCopy {
+	display: flex;
+	flex-direction: column;
+	gap: 0.85rem;
+}
+
+.newsFeatureCopy > * {
+	margin: 0;
+}
+
+.newsRead {
+	font-family: var(--mantine-font-family-headings);
+	font-size: 0.85rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--brass);
 }
 
 .newsCover {
 	width: 100%;
 	aspect-ratio: 16 / 10;
 	object-fit: cover;
+}
+
+.newsCardCover {
+	display: block;
+	width: calc(100% + 2.2rem);
+	margin: -1rem -1.1rem 0.25rem;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	object-position: center top;
+	border-bottom: 1px solid color-mix(in srgb, var(--brass) 35%, transparent);
+	filter: saturate(0.85);
 }
 
 .newsGrid {
@@ -277,54 +349,51 @@
 	line-height: 1.55;
 }
 
-.close {
-	text-align: center;
-	max-width: 36rem;
-	margin-inline: auto;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 1rem;
-}
-
-.closeLead {
-	margin: 0;
-	color: var(--app-text-muted);
-	max-width: 34ch;
-	line-height: 1.5;
+.faqAnswer :global(.mantine-Text-root) {
+	margin-bottom: 0;
+	color: inherit;
 }
 
 @keyframes heroReveal {
 	from {
 		opacity: 0;
-		filter: blur(6px);
 	}
 	to {
-		opacity: 0.55;
-		filter: blur(0);
+		opacity: 1;
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.heroScene img {
+	.heroShot {
 		animation: none;
 	}
 }
 
+@media (max-width: 48em) {
+	.heroShot {
+		top: auto;
+		bottom: 4%;
+		right: -30%;
+		width: 150vw;
+		transform: none;
+		opacity: 0.55;
+	}
+
+	.heroShade {
+		background: linear-gradient(
+			to top,
+			#000 0%,
+			color-mix(in srgb, #000 70%, transparent) 55%,
+			#000 100%
+		);
+	}
+}
+
 @media (max-width: 62em) {
-	.showcase {
-		grid-template-columns: 1fr;
-	}
-
-	.mechanics {
-		grid-template-columns: 1fr;
-	}
-
-	.newsFeature {
-		grid-template-columns: 1fr;
-	}
-
+	.showcase,
+	.mechanics,
+	.newsFeature,
 	.newsGrid {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 	}
 }
