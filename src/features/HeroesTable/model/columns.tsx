@@ -2,7 +2,7 @@ import { Anchor, Group, Stack, Text } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { type HeroClass, HeroImage } from '@/entities/hero';
+import { displayAttack, type HeroClass, HeroImage } from '@/entities/hero';
 
 import type { heroesTableFeatures } from './table-features';
 
@@ -53,7 +53,8 @@ export const heroesColumns = columnHelper.columns([
 		header: 'Здоровье',
 		sortFn: 'basic',
 	}),
-	columnHelper.accessor('damage', {
+	columnHelper.accessor((row) => displayAttack(row.damage, row.power), {
+		id: 'damage',
 		header: 'Урон',
 		sortFn: 'basic',
 	}),

@@ -10,7 +10,7 @@ import {
 const base = (over: Partial<PreviewCtx> = {}): PreviewCtx => ({
 	lvl: 1,
 	damage: 20,
-	power: 30,
+	power: 0,
 	health: 100,
 	maxHp: 100,
 	luck: 0,
@@ -24,6 +24,15 @@ describe('abilityPreview', () => {
 		const parts = getAbilityPreview('Assassin', 1, base({ damage: 20 }));
 		expect(parts).toEqual([{ kind: 'damage', value: 23 }]);
 		expect(formatAbilityPreview(parts)).toBe('≈23 урона до брони и попадания');
+	});
+
+	test('atk preview uses max(damage, power)', () => {
+		expect(getAbilityPreview('EvilTree', 2, base({ damage: 0, power: 30 }))).toEqual([
+			{ kind: 'damage', value: 36 },
+		]);
+		expect(getAbilityPreview('Assassin', 1, base({ damage: 20, power: 30 }))).toEqual([
+			{ kind: 'damage', value: 35 },
+		]);
 	});
 
 	test('Patriarch slot 2: heal L×7 + floor(power/3)', () => {

@@ -37,10 +37,10 @@ type PreviewFn = (ctx: PreviewCtx) => PreviewPart[];
 
 const round = (n: number): number => Math.round(n);
 
-/** Урон слота: атака, если есть; иначе сила магии (чистые маги с damage 0). */
+/** Урон слота в превью: max(атака, сила магии) — только отображение. */
 const atk = (ctx: PreviewCtx, mult: number): PreviewPart => ({
 	kind: 'damage',
-	value: Math.max(0, round((ctx.damage > 0 ? ctx.damage : ctx.power) * mult)),
+	value: Math.max(0, round(Math.max(ctx.damage, ctx.power) * mult)),
 });
 
 const heal = (value: number): PreviewPart => ({

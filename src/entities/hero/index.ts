@@ -1,4 +1,5 @@
 export { fetchHeroByCode, fetchHeroes } from './api/heroesApi';
+export { displayAttack } from './lib/displayAttack';
 export {
 	getHeroCharacterUrl,
 	getHeroDefaultPortraitUrl,

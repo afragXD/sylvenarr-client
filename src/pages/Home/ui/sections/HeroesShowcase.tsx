@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import {
+	displayAttack,
 	fetchHeroes,
 	getHeroCharacterUrl,
 	getHeroPortraitUrl,
@@ -65,7 +66,9 @@ export const HeroesShowcase = () => {
 							</div>
 							<div>
 								<span className={classes.statLabel}>Атака</span>
-								<span className={classes.statValue}>{current.damage}</span>
+								<span className={classes.statValue}>
+									{displayAttack(current.damage, current.power)}
+								</span>
 							</div>
 							<div>
 								<span className={classes.statLabel}>Инициатива</span>

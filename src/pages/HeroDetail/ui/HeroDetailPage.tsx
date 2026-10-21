@@ -8,6 +8,7 @@ import {
 	$heroError,
 	$heroes,
 	$heroPending,
+	displayAttack,
 	getHeroCharacterUrl,
 	getHeroPortraitUrl,
 	heroesPageMounted,
@@ -130,7 +131,13 @@ export const HeroDetailPage = () => {
 									<div key={stat.key}>
 										<span className={classes.statLabel}>{stat.label}</span>
 										<span className={classes.statValue}>
-											{stat.key === 'size' ? (hero.size > 1 ? 'II' : 'I') : hero[stat.key]}
+											{stat.key === 'size'
+												? hero.size > 1
+													? 'II'
+													: 'I'
+												: stat.key === 'damage'
+													? displayAttack(hero.damage, hero.power)
+													: hero[stat.key]}
 										</span>
 									</div>
 								))}
