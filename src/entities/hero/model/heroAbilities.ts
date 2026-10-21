@@ -646,7 +646,7 @@ const PILOTS: Record<string, RawHeroAbilityDoc> = {
 		slots: [
 			{
 				slot: 1,
-				title: 'Напоить',
+				title: 'Homie De Flanders',
 				body: 'Магический урон водой некачественным пивом. Игнорирует охрану.',
 			},
 			{
