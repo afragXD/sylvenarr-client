@@ -1,5 +1,12 @@
 /* ——— Shared CRPG chrome (BG3-inspired) ——— */
 
+.sylvenarr-page-shell {
+	width: min(100%, var(--page-max, 88rem));
+	margin-inline: auto;
+	padding-inline: var(--page-inline, clamp(1rem, 3.5vw, 3rem));
+	box-sizing: border-box;
+}
+
 .sylvenarr-page-veil {
 	position: relative;
 	isolation: isolate;

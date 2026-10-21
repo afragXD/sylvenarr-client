@@ -51,7 +51,7 @@ export const NewsListPage = () => {
 			title="Новости"
 			eyebrow="Хроника"
 			lead="Обновления арены, девлоги и анонсы — всё, что меняет игру."
-			width="content"
+			width="wide"
 		>
 			{error ? <Text c="accent">{error}</Text> : null}
 			{feature ? (

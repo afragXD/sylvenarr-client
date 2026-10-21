@@ -10,9 +10,10 @@
 	display: flex;
 	flex-direction: column;
 	gap: clamp(1.5rem, 3vw, 2.25rem);
-	padding: clamp(1.75rem, 4vw, 3rem) clamp(1.25rem, 5vw, 4.5rem);
-	max-width: 88rem;
+	width: min(100%, var(--page-max, 88rem));
 	margin-inline: auto;
+	padding: clamp(1.75rem, 4vw, 3rem) var(--page-inline, clamp(1rem, 3.5vw, 3rem));
+	box-sizing: border-box;
 	z-index: 1;
 }
 
@@ -22,7 +23,7 @@
 	display: flex;
 	align-items: center;
 	overflow: hidden;
-	padding: clamp(6rem, 12vw, 8rem) clamp(1.25rem, 5vw, 4.5rem) clamp(3rem, 7vw, 5rem);
+	padding: clamp(6rem, 12vw, 8rem) 0 clamp(3rem, 7vw, 5rem);
 }
 
 .heroScene {
@@ -63,10 +64,18 @@
 .heroCopy {
 	position: relative;
 	z-index: 2;
-	max-width: 36rem;
+	width: min(100%, var(--page-max, 88rem));
+	margin-inline: auto;
+	padding-inline: var(--page-inline, clamp(1rem, 3.5vw, 3rem));
+	box-sizing: border-box;
+	max-width: none;
 	display: flex;
 	flex-direction: column;
 	gap: 1.15rem;
+}
+
+.heroCopy > * {
+	max-width: 36rem;
 }
 
 .heroTitle {

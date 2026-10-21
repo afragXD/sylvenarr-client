@@ -33,7 +33,7 @@ export const NewsDetailPage = () => {
 
 	if (error) {
 		return (
-			<PageFrame title="Новость" width="content">
+			<PageFrame title="Новость" width="wide">
 				<Text c="accent">{error}</Text>
 			</PageFrame>
 		);
@@ -41,7 +41,7 @@ export const NewsDetailPage = () => {
 
 	if (!item) {
 		return (
-			<PageFrame title="Новость" width="content">
+			<PageFrame title="Новость" width="wide">
 				<Text c="var(--app-text-muted)">Загрузка…</Text>
 			</PageFrame>
 		);
@@ -52,14 +52,19 @@ export const NewsDetailPage = () => {
 			title={item.title}
 			eyebrow={NEWS_CATEGORY_LABEL[item.category]}
 			lead={item.summary}
-			width="content"
+			width="wide"
 		>
-			<Stack gap="md" maw="42rem">
+			<Stack gap="md" maw="52rem">
 				<Text size="sm" c="var(--app-text-muted)">
 					{formatDate(item.publishedAt)}
 				</Text>
 				{item.coverUrl ? (
-					<ArtFade src={item.coverUrl} mask="bottom" alt="" style={{ maxHeight: 320 }} />
+					<ArtFade
+						src={item.coverUrl}
+						mask="bottom"
+						alt=""
+						style={{ maxHeight: 380, width: '100%' }}
+					/>
 				) : null}
 				<div style={{ color: 'var(--app-text-muted)', fontSize: '1.05rem', maxWidth: '70ch' }}>
 					<MarkdownBody>{item.body}</MarkdownBody>

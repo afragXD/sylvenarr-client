@@ -114,6 +114,9 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
 		'--wine': theme.other.wine,
 		'--smoke': theme.other.smoke,
 		'--smoke-deep': theme.other.smokeDeep,
+		/* Общий горизонтальный край хедера, страниц и подвала. */
+		'--page-inline': 'clamp(1rem, 3.5vw, 3rem)',
+		'--page-max': '88rem',
 	},
 	light: {
 		'--mantine-color-body': theme.other.appBg,

@@ -1,8 +1,15 @@
 .root {
 	position: relative;
-	padding: clamp(2.5rem, 6vw, 4rem) clamp(1.25rem, 5vw, 4.5rem) 2rem;
+	padding: clamp(2.5rem, 6vw, 4rem) 0 2rem;
 	background: #000;
 	color: var(--app-text);
+}
+
+.shell {
+	width: min(100%, var(--page-max, 88rem));
+	margin-inline: auto;
+	padding-inline: var(--page-inline, clamp(1rem, 3.5vw, 3rem));
+	box-sizing: border-box;
 }
 
 .rule {

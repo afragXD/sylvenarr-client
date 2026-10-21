@@ -12,6 +12,13 @@ import { SiteMenu } from '@/widgets/SiteMenu';
 
 import classes from './Header.module.css';
 
+const PRIMARY_NAV = [
+	{ to: '/heroes', label: 'Герои' },
+	{ to: '/lobby', label: 'Лобби' },
+	{ to: '/rating', label: 'Рейтинг' },
+	{ to: '/news', label: 'Новости' },
+] as const;
+
 const initialsFromName = (name: string): string => {
 	const parts = name.trim().split(/\s+/).filter(Boolean);
 	if (parts.length === 0) {
@@ -67,17 +74,13 @@ export const Header = () => {
 							<RuneGateIcon size={compact ? 36 : 52} />
 							{!compact ? <span className={classes.wordmark}>{APP_TITLE}</span> : null}
 						</Link>
-						<button
-							type="button"
-							className={classes.burger}
-							aria-label="Открыть меню"
-							aria-expanded={menuOpen}
-							onClick={() => setMenuOpen(true)}
-						>
-							<span />
-							<span />
-							<span />
-						</button>
+						<nav className={classes.nav} aria-label="Основная навигация">
+							{PRIMARY_NAV.map((item) => (
+								<Link key={item.to} to={item.to} className={classes.navLink}>
+									{item.label}
+								</Link>
+							))}
+						</nav>
 					</div>
 
 					<div className={classes.right}>
@@ -141,6 +144,17 @@ export const Header = () => {
 								</Menu.Dropdown>
 							</Menu>
 						) : null}
+						<button
+							type="button"
+							className={classes.burger}
+							aria-label="Открыть меню"
+							aria-expanded={menuOpen}
+							onClick={() => setMenuOpen(true)}
+						>
+							<span />
+							<span />
+							<span />
+						</button>
 					</div>
 				</div>
 			</div>
