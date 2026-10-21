@@ -71,7 +71,9 @@ export const Header = () => {
 								.join(' ')}
 							aria-label={APP_TITLE}
 						>
-							<RuneGateIcon size={compact ? 36 : 52} />
+							<span className={classes.mark} aria-hidden>
+								<RuneGateIcon size={compact ? 32 : 40} />
+							</span>
 							{!compact ? <span className={classes.wordmark}>{APP_TITLE}</span> : null}
 						</Link>
 						<nav className={classes.nav} aria-label="Основная навигация">

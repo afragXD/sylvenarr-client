@@ -57,7 +57,7 @@ export const PageFrame = ({
 							.filter(Boolean)
 							.join(' ')}
 					>
-						<Stack gap="sm" maw={640}>
+						<Stack gap="sm">
 							<SectionHeading title={title ?? ''} eyebrow={eyebrow} align="start" />
 							{lead ? (
 								<Text c="var(--app-text-muted)" className={classes.lead}>

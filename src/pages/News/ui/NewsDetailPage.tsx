@@ -54,7 +54,7 @@ export const NewsDetailPage = () => {
 			lead={item.summary}
 			width="wide"
 		>
-			<Stack gap="md" maw="52rem">
+			<Stack gap="md">
 				<Text size="sm" c="var(--app-text-muted)">
 					{formatDate(item.publishedAt)}
 				</Text>
@@ -66,7 +66,7 @@ export const NewsDetailPage = () => {
 						style={{ maxHeight: 380, width: '100%' }}
 					/>
 				) : null}
-				<div style={{ color: 'var(--app-text-muted)', fontSize: '1.05rem', maxWidth: '70ch' }}>
+				<div style={{ color: 'var(--app-text-muted)', fontSize: '1.05rem' }}>
 					<MarkdownBody>{item.body}</MarkdownBody>
 				</div>
 			</Stack>

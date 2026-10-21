@@ -2,6 +2,7 @@
 	display: block;
 	color: inherit;
 	text-decoration: none;
+	height: 100%;
 }
 
 .title {
@@ -19,11 +20,21 @@
 	outline-offset: 4px;
 }
 
+.copy {
+	min-width: 0;
+	width: 100%;
+}
+
 .feature {
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-	gap: clamp(1rem, 3vw, 2rem);
+	grid-template-columns: minmax(0, 1fr);
+	gap: clamp(1.1rem, 2.5vw, 2rem);
 	align-items: center;
+}
+
+.feature:has(.featureCover) {
+	/* Обложка забирает ширину; текст компактной колонкой у правого края рамки */
+	grid-template-columns: minmax(0, 1fr) minmax(18rem, 26rem);
 }
 
 .featureCover {
@@ -44,8 +55,9 @@
 
 .grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 1rem;
+	align-items: stretch;
 }
 
 .cardCover {
@@ -58,8 +70,18 @@
 	border-bottom: 1px solid color-mix(in srgb, var(--brass) 35%, transparent);
 }
 
+@media (max-width: 62em) {
+	.grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
 @media (max-width: 48em) {
-	.feature {
+	.feature:has(.featureCover) {
+		grid-template-columns: 1fr;
+	}
+
+	.grid {
 		grid-template-columns: 1fr;
 	}
 }

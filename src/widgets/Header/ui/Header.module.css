@@ -4,6 +4,7 @@
 	display: flex;
 	align-items: center;
 	padding: 0;
+	overflow: visible;
 	background: linear-gradient(to bottom, color-mix(in srgb, #000 72%, transparent), transparent);
 }
 
@@ -16,6 +17,7 @@
 	padding-inline: var(--page-inline, clamp(1rem, 3.5vw, 3rem));
 	gap: 1rem;
 	box-sizing: border-box;
+	overflow: visible;
 }
 
 .left,
@@ -28,26 +30,45 @@
 
 .left {
 	flex: 1 1 auto;
-	gap: clamp(0.85rem, 2vw, 1.75rem);
+	/* gap через margin у brand — иначе при compact (width:0) нав уезжает вправо */
+	gap: 0;
+	overflow: visible;
 }
 
 .right {
 	flex: 0 0 auto;
 }
 
+/* В потоке — название (на линии контента); mark вынесен влево. */
 .brand {
+	position: relative;
 	display: inline-flex;
 	align-items: center;
-	gap: 0.7rem;
 	color: var(--app-text);
 	text-decoration: none;
-	transform-origin: left center;
-	transition: transform 220ms ease;
 	flex-shrink: 0;
+	overflow: visible;
+}
+
+.brand:not(.brandCompact) {
+	margin-right: clamp(0.85rem, 2vw, 1.75rem);
+}
+
+.mark {
+	position: absolute;
+	right: 100%;
+	top: 50%;
+	/* Зазор до названия / края контента; иконка сидит в левом gutter */
+	margin-right: 0.5rem;
+	transform: translateY(-50%);
+	display: inline-flex;
+	line-height: 0;
+	color: inherit;
 }
 
 .brandCompact {
-	transform: scale(0.72);
+	/* Только иконка: нулевая ширина в потоке, nav остаётся на краю контента. */
+	width: 0;
 }
 
 .wordmark {
@@ -77,7 +98,9 @@
 	white-space: nowrap;
 	padding: 0.35rem 0;
 	border-bottom: 1px solid transparent;
-	transition: color 140ms ease, border-color 140ms ease;
+	transition:
+		color 140ms ease,
+		border-color 140ms ease;
 }
 
 .navLink:hover,
@@ -151,8 +174,20 @@
 	}
 }
 
+/* На узкой ширине лого не обрезаем: чуть уменьшаем вынос. */
+@media (max-width: 40em) {
+	.mark {
+		margin-right: 0.45rem;
+	}
+
+	.brand:not(.brandCompact) .mark {
+		position: static;
+		transform: none;
+		margin-right: 0.55rem;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
-	.brand,
 	.navLink {
 		transition: none;
 	}

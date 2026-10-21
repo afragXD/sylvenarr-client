@@ -54,7 +54,7 @@ export const NewsSection = () => {
 						<h3 className={classes.name} style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)' }}>
 							{feature.title}
 						</h3>
-						<p className={classes.lore}>{feature.summary}</p>
+						<p className={classes.newsFeatureSummary}>{feature.summary}</p>
 						<span className={classes.newsRead}>Читать →</span>
 					</div>
 				</Link>

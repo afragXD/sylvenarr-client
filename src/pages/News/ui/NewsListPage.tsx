@@ -61,7 +61,7 @@ export const NewsListPage = () => {
 							{feature.coverUrl ? (
 								<img src={feature.coverUrl} alt="" className={classes.featureCover} />
 							) : null}
-							<Stack gap="sm">
+							<Stack gap="sm" className={classes.copy}>
 								<Text
 									size="sm"
 									c="var(--copper)"
@@ -81,7 +81,7 @@ export const NewsListPage = () => {
 								>
 									{feature.title}
 								</Text>
-								<Text c="var(--app-text-muted)" maw="48ch" style={{ lineHeight: 1.55 }}>
+								<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
 									{feature.summary}
 								</Text>
 								<Text className={classes.read}>Читать →</Text>
