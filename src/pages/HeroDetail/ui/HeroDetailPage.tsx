@@ -41,6 +41,7 @@ type StatSource = {
 	luck: number;
 	morale: number;
 	mana: number;
+	maxMana: number;
 	power: number;
 	accuracy: number;
 	gold: number;
@@ -171,6 +172,7 @@ export const HeroDetailPage = () => {
 											['luck', 'Удача'],
 											['morale', 'Мораль'],
 											['mana', 'Мана'],
+											['maxMana', 'Макс. мана'],
 											['power', 'Сила магии'],
 											['accuracy', 'Точность'],
 											['gold', 'Золото'],

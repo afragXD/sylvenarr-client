@@ -269,7 +269,9 @@ export const BattlePanel = ({
 					{active && battle.outcome === 'ongoing' && (
 						<Text size="sm" c="var(--app-text-muted)">
 							Ходит: {active.displayName}
-							{typeof active.mana === 'number' && active.mana > 0 ? ` · МР ${active.mana}` : ''}
+							{typeof active.mana === 'number' && (active.mana > 0 || active.maxMana > 0)
+								? ` · МР ${active.mana}/${active.maxMana || active.mana}`
+								: ''}
 						</Text>
 					)}
 					{battle.outcome === 'ongoing' && !drawOfferBy && (
@@ -687,8 +689,12 @@ const RowColumn = ({
 									{typeof unit.armor === 'number' ? (
 										<CombatStat kind="armor" value={unit.armor} muted />
 									) : null}
-									{unit.alive && unit.mana > 0 ? (
-										<CombatStat kind="mana" value={unit.mana} muted />
+									{unit.alive && (unit.mana > 0 || unit.maxMana > 0) ? (
+										<CombatStat
+											kind="mana"
+											value={`${unit.mana}/${unit.maxMana || unit.mana}`}
+											muted
+										/>
 									) : null}
 									{!unit.alive ? <CombatStat kind="fallen" /> : null}
 								</CombatStatRow>

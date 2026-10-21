@@ -37,9 +37,10 @@ type PreviewFn = (ctx: PreviewCtx) => PreviewPart[];
 
 const round = (n: number): number => Math.round(n);
 
+/** Урон слота: атака, если есть; иначе сила магии (чистые маги с damage 0). */
 const atk = (ctx: PreviewCtx, mult: number): PreviewPart => ({
 	kind: 'damage',
-	value: Math.max(0, round(ctx.damage * mult)),
+	value: Math.max(0, round((ctx.damage > 0 ? ctx.damage : ctx.power) * mult)),
 });
 
 const heal = (value: number): PreviewPart => ({
@@ -143,6 +144,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		],
 		2: (ctx) => [{ kind: 'accuracy', value: 20 + ctx.lvl }],
 		4: (ctx) => [heal(5 + ctx.lvl)],
+		5: (ctx) => [atk(ctx, 1)],
 	},
 	Patriarch: {
 		1: (ctx) => [atk(ctx, 1)],
@@ -184,9 +186,12 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		1: (ctx) => [atk(ctx, 1)],
 	},
 	EvilTree: {
-		1: (ctx) => [atk(ctx, 1)],
+		2: (ctx) => [atk(ctx, 1.2)],
 		3: (ctx) => [
 			{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 4), label: 'р. запрет лечения' },
+		],
+		4: (ctx) => [
+			{ kind: 'duration', value: 3 + Math.floor(ctx.lvl / 4), label: 'р. урока' },
 		],
 		5: (ctx) => [{ kind: 'text', value: `+${2 + ctx.lvl} уровней цели` }],
 	},

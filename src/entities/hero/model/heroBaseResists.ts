@@ -24,7 +24,7 @@ const entry = (
 });
 
 const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
-	Pyro: [entry('FIRE', 'Огонь', { ward: 1 })],
+	Pyro: [entry('FIRE', 'Огонь', { value: 25, ward: 1 })],
 	Oracle: [entry('FIRE', 'Огонь', { ward: 1 })],
 	Witch: [
 		entry('FINALSTRIKE', 'Смертельный удар', { value: 25, ward: 1 }),
@@ -39,7 +39,7 @@ const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
 	],
 	Knight: [entry('FINALSTRIKE', 'Смертельный удар', { value: 25 })],
 	Archlich: [
-		entry('FIRE', 'Огонь', { value: -20 }),
+		entry('FIRE', 'Огонь', { value: -20, ward: 1 }),
 		entry('DEATH', 'Смерть', { value: 75, ward: 1 }),
 		entry('HOLY', 'Сакральный', { value: -20 }),
 	],

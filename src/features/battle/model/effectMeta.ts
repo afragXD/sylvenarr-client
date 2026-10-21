@@ -72,7 +72,8 @@ export type EffectId =
 	| 'INTERDICT'
 	| 'MAGIC_SHACKLES'
 	| 'ENSLAVED'
-	| 'ROW_FORTIFY';
+	| 'ROW_FORTIFY'
+	| 'ASHILLNESS';
 
 export type EffectKind = 'buff' | 'debuff';
 
@@ -137,6 +138,7 @@ const DEBUFF_ORDER: EffectId[] = [
 	'INTERDICT',
 	'MAGIC_SHACKLES',
 	'ENSLAVED',
+	'ASHILLNESS',
 ];
 
 const CATALOG: Record<EffectId, EffectMeta> = {
@@ -481,6 +483,15 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		exampleAtL: exampleTypical('+6 брони · 1 р.'),
 		Icon: Shield,
 		kind: 'buff',
+	},
+	ASHILLNESS: {
+		id: 'ASHILLNESS',
+		label: 'Пепельная язва',
+		description: 'Болезнь нежити: ослабляет магическую мощь и инициативу.',
+		mechanics: '−25% мощи и инициативы при наложении · (1 + ⌊L/5⌋) р.',
+		exampleAtL: exampleAtL('1 р. при L=5'),
+		Icon: Biohazard,
+		kind: 'debuff',
 	},
 };
 

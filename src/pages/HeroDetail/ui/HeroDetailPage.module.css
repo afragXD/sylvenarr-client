@@ -85,6 +85,14 @@
 @media (max-width: 900px) {
 	.layout {
 		grid-template-columns: 1fr;
+		min-width: 0;
+		max-width: 100%;
+	}
+
+	.copy,
+	.artWrap {
+		min-width: 0;
+		max-width: 100%;
 	}
 
 	.artWrap {

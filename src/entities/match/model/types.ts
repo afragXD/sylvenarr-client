@@ -66,6 +66,7 @@ export type BattleUnit = {
 	isSummon: boolean;
 	horseIsDead: boolean;
 	mana: number;
+	maxMana: number;
 	damage: number;
 	armor: number;
 	initiative: number;

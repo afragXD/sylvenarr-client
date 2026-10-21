@@ -74,9 +74,9 @@ export const HeroAbilitiesSection = ({ code, isPlayable, hero }: HeroAbilitiesSe
 				});
 				return (
 					<div key={slot.slot} className={styles.entry}>
-						<Group gap={8} wrap="nowrap">
+						<Group gap={8} wrap="wrap" style={{ minWidth: 0 }}>
 							<AbilityTags tags={slot.tags} />
-							<Text size="sm" fw={600}>
+							<Text size="sm" fw={600} style={{ minWidth: 0 }}>
 								[{slot.slot}] {slot.title}
 							</Text>
 						</Group>

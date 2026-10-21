@@ -11,6 +11,7 @@ export type HeroClass = {
 	luck: number;
 	morale: number;
 	mana: number;
+	maxMana: number;
 	power: number;
 	gold: number;
 	accuracy: number;

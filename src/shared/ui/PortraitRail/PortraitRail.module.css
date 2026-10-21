@@ -84,12 +84,15 @@
 	.root {
 		flex-direction: row;
 		width: 100%;
+		max-width: 100%;
+		min-width: 0;
 	}
 
 	.rail {
+		flex: 1 1 auto;
 		flex-direction: row;
 		max-height: none;
-		max-width: 100%;
+		min-width: 0;
 		overflow-x: auto;
 		overflow-y: hidden;
 	}
@@ -100,6 +103,7 @@
 	}
 
 	.nav {
+		flex-shrink: 0;
 		transform: rotate(-90deg);
 	}
 }

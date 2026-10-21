@@ -277,7 +277,11 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				mechanics: 'Себе +10 ОЗ (мгновенное лечение).',
 				tags: ['heal'],
 			},
-			5: { mechanics: 'Базовые действия.', tags: ['buff'] },
+			5: {
+				mechanics:
+					'Дальний бой; игнор (20+L)% брони; +15% урона за союзника на кладбище.',
+				tags: ['attack'],
+			},
 		},
 	},
 	Patriarch: {
@@ -441,9 +445,8 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		passiveMechanics: 'В начале хода: −10…80 золота.',
 		slots: {
 			1: {
-				mechanics:
-					'«Радость»: +10+2L удачи если удача < 5, иначе +5 · 2 р.',
-				tags: ['buff'],
+				mechanics: 'Магия воды по врагу (сила магии); охрана не блокирует.',
+				tags: ['attack'],
 			},
 			2: {
 				mechanics: '70+2L%: «Головокружение» · 2 р.',
@@ -467,25 +470,26 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['buff'],
 			},
 			2: {
-				mechanics: 'Урон врагу; лечение ряду = урон / N союзников ряда.',
-				tags: ['attack', 'heal', 'aoe'],
+				mechanics:
+					'Магия земли, игнор 40% брони; хил ряду + бонус слабейшему; «Замедление».',
+				tags: ['attack', 'heal', 'aoe', 'debuff'],
 			},
 			3: {
 				mechanics: '«Запрет лечения» · 2+⌊L/4⌋ р. (лечение → 0).',
 				tags: ['debuff'],
 			},
-		4: {
-			mechanics:
-				'3 МР: случайно «Сила» / «Радость» / «Ускорение» · 2 р.',
-			tags: ['buff'],
-		},
-		5: {
-			mechanics: '4 МР: levelup союзника на +2+L уровней.',
-			tags: ['buff'],
+			4: {
+				mechanics:
+					'3 МР: урок на 3+⌊L/4⌋ р. — сосредоточение / сила / крит / броня.',
+				tags: ['buff'],
+			},
+			5: {
+				mechanics: '4 МР: levelup союзника на +2+L уровней.',
+				tags: ['buff'],
+			},
 		},
 	},
-},
-Mermaid: {
+	Mermaid: {
 		slots: {
 			1: {
 				mechanics:
