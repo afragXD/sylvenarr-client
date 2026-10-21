@@ -9,10 +9,10 @@ export type MechanicStep = {
 export const MECHANIC_STEPS: readonly MechanicStep[] = [
 	{
 		id: 'draft',
-		title: 'Драфт',
+		title: 'Набор отряда',
 		body: 'Соперники по очереди забирают классы, пока не заполнят квоту отряда.',
 		scene: '/scenes/draft.webp',
-		sceneAlt: 'Драфт: соперники по очереди выбирают героев',
+		sceneAlt: 'Набор отряда: соперники по очереди выбирают героев',
 	},
 	{
 		id: 'rows',

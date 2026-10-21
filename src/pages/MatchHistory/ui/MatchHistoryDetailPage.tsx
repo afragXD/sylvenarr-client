@@ -88,7 +88,7 @@ export const MatchHistoryDetailPage = () => {
 							</Text>
 							{!detail.hasSnapshot && (
 								<Text size="sm" c="var(--app-text-muted)">
-									Подробности боя недоступны (матч до обновления). Показаны составы из draft.
+									Подробности боя недоступны (матч до обновления). Показаны составы из набора.
 								</Text>
 							)}
 						</Stack>

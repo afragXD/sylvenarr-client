@@ -78,19 +78,14 @@ export const HeroDetailPage = () => {
 
 	const statusLabel = hero
 		? hero.isPlayable
-			? 'Доступен в драфте'
+			? 'Доступен в наборе'
 			: isTransformForm(hero.code)
 				? 'Боевая форма'
 				: 'Только призыв'
 		: '';
 
 	return (
-		<PageFrame
-			width="wide"
-			eyebrow="Класс арены"
-			title={hero?.displayName ?? 'Герой'}
-			lead={hero?.roleSummary || 'Карточка класса: роль, лор и характеристики.'}
-		>
+		<PageFrame width="wide">
 			<Anchor
 				component={Link}
 				to="/heroes"
@@ -100,6 +95,7 @@ export const HeroDetailPage = () => {
 				fw={500}
 				w="fit-content"
 				display="inline-block"
+				className={classes.back}
 			>
 				← К реестру
 			</Anchor>

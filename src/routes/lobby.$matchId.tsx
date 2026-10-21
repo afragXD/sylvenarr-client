@@ -8,7 +8,7 @@ export const Route = createFileRoute('/lobby/$matchId')({
 	head: ({ params }) => ({
 		meta: seo({
 			title: 'Матч',
-			description: 'Draft и лобби матча Sylvenarr',
+			description: 'Набор отряда и лобби матча Sylvenarr',
 			url: absoluteUrl(`/lobby/${params.matchId}`),
 			noIndex: true,
 		}),

@@ -349,7 +349,7 @@ const PILOTS: Record<string, RawHeroAbilityDoc> = {
 	},
 	Werewolf: {
 		summonNote:
-			'Боевая форма Мародёра: появляется только через превращение в бою, в драфте не выбирается.',
+			'Боевая форма Мародёра: появляется только через превращение в бою, в наборе не выбирается.',
 		slots: [
 			{
 				slot: 1,
@@ -802,7 +802,7 @@ export function getHeroAbilities(code: string, isPlayable: boolean): HeroAbility
 			return {
 				slots: [],
 				summonNote:
-					'Боевая форма: появляется только через превращение в бою, в драфте не выбирается.',
+					'Боевая форма: появляется только через превращение в бою, в наборе не выбирается.',
 			};
 		}
 		return {

@@ -1,9 +1,9 @@
 export const APP_TITLE = 'Sylvenarr' as const;
 
 export const APP_DESCRIPTION =
-	'Sylvenarr: Origins — пошаговый PvP-арена. Соберите отряд героев, выйдите в драфт и сразитесь с соперником.' as const;
+	'Sylvenarr: Origins — пошаговый PvP-арена. Соберите отряд героев, наберите состав и сразитесь с соперником.' as const;
 
-export const APP_KEYWORDS = 'sylvenarr, origins, пошаговый pvp, герои, арена, драфт' as const;
+export const APP_KEYWORDS = 'sylvenarr, origins, пошаговый pvp, герои, арена, набор отряда' as const;
 
 /** Автор веб-версии. */
 export const AUTHOR_NAME = 'Wormgod' as const;

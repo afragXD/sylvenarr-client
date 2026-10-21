@@ -56,7 +56,7 @@ export const HeroesShowcase = () => {
 						<p className={classes.lore}>
 							{current.roleSummary ||
 								current.description ||
-								'Откройте карточку класса перед драфтом.'}
+								'Откройте карточку класса перед набором отряда.'}
 						</p>
 						<OrnateFrame variant="panel" className={classes.stats}>
 							<div>
