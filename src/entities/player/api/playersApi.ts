@@ -60,6 +60,37 @@ export function getOAuthStartUrl(providerId: string): string {
 }
 
 /**
+ * Вход по логину/почте и паролю.
+ */
+export async function loginWithPassword(input: {
+	readonly loginOrEmail: string;
+	readonly password: string;
+}): Promise<{ playerId: string; displayName: string }> {
+	return apiFetchJson(
+		'/auth/login',
+		{
+			method: 'POST',
+			body: JSON.stringify({
+				loginOrEmail: input.loginOrEmail,
+				password: input.password,
+			}),
+		},
+		(data) => {
+			if (
+				!isRecord(data) ||
+				data.ok !== true ||
+				typeof data.playerId !== 'string' ||
+				typeof data.displayName !== 'string'
+			) {
+				throw new Error('Некорректный ответ входа');
+			}
+			return { playerId: data.playerId, displayName: data.displayName };
+		},
+		'Неверный логин или пароль',
+	);
+}
+
+/**
  * Выход: очистка cookie сессии на API.
  */
 export async function logoutPlayer(): Promise<void> {
