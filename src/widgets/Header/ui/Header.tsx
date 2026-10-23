@@ -1,10 +1,11 @@
 import { Avatar, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core';
 import { useWindowScroll } from '@mantine/hooks';
 import { Link } from '@tanstack/react-router';
+import { useUnit } from 'effector-react';
 import { LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { fetchCurrentPlayer, logoutPlayer, type Player } from '@/entities/player';
+import { $player, logoutFx, sessionRequested } from '@/entities/player';
 import { APP_TITLE } from '@/shared/constants';
 import { resolveStaticUrl } from '@/shared/lib/staticUrl';
 import { RuneGateIcon } from '@/shared/ui/BrandMark';
@@ -32,25 +33,20 @@ const initialsFromName = (name: string): string => {
 };
 
 export const Header = () => {
-	const [player, setPlayer] = useState<Player | null>(null);
+	const player = useUnit($player);
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [scroll] = useWindowScroll();
 	const compact = scroll.y > 80;
 
 	useEffect(() => {
-		void fetchCurrentPlayer()
-			.then(setPlayer)
-			.catch(() => {
-				setPlayer(null);
-			});
+		sessionRequested();
 	}, []);
 
 	const handleLogout = async () => {
 		setIsLoggingOut(true);
 		try {
-			await logoutPlayer();
-			setPlayer(null);
+			await logoutFx();
 		} catch {
 			/* ignore */
 		} finally {
@@ -59,6 +55,7 @@ export const Header = () => {
 	};
 
 	const playTo = player ? '/lobby' : '/sign-in';
+	const avatarSrc = resolveStaticUrl(player?.avatarUrl) ?? player?.avatarUrl ?? undefined;
 
 	return (
 		<>
@@ -91,28 +88,11 @@ export const Header = () => {
 							Играть
 						</OrnateLink>
 						{player ? (
-							<Menu
-								shadow="md"
-								width={240}
-								position="bottom-end"
-								radius={0}
-								onChange={(opened) => {
-									if (!opened) {
-										return;
-									}
-									void fetchCurrentPlayer()
-										.then(setPlayer)
-										.catch(() => {
-											setPlayer(null);
-										});
-								}}
-							>
+							<Menu shadow="md" width={240} position="bottom-end" radius={0}>
 								<Menu.Target>
 									<UnstyledButton aria-label="Меню аккаунта" className={classes.avatar}>
 										<Avatar
-											src={
-												resolveStaticUrl(player.avatarUrl) ?? player.avatarUrl ?? undefined
-											}
+											src={avatarSrc}
 											alt={player.displayName}
 											radius="xl"
 											size={36}
@@ -126,9 +106,7 @@ export const Header = () => {
 									<Menu.Item component={Link} to="/profile">
 										<Group gap="sm" wrap="nowrap" align="flex-start">
 											<Avatar
-												src={
-													resolveStaticUrl(player.avatarUrl) ?? player.avatarUrl ?? undefined
-												}
+												src={avatarSrc}
 												alt=""
 												radius="xl"
 												size={32}

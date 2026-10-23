@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
 	fetchCurrentPlayer,
 	type Player,
+	playerUpdated,
 	updateMyProfile,
 	uploadMyAvatar,
 } from '@/entities/player';
@@ -50,6 +51,7 @@ export const ProfilePage = () => {
 			const updated = await updateMyProfile(displayName.trim());
 			setPlayer(updated);
 			setDisplayName(updated.displayName);
+			playerUpdated(updated);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Не удалось сохранить');
 		} finally {
@@ -66,6 +68,7 @@ export const ProfilePage = () => {
 		try {
 			const updated = await uploadMyAvatar(file);
 			setPlayer(updated);
+			playerUpdated(updated);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Не удалось загрузить аватар');
 		} finally {

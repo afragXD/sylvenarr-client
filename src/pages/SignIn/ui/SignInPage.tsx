@@ -8,6 +8,7 @@ import {
 	fetchAuthProviders,
 	fetchCurrentPlayer,
 	loginWithPassword,
+	playerUpdated,
 } from '@/entities/player';
 import { ApiError } from '@/shared/api/http';
 import { OAuthProviderButton } from '@/shared/ui/oauth';
@@ -54,7 +55,8 @@ export const SignInPage = () => {
 			setServerError(null);
 			try {
 				await loginWithPassword(value);
-				await fetchCurrentPlayer();
+				const me = await fetchCurrentPlayer();
+				playerUpdated(me);
 				await navigate({ to: '/lobby' });
 			} catch (err) {
 				const message =
@@ -82,8 +84,9 @@ export const SignInPage = () => {
 				}
 			});
 		void fetchCurrentPlayer()
-			.then(() => {
+			.then((me) => {
 				if (mounted) {
+					playerUpdated(me);
 					setAlreadySignedIn(true);
 				}
 			})
