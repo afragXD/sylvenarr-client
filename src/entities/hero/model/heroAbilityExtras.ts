@@ -192,6 +192,8 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		},
 	},
 	Inquisitor: {
+		passiveMechanics:
+			'При защите: «Контрудар» · 2 р. При усилении отряда: лечение 10–(15+L). Каждые 5 р.: +20 брони, +10 силы.',
 		slots: {
 			1: { mechanics: 'Удар булавой ×1.', tags: ['attack'] },
 			2: {
@@ -484,7 +486,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['buff'],
 			},
 			5: {
-				mechanics: '4 МР: levelup союзника на +2+L уровней.',
+				mechanics: '4 МР: levelup союзника на +3 уровней.',
 				tags: ['buff'],
 			},
 		},
