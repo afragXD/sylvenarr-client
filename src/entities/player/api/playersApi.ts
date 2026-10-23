@@ -33,6 +33,32 @@ export async function fetchCurrentPlayer(): Promise<Player> {
 }
 
 /**
+ * Смена displayName.
+ */
+export async function updateMyProfile(displayName: string): Promise<Player> {
+	return apiFetchJson(
+		'/players/me',
+		{ method: 'PATCH', body: JSON.stringify({ displayName }) },
+		parsePlayer,
+		'Не удалось сохранить профиль',
+	);
+}
+
+/**
+ * Загрузка аватара на volume (`/static/images/avatars/…`).
+ */
+export async function uploadMyAvatar(file: File): Promise<Player> {
+	const form = new FormData();
+	form.append('file', file);
+	return apiFetchJson(
+		'/players/me/avatar',
+		{ method: 'POST', body: form },
+		parsePlayer,
+		'Не удалось загрузить аватар',
+	);
+}
+
+/**
  * Список включённых OAuth-провайдеров.
  */
 export async function fetchAuthProviders(): Promise<AuthProvider[]> {

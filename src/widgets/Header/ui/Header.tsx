@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { fetchCurrentPlayer, logoutPlayer, type Player } from '@/entities/player';
 import { APP_TITLE } from '@/shared/constants';
+import { resolveStaticUrl } from '@/shared/lib/staticUrl';
 import { RuneGateIcon } from '@/shared/ui/BrandMark';
 import { OrnateLink } from '@/shared/ui/OrnateButton';
 import { SiteMenu } from '@/widgets/SiteMenu';
@@ -90,11 +91,28 @@ export const Header = () => {
 							Играть
 						</OrnateLink>
 						{player ? (
-							<Menu shadow="md" width={240} position="bottom-end" radius={0}>
+							<Menu
+								shadow="md"
+								width={240}
+								position="bottom-end"
+								radius={0}
+								onChange={(opened) => {
+									if (!opened) {
+										return;
+									}
+									void fetchCurrentPlayer()
+										.then(setPlayer)
+										.catch(() => {
+											setPlayer(null);
+										});
+								}}
+							>
 								<Menu.Target>
 									<UnstyledButton aria-label="Меню аккаунта" className={classes.avatar}>
 										<Avatar
-											src={player.avatarUrl}
+											src={
+												resolveStaticUrl(player.avatarUrl) ?? player.avatarUrl ?? undefined
+											}
 											alt={player.displayName}
 											radius="xl"
 											size={36}
@@ -105,9 +123,17 @@ export const Header = () => {
 									</UnstyledButton>
 								</Menu.Target>
 								<Menu.Dropdown className={classes.menu}>
-									<Menu.Label>
+									<Menu.Item component={Link} to="/profile">
 										<Group gap="sm" wrap="nowrap" align="flex-start">
-											<Avatar src={player.avatarUrl} alt="" radius="xl" size={32} color="brand">
+											<Avatar
+												src={
+													resolveStaticUrl(player.avatarUrl) ?? player.avatarUrl ?? undefined
+												}
+												alt=""
+												radius="xl"
+												size={32}
+												color="brand"
+											>
 												{initialsFromName(player.displayName)}
 											</Avatar>
 											<Stack gap={2} style={{ minWidth: 0 }}>
@@ -121,8 +147,14 @@ export const Header = () => {
 												) : null}
 											</Stack>
 										</Group>
-									</Menu.Label>
+									</Menu.Item>
 									<Menu.Divider />
+									<Menu.Item component={Link} to="/profile">
+										Профиль
+									</Menu.Item>
+									<Menu.Item component={Link} to="/matches">
+										Мои матчи
+									</Menu.Item>
 									<Menu.Item component={Link} to="/lobby">
 										Лобби
 									</Menu.Item>

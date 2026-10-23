@@ -15,6 +15,7 @@ import { Route as LobbyRouteImport } from './routes/lobby'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RatingRouteImport } from './routes/rating'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SignInRouteImport } from './routes/sign-in'
@@ -62,6 +63,11 @@ const NewsRoute = NewsRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RatingRoute = RatingRouteImport.update({
@@ -162,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/matches': typeof MatchesRouteWithChildren
   '/news': typeof NewsRouteWithChildren
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sign-in': typeof SignInRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sign-in': typeof SignInRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/matches': typeof MatchesRouteWithChildren
   '/news': typeof NewsRouteWithChildren
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sign-in': typeof SignInRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/news'
     | '/privacy'
+    | '/profile'
     | '/rating'
     | '/robots.txt'
     | '/sign-in'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/privacy'
+    | '/profile'
     | '/rating'
     | '/robots.txt'
     | '/sign-in'
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/news'
     | '/privacy'
+    | '/profile'
     | '/rating'
     | '/robots.txt'
     | '/sign-in'
@@ -312,6 +324,7 @@ export interface RootRouteChildren {
   MatchesRoute: typeof MatchesRouteWithChildren
   NewsRoute: typeof NewsRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
+  ProfileRoute: typeof ProfileRoute
   RatingRoute: typeof RatingRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SignInRoute: typeof SignInRoute
@@ -362,6 +375,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rating': {
@@ -568,6 +588,7 @@ const rootRouteChildren: RootRouteChildren = {
   MatchesRoute: MatchesRouteWithChildren,
   NewsRoute: NewsRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
+  ProfileRoute: ProfileRoute,
   RatingRoute: RatingRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SignInRoute: SignInRoute,
@@ -578,12 +599,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
