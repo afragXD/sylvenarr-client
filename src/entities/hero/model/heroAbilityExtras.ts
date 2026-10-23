@@ -486,7 +486,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['buff'],
 			},
 			5: {
-				mechanics: '4 МР: levelup союзника на +3 уровней.',
+				mechanics: '4 МР: союзник получает +3 уровня.',
 				tags: ['buff'],
 			},
 		},

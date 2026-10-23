@@ -193,7 +193,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		4: (ctx) => [
 			{ kind: 'duration', value: 3 + Math.floor(ctx.lvl / 4), label: 'р. урока' },
 		],
-		5: (ctx) => [{ kind: 'text', value: `+${2 + ctx.lvl} уровней цели` }],
+		5: () => [{ kind: 'text', value: '+3 уровня цели' }],
 	},
 	Mermaid: {
 		1: mermaidBreeze,

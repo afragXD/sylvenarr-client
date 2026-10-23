@@ -700,7 +700,7 @@ const PILOTS: Record<string, RawHeroAbilityDoc> = {
 			{
 				slot: 5,
 				title: 'Взращивание',
-				body: '4 МР: союзник мгновенно получает +3 уровня.',
+				body: '4 МР: союзник получает +3 уровня.',
 			},
 		],
 	},
