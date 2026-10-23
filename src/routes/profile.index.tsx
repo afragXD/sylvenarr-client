@@ -1,18 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-
-import { ProfileDossierPage } from '@/pages/Profile';
-import { absoluteUrl } from '@/shared/constants';
-import { seo } from '@/shared/lib/seo/seo';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/profile/')({
-	head: () => ({
-		meta: seo({
-			title: 'Досье',
-			description: 'Герои, которых вы берёте чаще всего',
-			url: absoluteUrl('/profile'),
-			noIndex: true,
-		}),
-		links: [{ rel: 'canonical', href: absoluteUrl('/profile') }],
-	}),
-	component: ProfileDossierPage,
+	beforeLoad: () => {
+		throw redirect({ to: '/profile/settings' });
+	},
 });

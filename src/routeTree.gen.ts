@@ -33,6 +33,7 @@ import { Route as MatchesMatchIdRouteImport } from './routes/matches.$matchId'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as ProfileDossierRouteImport } from './routes/profile.dossier'
 import { Route as ProfileSettingsRouteImport } from './routes/profile.settings'
 import { Route as AdminNewsIndexRouteImport } from './routes/admin.news.index'
 import { Route as AdminNewsIdRouteImport } from './routes/admin.news.$id'
@@ -158,6 +159,11 @@ const ProfileIndexRoute = ProfileIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProfileRoute,
 } as any)
+const ProfileDossierRoute = ProfileDossierRouteImport.update({
+  id: '/dossier',
+  path: '/dossier',
+  getParentRoute: () => ProfileRoute,
+} as any)
 const ProfileSettingsRoute = ProfileSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/profile/dossier': typeof ProfileDossierRoute
   '/profile/settings': typeof ProfileSettingsRoute
   '/heroes/': typeof HeroesIndexRoute
   '/lobby/': typeof LobbyIndexRoute
@@ -223,6 +230,7 @@ export interface FileRoutesByTo {
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/profile/dossier': typeof ProfileDossierRoute
   '/profile/settings': typeof ProfileSettingsRoute
   '/heroes': typeof HeroesIndexRoute
   '/lobby': typeof LobbyIndexRoute
@@ -254,6 +262,7 @@ export interface FileRoutesById {
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/profile/dossier': typeof ProfileDossierRoute
   '/profile/settings': typeof ProfileSettingsRoute
   '/heroes/': typeof HeroesIndexRoute
   '/lobby/': typeof LobbyIndexRoute
@@ -286,6 +295,7 @@ export interface FileRouteTypes {
     | '/lobby/$matchId'
     | '/matches/$matchId'
     | '/news/$slug'
+    | '/profile/dossier'
     | '/profile/settings'
     | '/heroes/'
     | '/lobby/'
@@ -310,6 +320,7 @@ export interface FileRouteTypes {
     | '/lobby/$matchId'
     | '/matches/$matchId'
     | '/news/$slug'
+    | '/profile/dossier'
     | '/profile/settings'
     | '/heroes'
     | '/lobby'
@@ -340,6 +351,7 @@ export interface FileRouteTypes {
     | '/lobby/$matchId'
     | '/matches/$matchId'
     | '/news/$slug'
+    | '/profile/dossier'
     | '/profile/settings'
     | '/heroes/'
     | '/lobby/'
@@ -537,6 +549,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof ProfileRoute
     }
+    '/profile/dossier': {
+      id: '/profile/dossier'
+      path: '/dossier'
+      fullPath: '/profile/dossier'
+      preLoaderRoute: typeof ProfileDossierRouteImport
+      parentRoute: typeof ProfileRoute
+    }
     '/profile/settings': {
       id: '/profile/settings'
       path: '/settings'
@@ -623,11 +642,13 @@ const NewsRouteChildren: NewsRouteChildren = {
 const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
 
 interface ProfileRouteChildren {
+  ProfileDossierRoute: typeof ProfileDossierRoute
   ProfileSettingsRoute: typeof ProfileSettingsRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
 const ProfileRouteChildren: ProfileRouteChildren = {
+  ProfileDossierRoute: ProfileDossierRoute,
   ProfileSettingsRoute: ProfileSettingsRoute,
   ProfileIndexRoute: ProfileIndexRoute,
 }

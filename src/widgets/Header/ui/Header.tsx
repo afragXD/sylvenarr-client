@@ -127,7 +127,7 @@ export const Header = () => {
 										</Group>
 									</Menu.Item>
 									<Menu.Divider />
-									<Menu.Item component={Link} to="/profile">
+									<Menu.Item component={Link} to="/profile/dossier">
 										Досье
 									</Menu.Item>
 									<Menu.Item component={Link} to="/profile/settings">

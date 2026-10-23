@@ -21,8 +21,9 @@ const SECTION_META: Record<string, { title: string; lead: string }> = {
  */
 export const ProfileShell = () => {
 	const pathname = useRouterState({ select: (state) => state.location.pathname });
-	const isSettings = pathname.startsWith('/profile/settings');
-	const meta = isSettings ? SECTION_META.settings : SECTION_META.dossier;
+	const meta = pathname.startsWith('/profile/dossier')
+		? SECTION_META.dossier
+		: SECTION_META.settings;
 
 	return (
 		<PageFrame title={meta.title} eyebrow="Аккаунт" width="wide" lead={meta.lead}>
