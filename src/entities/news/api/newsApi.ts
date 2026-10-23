@@ -109,6 +109,25 @@ export type NewsWritePayload = {
 	publishedAt?: string | null;
 };
 
+/**
+ * Загружает картинку в volume (`/static/images/scenes/…`). Возвращает публичный путь для coverUrl / markdown.
+ */
+export async function uploadNewsImage(file: File): Promise<{ url: string; fileName: string }> {
+	const form = new FormData();
+	form.append('file', file);
+	return apiFetchJson(
+		'/admin/news/upload',
+		{ method: 'POST', body: form },
+		(data) => {
+			if (!isRecord(data) || typeof data.url !== 'string' || typeof data.fileName !== 'string') {
+				throw new Error('Некорректный ответ загрузки');
+			}
+			return { url: data.url, fileName: data.fileName };
+		},
+		'Не удалось загрузить изображение',
+	);
+}
+
 export async function createNews(payload: NewsWritePayload): Promise<NewsItem> {
 	return apiFetchJson(
 		'/admin/news',

@@ -7,6 +7,7 @@ export {
 	fetchNewsList,
 	type NewsWritePayload,
 	updateNews,
+	uploadNewsImage,
 } from './api/newsApi';
 export {
 	NEWS_CATEGORY_LABEL,

@@ -1,6 +1,6 @@
 import { NativeSelect, Stack, Tabs, Text, Textarea, TextInput } from '@mantine/core';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 import {
 	createNews,
@@ -8,7 +8,9 @@ import {
 	NEWS_CATEGORY_LABEL,
 	type NewsCategory,
 	updateNews,
+	uploadNewsImage,
 } from '@/entities/news';
+import { resolveStaticUrl } from '@/shared/lib/staticUrl';
 import { slugify } from '@/shared/lib/slugify';
 import { MarkdownBody } from '@/shared/ui/MarkdownBody';
 import { OrnateButton } from '@/shared/ui/OrnateButton';
@@ -43,6 +45,10 @@ export const AdminNewsFormPage = ({ mode }: { mode: 'new' | 'edit' }) => {
 	const [slugTouched, setSlugTouched] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
+	const [uploadingCover, setUploadingCover] = useState(false);
+	const [uploadingBody, setUploadingBody] = useState(false);
+	const coverInputRef = useRef<HTMLInputElement>(null);
+	const bodyInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (mode !== 'edit' || !params.id) {
@@ -74,6 +80,47 @@ export const AdminNewsFormPage = ({ mode }: { mode: 'new' | 'edit' }) => {
 			}
 			return next;
 		});
+	};
+
+	const onCoverFile = async (file: File | undefined) => {
+		if (!file) {
+			return;
+		}
+		setUploadingCover(true);
+		setError(null);
+		try {
+			const { url } = await uploadNewsImage(file);
+			setField('coverUrl', url);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Не удалось загрузить обложку');
+		} finally {
+			setUploadingCover(false);
+			if (coverInputRef.current) {
+				coverInputRef.current.value = '';
+			}
+		}
+	};
+
+	const onBodyImageFile = async (file: File | undefined) => {
+		if (!file) {
+			return;
+		}
+		setUploadingBody(true);
+		setError(null);
+		try {
+			const { url } = await uploadNewsImage(file);
+			setForm((prev) => {
+				const insert = `\n\n![скрин](${url})\n\n`;
+				return { ...prev, body: prev.body ? `${prev.body}${insert}` : insert.trim() };
+			});
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Не удалось загрузить картинку');
+		} finally {
+			setUploadingBody(false);
+			if (bodyInputRef.current) {
+				bodyInputRef.current.value = '';
+			}
+		}
 	};
 
 	const payload = (publish: boolean) => ({
@@ -109,6 +156,8 @@ export const AdminNewsFormPage = ({ mode }: { mode: 'new' | 'edit' }) => {
 		}
 	};
 
+	const coverPreview = resolveStaticUrl(form.coverUrl);
+
 	return (
 		<PageFrame
 			title={mode === 'new' ? 'Новая новость' : 'Редактирование'}
@@ -142,13 +191,53 @@ export const AdminNewsFormPage = ({ mode }: { mode: 'new' | 'edit' }) => {
 					onChange={(event) => setField('category', event.currentTarget.value as NewsCategory)}
 					radius={0}
 				/>
-				<TextInput
-					label="Обложка (URL)"
-					value={form.coverUrl}
-					onChange={(event) => setField('coverUrl', event.currentTarget.value)}
-					placeholder="/static/images/scenes/battle.webp"
-					radius={0}
-				/>
+				<div>
+					<Text size="sm" mb={6} style={{ fontWeight: 500 }}>
+						Обложка
+					</Text>
+					<div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+						<input
+							ref={coverInputRef}
+							type="file"
+							accept="image/webp,image/png,image/jpeg,image/gif,image/avif"
+							hidden
+							onChange={(event) => void onCoverFile(event.currentTarget.files?.[0])}
+						/>
+						<OrnateButton
+							variant="outline"
+							disabled={uploadingCover || saving}
+							onClick={() => coverInputRef.current?.click()}
+						>
+							{uploadingCover ? 'Загрузка…' : 'Загрузить'}
+						</OrnateButton>
+						<Text size="sm" c="dimmed">
+							webp / png / jpg, до 5 МБ
+						</Text>
+					</div>
+					{coverPreview ? (
+						<img
+							src={coverPreview}
+							alt=""
+							style={{
+								display: 'block',
+								marginTop: '0.75rem',
+								maxWidth: '100%',
+								maxHeight: 180,
+								objectFit: 'cover',
+								border: '1px solid color-mix(in srgb, var(--app-border) 70%, transparent)',
+							}}
+						/>
+					) : null}
+					<TextInput
+						mt="sm"
+						label="Путь обложки"
+						value={form.coverUrl}
+						onChange={(event) => setField('coverUrl', event.currentTarget.value)}
+						placeholder="/static/images/scenes/…"
+						description="Заполняется после загрузки; можно вписать вручную"
+						radius={0}
+					/>
+				</div>
 				<TextInput
 					label="Дата публикации"
 					type="datetime-local"
@@ -170,6 +259,22 @@ export const AdminNewsFormPage = ({ mode }: { mode: 'new' | 'edit' }) => {
 						<Tabs.Tab value="preview">Превью</Tabs.Tab>
 					</Tabs.List>
 					<Tabs.Panel value="edit" pt="sm">
+						<div style={{ marginBottom: '0.75rem' }}>
+							<input
+								ref={bodyInputRef}
+								type="file"
+								accept="image/webp,image/png,image/jpeg,image/gif,image/avif"
+								hidden
+								onChange={(event) => void onBodyImageFile(event.currentTarget.files?.[0])}
+							/>
+							<OrnateButton
+								variant="outline"
+								disabled={uploadingBody || saving}
+								onClick={() => bodyInputRef.current?.click()}
+							>
+								{uploadingBody ? 'Загрузка…' : 'Вставить картинку в текст'}
+							</OrnateButton>
+						</div>
 						<Textarea
 							value={form.body}
 							onChange={(event) => setField('body', event.currentTarget.value)}
@@ -189,7 +294,7 @@ export const AdminNewsFormPage = ({ mode }: { mode: 'new' | 'edit' }) => {
 					</Tabs.Panel>
 				</Tabs>
 				<GroupButtons
-					saving={saving}
+					saving={saving || uploadingCover || uploadingBody}
 					onDraft={() => void save(false)}
 					onPublish={() => void save(true)}
 				/>

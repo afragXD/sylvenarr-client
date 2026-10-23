@@ -33,7 +33,8 @@ const readErrorMessage = async (response: Response, fallback: string): Promise<s
 export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
 	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
 	const headers = new Headers(init?.headers);
-	if (init?.body && !headers.has('content-type')) {
+	// FormData сам выставляет multipart boundary — не перебиваем application/json
+	if (init?.body && !(init.body instanceof FormData) && !headers.has('content-type')) {
 		headers.set('content-type', 'application/json');
 	}
 	const response = await fetch(`${API_BASE_URL}${normalizedPath}`, {
