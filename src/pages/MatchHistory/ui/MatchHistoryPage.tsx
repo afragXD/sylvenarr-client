@@ -8,6 +8,7 @@ import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { getMatchResultColor } from '@/shared/lib/stats';
 import { OrnateFrame } from '@/shared/ui/OrnateFrame';
 import { PageFrame } from '@/shared/ui/PageFrame';
+import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 /**
  * История завершённых матчей текущего игрока.
@@ -92,7 +93,13 @@ export const MatchHistoryPage = () => {
 										<Table.Td c="var(--app-text-muted)" className="sylvenarr-tabular" size="sm">
 											{new Date(row.finishedAt).toLocaleString('ru-RU')}
 										</Table.Td>
-										<Table.Td fw={600}>{row.opponentName}</Table.Td>
+										<Table.Td>
+											<PlayerIdentity
+												name={row.opponentName}
+												avatarUrl={row.opponentAvatarUrl}
+												size={28}
+											/>
+										</Table.Td>
 										<Table.Td
 											c={getMatchResultColor(row.result)}
 											fw={row.result === 'draw' ? undefined : 600}

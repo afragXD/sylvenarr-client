@@ -14,6 +14,7 @@ export type MatchStatus =
 export type MatchPlayerBrief = {
 	id: string;
 	displayName: string;
+	avatarUrl: string | null;
 };
 
 export type MatchDraftPick = {
@@ -149,6 +150,7 @@ export type MatchHistoryItem = {
 	id: string;
 	result: 'win' | 'loss' | 'draw';
 	opponentName: string;
+	opponentAvatarUrl: string | null;
 	finishedAt: string;
 	durationSeconds: number | null;
 };
@@ -171,6 +173,7 @@ export type MatchHistoryUnit = {
 export type MatchHistoryTeam = {
 	playerId: string;
 	displayName: string;
+	avatarUrl: string | null;
 	units: MatchHistoryUnit[];
 };
 
@@ -178,6 +181,7 @@ export type MatchHistoryDetail = {
 	id: string;
 	result: 'win' | 'loss' | 'draw';
 	opponentName: string;
+	opponentAvatarUrl: string | null;
 	finishedAt: string;
 	durationSeconds: number | null;
 	stage: number | null;

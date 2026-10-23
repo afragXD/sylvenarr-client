@@ -13,6 +13,7 @@ import {
 import { fetchCurrentPlayer, type Player } from '@/entities/player';
 import { ApiError } from '@/shared/api/http';
 import { PageFrame } from '@/shared/ui/PageFrame';
+import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 import styles from './LobbyPage.module.css';
 import { LobbyRulesForm } from './LobbyRulesForm';
@@ -117,12 +118,16 @@ export const LobbyPage = () => {
 					<LobbyRulesForm rules={rules} onChange={setRules} />
 
 					<div className={`sylvenarr-panel ${styles.actions}`}>
-						<Text size="sm" c="var(--app-text-muted)">
-							Вы:{' '}
-							<Text span fw={600} c="var(--app-text)">
-								{player.displayName}
+						<Group gap="xs" align="center">
+							<Text size="sm" c="var(--app-text-muted)">
+								Вы:
 							</Text>
-						</Text>
+							<PlayerIdentity
+								name={player.displayName}
+								avatarUrl={player.avatarUrl}
+								size={28}
+							/>
+						</Group>
 
 						<Button
 							className="sylvenarr-plate-btn"

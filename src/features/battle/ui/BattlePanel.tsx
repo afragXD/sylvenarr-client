@@ -1,6 +1,6 @@
 import { Button, Group, Modal, Stack, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import {
 	formatAbilityPreview,
@@ -10,6 +10,7 @@ import {
 	previewCtxFromUnit,
 } from '@/entities/hero';
 import type { AbilityInfo, BattleState, BattleUnit, Match } from '@/entities/match';
+import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 import { previewWeaponAttack, type AttackPreview } from '../lib/attackPreview';
 import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
@@ -333,7 +334,14 @@ export const BattlePanel = ({
 			<div className={styles.battlefield}>
 				<div className={styles.field}>
 					<TeamSide
-						title={`Игрок 1 · ${match.host.displayName}`}
+						title={
+							<PlayerIdentity
+								name={match.host.displayName}
+								avatarUrl={match.host.avatarUrl}
+								prefix="Игрок 1"
+								size={28}
+							/>
+						}
 						units={hostUnits}
 						mirror
 						activeId={battle.activeUnitId}
@@ -342,7 +350,14 @@ export const BattlePanel = ({
 						attackPreviewFor={attackPreviewFor}
 					/>
 					<TeamSide
-						title={`Игрок 2 · ${match.guest?.displayName ?? '…'}`}
+						title={
+							<PlayerIdentity
+								name={match.guest?.displayName ?? '…'}
+								avatarUrl={match.guest?.avatarUrl}
+								prefix="Игрок 2"
+								size={28}
+							/>
+						}
 						units={guestUnits}
 						mirror={false}
 						activeId={battle.activeUnitId}
@@ -573,7 +588,7 @@ const TeamSide = ({
 	onUnitClick,
 	attackPreviewFor,
 }: {
-	title: string;
+	title: ReactNode;
 	units: BattleUnit[];
 	mirror: boolean;
 	activeId: string | null;

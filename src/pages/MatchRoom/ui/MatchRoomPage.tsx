@@ -1,7 +1,7 @@
 import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { Anchor, Box, Button, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 
 import { fetchHeroes, type HeroClass } from '@/entities/hero';
 import {
@@ -26,6 +26,7 @@ import { ApiError } from '@/shared/api/http';
 import { API_BASE_URL } from '@/shared/constants';
 import { InviteCodeChip } from '@/shared/ui/InviteCodeChip';
 import { PageFrame } from '@/shared/ui/PageFrame';
+import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 const POLL_MS = 2500;
 
@@ -438,9 +439,13 @@ export const MatchRoomPage = () => {
 									Передайте код другу. После входа начнётся набор отряда — ходит игрок 1.
 								</Text>
 								<InviteCodeChip code={match.inviteCode} />
-								<Text size="sm" c="var(--app-text-muted)">
-									Игрок 1: {match.host.displayName}
-								</Text>
+								<PlayerIdentity
+									name={match.host.displayName}
+									avatarUrl={match.host.avatarUrl}
+									prefix="Игрок 1"
+									size={28}
+									muted
+								/>
 							</Stack>
 						</Box>
 					)}
@@ -485,7 +490,14 @@ export const MatchRoomPage = () => {
 						<>
 							<Group align="stretch" gap="xl" wrap="wrap" preventGrowOverflow={false}>
 								<TeamPanel
-									title={`Игрок 1 · ${match.host.displayName}`}
+									title={
+										<PlayerIdentity
+											name={match.host.displayName}
+											avatarUrl={match.host.avatarUrl}
+											prefix="Игрок 1"
+											size={28}
+										/>
+									}
 									ownerPlayerId={match.host.id}
 									size={match.draft.hostSize}
 									cap={match.draft.initialTeamSize}
@@ -496,7 +508,14 @@ export const MatchRoomPage = () => {
 									mirrorRows
 								/>
 								<TeamPanel
-									title={`Игрок 2 · ${match.guest?.displayName ?? '…'}`}
+									title={
+										<PlayerIdentity
+											name={match.guest?.displayName ?? '…'}
+											avatarUrl={match.guest?.avatarUrl}
+											prefix="Игрок 2"
+											size={28}
+										/>
+									}
 									ownerPlayerId={match.guest?.id ?? 'guest'}
 									size={match.draft.guestSize}
 									cap={match.draft.initialTeamSize}
@@ -612,7 +631,7 @@ const TeamPanel = ({
 	canDragUnits,
 	mirrorRows = false,
 }: {
-	title: string;
+	title: ReactNode;
 	ownerPlayerId: string;
 	size: number;
 	cap: number;
@@ -655,8 +674,8 @@ const TeamPanel = ({
 			}}
 		>
 			<Stack gap="sm">
-				<Group justify="space-between">
-					<Text fw={600}>{title}</Text>
+				<Group justify="space-between" align="center" wrap="nowrap">
+					{title}
 					<Text size="sm" c="var(--app-text-muted)">
 						{size}/{cap}
 					</Text>

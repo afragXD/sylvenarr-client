@@ -6,6 +6,7 @@ import { fetchRating, type RatingRow } from '@/entities/rating';
 import { ApiError } from '@/shared/api/http';
 import { getPtsColor, START_PTS } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
+import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 const TOP_RANK_ICONS: Record<number, { Icon: LucideIcon; color: string }> = {
 	1: { Icon: Trophy, color: '#CBB48C' },
@@ -133,7 +134,13 @@ export const RatingPage = () => {
 												</Text>
 											</Group>
 										</Table.Td>
-										<Table.Td fw={600}>{row.displayName}</Table.Td>
+										<Table.Td>
+											<PlayerIdentity
+												name={row.displayName}
+												avatarUrl={row.avatarUrl}
+												size={28}
+											/>
+										</Table.Td>
 										<Table.Td
 											ff="monospace"
 											c={getPtsColor(row.pts)}

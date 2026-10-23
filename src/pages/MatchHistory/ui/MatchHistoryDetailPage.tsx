@@ -14,6 +14,7 @@ import { ApiError } from '@/shared/api/http';
 import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { getMatchResultColor } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
+import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 import styles from './MatchHistoryDetailPage.module.css';
 import { formatDuration } from './MatchHistoryPage';
@@ -79,14 +80,23 @@ export const MatchHistoryDetailPage = () => {
 							<Title order={1} c={getMatchResultColor(detail.result)}>
 								{resultTitle(detail.result)}
 							</Title>
-							<Text c="var(--app-text-muted)">
-								Соперник: {detail.opponentName} ·{' '}
-								{new Date(detail.finishedAt).toLocaleString('ru-RU')}
-								{detail.durationSeconds !== null
-									? ` · ${formatDuration(detail.durationSeconds)}`
-									: ''}
-								{detail.stage !== null ? ` · раундов: ${detail.stage}` : ''}
-							</Text>
+							<Group gap="sm" wrap="wrap" align="center">
+								<Text c="var(--app-text-muted)" component="span">
+									Соперник:
+								</Text>
+								<PlayerIdentity
+									name={detail.opponentName}
+									avatarUrl={detail.opponentAvatarUrl}
+									size={28}
+								/>
+								<Text c="var(--app-text-muted)" size="sm">
+									{new Date(detail.finishedAt).toLocaleString('ru-RU')}
+									{detail.durationSeconds !== null
+										? ` · ${formatDuration(detail.durationSeconds)}`
+										: ''}
+									{detail.stage !== null ? ` · раундов: ${detail.stage}` : ''}
+								</Text>
+							</Group>
 							{!detail.hasSnapshot && (
 								<Text size="sm" c="var(--app-text-muted)">
 									Подробности боя недоступны (матч до обновления). Показаны составы из набора.
@@ -96,10 +106,20 @@ export const MatchHistoryDetailPage = () => {
 
 						<div className={styles.field}>
 							<div className={styles.playerLabel} data-side="host">
-								Игрок 1 · {detail.host.displayName}
+								<PlayerIdentity
+									name={detail.host.displayName}
+									avatarUrl={detail.host.avatarUrl}
+									prefix="Игрок 1"
+									size={24}
+								/>
 							</div>
 							<div className={styles.playerLabel} data-side="guest">
-								Игрок 2 · {detail.guest.displayName}
+								<PlayerIdentity
+									name={detail.guest.displayName}
+									avatarUrl={detail.guest.avatarUrl}
+									prefix="Игрок 2"
+									size={24}
+								/>
 							</div>
 							<RowColumn label="Задний ряд" units={unitsInRow(detail.host, ROW_BACK)} />
 							<RowColumn label="Передний ряд" units={unitsInRow(detail.host, ROW_FRONT)} />
