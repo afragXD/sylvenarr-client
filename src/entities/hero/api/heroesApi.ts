@@ -41,3 +41,39 @@ export async function fetchHeroByCode(code: string): Promise<HeroClass> {
 		'Герой не найден',
 	);
 }
+
+export type FavoriteHeroStat = {
+	code: string;
+	displayName: string;
+	pickCount: number;
+};
+
+/**
+ * Глобальный топ героев по числу выборов на арене.
+ */
+export async function fetchFavoriteHeroes(limit = 24): Promise<FavoriteHeroStat[]> {
+	const query = new URLSearchParams({ limit: String(limit) });
+	return apiFetchJson(
+		`/heroes/favorites?${query}`,
+		undefined,
+		(data) => {
+			if (!Array.isArray(data)) {
+				throw new Error('Некорректный список популярных героев');
+			}
+			return data
+				.filter(isRecord)
+				.filter(
+					(item) =>
+						typeof item.code === 'string' &&
+						typeof item.displayName === 'string' &&
+						typeof item.pickCount === 'number',
+				)
+				.map((item) => ({
+					code: item.code as string,
+					displayName: item.displayName as string,
+					pickCount: item.pickCount as number,
+				}));
+		},
+		'Не удалось загрузить популярных героев',
+	);
+}

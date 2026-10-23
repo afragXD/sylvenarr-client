@@ -13,6 +13,8 @@ import { resolveStaticUrl } from '@/shared/lib/staticUrl';
 import { OrnateButton } from '@/shared/ui/OrnateButton';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
+import { ProfileNav } from './ProfileNav';
+
 const initialsFromName = (name: string): string => {
 	const parts = name.trim().split(/\s+/).filter(Boolean);
 	if (parts.length === 0) {
@@ -24,7 +26,10 @@ const initialsFromName = (name: string): string => {
 	return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase();
 };
 
-export const ProfilePage = () => {
+/**
+ * Настройки аккаунта: имя и аватар.
+ */
+export const ProfileSettingsPage = () => {
 	const navigate = useNavigate();
 	const [player, setPlayer] = useState<Player | null>(null);
 	const [displayName, setDisplayName] = useState('');
@@ -81,8 +86,11 @@ export const ProfilePage = () => {
 
 	if (!player) {
 		return (
-			<PageFrame title="Профиль" eyebrow="Аккаунт" width="form">
-				<Text c="dimmed">Загрузка…</Text>
+			<PageFrame title="Настройки" eyebrow="Аккаунт" width="form">
+				<Stack gap="md">
+					<ProfileNav />
+					<Text c="dimmed">Загрузка…</Text>
+				</Stack>
 			</PageFrame>
 		);
 	}
@@ -90,8 +98,9 @@ export const ProfilePage = () => {
 	const avatarSrc = resolveStaticUrl(player.avatarUrl) ?? player.avatarUrl ?? undefined;
 
 	return (
-		<PageFrame title="Профиль" eyebrow="Аккаунт" width="form" lead="Имя и аватар на сайте">
+		<PageFrame title="Настройки" eyebrow="Аккаунт" width="form" lead="Имя и аватар на сайте">
 			<Stack gap="md">
+				<ProfileNav />
 				{error ? <Text c="accent">{error}</Text> : null}
 				<div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
 					<Avatar src={avatarSrc} alt="" radius="xl" size={72} color="brand">

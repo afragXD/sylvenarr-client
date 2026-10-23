@@ -25,11 +25,49 @@ const parsePlayer = (data: unknown): Player => {
 	};
 };
 
+export type FavoriteHero = {
+	code: string;
+	displayName: string;
+	pickCount: number;
+};
+
+const parseFavoriteHeroes = (data: unknown): FavoriteHero[] => {
+	if (!Array.isArray(data)) {
+		throw new Error('Некорректный список любимых героев');
+	}
+	return data
+		.filter(isRecord)
+		.filter(
+			(item) =>
+				typeof item.code === 'string' &&
+				typeof item.displayName === 'string' &&
+				typeof item.pickCount === 'number',
+		)
+		.map((item) => ({
+			code: item.code as string,
+			displayName: item.displayName as string,
+			pickCount: item.pickCount as number,
+		}));
+};
+
 /**
  * Текущий авторизованный игрок из сессии.
  */
 export async function fetchCurrentPlayer(): Promise<Player> {
 	return apiFetchJson('/players/me', undefined, parsePlayer, 'Требуется авторизация');
+}
+
+/**
+ * Любимые герои текущего игрока по числу выборов.
+ */
+export async function fetchMyFavoriteHeroes(limit = 5): Promise<FavoriteHero[]> {
+	const query = new URLSearchParams({ limit: String(limit) });
+	return apiFetchJson(
+		`/players/me/favorite-heroes?${query}`,
+		undefined,
+		parseFavoriteHeroes,
+		'Не удалось загрузить любимых героев',
+	);
 }
 
 /**

@@ -25,12 +25,15 @@ import { Route as AdminNewsRouteImport } from './routes/admin.news'
 import { Route as HeroesIndexRouteImport } from './routes/heroes.index'
 import { Route as HeroesCodeRouteImport } from './routes/heroes.$code'
 import { Route as HeroesEffectsRouteImport } from './routes/heroes.effects'
+import { Route as HeroesPopularRouteImport } from './routes/heroes.popular'
 import { Route as LobbyIndexRouteImport } from './routes/lobby.index'
 import { Route as LobbyMatchIdRouteImport } from './routes/lobby.$matchId'
 import { Route as MatchesIndexRouteImport } from './routes/matches.index'
 import { Route as MatchesMatchIdRouteImport } from './routes/matches.$matchId'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsSlugRouteImport } from './routes/news.$slug'
+import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as ProfileSettingsRouteImport } from './routes/profile.settings'
 import { Route as AdminNewsIndexRouteImport } from './routes/admin.news.index'
 import { Route as AdminNewsIdRouteImport } from './routes/admin.news.$id'
 import { Route as AdminNewsNewRouteImport } from './routes/admin.news.new'
@@ -115,6 +118,11 @@ const HeroesEffectsRoute = HeroesEffectsRouteImport.update({
   path: '/effects',
   getParentRoute: () => HeroesRoute,
 } as any)
+const HeroesPopularRoute = HeroesPopularRouteImport.update({
+  id: '/popular',
+  path: '/popular',
+  getParentRoute: () => HeroesRoute,
+} as any)
 const LobbyIndexRoute = LobbyIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -145,6 +153,16 @@ const NewsSlugRoute = NewsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => NewsRoute,
 } as any)
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProfileRoute,
+} as any)
+const ProfileSettingsRoute = ProfileSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => ProfileRoute,
+} as any)
 const AdminNewsIndexRoute = AdminNewsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -168,7 +186,7 @@ export interface FileRoutesByFullPath {
   '/matches': typeof MatchesRouteWithChildren
   '/news': typeof NewsRouteWithChildren
   '/privacy': typeof PrivacyRoute
-  '/profile': typeof ProfileRoute
+  '/profile': typeof ProfileRouteWithChildren
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sign-in': typeof SignInRoute
@@ -177,13 +195,16 @@ export interface FileRoutesByFullPath {
   '/admin/news': typeof AdminNewsRouteWithChildren
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
+  '/heroes/popular': typeof HeroesPopularRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/profile/settings': typeof ProfileSettingsRoute
   '/heroes/': typeof HeroesIndexRoute
   '/lobby/': typeof LobbyIndexRoute
   '/matches/': typeof MatchesIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/profile/': typeof ProfileIndexRoute
   '/admin/news/$id': typeof AdminNewsIdRoute
   '/admin/news/new': typeof AdminNewsNewRoute
   '/admin/news/': typeof AdminNewsIndexRoute
@@ -191,7 +212,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/privacy': typeof PrivacyRoute
-  '/profile': typeof ProfileRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sign-in': typeof SignInRoute
@@ -199,13 +219,16 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
+  '/heroes/popular': typeof HeroesPopularRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/profile/settings': typeof ProfileSettingsRoute
   '/heroes': typeof HeroesIndexRoute
   '/lobby': typeof LobbyIndexRoute
   '/matches': typeof MatchesIndexRoute
   '/news': typeof NewsIndexRoute
+  '/profile': typeof ProfileIndexRoute
   '/admin/news/$id': typeof AdminNewsIdRoute
   '/admin/news/new': typeof AdminNewsNewRoute
   '/admin/news': typeof AdminNewsIndexRoute
@@ -218,7 +241,7 @@ export interface FileRoutesById {
   '/matches': typeof MatchesRouteWithChildren
   '/news': typeof NewsRouteWithChildren
   '/privacy': typeof PrivacyRoute
-  '/profile': typeof ProfileRoute
+  '/profile': typeof ProfileRouteWithChildren
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sign-in': typeof SignInRoute
@@ -227,13 +250,16 @@ export interface FileRoutesById {
   '/admin/news': typeof AdminNewsRouteWithChildren
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
+  '/heroes/popular': typeof HeroesPopularRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/profile/settings': typeof ProfileSettingsRoute
   '/heroes/': typeof HeroesIndexRoute
   '/lobby/': typeof LobbyIndexRoute
   '/matches/': typeof MatchesIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/profile/': typeof ProfileIndexRoute
   '/admin/news/$id': typeof AdminNewsIdRoute
   '/admin/news/new': typeof AdminNewsNewRoute
   '/admin/news/': typeof AdminNewsIndexRoute
@@ -256,13 +282,16 @@ export interface FileRouteTypes {
     | '/admin/news'
     | '/heroes/$code'
     | '/heroes/effects'
+    | '/heroes/popular'
     | '/lobby/$matchId'
     | '/matches/$matchId'
     | '/news/$slug'
+    | '/profile/settings'
     | '/heroes/'
     | '/lobby/'
     | '/matches/'
     | '/news/'
+    | '/profile/'
     | '/admin/news/$id'
     | '/admin/news/new'
     | '/admin/news/'
@@ -270,7 +299,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/privacy'
-    | '/profile'
     | '/rating'
     | '/robots.txt'
     | '/sign-in'
@@ -278,13 +306,16 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/heroes/$code'
     | '/heroes/effects'
+    | '/heroes/popular'
     | '/lobby/$matchId'
     | '/matches/$matchId'
     | '/news/$slug'
+    | '/profile/settings'
     | '/heroes'
     | '/lobby'
     | '/matches'
     | '/news'
+    | '/profile'
     | '/admin/news/$id'
     | '/admin/news/new'
     | '/admin/news'
@@ -305,13 +336,16 @@ export interface FileRouteTypes {
     | '/admin/news'
     | '/heroes/$code'
     | '/heroes/effects'
+    | '/heroes/popular'
     | '/lobby/$matchId'
     | '/matches/$matchId'
     | '/news/$slug'
+    | '/profile/settings'
     | '/heroes/'
     | '/lobby/'
     | '/matches/'
     | '/news/'
+    | '/profile/'
     | '/admin/news/$id'
     | '/admin/news/new'
     | '/admin/news/'
@@ -324,7 +358,7 @@ export interface RootRouteChildren {
   MatchesRoute: typeof MatchesRouteWithChildren
   NewsRoute: typeof NewsRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
-  ProfileRoute: typeof ProfileRoute
+  ProfileRoute: typeof ProfileRouteWithChildren
   RatingRoute: typeof RatingRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SignInRoute: typeof SignInRoute
@@ -447,6 +481,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HeroesEffectsRouteImport
       parentRoute: typeof HeroesRoute
     }
+    '/heroes/popular': {
+      id: '/heroes/popular'
+      path: '/popular'
+      fullPath: '/heroes/popular'
+      preLoaderRoute: typeof HeroesPopularRouteImport
+      parentRoute: typeof HeroesRoute
+    }
     '/lobby/': {
       id: '/lobby/'
       path: '/'
@@ -489,6 +530,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsSlugRouteImport
       parentRoute: typeof NewsRoute
     }
+    '/profile/': {
+      id: '/profile/'
+      path: '/'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
+      parentRoute: typeof ProfileRoute
+    }
+    '/profile/settings': {
+      id: '/profile/settings'
+      path: '/settings'
+      fullPath: '/profile/settings'
+      preLoaderRoute: typeof ProfileSettingsRouteImport
+      parentRoute: typeof ProfileRoute
+    }
     '/admin/news/': {
       id: '/admin/news/'
       path: '/'
@@ -516,12 +571,14 @@ declare module '@tanstack/react-router' {
 interface HeroesRouteChildren {
   HeroesCodeRoute: typeof HeroesCodeRoute
   HeroesEffectsRoute: typeof HeroesEffectsRoute
+  HeroesPopularRoute: typeof HeroesPopularRoute
   HeroesIndexRoute: typeof HeroesIndexRoute
 }
 
 const HeroesRouteChildren: HeroesRouteChildren = {
   HeroesCodeRoute: HeroesCodeRoute,
   HeroesEffectsRoute: HeroesEffectsRoute,
+  HeroesPopularRoute: HeroesPopularRoute,
   HeroesIndexRoute: HeroesIndexRoute,
 }
 
@@ -565,6 +622,19 @@ const NewsRouteChildren: NewsRouteChildren = {
 
 const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
 
+interface ProfileRouteChildren {
+  ProfileSettingsRoute: typeof ProfileSettingsRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
+}
+
+const ProfileRouteChildren: ProfileRouteChildren = {
+  ProfileSettingsRoute: ProfileSettingsRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
+}
+
+const ProfileRouteWithChildren =
+  ProfileRoute._addFileChildren(ProfileRouteChildren)
+
 interface AdminNewsRouteChildren {
   AdminNewsIdRoute: typeof AdminNewsIdRoute
   AdminNewsNewRoute: typeof AdminNewsNewRoute
@@ -588,7 +658,7 @@ const rootRouteChildren: RootRouteChildren = {
   MatchesRoute: MatchesRouteWithChildren,
   NewsRoute: NewsRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
-  ProfileRoute: ProfileRoute,
+  ProfileRoute: ProfileRouteWithChildren,
   RatingRoute: RatingRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SignInRoute: SignInRoute,

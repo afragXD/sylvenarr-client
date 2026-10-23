@@ -51,9 +51,14 @@ export const HeroesPage = () => {
 		>
 			<Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
 				<Stack gap={6} maw={640}>
-					<Anchor component={Link} to="/heroes/effects" size="sm" c="brand" w="fit-content">
-						Кодекс эффектов
-					</Anchor>
+					<Group gap="md">
+						<Anchor component={Link} to="/heroes/popular" size="sm" c="brand" w="fit-content">
+							Популярные герои
+						</Anchor>
+						<Anchor component={Link} to="/heroes/effects" size="sm" c="brand" w="fit-content">
+							Кодекс эффектов
+						</Anchor>
+					</Group>
 				</Stack>
 				{showTable && (
 					<Text size="sm" c="brand" className="sylvenarr-tabular">
