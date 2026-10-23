@@ -77,10 +77,13 @@ const STATS: ReadonlyArray<{
 	{ key: 'gold', label: 'Золото', hint: 'Трофеи юнита', Icon: Coins },
 	{ key: 'critBank', label: 'Крит-банк', hint: 'Накопленный критический запас', Icon: Sword },
 	{ key: 'ultaCharges', label: 'Заряды', hint: 'Заряды ультимативной способности', Icon: Sparkles },
-	{ key: 'morale', label: 'Мораль', hint: 'Боевой дух (каталожный показатель)', Icon: Ghost },
+	{ key: 'morale', label: 'Мораль', hint: 'Боевой дух', Icon: Ghost },
 ];
 
 function formatMorale(value: number): string {
+	if (value < -150) {
+		return 'N/A';
+	}
 	return value > 0 ? `+${value}` : String(value);
 }
 

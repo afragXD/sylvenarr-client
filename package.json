@@ -12,7 +12,8 @@
     "lint": "biome lint",
     "check": "biome check",
     "test": "bun test src",
-    "copy-hero-images": "bun scripts/copy-hero-images.mjs"
+    "copy-hero-images": "bun scripts/copy-hero-images.mjs",
+    "copy-scene-images": "bun scripts/copy-scene-images.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

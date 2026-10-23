@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { fetchMyMatches, type MatchHistoryItem } from '@/entities/match';
 import { ApiError } from '@/shared/api/http';
+import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { getMatchResultColor } from '@/shared/lib/stats';
 import { OrnateFrame } from '@/shared/ui/OrnateFrame';
 import { PageFrame } from '@/shared/ui/PageFrame';
@@ -46,7 +47,7 @@ export const MatchHistoryPage = () => {
 			eyebrow="Арена"
 			title="Мои матчи"
 			lead="Завершённые бои: соперник, результат, длительность."
-			scene="/scenes/battle.webp"
+			scene={getSceneUrl('battle.webp')}
 		>
 			{loading && <Loader color="brand" size="sm" />}
 			{error && (

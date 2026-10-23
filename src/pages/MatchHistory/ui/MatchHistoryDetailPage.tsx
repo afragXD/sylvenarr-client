@@ -11,6 +11,7 @@ import {
 } from '@/entities/match';
 import { CombatStat, CombatStatRow } from '@/features/battle';
 import { ApiError } from '@/shared/api/http';
+import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { getMatchResultColor } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
@@ -58,7 +59,7 @@ export const MatchHistoryDetailPage = () => {
 			eyebrow="Арена"
 			title="Карточка матча"
 			lead="Составы, статы и лог завершённого боя."
-			scene="/scenes/battle.webp"
+			scene={getSceneUrl('battle.webp')}
 		>
 			<Stack gap="md">
 				<Anchor component={Link} to="/matches" c="brand" size="sm">

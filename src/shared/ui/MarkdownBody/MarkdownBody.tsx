@@ -1,6 +1,8 @@
 import { Text, Title } from '@mantine/core';
 import type { ReactNode } from 'react';
 
+import { resolveStaticUrl } from '@/shared/lib/staticUrl';
+
 type MarkdownBodyProps = {
 	children: string;
 	className?: string;
@@ -20,10 +22,11 @@ export const MarkdownBody = ({ children, className }: MarkdownBodyProps) => {
 				const trimmed = block.trim();
 				const imageOnly = /^!\[([^\]]*)\]\(([^)]+)\)$/.exec(trimmed);
 				if (imageOnly) {
+					const src = resolveStaticUrl(imageOnly[2]) ?? imageOnly[2];
 					return (
 						<img
 							key={key}
-							src={imageOnly[2]}
+							src={src}
 							alt={imageOnly[1]}
 							loading="lazy"
 							style={{

@@ -3,6 +3,7 @@ import { useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { fetchNewsBySlug, NEWS_CATEGORY_LABEL, type NewsItem } from '@/entities/news';
+import { resolveStaticUrl } from '@/shared/lib/staticUrl';
 import { ArtFade } from '@/shared/ui/ArtFade';
 import { MarkdownBody } from '@/shared/ui/MarkdownBody';
 import { PageFrame } from '@/shared/ui/PageFrame';
@@ -60,7 +61,7 @@ export const NewsDetailPage = () => {
 				</Text>
 				{item.coverUrl ? (
 					<ArtFade
-						src={item.coverUrl}
+						src={resolveStaticUrl(item.coverUrl) ?? item.coverUrl}
 						mask="bottom"
 						alt=""
 						style={{ maxHeight: 380, width: '100%' }}

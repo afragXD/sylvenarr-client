@@ -2,6 +2,7 @@ import { Stack, Text, TextInput } from '@mantine/core';
 import { useMemo, useState } from 'react';
 
 import { CODEX_L, type EffectMeta, listBuffs, listDebuffs } from '@/features/battle';
+import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { GoldRule } from '@/shared/ui/GoldRule';
 import { OrnateFrame } from '@/shared/ui/OrnateFrame';
 import { PageFrame } from '@/shared/ui/PageFrame';
@@ -63,7 +64,7 @@ export const EffectsCodexPage = () => {
 			eyebrow="Справочник"
 			title="Кодекс эффектов"
 			lead="Баффы и дебаффы поля боя: как работают и что снимают."
-			scene="/scenes/effects.webp"
+			scene={getSceneUrl('effects.webp')}
 		>
 			{shown === 0 ? (
 				<div className={styles.listColumn}>

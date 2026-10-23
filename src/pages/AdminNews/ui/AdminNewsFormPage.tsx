@@ -146,7 +146,7 @@ export const AdminNewsFormPage = ({ mode }: { mode: 'new' | 'edit' }) => {
 					label="Обложка (URL)"
 					value={form.coverUrl}
 					onChange={(event) => setField('coverUrl', event.currentTarget.value)}
-					placeholder="/scenes/battle.webp"
+					placeholder="/static/images/scenes/battle.webp"
 					radius={0}
 				/>
 				<TextInput

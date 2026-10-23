@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { fetchNewsList, NEWS_CATEGORY_LABEL, type NewsSummary } from '@/entities/news';
+import { resolveStaticUrl } from '@/shared/lib/staticUrl';
 import { OrnateButton } from '@/shared/ui/OrnateButton';
 import { OrnateFrame } from '@/shared/ui/OrnateFrame';
 import { PageFrame } from '@/shared/ui/PageFrame';
@@ -59,7 +60,11 @@ export const NewsListPage = () => {
 					<OrnateFrame variant="panel">
 						<div className={classes.feature}>
 							{feature.coverUrl ? (
-								<img src={feature.coverUrl} alt="" className={classes.featureCover} />
+								<img
+									src={resolveStaticUrl(feature.coverUrl) ?? feature.coverUrl}
+									alt=""
+									className={classes.featureCover}
+								/>
 							) : null}
 							<Stack gap="sm" className={classes.copy}>
 								<Text
@@ -100,7 +105,12 @@ export const NewsListPage = () => {
 					>
 						<OrnateFrame variant="card">
 							{item.coverUrl ? (
-								<img src={item.coverUrl} alt="" className={classes.cardCover} loading="lazy" />
+								<img
+									src={resolveStaticUrl(item.coverUrl) ?? item.coverUrl}
+									alt=""
+									className={classes.cardCover}
+									loading="lazy"
+								/>
 							) : null}
 							<Text size="xs" c="var(--copper)" tt="uppercase" style={{ letterSpacing: '0.08em' }}>
 								{NEWS_CATEGORY_LABEL[item.category]}

@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { fetchNewsList, NEWS_CATEGORY_LABEL, type NewsSummary } from '@/entities/news';
+import { resolveStaticUrl } from '@/shared/lib/staticUrl';
 import { ArtFade } from '@/shared/ui/ArtFade';
 import { OrnateLink } from '@/shared/ui/OrnateButton';
 import { OrnateFrame } from '@/shared/ui/OrnateFrame';
@@ -42,7 +43,12 @@ export const NewsSection = () => {
 			{feature ? (
 				<Link to="/news/$slug" params={{ slug: feature.slug }} className={classes.newsFeature}>
 					{feature.coverUrl ? (
-						<ArtFade src={feature.coverUrl} mask="splash" className={classes.newsCover} alt="" />
+						<ArtFade
+							src={resolveStaticUrl(feature.coverUrl) ?? feature.coverUrl}
+							mask="splash"
+							className={classes.newsCover}
+							alt=""
+						/>
 					) : (
 						<div className={classes.newsCover} />
 					)}
@@ -71,7 +77,7 @@ export const NewsSection = () => {
 							<OrnateFrame variant="card">
 								{item.coverUrl ? (
 									<img
-										src={item.coverUrl}
+										src={resolveStaticUrl(item.coverUrl) ?? item.coverUrl}
 										alt=""
 										className={classes.newsCardCover}
 										loading="lazy"

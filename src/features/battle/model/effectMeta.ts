@@ -73,7 +73,8 @@ export type EffectId =
 	| 'MAGIC_SHACKLES'
 	| 'ENSLAVED'
 	| 'ROW_FORTIFY'
-	| 'ASHILLNESS';
+	| 'ASHILLNESS'
+	| 'ABSOLUTEPOWER';
 
 export type EffectKind = 'buff' | 'debuff';
 
@@ -115,6 +116,7 @@ const BUFF_ORDER: EffectId[] = [
 	'INVISIBLE',
 	'ROW_FORTIFY',
 	'STUN_IMMUNE',
+	'ABSOLUTEPOWER',
 ];
 
 const DEBUFF_ORDER: EffectId[] = [
@@ -208,9 +210,9 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	HAPPY: {
 		id: 'HAPPY',
 		label: 'Радость',
-		description: 'Повышает удачу.',
-		mechanics: '+(15 + 2L) удачи · 2 р.',
-		exampleAtL: exampleAtL('+25 удачи · 2 р.'),
+		description: 'Повышает боевой дух.',
+		mechanics: '+(15 + 2L) морали · 2 р.',
+		exampleAtL: exampleAtL('+25 морали · 2 р.'),
 		Icon: Smile,
 		kind: 'buff',
 	},
@@ -492,6 +494,15 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		exampleAtL: exampleAtL('1 р. при L=5'),
 		Icon: Biohazard,
 		kind: 'debuff',
+	},
+	ABSOLUTEPOWER: {
+		id: 'ABSOLUTEPOWER',
+		label: 'Могущество',
+		description: 'Временно усиливает силу магии союзника.',
+		mechanics: '+(25% + 5%×L) силы магии · 1–2 р.',
+		exampleAtL: exampleAtL('+50% силы магии · 1–2 р.'),
+		Icon: Sparkles,
+		kind: 'buff',
 	},
 };
 

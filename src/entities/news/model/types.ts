@@ -6,6 +6,7 @@ export type NewsSummary = {
 	title: string;
 	summary: string;
 	category: NewsCategory;
+	/** Путь на volume Angie, напр. `/static/images/scenes/battle.webp`. */
 	coverUrl: string | null;
 	publishedAt: string | null;
 };

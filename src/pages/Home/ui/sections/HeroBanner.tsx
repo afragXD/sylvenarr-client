@@ -1,3 +1,4 @@
+import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { OrnateLink } from '@/shared/ui/OrnateButton';
 import { SmokeBackdrop } from '@/shared/ui/SmokeBackdrop';
 
@@ -8,7 +9,7 @@ export const HeroBanner = () => {
 		<section className={classes.hero} aria-label="Sylvenarr">
 			<div className={classes.heroScene} aria-hidden>
 				<div className={classes.heroShot}>
-					<img src="/scenes/battle.webp" alt="" draggable={false} />
+					<img src={getSceneUrl('battle.webp')} alt="" draggable={false} />
 				</div>
 				<div className={classes.heroShade} />
 				<SmokeBackdrop fog overlay />
