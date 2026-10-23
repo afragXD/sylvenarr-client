@@ -1,5 +1,6 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 
+import { ProfileShell } from '@/pages/Profile';
 import { absoluteUrl } from '@/shared/constants';
 import { seo } from '@/shared/lib/seo/seo';
 
@@ -13,5 +14,5 @@ export const Route = createFileRoute('/profile')({
 		}),
 		links: [{ rel: 'canonical', href: absoluteUrl('/profile') }],
 	}),
-	component: () => <Outlet />,
+	component: ProfileShell,
 });

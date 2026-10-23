@@ -1,0 +1,82 @@
+.layout {
+	display: grid;
+	gap: 1.25rem;
+	align-items: start;
+}
+
+.side {
+	min-width: 0;
+}
+
+.sideNav {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.5rem;
+}
+
+.link {
+	display: block;
+	padding: 0.65rem 0.85rem;
+	color: var(--app-text-muted);
+	text-decoration: none;
+	text-align: center;
+	border: 1px solid var(--app-border);
+	background: color-mix(in srgb, var(--app-surface) 88%, #000);
+	font-size: 0.95rem;
+	line-height: 1.3;
+	transition:
+		color 120ms ease,
+		border-color 120ms ease,
+		background 120ms ease;
+}
+
+.link:hover {
+	color: var(--app-text);
+	border-color: color-mix(in srgb, var(--brass) 55%, var(--app-border));
+}
+
+.linkActive {
+	color: var(--app-text);
+	border-color: color-mix(in srgb, var(--brass) 70%, var(--app-border));
+	background: color-mix(in srgb, var(--wine) 22%, var(--app-surface));
+}
+
+.main {
+	min-width: 0;
+}
+
+@media (min-width: 48em) {
+	.layout {
+		grid-template-columns: 12.5rem minmax(0, 1fr);
+		gap: 2rem;
+	}
+
+	.side {
+		position: sticky;
+		top: 1rem;
+	}
+
+	.sideNav {
+		grid-template-columns: 1fr;
+		gap: 0.35rem;
+	}
+
+	.link {
+		text-align: start;
+		border: none;
+		border-left: 2px solid transparent;
+		background: transparent;
+		padding: 0.45rem 0 0.45rem 0.85rem;
+	}
+
+	.link:hover {
+		background: transparent;
+		border-left-color: color-mix(in srgb, var(--brass) 45%, transparent);
+	}
+
+	.linkActive {
+		background: transparent;
+		border-left-color: var(--mantine-color-brand-4, var(--brass));
+		color: var(--app-text);
+	}
+}

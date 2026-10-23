@@ -1,41 +1,36 @@
-import { Group } from '@mantine/core';
 import { Link, useRouterState } from '@tanstack/react-router';
 
+import classes from './ProfileShell.module.css';
+
 const LINKS = [
-	{ to: '/profile', label: 'Досье', exact: true },
-	{ to: '/profile/settings', label: 'Настройки', exact: false },
-] as const;
+	{ to: '/profile/settings' as const, label: 'Настройки', match: 'settings' as const },
+	{ to: '/profile' as const, label: 'Досье', match: 'dossier' as const },
+];
 
 /**
- * Навигация между разделами профиля.
+ * Навигация профиля: колонка слева на десктопе, две кнопки на мобилке.
  */
 export const ProfileNav = () => {
 	const pathname = useRouterState({ select: (state) => state.location.pathname });
+	const isSettings = pathname.startsWith('/profile/settings');
 
 	return (
-		<Group gap="md" component="nav" aria-label="Разделы профиля">
+		<nav className={classes.sideNav} aria-label="Разделы профиля">
 			{LINKS.map((link) => {
-				const active = link.exact
-					? pathname === link.to || pathname === `${link.to}/`
-					: pathname.startsWith(link.to);
+				const active = link.match === 'settings' ? isSettings : !isSettings;
 				return (
 					<Link
 						key={link.to}
 						to={link.to}
-						style={{
-							color: active ? 'var(--mantine-color-brand-4)' : 'var(--app-text-muted)',
-							textDecoration: 'none',
-							borderBottom: active
-								? '1px solid var(--mantine-color-brand-4)'
-								: '1px solid transparent',
-							paddingBottom: 2,
-							fontSize: '0.95rem',
-						}}
+						className={[classes.link, active ? classes.linkActive : null]
+							.filter(Boolean)
+							.join(' ')}
+						aria-current={active ? 'page' : undefined}
 					>
 						{link.label}
 					</Link>
 				);
 			})}
-		</Group>
+		</nav>
 	);
 };

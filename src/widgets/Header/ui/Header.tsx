@@ -103,7 +103,7 @@ export const Header = () => {
 									</UnstyledButton>
 								</Menu.Target>
 								<Menu.Dropdown className={classes.menu}>
-									<Menu.Item component={Link} to="/profile">
+									<Menu.Item component={Link} to="/profile/settings">
 										<Group gap="sm" wrap="nowrap" align="flex-start">
 											<Avatar
 												src={avatarSrc}
@@ -128,7 +128,10 @@ export const Header = () => {
 									</Menu.Item>
 									<Menu.Divider />
 									<Menu.Item component={Link} to="/profile">
-										Профиль
+										Досье
+									</Menu.Item>
+									<Menu.Item component={Link} to="/profile/settings">
+										Настройки
 									</Menu.Item>
 									<Menu.Item component={Link} to="/matches">
 										Мои матчи

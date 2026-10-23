@@ -11,9 +11,6 @@ import {
 } from '@/entities/player';
 import { resolveStaticUrl } from '@/shared/lib/staticUrl';
 import { OrnateButton } from '@/shared/ui/OrnateButton';
-import { PageFrame } from '@/shared/ui/PageFrame';
-
-import { ProfileNav } from './ProfileNav';
 
 const initialsFromName = (name: string): string => {
 	const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -85,64 +82,54 @@ export const ProfileSettingsPage = () => {
 	};
 
 	if (!player) {
-		return (
-			<PageFrame title="Настройки" eyebrow="Аккаунт" width="form">
-				<Stack gap="md">
-					<ProfileNav />
-					<Text c="dimmed">Загрузка…</Text>
-				</Stack>
-			</PageFrame>
-		);
+		return <Text c="dimmed">Загрузка…</Text>;
 	}
 
 	const avatarSrc = resolveStaticUrl(player.avatarUrl) ?? player.avatarUrl ?? undefined;
 
 	return (
-		<PageFrame title="Настройки" eyebrow="Аккаунт" width="form" lead="Имя и аватар на сайте">
-			<Stack gap="md">
-				<ProfileNav />
-				{error ? <Text c="accent">{error}</Text> : null}
-				<div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
-					<Avatar src={avatarSrc} alt="" radius="xl" size={72} color="brand">
-						{initialsFromName(player.displayName)}
-					</Avatar>
-					<div>
-						<input
-							ref={fileRef}
-							type="file"
-							accept="image/webp,image/png,image/jpeg,image/gif,image/avif"
-							hidden
-							onChange={(event) => void onAvatarFile(event.currentTarget.files?.[0])}
-						/>
-						<OrnateButton
-							variant="outline"
-							disabled={uploading || saving}
-							onClick={() => fileRef.current?.click()}
-						>
-							{uploading ? 'Загрузка…' : 'Загрузить'}
-						</OrnateButton>
-						<Text size="sm" c="dimmed" mt={6}>
-							webp / png / jpg, до 2 МБ
-						</Text>
-					</div>
+		<Stack gap="md" maw={420}>
+			{error ? <Text c="accent">{error}</Text> : null}
+			<div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+				<Avatar src={avatarSrc} alt="" radius="xl" size={72} color="brand">
+					{initialsFromName(player.displayName)}
+				</Avatar>
+				<div>
+					<input
+						ref={fileRef}
+						type="file"
+						accept="image/webp,image/png,image/jpeg,image/gif,image/avif"
+						hidden
+						onChange={(event) => void onAvatarFile(event.currentTarget.files?.[0])}
+					/>
+					<OrnateButton
+						variant="outline"
+						disabled={uploading || saving}
+						onClick={() => fileRef.current?.click()}
+					>
+						{uploading ? 'Загрузка…' : 'Загрузить'}
+					</OrnateButton>
+					<Text size="sm" c="dimmed" mt={6}>
+						webp / png / jpg, до 2 МБ
+					</Text>
 				</div>
-				<TextInput
-					label="Имя"
-					value={displayName}
-					onChange={(event) => setDisplayName(event.currentTarget.value)}
-					description="От 2 до 32 символов, уникальное"
-					radius={0}
-					maxLength={32}
-				/>
-				<OrnateButton
-					variant="parchment"
-					withDiamonds={false}
-					disabled={saving || uploading || displayName.trim() === player.displayName}
-					onClick={() => void saveName()}
-				>
-					{saving ? 'Сохранение…' : 'Сохранить имя'}
-				</OrnateButton>
-			</Stack>
-		</PageFrame>
+			</div>
+			<TextInput
+				label="Имя"
+				value={displayName}
+				onChange={(event) => setDisplayName(event.currentTarget.value)}
+				description="От 2 до 32 символов, уникальное"
+				radius={0}
+				maxLength={32}
+			/>
+			<OrnateButton
+				variant="parchment"
+				withDiamonds={false}
+				disabled={saving || uploading || displayName.trim() === player.displayName}
+				onClick={() => void saveName()}
+			>
+				{saving ? 'Сохранение…' : 'Сохранить имя'}
+			</OrnateButton>
+		</Stack>
 	);
 };
