@@ -146,14 +146,9 @@ export const Header = () => {
 										Рейтинг
 									</Menu.Item>
 									{player.role === 'admin' ? (
-										<>
-											<Menu.Item component={Link} to="/admin/news">
-												Управление новостями
-											</Menu.Item>
-											<Menu.Item component={Link} to="/admin/presets">
-												Пресеты отряда
-											</Menu.Item>
-										</>
+										<Menu.Item component={Link} to="/admin/news">
+											Управление новостями
+										</Menu.Item>
 									) : null}
 									<Menu.Divider />
 									<Menu.Item

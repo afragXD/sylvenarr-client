@@ -1,6 +1,6 @@
 import { PresetsLibraryPage } from '@/pages/Presets';
 
 /**
- * Личная библиотека пресетов отряда.
+ * Библиотека пресетов отряда в профиле.
  */
-export const ProfilePresetsPage = () => <PresetsLibraryPage mode="profile" />;
+export const ProfilePresetsPage = () => <PresetsLibraryPage />;

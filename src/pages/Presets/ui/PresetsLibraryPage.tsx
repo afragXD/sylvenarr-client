@@ -16,17 +16,12 @@ import { OrnateButton } from '@/shared/ui/OrnateButton';
 
 import { PresetEditorForm } from './PresetEditorForm';
 
-type PresetsLibraryPageProps = {
-	/** Только глобальные (админка). */
-	mode: 'profile' | 'admin';
-};
-
 type ProfilePresetsTab = 'personal' | 'global';
 
 /**
- * Библиотека пресетов: личные + просмотр глобальных, либо CRUD глобальных в админке.
+ * Библиотека пресетов: личные (CRUD) + глобальные (просмотр; admin — CRUD).
  */
-export const PresetsLibraryPage = ({ mode }: PresetsLibraryPageProps) => {
+export const PresetsLibraryPage = () => {
 	const navigate = useNavigate();
 	const [player, setPlayer] = useState<Player | null>(null);
 	const [heroes, setHeroes] = useState<HeroClass[]>([]);
@@ -37,13 +32,10 @@ export const PresetsLibraryPage = ({ mode }: PresetsLibraryPageProps) => {
 	const [editing, setEditing] = useState<SquadPreset | null>(null);
 	const [profileTab, setProfileTab] = useState<ProfilePresetsTab>('personal');
 
-	const isAdminMode = mode === 'admin';
-	const canEditGlobal = isAdminMode || player?.role === 'admin';
+	const canEditGlobal = player?.role === 'admin';
 
 	const reload = async () => {
-		const list = await fetchPresets({
-			scope: isAdminMode ? 'global' : 'all',
-		});
+		const list = await fetchPresets({ scope: 'all' });
 		setPresets(list);
 	};
 
@@ -68,7 +60,7 @@ export const PresetsLibraryPage = ({ mode }: PresetsLibraryPageProps) => {
 			alive = false;
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- boot once
-	}, [navigate, isAdminMode]);
+	}, [navigate]);
 
 	const mine = presets.filter((preset) => !preset.isGlobal);
 	const globals = presets.filter((preset) => preset.isGlobal);
@@ -115,7 +107,7 @@ export const PresetsLibraryPage = ({ mode }: PresetsLibraryPageProps) => {
 				await createPreset({
 					name: input.name,
 					slots: input.slots,
-					global: isAdminMode ? true : Boolean(input.global),
+					global: Boolean(input.global),
 				});
 			}
 			setEditorOpen(false);
@@ -199,9 +191,8 @@ export const PresetsLibraryPage = ({ mode }: PresetsLibraryPageProps) => {
 		<Stack gap="lg">
 			<Group justify="space-between" wrap="wrap" gap="sm">
 				<Text size="sm" c="var(--app-text-muted)">
-					{isAdminMode
-						? 'Глобальные пресеты видны всем игрокам в лобби.'
-						: 'Свои пресеты можно править. Глобальные — готовые составы от команды.'}
+					Свои пресеты можно править. Глобальные — готовые составы от команды
+					{canEditGlobal ? ' (их тоже можно править)' : ''}.
 				</Text>
 				<OrnateButton
 					variant="parchment"
@@ -219,30 +210,26 @@ export const PresetsLibraryPage = ({ mode }: PresetsLibraryPageProps) => {
 				</Text>
 			) : null}
 
-			{isAdminMode ? (
-				renderTable(globals, true)
-			) : (
-				<Tabs
-					value={profileTab}
-					onChange={(value) => {
-						if (value === 'personal' || value === 'global') {
-							setProfileTab(value);
-						}
-					}}
-					radius={0}
-				>
-					<Tabs.List>
-						<Tabs.Tab value="personal">Личные</Tabs.Tab>
-						<Tabs.Tab value="global">Глобальные</Tabs.Tab>
-					</Tabs.List>
-					<Tabs.Panel value="personal" pt="sm">
-						{renderTable(mine, true)}
-					</Tabs.Panel>
-					<Tabs.Panel value="global" pt="sm">
-						{renderTable(globals, canEditGlobal)}
-					</Tabs.Panel>
-				</Tabs>
-			)}
+			<Tabs
+				value={profileTab}
+				onChange={(value) => {
+					if (value === 'personal' || value === 'global') {
+						setProfileTab(value);
+					}
+				}}
+				radius={0}
+			>
+				<Tabs.List>
+					<Tabs.Tab value="personal">Личные</Tabs.Tab>
+					<Tabs.Tab value="global">Глобальные</Tabs.Tab>
+				</Tabs.List>
+				<Tabs.Panel value="personal" pt="sm">
+					{renderTable(mine, true)}
+				</Tabs.Panel>
+				<Tabs.Panel value="global" pt="sm">
+					{renderTable(globals, canEditGlobal)}
+				</Tabs.Panel>
+			</Tabs>
 
 			<Modal
 				opened={editorOpen}
@@ -259,7 +246,7 @@ export const PresetsLibraryPage = ({ mode }: PresetsLibraryPageProps) => {
 				<PresetEditorForm
 					heroes={heroes}
 					initial={editing}
-					allowGlobal={!isAdminMode && player?.role === 'admin'}
+					allowGlobal={canEditGlobal}
 					busy={busy}
 					onSubmit={handleSubmit}
 					onCancel={() => {
