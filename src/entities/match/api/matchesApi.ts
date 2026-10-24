@@ -84,6 +84,24 @@ export async function draftPick(input: {
 }
 
 /**
+ * Применить пресет отряда в draft.
+ */
+export async function draftPreset(input: {
+	readonly matchId: string;
+	readonly presetId: string;
+}): Promise<Match> {
+	return apiFetchJson(
+		`/matches/${encodeURIComponent(input.matchId)}/draft/preset`,
+		{
+			method: 'POST',
+			body: JSON.stringify({ presetId: input.presetId }),
+		},
+		parseMatch,
+		'Не удалось применить пресет',
+	);
+}
+
+/**
  * Случайный пик в draft.
  */
 export async function draftRandom(input: {

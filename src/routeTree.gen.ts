@@ -22,6 +22,7 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminNewsRouteImport } from './routes/admin.news'
+import { Route as AdminPresetsRouteImport } from './routes/admin.presets'
 import { Route as HeroesIndexRouteImport } from './routes/heroes.index'
 import { Route as HeroesCodeRouteImport } from './routes/heroes.$code'
 import { Route as HeroesEffectsRouteImport } from './routes/heroes.effects'
@@ -34,6 +35,7 @@ import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
 import { Route as ProfileDossierRouteImport } from './routes/profile.dossier'
+import { Route as ProfilePresetsRouteImport } from './routes/profile.presets'
 import { Route as ProfileSettingsRouteImport } from './routes/profile.settings'
 import { Route as AdminNewsIndexRouteImport } from './routes/admin.news.index'
 import { Route as AdminNewsIdRouteImport } from './routes/admin.news.$id'
@@ -104,6 +106,11 @@ const AdminNewsRoute = AdminNewsRouteImport.update({
   path: '/admin/news',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPresetsRoute = AdminPresetsRouteImport.update({
+  id: '/admin/presets',
+  path: '/admin/presets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HeroesIndexRoute = HeroesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -164,6 +171,11 @@ const ProfileDossierRoute = ProfileDossierRouteImport.update({
   path: '/dossier',
   getParentRoute: () => ProfileRoute,
 } as any)
+const ProfilePresetsRoute = ProfilePresetsRouteImport.update({
+  id: '/presets',
+  path: '/presets',
+  getParentRoute: () => ProfileRoute,
+} as any)
 const ProfileSettingsRoute = ProfileSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -199,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/news': typeof AdminNewsRouteWithChildren
+  '/admin/presets': typeof AdminPresetsRoute
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
   '/heroes/popular': typeof HeroesPopularRoute
@@ -206,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/news/$slug': typeof NewsSlugRoute
   '/profile/dossier': typeof ProfileDossierRoute
+  '/profile/presets': typeof ProfilePresetsRoute
   '/profile/settings': typeof ProfileSettingsRoute
   '/heroes/': typeof HeroesIndexRoute
   '/lobby/': typeof LobbyIndexRoute
@@ -224,6 +238,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/presets': typeof AdminPresetsRoute
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
   '/heroes/popular': typeof HeroesPopularRoute
@@ -231,6 +246,7 @@ export interface FileRoutesByTo {
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/news/$slug': typeof NewsSlugRoute
   '/profile/dossier': typeof ProfileDossierRoute
+  '/profile/presets': typeof ProfilePresetsRoute
   '/profile/settings': typeof ProfileSettingsRoute
   '/heroes': typeof HeroesIndexRoute
   '/lobby': typeof LobbyIndexRoute
@@ -256,6 +272,7 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/news': typeof AdminNewsRouteWithChildren
+  '/admin/presets': typeof AdminPresetsRoute
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
   '/heroes/popular': typeof HeroesPopularRoute
@@ -263,6 +280,7 @@ export interface FileRoutesById {
   '/matches/$matchId': typeof MatchesMatchIdRoute
   '/news/$slug': typeof NewsSlugRoute
   '/profile/dossier': typeof ProfileDossierRoute
+  '/profile/presets': typeof ProfilePresetsRoute
   '/profile/settings': typeof ProfileSettingsRoute
   '/heroes/': typeof HeroesIndexRoute
   '/lobby/': typeof LobbyIndexRoute
@@ -289,6 +307,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/sitemap.xml'
     | '/admin/news'
+    | '/admin/presets'
     | '/heroes/$code'
     | '/heroes/effects'
     | '/heroes/popular'
@@ -296,6 +315,7 @@ export interface FileRouteTypes {
     | '/matches/$matchId'
     | '/news/$slug'
     | '/profile/dossier'
+    | '/profile/presets'
     | '/profile/settings'
     | '/heroes/'
     | '/lobby/'
@@ -314,6 +334,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/sitemap.xml'
+    | '/admin/presets'
     | '/heroes/$code'
     | '/heroes/effects'
     | '/heroes/popular'
@@ -321,6 +342,7 @@ export interface FileRouteTypes {
     | '/matches/$matchId'
     | '/news/$slug'
     | '/profile/dossier'
+    | '/profile/presets'
     | '/profile/settings'
     | '/heroes'
     | '/lobby'
@@ -345,6 +367,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/sitemap.xml'
     | '/admin/news'
+    | '/admin/presets'
     | '/heroes/$code'
     | '/heroes/effects'
     | '/heroes/popular'
@@ -352,6 +375,7 @@ export interface FileRouteTypes {
     | '/matches/$matchId'
     | '/news/$slug'
     | '/profile/dossier'
+    | '/profile/presets'
     | '/profile/settings'
     | '/heroes/'
     | '/lobby/'
@@ -377,6 +401,7 @@ export interface RootRouteChildren {
   SignUpRoute: typeof SignUpRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminNewsRoute: typeof AdminNewsRouteWithChildren
+  AdminPresetsRoute: typeof AdminPresetsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -472,6 +497,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNewsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/presets': {
+      id: '/admin/presets'
+      path: '/admin/presets'
+      fullPath: '/admin/presets'
+      preLoaderRoute: typeof AdminPresetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/heroes/': {
       id: '/heroes/'
       path: '/'
@@ -554,6 +586,13 @@ declare module '@tanstack/react-router' {
       path: '/dossier'
       fullPath: '/profile/dossier'
       preLoaderRoute: typeof ProfileDossierRouteImport
+      parentRoute: typeof ProfileRoute
+    }
+    '/profile/presets': {
+      id: '/profile/presets'
+      path: '/presets'
+      fullPath: '/profile/presets'
+      preLoaderRoute: typeof ProfilePresetsRouteImport
       parentRoute: typeof ProfileRoute
     }
     '/profile/settings': {
@@ -643,12 +682,14 @@ const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
 
 interface ProfileRouteChildren {
   ProfileDossierRoute: typeof ProfileDossierRoute
+  ProfilePresetsRoute: typeof ProfilePresetsRoute
   ProfileSettingsRoute: typeof ProfileSettingsRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
 const ProfileRouteChildren: ProfileRouteChildren = {
   ProfileDossierRoute: ProfileDossierRoute,
+  ProfilePresetsRoute: ProfilePresetsRoute,
   ProfileSettingsRoute: ProfileSettingsRoute,
   ProfileIndexRoute: ProfileIndexRoute,
 }
@@ -686,6 +727,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpRoute: SignUpRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminNewsRoute: AdminNewsRouteWithChildren,
+  AdminPresetsRoute: AdminPresetsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

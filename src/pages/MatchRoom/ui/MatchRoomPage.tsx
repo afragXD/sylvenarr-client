@@ -7,6 +7,7 @@ import { fetchHeroes, type HeroClass } from '@/entities/hero';
 import {
 	cancelMatch,
 	draftPick,
+	draftPreset,
 	draftRandom,
 	fetchMatchById,
 	formatRulesSummary,
@@ -22,6 +23,8 @@ import { API_BASE_URL } from '@/shared/constants';
 import { InviteCodeChip } from '@/shared/ui/InviteCodeChip';
 import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
+
+import { DraftPresetModal } from './DraftPresetModal';
 
 const POLL_MS = 2500;
 const PING_MS = 20_000;
@@ -78,6 +81,7 @@ export const MatchRoomPage = () => {
 	const [isBusy, setIsBusy] = useState(false);
 	const [bootError, setBootError] = useState<string | null>(null);
 	const [modalHeroCode, setModalHeroCode] = useState<string | null>(null);
+	const [presetModalOpen, setPresetModalOpen] = useState(false);
 	const battleSocketRef = useRef<WebSocket | null>(null);
 
 	const sensors = useSensors(
@@ -272,6 +276,23 @@ export const MatchRoomPage = () => {
 		}
 	};
 
+	const handleApplyPreset = async (presetId: string) => {
+		if (!match) {
+			return;
+		}
+		setIsBusy(true);
+		setError(null);
+		try {
+			const next = await draftPreset({ matchId: match.id, presetId });
+			setMatch(next);
+			setPresetModalOpen(false);
+		} catch (err) {
+			setError(err instanceof ApiError ? err.message : 'Ошибка пресета');
+		} finally {
+			setIsBusy(false);
+		}
+	};
+
 	const sendBattleFrame = (frame: Record<string, unknown>) => {
 		const socket = battleSocketRef.current;
 		if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -413,6 +434,18 @@ export const MatchRoomPage = () => {
 				? match.draft.hostSize
 				: match.draft.guestSize
 			: 0;
+	const myEntry =
+		player && match
+			? player.id === match.host.id
+				? (match.draft.hostEntry ?? (mySize > 0 ? 'draft' : 'empty'))
+				: (match.draft.guestEntry ?? (mySize > 0 ? 'draft' : 'empty'))
+			: 'empty';
+	const lockedByPreset = myEntry === 'preset';
+	const canApplyPreset =
+		match?.status === 'drafting' &&
+		match.draft.initialTeamSize >= 3 &&
+		myEntry === 'empty' &&
+		!isBusy;
 
 	if (bootError) {
 		return (
@@ -441,6 +474,7 @@ export const MatchRoomPage = () => {
 	const canDragUnits =
 		match.status === 'drafting' &&
 		!isBusy &&
+		!lockedByPreset &&
 		(player.id === match.host.id || player.id === match.guest?.id);
 
 	return (
@@ -547,7 +581,9 @@ export const MatchRoomPage = () => {
 									cap={match.draft.initialTeamSize}
 									picks={match.draft.hostPicks}
 									isTurn={match.draft.turnPlayerId === match.host.id}
-									acceptDrops={player.id === match.host.id && !isBusy}
+									acceptDrops={
+										player.id === match.host.id && !isBusy && !lockedByPreset
+									}
 									canDragUnits={canDragUnits && player.id === match.host.id}
 									mirrorRows
 								/>
@@ -565,7 +601,12 @@ export const MatchRoomPage = () => {
 									cap={match.draft.initialTeamSize}
 									picks={match.draft.guestPicks}
 									isTurn={match.draft.turnPlayerId === match.guest?.id}
-									acceptDrops={Boolean(match.guest) && player.id === match.guest?.id && !isBusy}
+									acceptDrops={
+										Boolean(match.guest) &&
+										player.id === match.guest?.id &&
+										!isBusy &&
+										!lockedByPreset
+									}
 									canDragUnits={
 										canDragUnits && Boolean(match.guest) && player.id === match.guest?.id
 									}
@@ -575,75 +616,97 @@ export const MatchRoomPage = () => {
 							<Stack gap="md">
 								<Group justify="space-between" align="center" wrap="wrap" gap="sm">
 									<Text fw={600}>
-										{isMyTurn
-											? `Ваш ход · квота ${mySize}/${match.draft.initialTeamSize}. Перетащите героя на ряд.`
-											: 'Ход соперника…'}
+										{lockedByPreset
+											? 'Отряд зафиксирован пресетом. Ждём соперника…'
+											: isMyTurn
+												? `Ваш ход · квота ${mySize}/${match.draft.initialTeamSize}. Перетащите героя на ряд.`
+												: 'Ход соперника…'}
 									</Text>
-									<Button
-										variant="light"
-										color="accent"
-										loading={isBusy}
-										disabled={!isMyTurn}
-										onClick={() => void handleRandom()}
-									>
-										Случайно
-									</Button>
+									<Group gap="sm">
+										{canApplyPreset ? (
+											<Button
+												variant="light"
+												color="brand"
+												disabled={isBusy}
+												onClick={() => setPresetModalOpen(true)}
+											>
+												Пресет
+											</Button>
+										) : null}
+										<Button
+											variant="light"
+											color="accent"
+											loading={isBusy}
+											disabled={!isMyTurn || lockedByPreset}
+											onClick={() => void handleRandom()}
+										>
+											Случайно
+										</Button>
+									</Group>
 								</Group>
 								{error && (
 									<Text c="red" role="alert">
 										{error}
 									</Text>
 								)}
-								<Text size="sm" c="var(--app-text-muted)">
-									Цифра в углу карточки — сколько слотов герой занимает в отряде: I — один, II —
-									два.
-								</Text>
-								<SimpleGrid
-									cols={{ base: 3, sm: 4, md: 6, lg: 8 }}
-									spacing="lg"
-									verticalSpacing="lg"
-								>
-									{[...heroes]
-										.sort(
-											(a, b) => b.size - a.size || a.displayName.localeCompare(b.displayName, 'ru'),
-										)
-										.map((hero) => {
-											const freeSlots = match.draft.initialTeamSize - mySize;
-											const fits = hero.size <= freeSlots;
-											const ownCodes = new Set(
-												[...match.draft.hostPicks, ...match.draft.guestPicks]
-													.filter((pick) => pick.playerId === player?.id)
-													.map((pick) => pick.heroClassCode),
-											);
-											const allCodes = new Set(
-												[...match.draft.hostPicks, ...match.draft.guestPicks].map(
-													(pick) => pick.heroClassCode,
-												),
-											);
-											const blockedByDupes =
-												(match.rules.heroDupes === 'uniqueTeam' && ownCodes.has(hero.code)) ||
-												(match.rules.heroDupes === 'uniqueMatch' && allCodes.has(hero.code));
-											const disabled = !isMyTurn || isBusy || !fits || blockedByDupes;
-											const disabledReason = !isMyTurn
-												? 'Сейчас ход соперника'
-												: blockedByDupes
-													? match.rules.heroDupes === 'uniqueMatch'
-														? 'Этот класс уже выбран в матче'
-														: 'Этот класс уже есть в вашем отряде'
-													: !fits
-														? `Не хватает места: нужно ${hero.size}, свободно ${freeSlots}`
-														: undefined;
-											return (
-												<DraftHeroCard
-													key={hero.code}
-													hero={hero}
-													disabled={disabled}
-													disabledReason={disabledReason}
-													onOpen={setModalHeroCode}
-												/>
-											);
-										})}
-								</SimpleGrid>
+								{!lockedByPreset ? (
+									<>
+										<Text size="sm" c="var(--app-text-muted)">
+											Цифра в углу карточки — сколько слотов герой занимает в отряде: I — один, II —
+											два.
+										</Text>
+										<SimpleGrid
+											cols={{ base: 3, sm: 4, md: 6, lg: 8 }}
+											spacing="lg"
+											verticalSpacing="lg"
+										>
+											{[...heroes]
+												.sort(
+													(a, b) =>
+														b.size - a.size || a.displayName.localeCompare(b.displayName, 'ru'),
+												)
+												.map((hero) => {
+													const freeSlots = match.draft.initialTeamSize - mySize;
+													const fits = hero.size <= freeSlots;
+													const ownCodes = new Set(
+														[...match.draft.hostPicks, ...match.draft.guestPicks]
+															.filter((pick) => pick.playerId === player?.id)
+															.map((pick) => pick.heroClassCode),
+													);
+													const allCodes = new Set(
+														[...match.draft.hostPicks, ...match.draft.guestPicks].map(
+															(pick) => pick.heroClassCode,
+														),
+													);
+													const blockedByDupes =
+														(match.rules.heroDupes === 'uniqueTeam' &&
+															ownCodes.has(hero.code)) ||
+														(match.rules.heroDupes === 'uniqueMatch' &&
+															allCodes.has(hero.code));
+													const disabled =
+														!isMyTurn || isBusy || !fits || blockedByDupes;
+													const disabledReason = !isMyTurn
+														? 'Сейчас ход соперника'
+														: blockedByDupes
+															? match.rules.heroDupes === 'uniqueMatch'
+																? 'Этот класс уже выбран в матче'
+																: 'Этот класс уже есть в вашем отряде'
+															: !fits
+																? `Не хватает места: нужно ${hero.size}, свободно ${freeSlots}`
+																: undefined;
+													return (
+														<DraftHeroCard
+															key={hero.code}
+															hero={hero}
+															disabled={disabled}
+															disabledReason={disabledReason}
+															onOpen={setModalHeroCode}
+														/>
+													);
+												})}
+										</SimpleGrid>
+									</>
+								) : null}
 							</Stack>
 						</>
 					)}
@@ -660,6 +723,13 @@ export const MatchRoomPage = () => {
 			</DndContext>
 
 			<HeroDetailModal code={modalHeroCode} onClose={() => setModalHeroCode(null)} />
+			<DraftPresetModal
+				opened={presetModalOpen}
+				teamSize={match.draft.initialTeamSize}
+				busy={isBusy}
+				onClose={() => setPresetModalOpen(false)}
+				onPick={(presetId) => void handleApplyPreset(presetId)}
+			/>
 		</PageFrame>
 	);
 };

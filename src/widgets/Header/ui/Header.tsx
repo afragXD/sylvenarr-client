@@ -130,6 +130,9 @@ export const Header = () => {
 									<Menu.Item component={Link} to="/profile/dossier">
 										Досье
 									</Menu.Item>
+									<Menu.Item component={Link} to="/profile/presets">
+										Пресеты
+									</Menu.Item>
 									<Menu.Item component={Link} to="/profile/settings">
 										Настройки
 									</Menu.Item>
@@ -143,9 +146,14 @@ export const Header = () => {
 										Рейтинг
 									</Menu.Item>
 									{player.role === 'admin' ? (
-										<Menu.Item component={Link} to="/admin/news">
-											Управление новостями
-										</Menu.Item>
+										<>
+											<Menu.Item component={Link} to="/admin/news">
+												Управление новостями
+											</Menu.Item>
+											<Menu.Item component={Link} to="/admin/presets">
+												Пресеты отряда
+											</Menu.Item>
+										</>
 									) : null}
 									<Menu.Divider />
 									<Menu.Item

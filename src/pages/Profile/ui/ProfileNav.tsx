@@ -5,6 +5,7 @@ import classes from './ProfileShell.module.css';
 const LINKS = [
 	{ to: '/profile/settings' as const, label: 'Настройки' },
 	{ to: '/profile/dossier' as const, label: 'Досье' },
+	{ to: '/profile/presets' as const, label: 'Пресеты' },
 ];
 
 /**

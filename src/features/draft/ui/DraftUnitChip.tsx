@@ -22,6 +22,8 @@ export const DraftUnitChip = ({ pick, canDrag }: DraftUnitChipProps) => {
 		data: { type: 'pick', pickId: pick.id, fromRow: pick.row, size: pick.size },
 	});
 
+	const isHidden = !pick.heroClassCode || pick.displayName === 'Скрыто';
+
 	return (
 		<Box
 			ref={setNodeRef}
@@ -33,9 +35,13 @@ export const DraftUnitChip = ({ pick, canDrag }: DraftUnitChipProps) => {
 			}}
 			{...(canDrag ? { ...listeners, ...attributes } : {})}
 		>
-			<HeroImage code={pick.heroClassCode} alt={pick.displayName} w={32} h={32} radius={0} />
+			{isHidden ? (
+				<Box w={32} h={32} style={{ background: 'var(--app-panel-border)', flexShrink: 0 }} />
+			) : (
+				<HeroImage code={pick.heroClassCode} alt={pick.displayName} w={32} h={32} radius={0} />
+			)}
 			<Text className={styles.name} size="sm" lineClamp={1}>
-				{pick.displayName}
+				{isHidden ? 'Скрыто' : pick.displayName}
 				{pick.size > 1 ? ` (${pick.size})` : ''}
 			</Text>
 		</Box>

@@ -17,6 +17,8 @@ export type MatchPlayerBrief = {
 	avatarUrl: string | null;
 };
 
+export type MatchDraftPickSource = 'draft' | 'preset';
+
 export type MatchDraftPick = {
 	id: string;
 	playerId: string;
@@ -25,7 +27,10 @@ export type MatchDraftPick = {
 	size: number;
 	row: number;
 	pickOrder: number;
+	source?: MatchDraftPickSource;
 };
+
+export type MatchDraftEntry = 'empty' | 'draft' | 'preset';
 
 export type MatchDraftState = {
 	turnPlayerId: string | null;
@@ -34,6 +39,8 @@ export type MatchDraftState = {
 	hostSize: number;
 	guestSize: number;
 	initialTeamSize: number;
+	hostEntry?: MatchDraftEntry;
+	guestEntry?: MatchDraftEntry;
 };
 
 export type BattleEffectBrief = {

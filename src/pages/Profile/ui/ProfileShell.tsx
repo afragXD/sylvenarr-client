@@ -14,6 +14,20 @@ const SECTION_META: Record<string, { title: string; lead: string }> = {
 		title: 'Досье',
 		lead: 'Герои, которых вы берёте чаще всего',
 	},
+	presets: {
+		title: 'Пресеты отряда',
+		lead: 'Готовые составы для лобби',
+	},
+};
+
+const metaForPath = (pathname: string) => {
+	if (pathname.startsWith('/profile/dossier')) {
+		return SECTION_META.dossier;
+	}
+	if (pathname.startsWith('/profile/presets')) {
+		return SECTION_META.presets;
+	}
+	return SECTION_META.settings;
 };
 
 /**
@@ -21,9 +35,7 @@ const SECTION_META: Record<string, { title: string; lead: string }> = {
  */
 export const ProfileShell = () => {
 	const pathname = useRouterState({ select: (state) => state.location.pathname });
-	const meta = pathname.startsWith('/profile/dossier')
-		? SECTION_META.dossier
-		: SECTION_META.settings;
+	const meta = metaForPath(pathname);
 
 	return (
 		<PageFrame title={meta.title} eyebrow="Аккаунт" width="wide" lead={meta.lead}>
