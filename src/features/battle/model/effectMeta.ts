@@ -21,6 +21,7 @@ import {
 	Orbit,
 	Shield,
 	ShieldOff,
+	Shuffle,
 	Skull,
 	Smile,
 	Sparkles,
@@ -30,6 +31,7 @@ import {
 	Timer,
 	VolumeX,
 	WifiOff,
+	Wind,
 	Zap,
 	ZapOff,
 } from 'lucide-react';
@@ -58,6 +60,9 @@ export type EffectId =
 	| 'INTERFERENCE'
 	| 'SILENCE'
 	| 'IMPISH'
+	| 'POLYMORPH'
+	| 'FIRESHIELD'
+	| 'AIRSHIELD'
 	| 'LUCKY'
 	| 'FOCUSED'
 	| 'STUNNED'
@@ -67,6 +72,7 @@ export type EffectId =
 	| 'GALL'
 	| 'SANCTUM'
 	| 'FIREDWEAPON'
+	| 'AIRWEAPON'
 	| 'MIND_WARD'
 	| 'INVISIBLE'
 	| 'INTERDICT'
@@ -106,12 +112,16 @@ const BUFF_ORDER: EffectId[] = [
 	'REGENHP',
 	'HASTE',
 	'CHAMELEON',
+	'POLYMORPH',
+	'FIRESHIELD',
+	'AIRSHIELD',
 	'STONEFLESH',
 	'CONTR',
 	'LUCKY',
 	'FOCUSED',
 	'SANCTUM',
 	'FIREDWEAPON',
+	'AIRWEAPON',
 	'MIND_WARD',
 	'INVISIBLE',
 	'ROW_FORTIFY',
@@ -147,10 +157,19 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	GUARDED: {
 		id: 'GUARDED',
 		label: 'Под охраной',
-		description: 'Союзник прикрывает цель: повышенная защита на несколько раундов.',
-		mechanics: '+3 брони · 2 р.',
-		exampleAtL: exampleTypical('+3 брони · 2 р.'),
+		description: 'Носителя нельзя выбрать целью обычных атак и большинства способностей.',
+		mechanics: 'блок выбора цели · 1–2 р. (детектив и укус оборотня пробивают)',
+		exampleAtL: exampleTypical('2 р. (рыцарь) / 1 р. (скелет-чемпион)'),
 		Icon: Shield,
+		kind: 'buff',
+	},
+	AIRSHIELD: {
+		id: 'AIRSHIELD',
+		label: 'Воздушный щит',
+		description: 'Снижает урон от стрел и снарядов.',
+		mechanics: '+33 сопротивления «Снаряды» · 2 р.',
+		exampleAtL: exampleTypical('стрелы −33% · 2 р.'),
+		Icon: Wind,
 		kind: 'buff',
 	},
 	STRENGTH: {
@@ -351,6 +370,24 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		Icon: Bug,
 		kind: 'debuff',
 	},
+	POLYMORPH: {
+		id: 'POLYMORPH',
+		label: 'Многоликий',
+		description: 'Ассасин в чужом облике; по окончании возвращается к себе.',
+		mechanics: 'чужой класс · 2 р., затем откат',
+		exampleAtL: exampleTypical('2 р.'),
+		Icon: Shuffle,
+		kind: 'buff',
+	},
+	FIRESHIELD: {
+		id: 'FIRESHIELD',
+		label: 'Огненный щит',
+		description: 'Атакующий получает огненный урон и теряет броню; заряд щита тратится.',
+		mechanics: 'ответный огонь ≈ 0.6×урон атакующего + ур. носителя · заряд/удар',
+		exampleAtL: exampleTypical('обжиг + −броня за удар'),
+		Icon: Flame,
+		kind: 'buff',
+	},
 	LUCKY: {
 		id: 'LUCKY',
 		label: 'Удача',
@@ -430,6 +467,15 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		mechanics: 'удар → шанс «Поджог» · (1 + ⌊L/6⌋) р.',
 		exampleAtL: exampleAtL('1 р.'),
 		Icon: Flame,
+		kind: 'buff',
+	},
+	AIRWEAPON: {
+		id: 'AIRWEAPON',
+		label: 'Электрическое оружие',
+		description: 'Удары наносят доп. урон воздухом и могут оглушить.',
+		mechanics: 'доп. воздух ≈ сила/5+4; стан 50+⌊сила/5⌋% · 2 р.',
+		exampleAtL: exampleTypical('искры + шанс стана'),
+		Icon: Zap,
 		kind: 'buff',
 	},
 	MIND_WARD: {

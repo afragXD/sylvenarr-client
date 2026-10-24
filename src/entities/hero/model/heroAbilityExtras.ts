@@ -25,7 +25,10 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				mechanics: 'Стоимость 110 золота; «Сила» / «Благословение» ряду на 2 р.',
 				tags: ['buff'],
 			},
-			4: { mechanics: '«Под охраной» союзнику · 2 р., +3 брони.', tags: ['buff'] },
+			4: {
+				mechanics: '«Под охраной» союзнику · 2 р. (нельзя выбрать целью атаки).',
+				tags: ['buff'],
+			},
 			5: {
 				mechanics:
 					'Снимает «Отравление» / «Поджог» / «Кровотечение»; шанс сохранить ход.',
@@ -62,7 +65,10 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				mechanics: 'Магия ×1.1 + урон по соседней цели; игнор брони 15%.',
 				tags: ['attack', 'aoe'],
 			},
-			2: { mechanics: 'Призыв/эволюция нежити (меню).', tags: ['summon'] },
+			2: {
+				mechanics: 'Призыв/эволюция: скелет-чемпион на 2-м применении.',
+				tags: ['summon'],
+			},
 			3: {
 				mechanics:
 					'Саммону: усиление; союзнику: «Пьющий жизни» · 1 р.',
@@ -72,7 +78,10 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				mechanics: 'Одной цели: шанс «Ужас» · 2 р.',
 				tags: ['debuff'],
 			},
-			5: { mechanics: 'Жертва союзника → мана + усиление.', tags: ['buff'] },
+			5: {
+				mechanics: '3 МР; жертва союзника → ~½ ур. жертвы + мана с ОЗ + усиление.',
+				tags: ['buff'],
+			},
 		},
 	},
 	DemonLord: {
@@ -85,7 +94,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			3: { mechanics: 'Магия; шанс сильного −брони.', tags: ['attack', 'debuff'] },
 			4: {
 				mechanics:
-					'На себя «Под охраной»; союзнику «Регенерация». Не путать с «Огненным оружием».',
+					'На себя «Огненный щит» + «Ускорение» (+15 ин., 2 р.); союзнику «Регенерация».',
 				tags: ['buff', 'heal'],
 			},
 			5: {
@@ -99,7 +108,8 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		slots: {
 			1: { mechanics: 'Урон ×1.15; игнор брони 35%.', tags: ['attack'] },
 			2: {
-				mechanics: 'На себя: «Радость» · 2 р.; +2 урона.',
+				mechanics:
+					'Цель (союзник/враг): «Многоликий» · 2 р., +1 ур., мораль +L+3. Гигант с L≥10.',
 				tags: ['buff'],
 			},
 			3: {
@@ -127,12 +137,12 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		},
 			3: {
 				mechanics:
-					'2 МР: ×1.1; игнор брони 15%; шанс украсть урон/силу цели.',
+					'2 МР, КД 3: ×1.1; игнор 15%; Chance(100, HOLY, LOWERING) → украсть 1+⌊L/5⌋ ур.',
 				tags: ['attack', 'debuff'],
 			},
 			4: {
 				mechanics:
-					'Рывок на фронт; «Ускорение» · 2 р.; ×1.25 против нежити.',
+					'Рывок на фронт; «Ускорение» · 2 р.; ×1.25 против нежити и демонов.',
 				tags: ['attack', 'buff'],
 			},
 		5: {
@@ -197,7 +207,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		slots: {
 			1: { mechanics: 'Удар булавой ×1.', tags: ['attack'] },
 			2: {
-				mechanics: '3 МР: молния + «Помехи» · 1 р.',
+				mechanics: '3 МР, КД 2: молния + «Помехи»; живым −(3–6+L) боевого духа.',
 				tags: ['attack', 'debuff'],
 			},
 			3: {
@@ -205,7 +215,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['debuff'],
 			},
 			4: {
-				mechanics: '×1.25; шанс «Оглушение» или −броня.',
+				mechanics: '×1.25; шанс «Оглушение» 62+2L% или −броня 25% урона.',
 				tags: ['attack', 'debuff'],
 			},
 			5: {
@@ -268,11 +278,11 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			},
 			2: {
 				mechanics:
-					'1 МР: ряду «Сила» + «Сосредоточение» · 2 р.',
+					'1 МР: ряду «Сила» (+25%) + «Сосредоточение» · 1 р.',
 				tags: ['buff', 'aoe'],
 			},
 			3: {
-				mechanics: 'Снимает ослабления с союзника.',
+				mechanics: 'Снимает ослабления с союзника и с Травницы.',
 				tags: ['heal'],
 			},
 			4: {
@@ -299,11 +309,12 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		slots: {
 			1: { mechanics: '2 МР: лечение + рост max ОЗ.', tags: ['heal'] },
 			2: {
-				mechanics: '3 МР: доп. ход союзнику (уже ходившему).',
+				mechanics: '3 МР, КД 2: доп. ход союзнику (уже ходившему), 100%.',
 				tags: ['buff'],
 			},
 			3: {
-				mechanics: '«Вард разума» + «Радость» цели.',
+				mechanics:
+					'2 р.: нечётный ур. → «Электрическое оружие»; чётный → «Пьющий жизни» (0.2+0.02L).',
 				tags: ['buff'],
 			},
 			4: { mechanics: 'Ульта: мана ряду.', tags: ['buff', 'aoe'] },
@@ -312,19 +323,20 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 	},
 	Demiurge: {
 		passiveMechanics:
-			'В начале хода: 50% «Под охраной» случайному союзнику · 2 р.',
+			'В начале хода: 50% «Воздушный щит» (+33 к сопротивлению снарядам) случайному союзнику · 2 р.',
 		slots: {
 			1: {
-				mechanics: '3 МР (фронт): молния + 2 цепочки ×0.5/×0.25.',
+				mechanics:
+					'3 МР (любой ряд): молния + 2 цепочки ×0.5/×0.25 (уклонение ×1.2). С фронта: стан 50+L% при попадании.',
 				tags: ['attack', 'aoe'],
 			},
 			2: {
-				mechanics: '5 МР (задний ряд): фантом-копия цели.',
+				mechanics: '5 МР (задний ряд): фантом-копия цели (мана = ⌊max/3⌋).',
 				tags: ['summon'],
 			},
 			3: {
 				mechanics:
-					'2 МР: помрачение — шанс, что цель ударит своего союзника.',
+					'2 МР, КД 2: шанс 80+L% (разум) — цель бьёт союзника с min(ОЗ−ур.).',
 				tags: ['debuff', 'attack'],
 			},
 			4: { mechanics: 'Призыв эктоплазмы на свой ряд.', tags: ['summon'] },
@@ -372,7 +384,8 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			tags: ['attack', 'buff'],
 		},
 			3: {
-				mechanics: '«Метка» + «Неудача» · 2 р.',
+				mechanics:
+					'«Метка» · (1+⌊L/4⌋) р.; «Головокружение» −(15+⌊L/2⌋) уклонения · (2+⌊L/7⌋) р.',
 				tags: ['debuff'],
 			},
 			4: {
@@ -495,7 +508,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		slots: {
 			1: {
 				mechanics:
-					'Лечение L×5+round(20×(2−оз/max)); +точность L×2+2 навсегда.',
+					'Лечение L×2+round(сила×(2−оз/max)); +точность L+2 навсегда.',
 				tags: ['heal', 'buff'],
 			},
 			2: {

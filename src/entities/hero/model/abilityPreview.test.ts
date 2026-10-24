@@ -47,15 +47,16 @@ describe('abilityPreview', () => {
 	});
 
 	test('Mermaid slot 1: heal range without target; exact with ratio', () => {
-		const range = getAbilityPreview('Mermaid', 1, base({ lvl: 2 }));
+		// base L×2 + power×(2−ratio); power=20 → min 4+20, max 4+40; acc L+2
+		const range = getAbilityPreview('Mermaid', 1, base({ lvl: 2, power: 20 }));
 		expect(range).toEqual([
-			{ kind: 'healRange', min: 30, max: 50 },
-			{ kind: 'accuracy', value: 6 },
+			{ kind: 'healRange', min: 24, max: 44 },
+			{ kind: 'accuracy', value: 4 },
 		]);
-		const exact = getAbilityPreview('Mermaid', 1, base({ lvl: 2, targetHpRatio: 1 }));
+		const exact = getAbilityPreview('Mermaid', 1, base({ lvl: 2, power: 20, targetHpRatio: 1 }));
 		expect(exact).toEqual([
-			{ kind: 'heal', value: 30 },
-			{ kind: 'accuracy', value: 6 },
+			{ kind: 'heal', value: 24 },
+			{ kind: 'accuracy', value: 4 },
 		]);
 	});
 

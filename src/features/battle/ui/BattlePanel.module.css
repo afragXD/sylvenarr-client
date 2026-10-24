@@ -80,6 +80,11 @@
 	outline: 2px solid var(--mantine-color-brand-5);
 }
 
+.unit[data-prompt-hover="true"] {
+	outline: 2px solid var(--mantine-color-yellow-5);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--mantine-color-yellow-5) 35%, transparent);
+}
+
 .unit[data-inspectable="true"] {
 	cursor: pointer;
 }

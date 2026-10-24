@@ -1,14 +1,11 @@
 import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { Anchor, Box, Button, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import { fetchHeroes, type HeroClass } from '@/entities/hero';
 import {
-	acceptDraw,
-	battleAction,
 	cancelMatch,
-	declineDraw,
 	draftPick,
 	draftRandom,
 	fetchMatchById,
@@ -16,8 +13,6 @@ import {
 	type Match,
 	type MatchDraftPick,
 	moveDraftPick,
-	offerDraw,
-	surrenderMatch,
 } from '@/entities/match';
 import { fetchCurrentPlayer, type Player } from '@/entities/player';
 import { BattlePanel } from '@/features/battle';
@@ -29,10 +24,46 @@ import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 const POLL_MS = 2500;
+const PING_MS = 20_000;
 
 const battleWsUrl = (matchId: string): string => {
 	const wsBase = API_BASE_URL.replace(/^http/i, 'ws');
 	return `${wsBase}/matches/ws/${encodeURIComponent(matchId)}`;
+};
+
+const mergeBattleFrame = (
+	prev: Match,
+	payload: { type?: string; battle?: Match['battle'] },
+): Match => {
+	const battle = payload.battle;
+	if (!battle) {
+		return prev;
+	}
+	const nextStatus =
+		payload.type === 'battle:ended' || battle.outcome !== 'ongoing'
+			? 'finished'
+			: prev.status === 'fighting'
+				? 'fighting'
+				: prev.status;
+	return {
+		...prev,
+		status: nextStatus,
+		winnerPlayerId: battle.winnerPlayerId ?? prev.winnerPlayerId,
+		battle: {
+			...battle,
+			skillLabel: battle.skillLabel ?? null,
+			legalSkillTargetIds: battle.legalSkillTargetIds ?? [],
+			abilities: battle.abilities ?? [],
+			pendingPrompt: battle.pendingPrompt ?? null,
+			units: (battle.units ?? []).map((unit) => ({
+				...unit,
+				effects: unit.effects ?? [],
+				isSummon: unit.isSummon ?? false,
+				horseIsDead: unit.horseIsDead ?? false,
+				mana: unit.mana ?? 0,
+			})),
+		},
+	};
 };
 const ROW_FRONT = 0;
 const ROW_BACK = 1;
@@ -47,6 +78,7 @@ export const MatchRoomPage = () => {
 	const [isBusy, setIsBusy] = useState(false);
 	const [bootError, setBootError] = useState<string | null>(null);
 	const [modalHeroCode, setModalHeroCode] = useState<string | null>(null);
+	const battleSocketRef = useRef<WebSocket | null>(null);
 
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -85,7 +117,12 @@ export const MatchRoomPage = () => {
 	const activeMatchStatus = match?.status;
 
 	useEffect(() => {
-		if (!activeMatchId || activeMatchStatus === 'cancelled' || activeMatchStatus === 'finished') {
+		if (
+			!activeMatchId ||
+			activeMatchStatus === 'cancelled' ||
+			activeMatchStatus === 'finished' ||
+			activeMatchStatus === 'fighting'
+		) {
 			return;
 		}
 		const timer = window.setInterval(() => {
@@ -103,70 +140,102 @@ export const MatchRoomPage = () => {
 	}, [activeMatchId, activeMatchStatus]);
 
 	useEffect(() => {
-		if (!activeMatchId || (activeMatchStatus !== 'fighting' && activeMatchStatus !== 'finished')) {
+		if (!activeMatchId || activeMatchStatus !== 'fighting') {
 			return;
 		}
-		let socket: WebSocket | null = null;
 		let closed = false;
-		try {
+		let socket: WebSocket | null = null;
+		let attempt = 0;
+		let generation = 0;
+		let pingTimer = 0;
+		let reconnectTimer = 0;
+
+		const connect = () => {
+			const mine = ++generation;
 			socket = new WebSocket(battleWsUrl(activeMatchId));
-		} catch {
-			return;
-		}
-		socket.addEventListener('open', () => {
-			socket?.send(JSON.stringify({ type: 'join' }));
-		});
-		socket.addEventListener('message', (event) => {
-			if (closed) {
-				return;
-			}
-			try {
-				const payload = JSON.parse(String(event.data)) as {
-					type?: string;
-					battle?: Match['battle'];
-				};
-				if (
-					(payload.type === 'battle:state' || payload.type === 'battle:ended') &&
-					payload.battle
-				) {
-					const battle = payload.battle;
-					setMatch((prev) => {
-						if (!prev) {
-							return prev;
-						}
-						const nextStatus =
-							payload.type === 'battle:ended' || battle.outcome !== 'ongoing'
-								? 'finished'
-								: prev.status === 'fighting'
-									? 'fighting'
-									: prev.status;
-						return {
-							...prev,
-							status: nextStatus,
-							winnerPlayerId: battle.winnerPlayerId ?? prev.winnerPlayerId,
-							battle: {
-								...battle,
-								skillLabel: battle.skillLabel ?? null,
-								legalSkillTargetIds: battle.legalSkillTargetIds ?? [],
-								abilities: battle.abilities ?? [],
-								pendingPrompt: battle.pendingPrompt ?? null,
-								units: (battle.units ?? []).map((unit) => ({
-									...unit,
-									effects: unit.effects ?? [],
-									isSummon: unit.isSummon ?? false,
-									horseIsDead: unit.horseIsDead ?? false,
-									mana: unit.mana ?? 0,
-								})),
-							},
-						};
-					});
+			battleSocketRef.current = socket;
+			socket.addEventListener('open', () => {
+				if (closed || mine !== generation) {
+					return;
 				}
-			} catch {
-				/* ignore malformed frames */
-			}
-		});
+				attempt = 0;
+				socket?.send(JSON.stringify({ type: 'join' }));
+				window.clearInterval(pingTimer);
+				pingTimer = window.setInterval(() => {
+					if (socket?.readyState === WebSocket.OPEN) {
+						socket.send(JSON.stringify({ type: 'ping' }));
+					}
+				}, PING_MS);
+			});
+			socket.addEventListener('message', (event) => {
+				if (closed || mine !== generation) {
+					return;
+				}
+				try {
+					const payload = JSON.parse(String(event.data)) as {
+						type?: string;
+						message?: string;
+						battle?: Match['battle'];
+					};
+					if (payload.type === 'error') {
+						setError(payload.message ?? 'Ошибка боя');
+						setIsBusy(false);
+						return;
+					}
+					if (payload.type === 'pong' || payload.type === 'join') {
+						return;
+					}
+					if (
+						(payload.type === 'battle:state' || payload.type === 'battle:ended') &&
+						payload.battle
+					) {
+						setMatch((prev) => (prev ? mergeBattleFrame(prev, payload) : prev));
+						setIsBusy(false);
+						if (payload.type === 'battle:ended' || payload.battle.outcome !== 'ongoing') {
+							void fetchMatchById(activeMatchId)
+								.then((next) => {
+									if (!closed) {
+										setMatch(next);
+									}
+								})
+								.catch(() => {
+									/* снимок боя уже применён */
+								});
+						}
+					}
+				} catch {
+					/* ignore malformed frames */
+				}
+			});
+			socket.addEventListener('close', () => {
+				window.clearInterval(pingTimer);
+				if (battleSocketRef.current === socket) {
+					battleSocketRef.current = null;
+				}
+				if (closed || mine !== generation) {
+					return;
+				}
+				void fetchMatchById(activeMatchId)
+					.then((next) => {
+						if (!closed) {
+							setMatch(next);
+						}
+					})
+					.catch(() => {
+						/* ignore */
+					});
+				const delay = Math.min(8000, 1000 * 2 ** attempt);
+				attempt += 1;
+				reconnectTimer = window.setTimeout(connect, delay);
+			});
+		};
+
+		connect();
 		return () => {
 			closed = true;
+			window.clearInterval(pingTimer);
+			window.clearTimeout(reconnectTimer);
+			battleSocketRef.current = null;
 			socket?.close();
 		};
 	}, [activeMatchId, activeMatchStatus]);
@@ -203,7 +272,17 @@ export const MatchRoomPage = () => {
 		}
 	};
 
-	const handleBattleAction = async (input: {
+	const sendBattleFrame = (frame: Record<string, unknown>) => {
+		const socket = battleSocketRef.current;
+		if (!socket || socket.readyState !== WebSocket.OPEN) {
+			setError('Нет связи с боем');
+			setIsBusy(false);
+			return;
+		}
+		socket.send(JSON.stringify(frame));
+	};
+
+	const handleBattleAction = (input: {
 		unitId: string;
 		action: 'attack' | 'defend' | 'wait' | 'skill' | 'ability' | 'move';
 		targetId?: string;
@@ -215,78 +294,43 @@ export const MatchRoomPage = () => {
 		}
 		setIsBusy(true);
 		setError(null);
-		try {
-			const next = await battleAction({ matchId: match.id, ...input });
-			setMatch(next);
-		} catch (err) {
-			setError(err instanceof ApiError ? err.message : 'Ошибка хода');
-		} finally {
-			setIsBusy(false);
-		}
+		sendBattleFrame({ type: 'action', ...input });
 	};
 
-	const handleSurrender = async () => {
+	const handleSurrender = () => {
 		if (!match) {
 			return;
 		}
 		setIsBusy(true);
 		setError(null);
-		try {
-			const next = await surrenderMatch(match.id);
-			setMatch(next);
-		} catch (err) {
-			setError(err instanceof ApiError ? err.message : 'Ошибка сдачи');
-		} finally {
-			setIsBusy(false);
-		}
+		sendBattleFrame({ type: 'surrender' });
 	};
 
-	const handleOfferDraw = async () => {
+	const handleOfferDraw = () => {
 		if (!match) {
 			return;
 		}
 		setIsBusy(true);
 		setError(null);
-		try {
-			const next = await offerDraw(match.id);
-			setMatch(next);
-		} catch (err) {
-			setError(err instanceof ApiError ? err.message : 'Ошибка предложения ничьей');
-		} finally {
-			setIsBusy(false);
-		}
+		sendBattleFrame({ type: 'draw-offer' });
 	};
 
-	const handleAcceptDraw = async () => {
+	const handleAcceptDraw = () => {
 		if (!match) {
 			return;
 		}
 		setIsBusy(true);
 		setError(null);
-		try {
-			const next = await acceptDraw(match.id);
-			setMatch(next);
-		} catch (err) {
-			setError(err instanceof ApiError ? err.message : 'Ошибка принятия ничьей');
-		} finally {
-			setIsBusy(false);
-		}
+		sendBattleFrame({ type: 'draw-accept' });
 	};
 
-	const handleDeclineDraw = async () => {
+	const handleDeclineDraw = () => {
 		if (!match) {
 			return;
 		}
 		setIsBusy(true);
 		setError(null);
-		try {
-			const next = await declineDraw(match.id);
-			setMatch(next);
-		} catch (err) {
-			setError(err instanceof ApiError ? err.message : 'Ошибка отклонения ничьей');
-		} finally {
-			setIsBusy(false);
-		}
+		sendBattleFrame({ type: 'draw-decline' });
 	};
 
 	const handleDragEnd = (event: DragEndEvent) => {

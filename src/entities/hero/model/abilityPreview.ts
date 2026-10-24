@@ -56,14 +56,15 @@ function orcRage(ctx: PreviewCtx): number {
 }
 
 function mermaidBreeze(ctx: PreviewCtx): PreviewPart[] {
-	const base = ctx.lvl * 5;
-	const acc: PreviewPart = { kind: 'accuracy', value: ctx.lvl * 2 + 2 };
+	const base = ctx.lvl * 2;
+	const power = ctx.power;
+	const acc: PreviewPart = { kind: 'accuracy', value: ctx.lvl + 2 };
 	if (typeof ctx.targetHpRatio === 'number') {
 		const ratio = Math.min(1, Math.max(0, ctx.targetHpRatio));
-		const bonus = round(20 * (2 - ratio));
+		const bonus = round(power * (2 - ratio));
 		return [heal(base + bonus), acc];
 	}
-	return [{ kind: 'healRange', min: base + 20, max: base + 40 }, acc];
+	return [{ kind: 'healRange', min: base + power, max: base + power * 2 }, acc];
 }
 
 /** Слоты и пассивки с числовым превью; нет записи → только текстовый mechanics. */
@@ -107,7 +108,9 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	},
 	Assassin: {
 		1: (ctx) => [atk(ctx, 1.15)],
-		2: (ctx) => [{ kind: 'text', value: `«Радость» ${ctx.lvl + 3}` }],
+		2: (ctx) => [
+			{ kind: 'text', value: `облик · +1 ур. · мораль +${ctx.lvl + 3}` },
+		],
 	},
 	Paladin: {
 		1: (ctx) => [atk(ctx, 1.05), { kind: 'text', value: '×2 удара' }],

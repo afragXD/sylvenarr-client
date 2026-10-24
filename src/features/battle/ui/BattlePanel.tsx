@@ -75,6 +75,7 @@ export const BattlePanel = ({
 	const battle = match.battle;
 	const [pendingMode, setPendingMode] = useState<PendingMode>(null);
 	const [confirm, setConfirm] = useState<ConfirmState | null>(null);
+	const [promptHoverUnitId, setPromptHoverUnitId] = useState<string | null>(null);
 	const [inspectUnitId, setInspectUnitId] = useState<string | null>(null);
 	const [surrenderOpened, surrenderHandlers] = useDisclosure(false);
 	const wasMyTurnRef = useRef(false);
@@ -351,6 +352,7 @@ export const BattlePanel = ({
 						mirror
 						activeId={battle.activeUnitId}
 						legalTargets={highlightTargets}
+						promptHoverUnitId={promptHoverUnitId}
 						onUnitClick={handleUnitClick}
 						attackPreviewFor={attackPreviewFor}
 					/>
@@ -367,6 +369,7 @@ export const BattlePanel = ({
 						mirror={false}
 						activeId={battle.activeUnitId}
 						legalTargets={highlightTargets}
+						promptHoverUnitId={promptHoverUnitId}
 						onUnitClick={handleUnitClick}
 						attackPreviewFor={attackPreviewFor}
 					/>
@@ -412,23 +415,32 @@ export const BattlePanel = ({
 							: 'Выберите вариант'}
 					</Text>
 					<div className={styles.promptOptions}>
-						{prompt.options.map((option) => (
-							<div key={option.id} className={styles.promptOption}>
-								<Button
-									color="accent"
-									loading={busy}
-									onClick={() => handlePromptChoice(option.id)}
-									fullWidth
-								>
-									{option.label}
-								</Button>
-								{option.description ? (
-									<Text size="xs" c="var(--app-text-muted)" mt={4}>
-										{option.description}
-									</Text>
-								) : null}
-							</div>
-						))}
+						{prompt.options.map((option) => {
+							const isFieldUnit = battle.units.some((unit) => unit.id === option.id);
+							return (
+								<div key={option.id} className={styles.promptOption}>
+									<Button
+										color="accent"
+										loading={busy}
+										onClick={() => handlePromptChoice(option.id)}
+										onMouseEnter={() => {
+											if (isFieldUnit) {
+												setPromptHoverUnitId(option.id);
+											}
+										}}
+										onMouseLeave={() => setPromptHoverUnitId(null)}
+										fullWidth
+									>
+										{option.label}
+									</Button>
+									{option.description ? (
+										<Text size="xs" c="var(--app-text-muted)" mt={4}>
+											{option.description}
+										</Text>
+									) : null}
+								</div>
+							);
+						})}
 					</div>
 				</div>
 			)}
@@ -590,6 +602,7 @@ const TeamSide = ({
 	mirror,
 	activeId,
 	legalTargets,
+	promptHoverUnitId,
 	onUnitClick,
 	attackPreviewFor,
 }: {
@@ -598,6 +611,7 @@ const TeamSide = ({
 	mirror: boolean;
 	activeId: string | null;
 	legalTargets: string[];
+	promptHoverUnitId: string | null;
 	onUnitClick: (unit: BattleUnit) => void;
 	attackPreviewFor: (unit: BattleUnit) => AttackPreview | null;
 }) => {
@@ -617,6 +631,7 @@ const TeamSide = ({
 					units={left}
 					activeId={activeId}
 					legalTargets={legalTargets}
+					promptHoverUnitId={promptHoverUnitId}
 					onUnitClick={onUnitClick}
 					attackPreviewFor={attackPreviewFor}
 				/>
@@ -625,6 +640,7 @@ const TeamSide = ({
 					units={right}
 					activeId={activeId}
 					legalTargets={legalTargets}
+					promptHoverUnitId={promptHoverUnitId}
 					onUnitClick={onUnitClick}
 					attackPreviewFor={attackPreviewFor}
 				/>
@@ -646,6 +662,7 @@ const RowColumn = ({
 	units,
 	activeId,
 	legalTargets,
+	promptHoverUnitId,
 	onUnitClick,
 	attackPreviewFor,
 }: {
@@ -653,6 +670,7 @@ const RowColumn = ({
 	units: BattleUnit[];
 	activeId: string | null;
 	legalTargets: string[];
+	promptHoverUnitId: string | null;
 	onUnitClick: (unit: BattleUnit) => void;
 	attackPreviewFor: (unit: BattleUnit) => AttackPreview | null;
 }) => {
@@ -677,6 +695,9 @@ const RowColumn = ({
 								className={styles.unit}
 								data-active={unit.id === activeId ? 'true' : undefined}
 								data-target={legalTargets.includes(unit.id) ? 'true' : undefined}
+								data-prompt-hover={
+									unit.id === promptHoverUnitId ? 'true' : undefined
+								}
 								data-dead={unit.alive ? undefined : 'true'}
 								data-summon={unit.isSummon ? 'true' : undefined}
 								data-inspectable="true"

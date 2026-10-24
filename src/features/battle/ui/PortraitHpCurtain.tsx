@@ -10,8 +10,8 @@ type PortraitHpCurtainProps = {
 };
 
 /**
- * Красный полупрозрачный оверлей ОЗ снизу вверх поверх портрета.
- * Высота = (health / maxHp) * высота портрета.
+ * Красный полупрозрачный оверлей «штор» снизу вверх поверх портрета.
+ * Высота = потерянное ОЗ / maxHp (при полном ОЗ штор нет).
  */
 export const PortraitHpCurtain = ({
 	health,
@@ -19,15 +19,15 @@ export const PortraitHpCurtain = ({
 	children,
 	className,
 }: PortraitHpCurtainProps) => {
-	const ratio =
-		maxHp > 0 ? Math.max(0, Math.min(1, health / maxHp)) : 0;
+	const missing =
+		maxHp > 0 ? Math.max(0, Math.min(1, 1 - health / maxHp)) : 0;
 
 	return (
 		<span className={[styles.frame, className].filter(Boolean).join(' ')}>
 			{children}
 			<span
 				className={styles.fill}
-				style={{ height: `${ratio * 100}%` }}
+				style={{ height: `${missing * 100}%` }}
 				aria-hidden
 			/>
 		</span>
