@@ -1,4 +1,14 @@
-import { Button, Group, Select, Stack, Text, TextInput } from '@mantine/core';
+import {
+	DndContext,
+	type DragEndEvent,
+	PointerSensor,
+	useDraggable,
+	useDroppable,
+	useSensor,
+	useSensors,
+} from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
+import { Box, Button, Group, Select, Stack, Text, TextInput } from '@mantine/core';
 import { useMemo, useState } from 'react';
 
 import { type HeroClass, HeroImage } from '@/entities/hero';
@@ -6,6 +16,7 @@ import type { SquadPreset, SquadPresetSlotInput } from '@/entities/presets';
 
 const ROW_FRONT = 0;
 const ROW_BACK = 1;
+const MAX_PER_ROW = 3;
 
 type DraftSlot = SquadPresetSlotInput & {
 	key: string;
@@ -29,6 +40,7 @@ type PresetEditorFormProps = {
 
 /**
  * Форма создания/правки пресета: имя, ряды, выбор героев.
+ * Героев между рядами переносят drag-and-drop.
  */
 export const PresetEditorForm = ({
 	heroes,
@@ -40,7 +52,6 @@ export const PresetEditorForm = ({
 }: PresetEditorFormProps) => {
 	const [name, setName] = useState(initial?.name ?? '');
 	const [isGlobal, setIsGlobal] = useState(initial?.isGlobal ?? false);
-	const [row, setRow] = useState<number>(ROW_FRONT);
 	const [slots, setSlots] = useState<DraftSlot[]>(() =>
 		(initial?.slots ?? []).map((slot, index) => ({
 			key: `${slot.id}-${index}`,
@@ -51,6 +62,12 @@ export const PresetEditorForm = ({
 		})),
 	);
 	const [error, setError] = useState<string | null>(null);
+
+	const sensors = useSensors(
+		useSensor(PointerSensor, {
+			activationConstraint: { distance: 8 },
+		}),
+	);
 
 	const playable = useMemo(
 		() =>
@@ -70,9 +87,12 @@ export const PresetEditorForm = ({
 		if (!hero) {
 			return;
 		}
-		const rowCount = slots.filter((slot) => slot.row === row).length;
-		if (rowCount >= 3) {
-			setError('На этом ряду нет места');
+		const frontCount = slots.filter((slot) => slot.row === ROW_FRONT).length;
+		const backCount = slots.filter((slot) => slot.row === ROW_BACK).length;
+		const targetRow =
+			frontCount < MAX_PER_ROW ? ROW_FRONT : backCount < MAX_PER_ROW ? ROW_BACK : null;
+		if (targetRow === null) {
+			setError('Нет места в рядах');
 			return;
 		}
 		if (teamSize + hero.size > 6) {
@@ -85,7 +105,7 @@ export const PresetEditorForm = ({
 			{
 				key: `${code}-${Date.now()}`,
 				heroClassCode: hero.code,
-				row,
+				row: targetRow,
 				displayName: hero.displayName,
 				size: hero.size,
 			},
@@ -95,6 +115,43 @@ export const PresetEditorForm = ({
 	const removeSlot = (key: string) => {
 		setSlots((prev) => prev.filter((slot) => slot.key !== key));
 		setError(null);
+	};
+
+	const moveSlotToRow = (slotKey: string, targetRow: number) => {
+		const slot = slots.find((item) => item.key === slotKey);
+		if (!slot || slot.row === targetRow) {
+			return;
+		}
+		const targetCount = slots.filter((item) => item.row === targetRow).length;
+		if (targetCount >= MAX_PER_ROW) {
+			setError('На этом ряду нет места');
+			return;
+		}
+		setError(null);
+		setSlots((prev) =>
+			prev.map((item) => (item.key === slotKey ? { ...item, row: targetRow } : item)),
+		);
+	};
+
+	const handleDragEnd = (event: DragEndEvent) => {
+		if (busy) {
+			return;
+		}
+		const over = event.over;
+		if (!over) {
+			return;
+		}
+		const overData = over.data.current as { type?: string; row?: number } | undefined;
+		if (overData?.type !== 'row' || (overData.row !== ROW_FRONT && overData.row !== ROW_BACK)) {
+			return;
+		}
+		const activeData = event.active.data.current as
+			| { type?: string; slotKey?: string; fromRow?: number }
+			| undefined;
+		if (activeData?.type !== 'slot' || !activeData.slotKey) {
+			return;
+		}
+		moveSlotToRow(activeData.slotKey, overData.row);
 	};
 
 	const handleSave = async () => {
@@ -147,29 +204,8 @@ export const PresetEditorForm = ({
 				/>
 			) : null}
 			<Text size="sm" c="var(--app-text-muted)">
-				Размер: {teamSize}/6 (минимум 3). Ряд для добавления:{' '}
-				{row === ROW_FRONT ? 'передний' : 'задний'}.
+				Размер: {teamSize}/6 (минимум 3). Перетащите героя между рядами.
 			</Text>
-			<Group gap="xs">
-				<Button
-					size="compact-sm"
-					variant={row === ROW_FRONT ? 'filled' : 'default'}
-					color="brand"
-					onClick={() => setRow(ROW_FRONT)}
-					disabled={busy}
-				>
-					Передний ряд
-				</Button>
-				<Button
-					size="compact-sm"
-					variant={row === ROW_BACK ? 'filled' : 'default'}
-					color="brand"
-					onClick={() => setRow(ROW_BACK)}
-					disabled={busy}
-				>
-					Задний ряд
-				</Button>
-			</Group>
 			<Select
 				label="Добавить героя"
 				placeholder="Выберите класс"
@@ -182,10 +218,24 @@ export const PresetEditorForm = ({
 				onChange={addHero}
 				disabled={busy}
 			/>
-			<Group align="flex-start" gap="xl" wrap="wrap">
-				<SlotColumn title="Передний ряд" items={front} onRemove={removeSlot} busy={busy} />
-				<SlotColumn title="Задний ряд" items={back} onRemove={removeSlot} busy={busy} />
-			</Group>
+			<DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+				<Group align="stretch" gap="xl" wrap="wrap">
+					<SlotColumn
+						row={ROW_FRONT}
+						title="Передний ряд"
+						items={front}
+						onRemove={removeSlot}
+						busy={busy}
+					/>
+					<SlotColumn
+						row={ROW_BACK}
+						title="Задний ряд"
+						items={back}
+						onRemove={removeSlot}
+						busy={busy}
+					/>
+				</Group>
+			</DndContext>
 			{error ? (
 				<Text c="red" role="alert">
 					{error}
@@ -204,43 +254,116 @@ export const PresetEditorForm = ({
 };
 
 const SlotColumn = ({
+	row,
 	title,
 	items,
 	onRemove,
 	busy,
 }: {
+	row: number;
 	title: string;
 	items: DraftSlot[];
 	onRemove: (key: string) => void;
 	busy: boolean;
-}) => (
-	<Stack gap="xs" miw={200}>
-		<Text fw={600} size="sm">
-			{title}
-		</Text>
-		{items.length === 0 ? (
-			<Text size="sm" c="var(--app-text-muted)">
-				Пусто
+}) => {
+	const { setNodeRef, isOver } = useDroppable({
+		id: `preset-row:${row}`,
+		disabled: busy,
+		data: { type: 'row', row },
+	});
+
+	return (
+		<Stack gap="xs" miw={220} style={{ flex: 1 }}>
+			<Text fw={600} size="sm">
+				{title}
 			</Text>
-		) : (
-			items.map((slot) => (
-				<Group key={slot.key} gap="xs" wrap="nowrap">
-					<HeroImage code={slot.heroClassCode} alt={slot.displayName} w={28} h={28} radius={0} />
-					<Text size="sm" style={{ flex: 1 }} lineClamp={1}>
-						{slot.displayName}
-						{slot.size > 1 ? ` (${slot.size})` : ''}
+			<Box
+				ref={setNodeRef}
+				p="sm"
+				mih={140}
+				style={{
+					border: `1px dashed ${
+						isOver
+							? 'var(--mantine-color-accent-filled)'
+							: 'color-mix(in srgb, var(--app-text) 22%, transparent)'
+					}`,
+					background: isOver
+						? 'color-mix(in srgb, var(--mantine-color-accent-filled) 12%, var(--app-surface))'
+						: 'color-mix(in srgb, var(--app-surface-muted) 70%, transparent)',
+					outline: isOver
+						? '1px solid color-mix(in srgb, var(--mantine-color-accent-filled) 45%, transparent)'
+						: undefined,
+					transition: 'border-color 120ms ease, background 120ms ease, outline 120ms ease',
+				}}
+			>
+				{items.length === 0 ? (
+					<Text size="sm" c="var(--app-text-muted)">
+						Пусто
 					</Text>
-					<Button
-						size="compact-xs"
-						variant="subtle"
-						color="red"
-						disabled={busy}
-						onClick={() => onRemove(slot.key)}
-					>
-						×
-					</Button>
-				</Group>
-			))
-		)}
-	</Stack>
-);
+				) : (
+					<Stack gap="xs">
+						{items.map((slot) => (
+							<DraggableSlot
+								key={slot.key}
+								slot={slot}
+								onRemove={onRemove}
+								busy={busy}
+							/>
+						))}
+					</Stack>
+				)}
+			</Box>
+		</Stack>
+	);
+};
+
+const DraggableSlot = ({
+	slot,
+	onRemove,
+	busy,
+}: {
+	slot: DraftSlot;
+	onRemove: (key: string) => void;
+	busy: boolean;
+}) => {
+	const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+		id: `preset-slot:${slot.key}`,
+		disabled: busy,
+		data: { type: 'slot', slotKey: slot.key, fromRow: slot.row },
+	});
+
+	return (
+		<Group
+			ref={setNodeRef}
+			gap="xs"
+			wrap="nowrap"
+			p="xs"
+			style={{
+				transform: CSS.Translate.toString(transform),
+				opacity: isDragging ? 0.55 : 1,
+				background: 'var(--app-surface-muted)',
+				border: '1px solid var(--app-border)',
+				cursor: busy ? 'default' : 'grab',
+				touchAction: 'none',
+				userSelect: 'none',
+			}}
+			{...(busy ? {} : { ...listeners, ...attributes })}
+		>
+			<HeroImage code={slot.heroClassCode} alt={slot.displayName} w={28} h={28} radius={0} />
+			<Text size="sm" style={{ flex: 1 }} lineClamp={1}>
+				{slot.displayName}
+				{slot.size > 1 ? ` (${slot.size})` : ''}
+			</Text>
+			<Button
+				size="compact-xs"
+				variant="subtle"
+				color="red"
+				disabled={busy}
+				onPointerDown={(event) => event.stopPropagation()}
+				onClick={() => onRemove(slot.key)}
+			>
+				×
+			</Button>
+		</Group>
+	);
+};
