@@ -2,7 +2,7 @@ import { Button, Group, Modal, Stack, Table, Tabs, Text } from '@mantine/core';
 import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
-import { fetchHeroes, type HeroClass } from '@/entities/hero';
+import { fetchHeroes, type HeroClass, HeroImage } from '@/entities/hero';
 import { fetchCurrentPlayer, type Player } from '@/entities/player';
 import {
 	createPreset,
@@ -15,6 +15,9 @@ import { ApiError } from '@/shared/api/http';
 import { OrnateButton } from '@/shared/ui/OrnateButton';
 
 import { PresetEditorForm } from './PresetEditorForm';
+
+const firstSlot = (preset: SquadPreset) =>
+	[...preset.slots].sort((a, b) => a.slotOrder - b.slotOrder)[0] ?? null;
 
 type ProfilePresetsTab = 'personal' | 'global';
 
@@ -139,10 +142,23 @@ export const PresetsLibraryPage = () => {
 							</Table.Td>
 						</Table.Tr>
 					) : (
-						items.map((preset) => (
+						items.map((preset) => {
+							const lead = firstSlot(preset);
+							return (
 							<Table.Tr key={preset.id}>
 								<Table.Td>
-									<Text fw={600}>{preset.name}</Text>
+									<Group gap="sm" wrap="nowrap">
+										{lead ? (
+											<HeroImage
+												code={lead.heroClassCode}
+												alt={lead.displayName}
+												w={36}
+												h={36}
+												radius={0}
+											/>
+										) : null}
+										<Text fw={600}>{preset.name}</Text>
+									</Group>
 								</Table.Td>
 								<Table.Td>{preset.teamSize}</Table.Td>
 								<Table.Td>
@@ -180,7 +196,8 @@ export const PresetsLibraryPage = () => {
 									)}
 								</Table.Td>
 							</Table.Tr>
-						))
+							);
+						})
 					)}
 				</Table.Tbody>
 			</Table>
