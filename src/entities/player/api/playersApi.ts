@@ -61,9 +61,9 @@ export async function fetchCurrentPlayer(): Promise<Player> {
  * Любимые герои текущего игрока по числу выборов.
  */
 export async function fetchMyFavoriteHeroes(limit = 5): Promise<FavoriteHero[]> {
-	const query = new URLSearchParams({ limit: String(limit) });
+	const suffix = limit === 5 ? '' : `?limit=${encodeURIComponent(String(limit))}`;
 	return apiFetchJson(
-		`/players/me/favorite-heroes?${query}`,
+		`/players/me/favorite-heroes${suffix}`,
 		undefined,
 		parseFavoriteHeroes,
 		'Не удалось загрузить любимых героев',

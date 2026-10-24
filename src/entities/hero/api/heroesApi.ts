@@ -52,9 +52,10 @@ export type FavoriteHeroStat = {
  * Глобальный топ героев по числу выборов на арене.
  */
 export async function fetchFavoriteHeroes(limit = 24): Promise<FavoriteHeroStat[]> {
-	const query = new URLSearchParams({ limit: String(limit) });
+	// limit as query string; API coerces string → number
+	const suffix = limit === 24 ? '' : `?limit=${encodeURIComponent(String(limit))}`;
 	return apiFetchJson(
-		`/heroes/favorites?${query}`,
+		`/heroes/favorites${suffix}`,
 		undefined,
 		(data) => {
 			if (!Array.isArray(data)) {
