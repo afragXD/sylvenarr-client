@@ -1,4 +1,4 @@
-import { Button, Group, Modal, Stack, Table, Text } from '@mantine/core';
+import { Button, Group, Modal, Stack, Table, Tabs, Text } from '@mantine/core';
 import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
@@ -21,6 +21,8 @@ type PresetsLibraryPageProps = {
 	mode: 'profile' | 'admin';
 };
 
+type ProfilePresetsTab = 'personal' | 'global';
+
 /**
  * Библиотека пресетов: личные + просмотр глобальных, либо CRUD глобальных в админке.
  */
@@ -33,6 +35,7 @@ export const PresetsLibraryPage = ({ mode }: PresetsLibraryPageProps) => {
 	const [busy, setBusy] = useState(false);
 	const [editorOpen, setEditorOpen] = useState(false);
 	const [editing, setEditing] = useState<SquadPreset | null>(null);
+	const [profileTab, setProfileTab] = useState<ProfilePresetsTab>('personal');
 
 	const isAdminMode = mode === 'admin';
 	const canEditGlobal = isAdminMode || player?.role === 'admin';
@@ -219,16 +222,26 @@ export const PresetsLibraryPage = ({ mode }: PresetsLibraryPageProps) => {
 			{isAdminMode ? (
 				renderTable(globals, true)
 			) : (
-				<>
-					<Stack gap="sm">
-						<Text fw={600}>Мои</Text>
+				<Tabs
+					value={profileTab}
+					onChange={(value) => {
+						if (value === 'personal' || value === 'global') {
+							setProfileTab(value);
+						}
+					}}
+					radius={0}
+				>
+					<Tabs.List>
+						<Tabs.Tab value="personal">Личные</Tabs.Tab>
+						<Tabs.Tab value="global">Глобальные</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="personal" pt="sm">
 						{renderTable(mine, true)}
-					</Stack>
-					<Stack gap="sm">
-						<Text fw={600}>Глобальные</Text>
+					</Tabs.Panel>
+					<Tabs.Panel value="global" pt="sm">
 						{renderTable(globals, canEditGlobal)}
-					</Stack>
-				</>
+					</Tabs.Panel>
+				</Tabs>
 			)}
 
 			<Modal
