@@ -4,6 +4,7 @@ import { formatBaseResistsLine } from '../model/heroBaseResists';
 import { isTransformForm } from '../model/heroKinds';
 import type { HeroClass } from '../model/types';
 import { HeroImage } from './HeroImage';
+import { HeroRoleTags } from './HeroRoleTags';
 
 type NumericStatKey =
 	| 'health'
@@ -74,6 +75,7 @@ export const HeroBriefContent = ({ hero }: HeroBriefContentProps) => {
 						</Badge>
 					)}
 				</Group>
+				<HeroRoleTags tags={hero.tags ?? []} />
 				{hero.description ? (
 					<Text size="sm" style={{ lineHeight: 1.55 }}>
 						{hero.description}

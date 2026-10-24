@@ -50,6 +50,7 @@ export {
 	heroesPageMounted,
 	heroesRequested,
 } from './model/heroes';
-export type { HeroClass } from './model/types';
+export type { HeroClass, HeroRoleTag } from './model/types';
 export { HeroBriefContent } from './ui/HeroBriefContent';
 export { HeroImage } from './ui/HeroImage';
+export { HeroRoleTags } from './ui/HeroRoleTags';

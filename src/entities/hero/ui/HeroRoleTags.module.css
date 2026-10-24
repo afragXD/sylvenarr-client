@@ -1,0 +1,71 @@
+.row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	align-items: center;
+}
+
+.tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.18rem 0.45rem;
+	border: 1px solid var(--app-border);
+	background: color-mix(in srgb, var(--app-surface) 78%, transparent);
+	font-family: var(--mantine-font-family-headings);
+	font-size: 0.68rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	line-height: 1.2;
+	color: var(--app-text-muted);
+	white-space: nowrap;
+}
+
+.tag[data-mood='offense'] {
+	border-color: color-mix(in srgb, var(--mantine-color-accent-filled) 50%, var(--app-border));
+	background: color-mix(in srgb, var(--mantine-color-accent-filled) 18%, var(--app-surface));
+	color: color-mix(in srgb, var(--mantine-color-accent-3) 70%, var(--app-text));
+}
+
+.tag[data-mood='support'] {
+	border-color: color-mix(in srgb, var(--mantine-color-brand-5) 55%, var(--app-border));
+	background: color-mix(in srgb, var(--mantine-color-brand-6) 16%, var(--app-surface));
+	color: color-mix(in srgb, var(--brass) 75%, var(--app-text));
+}
+
+.tag[data-mood='heal'] {
+	border-color: color-mix(in srgb, var(--mantine-color-moss-5) 50%, var(--app-border));
+	background: color-mix(in srgb, var(--mantine-color-moss-6) 16%, var(--app-surface));
+	color: color-mix(in srgb, var(--mantine-color-moss-3) 65%, var(--app-text));
+}
+
+.tag[data-mood='control'] {
+	border-color: color-mix(in srgb, var(--copper) 55%, var(--app-border));
+	background: color-mix(in srgb, var(--copper) 14%, var(--app-surface));
+	color: color-mix(in srgb, var(--copper) 80%, var(--app-text));
+}
+
+.tag[data-mood='summon'] {
+	border-color: color-mix(in srgb, var(--brass) 60%, var(--app-border));
+	background: color-mix(in srgb, var(--brass) 12%, var(--app-surface-muted));
+	color: color-mix(in srgb, var(--parchment) 55%, var(--brass));
+}
+
+.tag[data-mood='curse'] {
+	border-color: color-mix(in srgb, var(--wine) 55%, var(--app-border));
+	background: color-mix(in srgb, var(--wine) 28%, var(--app-surface));
+	color: color-mix(in srgb, var(--mantine-color-accent-3) 55%, var(--parchment));
+}
+
+.tag[data-mood='identity'] {
+	border-color: color-mix(in srgb, var(--parchment) 35%, var(--app-border));
+	background: color-mix(in srgb, var(--parchment) 8%, var(--app-surface));
+	color: color-mix(in srgb, var(--parchment) 70%, var(--app-text));
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.tag {
+		transition: none;
+	}
+}

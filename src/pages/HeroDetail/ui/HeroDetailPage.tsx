@@ -11,6 +11,7 @@ import {
 	displayAttack,
 	getHeroCharacterUrl,
 	getHeroPortraitUrl,
+	HeroRoleTags,
 	heroesPageMounted,
 	heroPageOpened,
 	isTransformForm,
@@ -120,6 +121,7 @@ export const HeroDetailPage = () => {
 						<div className={classes.copy}>
 							<span className={classes.role}>{statusLabel}</span>
 							<h2 className={classes.name}>{hero.displayName}</h2>
+							<HeroRoleTags tags={hero.tags ?? []} />
 							{hero.description ? <p className={classes.lore}>{hero.description}</p> : null}
 							{hero.roleSummary ? (
 								<Text size="sm" c="var(--app-text-muted)" maw="42rem" style={{ lineHeight: 1.5 }}>

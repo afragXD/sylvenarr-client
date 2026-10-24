@@ -1,3 +1,9 @@
+export type HeroRoleTag = {
+	id: string;
+	label: string;
+	mood: string;
+};
+
 export type HeroClass = {
 	code: string;
 	displayName: string;
@@ -18,4 +24,5 @@ export type HeroClass = {
 	size: number;
 	isPlayable: boolean;
 	sortOrder: number;
+	tags: HeroRoleTag[];
 };
