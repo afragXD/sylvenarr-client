@@ -5,11 +5,18 @@ import { useEffect } from 'react';
 import { HeroImage } from '@/entities/hero';
 import type { TurnOrderEntry, TurnOrderPhase } from '@/entities/match';
 
+import { PortraitHpCurtain } from './PortraitHpCurtain';
 import styles from './TurnOrderStrip.module.css';
+
+export type UnitHpSnapshot = {
+	health: number;
+	maxHp: number;
+};
 
 type TurnOrderStripProps = {
 	entries: TurnOrderEntry[];
 	stage: number;
+	hpByUnitId?: ReadonlyMap<string, UnitHpSnapshot>;
 	onSelectUnit?: (unitId: string) => void;
 };
 
@@ -46,7 +53,12 @@ function entryTitle(entry: TurnOrderEntry, phase: TurnOrderPhase): string {
 /**
  * Шкала текущего раунда: ходившие → активный (playhead) → ожидающие.
  */
-export const TurnOrderStrip = ({ entries, stage, onSelectUnit }: TurnOrderStripProps) => {
+export const TurnOrderStrip = ({
+	entries,
+	stage,
+	hpByUnitId,
+	onSelectUnit,
+}: TurnOrderStripProps) => {
 	const reduceMotion =
 		typeof window !== 'undefined' &&
 		window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -86,6 +98,16 @@ export const TurnOrderStrip = ({ entries, stage, onSelectUnit }: TurnOrderStripP
 						const isActive = phase === 'active' || entry.isActive;
 						const interactive = entry.alive && Boolean(onSelectUnit);
 						const size = isActive ? 44 : 36;
+						const hp = hpByUnitId?.get(entry.unitId);
+						const image = (
+							<HeroImage
+								code={entry.heroClassCode}
+								alt={entry.displayName}
+								w={size}
+								h={size}
+								radius={0}
+							/>
+						);
 						return (
 							<button
 								key={entry.unitId}
@@ -105,13 +127,13 @@ export const TurnOrderStrip = ({ entries, stage, onSelectUnit }: TurnOrderStripP
 									}
 								}}
 							>
-								<HeroImage
-									code={entry.heroClassCode}
-									alt={entry.displayName}
-									w={size}
-									h={size}
-									radius={0}
-								/>
+								{hp ? (
+									<PortraitHpCurtain health={hp.health} maxHp={hp.maxHp}>
+										{image}
+									</PortraitHpCurtain>
+								) : (
+									image
+								)}
 							</button>
 						);
 					})}

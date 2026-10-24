@@ -1,0 +1,17 @@
+.frame {
+	position: relative;
+	display: inline-block;
+	overflow: hidden;
+	line-height: 0;
+	flex-shrink: 0;
+}
+
+.fill {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 1;
+	background: color-mix(in srgb, #b41414 55%, transparent);
+}

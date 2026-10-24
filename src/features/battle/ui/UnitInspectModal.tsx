@@ -34,6 +34,7 @@ import {
 import { AbilityTags } from './AbilityTags';
 import { CombatStat, CombatStatRow } from './CombatStat';
 import { ElementIcon, WardIcon } from './DamageSourceIcon';
+import { PortraitHpCurtain } from './PortraitHpCurtain';
 import { UnitEffects } from './UnitEffects';
 import styles from './UnitInspectModal.module.css';
 
@@ -110,13 +111,15 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 			{unit && doc && previewCtx && (
 				<Stack gap="md">
 					<Group gap="md" align="flex-start" wrap="nowrap">
-						<HeroImage
-							code={unit.heroClassCode}
-							alt={unit.displayName}
-							w={72}
-							h={72}
-							radius={0}
-						/>
+						<PortraitHpCurtain health={unit.health} maxHp={unit.maxHp}>
+							<HeroImage
+								code={unit.heroClassCode}
+								alt={unit.displayName}
+								w={72}
+								h={72}
+								radius={0}
+							/>
+						</PortraitHpCurtain>
 						<div>
 							<Group gap={6} wrap="wrap">
 								<Text size="sm" c="var(--app-text-muted)">

@@ -17,6 +17,7 @@ import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
 import { AbilityTags } from './AbilityTags';
 import styles from './BattlePanel.module.css';
 import { CombatStat, CombatStatRow } from './CombatStat';
+import { PortraitHpCurtain } from './PortraitHpCurtain';
 import { TurnOrderStrip } from './TurnOrderStrip';
 import { UnitEffects } from './UnitEffects';
 import { UnitInspectModal } from './UnitInspectModal';
@@ -112,6 +113,9 @@ export const BattlePanel = ({
 	const opponentDrawOffer = Boolean(drawOfferBy) && drawOfferBy !== playerId;
 	const hostUnits = battle.units.filter((unit) => unit.team === 0);
 	const guestUnits = battle.units.filter((unit) => unit.team === 1);
+	const hpByUnitId = new Map(
+		battle.units.map((unit) => [unit.id, { health: unit.health, maxHp: unit.maxHp }]),
+	);
 	const abilities = battle.abilities ?? [];
 	const isPilot = abilities.length > 0;
 	const skillLabel = battle.skillLabel;
@@ -326,6 +330,7 @@ export const BattlePanel = ({
 			<TurnOrderStrip
 				entries={battle.turnOrder ?? []}
 				stage={battle.stage}
+				hpByUnitId={hpByUnitId}
 				onSelectUnit={(unitId) => {
 					setInspectUnitId(unitId);
 				}}
@@ -679,13 +684,15 @@ const RowColumn = ({
 							>
 								<Group gap={6} wrap="nowrap" justify="space-between" w="100%">
 									<Group gap={6} wrap="nowrap" style={{ minWidth: 0 }}>
-										<HeroImage
-											code={unit.heroClassCode}
-											alt={unit.displayName}
-											w={28}
-											h={28}
-											radius={0}
-										/>
+										<PortraitHpCurtain health={unit.health} maxHp={unit.maxHp}>
+											<HeroImage
+												code={unit.heroClassCode}
+												alt={unit.displayName}
+												w={28}
+												h={28}
+												radius={0}
+											/>
+										</PortraitHpCurtain>
 										<Text size="sm" lineClamp={1}>
 											{unit.isSummon ? '✦ ' : ''}
 											{unit.displayName}
