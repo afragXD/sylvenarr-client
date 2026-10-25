@@ -133,7 +133,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			1: { mechanics: 'Всегда 2 удара ×1.05.', tags: ['attack'] },
 		2: {
 			mechanics:
-				'Ульта (−1): «Огненное оружие» · 2+⌊L/5⌋ р. и вард от Огня (1 заряд).',
+				'Ульта (−1): «Огненное оружие» · min(3, 2+⌊L/5⌋) р. и вард от Огня (1 заряд).',
 			tags: ['buff'],
 		},
 			3: {
@@ -161,7 +161,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['attack', 'debuff'],
 			},
 			2: {
-				mechanics: '3 МР (задний ряд): лечение всем союзникам.',
+				mechanics: '3 МР (задний ряд): лечение ряду выбранного союзника.',
 				tags: ['heal', 'aoe'],
 			},
 		3: {
@@ -197,7 +197,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['debuff'],
 			},
 			5: {
-				mechanics: '4 МР: шанс «Бес» · 2 р. (полиморф).',
+				mechanics: '4 МР; КД 3; 100% «Бес» · 2 р. (резист Земли/Превращения).',
 				tags: ['debuff'],
 			},
 		},
@@ -340,7 +340,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 					'2 МР, КД 2: шанс 80+L% (разум) — цель бьёт союзника с min(ОЗ−ур.).',
 				tags: ['debuff', 'attack'],
 			},
-			4: { mechanics: 'Призыв эктоплазмы на свой ряд.', tags: ['summon'] },
+			4: { mechanics: 'Призыв эктоплазмы (сначала фронт, иначе тыл).', tags: ['summon'] },
 			5: {
 				mechanics: '3 МР: философский камень; шанс сохранить ход.',
 				tags: ['buff'],
@@ -363,7 +363,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['debuff', 'aoe'],
 			},
 			4: {
-				mechanics: 'Союзнику «Огненное оружие» · 1 р.',
+				mechanics: 'Союзнику «Огненное оружие» · min(3, 1+⌊L/6⌋) р.',
 				tags: ['buff'],
 			},
 			5: {

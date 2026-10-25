@@ -464,7 +464,7 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'FIREDWEAPON',
 		label: 'Огненное оружие',
 		description: 'Удары с шансом поджечь цель.',
-		mechanics: 'удар → шанс «Поджог» · (1 + ⌊L/6⌋) р.',
+		mechanics: 'удар → шанс «Поджог» · min(3, 1+⌊L/6⌋) р. (паладин: min(3, 2+⌊L/5⌋)).',
 		exampleAtL: exampleAtL('1 р.'),
 		Icon: Flame,
 		kind: 'buff',

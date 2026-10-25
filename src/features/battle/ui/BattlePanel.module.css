@@ -187,8 +187,48 @@
 	padding: 0.65rem 0.75rem;
 	border: 1px solid var(--app-border);
 	background: color-mix(in srgb, var(--app-surface-muted) 70%, var(--app-surface));
-	font-size: 0.85rem;
-	line-height: 1.4;
+	font-size: 1rem;
+	line-height: 1.45;
+}
+
+.logLine {
+	margin: 0.1rem 0;
+}
+
+.logTurn {
+	margin: 0.65rem 0 0.35rem;
+	padding-top: 0.45rem;
+	border-top: 1px solid color-mix(in srgb, var(--app-border) 70%, transparent);
+	font-family: var(--mantine-font-family-headings);
+	font-size: 0.82rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--copper);
+}
+
+.logDmg[data-src='fire'] {
+	color: color-mix(in srgb, var(--mantine-color-accent-3) 75%, var(--app-text));
+	font-weight: 700;
+}
+
+.logDmg[data-src='holy'] {
+	color: color-mix(in srgb, var(--brass) 80%, var(--app-text));
+	font-weight: 700;
+}
+
+.logDmg[data-src='water'] {
+	color: color-mix(in srgb, var(--copper) 85%, var(--app-text));
+	font-weight: 700;
+}
+
+.logDmg[data-src='death'] {
+	color: color-mix(in srgb, var(--wine) 55%, var(--parchment));
+	font-weight: 700;
+}
+
+.logDmg[data-src='weapon'] {
+	color: var(--app-text);
+	font-weight: 700;
 }
 
 .confirm {

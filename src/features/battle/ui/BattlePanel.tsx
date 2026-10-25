@@ -24,6 +24,53 @@ import { UnitInspectModal } from './UnitInspectModal';
 
 type BattleActionKind = 'attack' | 'defend' | 'wait' | 'skill' | 'ability' | 'move';
 
+type LogDamageSrc = 'fire' | 'holy' | 'water' | 'death' | 'weapon';
+
+const DAMAGE_NUM_RE = /(\()(-?\d+)(\))/g;
+
+function detectLogDamageSrc(line: string): LogDamageSrc {
+	const lower = line.toLowerCase();
+	if (/поджог|огн|плам|горит|burning|fire/.test(lower)) {
+		return 'fire';
+	}
+	if (/свят|holy|копь[её] солнца|сакрал/.test(lower)) {
+		return 'holy';
+	}
+	if (/вод|слиз|шлёп|шлеп|water/.test(lower)) {
+		return 'water';
+	}
+	if (/яд|смерт|отрав|death|poison|bleeding|желч/.test(lower)) {
+		return 'death';
+	}
+	return 'weapon';
+}
+
+function renderBattleLogLine(line: string): ReactNode {
+	if (/^——\s*ХОД:/u.test(line) || /^——\s*ход:/iu.test(line)) {
+		return <div className={styles.logTurn}>{line}</div>;
+	}
+	const src = detectLogDamageSrc(line);
+	const parts: ReactNode[] = [];
+	let last = 0;
+	let match: RegExpExecArray | null;
+	DAMAGE_NUM_RE.lastIndex = 0;
+	while ((match = DAMAGE_NUM_RE.exec(line)) !== null) {
+		if (match.index > last) {
+			parts.push(line.slice(last, match.index));
+		}
+		parts.push(
+			<span key={`${match.index}-${match[2]}`} className={styles.logDmg} data-src={src}>
+				{match[0]}
+			</span>,
+		);
+		last = match.index + match[0].length;
+	}
+	if (last < line.length) {
+		parts.push(line.slice(last));
+	}
+	return <div className={styles.logLine}>{parts.length > 0 ? parts : line}</div>;
+}
+
 type BattlePanelProps = {
 	match: Match;
 	playerId: string;
@@ -375,11 +422,11 @@ export const BattlePanel = ({
 					/>
 				</div>
 				<div className={styles.log} aria-live="polite" ref={logRef}>
-					<Text size="xs" c="var(--app-text-muted)" mb={6}>
+					<Text size="sm" c="var(--app-text-muted)" mb={6}>
 						Журнал
 					</Text>
 					{battle.log.map((line, index) => (
-						<div key={`${index}-${line}`}>{line}</div>
+						<span key={`${index}-${line}`}>{renderBattleLogLine(line)}</span>
 					))}
 				</div>
 			</div>
