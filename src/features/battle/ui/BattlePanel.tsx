@@ -352,6 +352,7 @@ export const BattlePanel = ({
 		});
 		setPendingMode(null);
 		setConfirm(null);
+		setPromptHoverUnitId(null);
 	};
 
 	/** Оценка базовой атаки по цели при выборе «Атака» (для hover-попапа). */

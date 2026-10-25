@@ -110,7 +110,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			1: { mechanics: 'Урон ×1.15; игнор брони 35%.', tags: ['attack'] },
 			2: {
 				mechanics:
-					'Цель (союзник/враг): «Многоликий» · 2 р., +1 ур., мораль +L+3. Гигант с L≥10.',
+					'Цель (союзник/враг): «Многоликий» · 2 р., +1 ур., мораль +L+3, +1 заряд ульты. Гигант с L≥10.',
 				tags: ['buff'],
 			},
 			3: {
@@ -292,7 +292,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			},
 			5: {
 				mechanics:
-					'Дальний бой; игнор (20+L)% брони; +15% урона за союзника на кладбище (включая павших призывов).',
+					'Дальний бой; игнор (50+L)% брони; +15% урона за союзника на кладбище (включая павших призывов).',
 				tags: ['attack'],
 			},
 		},
@@ -341,7 +341,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['debuff', 'attack'],
 			},
 			4: {
-				mechanics: '2 МР: призыв эктоплазмы (сначала фронт, иначе тыл).',
+				mechanics: '3 МР, КД 2: призыв эктоплазмы (сначала фронт, иначе тыл).',
 				tags: ['summon'],
 			},
 			5: {
@@ -407,7 +407,8 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['attack'],
 			},
 			2: {
-				mechanics: 'Ульта (−1): «Отравление» всем врагам · 2 р.',
+				mechanics:
+					'Ульта (−1): цель → ряд; «Отравление» · 1 р. со шансом 50+L%.',
 				tags: ['debuff', 'aoe'],
 			},
 			3: {
@@ -416,7 +417,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			},
 			4: {
 				mechanics:
-					'Выпад с заднего ряда + смена ряда; себе «Контрудар» · 2 р.',
+					'Выпад с заднего ряда + смена ряда; себе «Контрудар» · 2+⌊L/6⌋ р.',
 				tags: ['attack', 'buff'],
 			},
 			5: {
@@ -454,7 +455,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['buff'],
 			},
 			4: {
-				mechanics: '+сила магии союзникам (доля 0.25+0.05L).',
+				mechanics: '+сила магии союзникам (доля 0.25+0.05L) · 1 р.',
 				tags: ['buff', 'aoe'],
 			},
 			5: { mechanics: 'Базовые действия.', tags: ['buff'] },

@@ -177,7 +177,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	},
 	Detective: {
 		1: (ctx) => [atk(ctx, 1.1)],
-		2: (ctx) => [atk(ctx, 0.5)],
+		4: (ctx) => [atk(ctx, 0.5)],
 	},
 	GhostWarrior: {
 		1: (ctx) => [atk(ctx, 1)],
