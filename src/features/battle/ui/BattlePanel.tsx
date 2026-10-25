@@ -24,9 +24,39 @@ import { UnitInspectModal } from './UnitInspectModal';
 
 type BattleActionKind = 'attack' | 'defend' | 'wait' | 'skill' | 'ability' | 'move';
 
-type LogDamageSrc = 'fire' | 'holy' | 'water' | 'death' | 'weapon';
+type LogDamageSrc =
+	| 'fire'
+	| 'holy'
+	| 'water'
+	| 'death'
+	| 'weapon'
+	| 'air'
+	| 'earth'
+	| 'arrows'
+	| 'mind';
 
-const DAMAGE_NUM_RE = /(\()(-?\d+)(\))/g;
+/** `(42)⟦FIRE⟧` — маркер источника; без маркера — эвристика. */
+const DAMAGE_MARKED_RE = /(\()(-?\d+)(\))(?:⟦([A-Z_]+)⟧)?/g;
+
+const SOURCE_TO_SRC: Record<string, LogDamageSrc> = {
+	FIRE: 'fire',
+	HOLY: 'holy',
+	WATER: 'water',
+	DEATH: 'death',
+	WEAPON: 'weapon',
+	DEFAULT: 'weapon',
+	AIR: 'air',
+	EARTH: 'earth',
+	ARROWS: 'arrows',
+	MIND: 'mind',
+	STUN: 'weapon',
+	DESTROYARMOR: 'weapon',
+	POLYMORPH: 'weapon',
+	IMITATION: 'weapon',
+	MOVEMENT: 'weapon',
+	FINALSTRIKE: 'death',
+	LOWERINGLEVEL: 'mind',
+};
 
 function detectLogDamageSrc(line: string): LogDamageSrc {
 	const lower = line.toLowerCase();
@@ -42,6 +72,15 @@ function detectLogDamageSrc(line: string): LogDamageSrc {
 	if (/яд|смерт|отрав|death|poison|bleeding|желч/.test(lower)) {
 		return 'death';
 	}
+	if (/молн|разряд|воздух|air/.test(lower)) {
+		return 'air';
+	}
+	if (/земл|ядр|earth|корн/.test(lower)) {
+		return 'earth';
+	}
+	if (/стрел|болт|пращ|лук|arrows/.test(lower)) {
+		return 'arrows';
+	}
 	return 'weapon';
 }
 
@@ -49,18 +88,30 @@ function renderBattleLogLine(line: string): ReactNode {
 	if (/^——\s*ХОД:/u.test(line) || /^——\s*ход:/iu.test(line)) {
 		return <div className={styles.logTurn}>{line}</div>;
 	}
-	const src = detectLogDamageSrc(line);
+	// CAPS-заголовок действия (одна строка без скобок урона, целиком капсом)
+	if (
+		line.length > 1 &&
+		!/\(\s*-?\d+\s*\)/.test(line) &&
+		!/^——/.test(line) &&
+		line === line.toLocaleUpperCase('ru-RU') &&
+		/[A-ZА-ЯЁ]/.test(line)
+	) {
+		return <div className={styles.logActionCaps}>{line}</div>;
+	}
+	const fallbackSrc = detectLogDamageSrc(line);
 	const parts: ReactNode[] = [];
 	let last = 0;
 	let match: RegExpExecArray | null;
-	DAMAGE_NUM_RE.lastIndex = 0;
-	while ((match = DAMAGE_NUM_RE.exec(line)) !== null) {
+	DAMAGE_MARKED_RE.lastIndex = 0;
+	while ((match = DAMAGE_MARKED_RE.exec(line)) !== null) {
 		if (match.index > last) {
 			parts.push(line.slice(last, match.index));
 		}
+		const tagged = match[4];
+		const src = (tagged && SOURCE_TO_SRC[tagged]) || fallbackSrc;
 		parts.push(
 			<span key={`${match.index}-${match[2]}`} className={styles.logDmg} data-src={src}>
-				{match[0]}
+				{`(${match[2]})`}
 			</span>,
 		);
 		last = match.index + match[0].length;

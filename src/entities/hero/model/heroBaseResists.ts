@@ -107,7 +107,10 @@ const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
 		entry('ARROWS', 'Снаряды', { value: 50, ward: 1 }),
 		entry('HOLY', 'Сакральный', { value: -30 }),
 	],
-	Ectoplasm: [entry('WEAPON', 'Оружие', { ward: 1 })],
+	Ectoplasm: [
+		entry('WEAPON', 'Оружие', { ward: 1 }),
+		entry('FIRE', 'Огонь', { value: -20 }),
+	],
 };
 
 /** Базовые резисты/варды класса (пусто, если не заданы). */

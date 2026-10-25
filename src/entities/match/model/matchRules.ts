@@ -25,10 +25,10 @@ export type MatchRules = {
 
 export const DEFAULT_MATCH_RULES: MatchRules = {
 	initialTeamSize: 3,
-	maxTeamSize: 6,
-	maxRowSize: 3,
+	maxTeamSize: 8,
+	maxRowSize: 4,
 	maxRounds: 20,
-	healthBonus: 0.5,
+	healthBonus: 0.65,
 	startingLevel: 1,
 	fairEnabled: false,
 	fairFrequency: 5,
@@ -65,10 +65,10 @@ export const RULES_PRESETS: Record<
 > = {
 	classic: {
 		initialTeamSize: 3,
-		maxTeamSize: 6,
-		maxRowSize: 3,
+		maxTeamSize: 8,
+		maxRowSize: 4,
 		maxRounds: 20,
-		healthBonus: 0.5,
+		healthBonus: 0.65,
 		startingLevel: 1,
 	},
 	fast: {

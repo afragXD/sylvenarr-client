@@ -206,6 +206,15 @@
 	color: var(--copper);
 }
 
+.logActionCaps {
+	margin: 0.35rem 0 0.1rem;
+	font-family: var(--mantine-font-family-headings);
+	font-size: 0.78rem;
+	letter-spacing: 0.05em;
+	font-weight: 700;
+	color: color-mix(in srgb, var(--copper) 70%, var(--app-text));
+}
+
 .logDmg[data-src='fire'] {
 	color: color-mix(in srgb, var(--mantine-color-accent-3) 75%, var(--app-text));
 	font-weight: 700;
@@ -228,6 +237,26 @@
 
 .logDmg[data-src='weapon'] {
 	color: var(--app-text);
+	font-weight: 700;
+}
+
+.logDmg[data-src='air'] {
+	color: color-mix(in srgb, #7eb6d9 70%, var(--app-text));
+	font-weight: 700;
+}
+
+.logDmg[data-src='earth'] {
+	color: color-mix(in srgb, #8b7355 75%, var(--app-text));
+	font-weight: 700;
+}
+
+.logDmg[data-src='arrows'] {
+	color: color-mix(in srgb, var(--brass) 55%, var(--app-text));
+	font-weight: 700;
+}
+
+.logDmg[data-src='mind'] {
+	color: color-mix(in srgb, #9b7bb8 65%, var(--app-text));
 	font-weight: 700;
 }
 
