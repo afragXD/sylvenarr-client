@@ -39,7 +39,7 @@ const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
 	],
 	Knight: [entry('FINALSTRIKE', 'Смертельный удар', { value: 25 })],
 	Archlich: [
-		entry('FIRE', 'Огонь', { value: -20, ward: 1 }),
+		entry('FIRE', 'Огонь', { value: -20 }),
 		entry('DEATH', 'Смерть', { value: 75, ward: 1 }),
 		entry('HOLY', 'Сакральный', { value: -20 }),
 	],
@@ -63,16 +63,19 @@ const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
 		entry('LOWERINGLEVEL', 'Понижение уровня', { ward: 1 }),
 	],
 	Dracolich: [
+		entry('FIRE', 'Огонь', { value: -15 }),
 		entry('MOVEMENT', 'Перемещение', { ward: 1 }),
 		entry('DEATH', 'Смерть', { value: 80, ward: 1 }),
 		entry('LOWERINGLEVEL', 'Понижение уровня', { immune: true }),
 		entry('POLYMORPH', 'Превращение', { ward: 1 }),
 	],
 	GhostWarrior: [
+		entry('FIRE', 'Огонь', { value: -15 }),
 		entry('DEATH', 'Смерть', { value: 85 }),
 		entry('HOLY', 'Сакральный', { value: -35 }),
 		entry('WEAPON', 'Оружие', { value: 20 }),
 	],
+	Specter: [entry('FIRE', 'Огонь', { value: -15 })],
 	Demiurge: [
 		entry('IMITATION', 'Копирование', { immune: true }),
 		entry('AIR', 'Воздух', { value: 20 }),
@@ -98,6 +101,7 @@ const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
 		entry('HOLY', 'Сакральный', { value: -40 }),
 	],
 	SkeletonChampion: [
+		entry('FIRE', 'Огонь', { value: -15 }),
 		entry('AIR', 'Воздух', { value: -25 }),
 		entry('DEATH', 'Смерть', { value: 65 }),
 		entry('ARROWS', 'Снаряды', { value: 50, ward: 1 }),
