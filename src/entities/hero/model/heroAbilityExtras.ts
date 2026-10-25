@@ -75,7 +75,8 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['buff', 'heal'],
 			},
 			4: {
-				mechanics: 'Одной цели: шанс «Ужас» · 2 р.',
+				mechanics:
+					'3 МР; шанс Разум 80%: «Ужас» · 2 р. (−мораль каждый ход) и снять контрудар.',
 				tags: ['debuff'],
 			},
 			5: {
@@ -367,7 +368,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			},
 			5: {
 				mechanics:
-					'Самосожжение: себя убивает; цели «Ужас»/«Неудача»; бафф лидеру.',
+					'Самосожжение: себя убивает; цели −мораль и «Неудача»; бафф лидеру.',
 				tags: ['debuff', 'buff'],
 			},
 		},
