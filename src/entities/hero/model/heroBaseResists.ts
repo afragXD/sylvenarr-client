@@ -75,7 +75,11 @@ const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
 		entry('HOLY', 'Сакральный', { value: -35 }),
 		entry('WEAPON', 'Оружие', { value: 20 }),
 	],
-	Specter: [entry('FIRE', 'Огонь', { value: -15 })],
+	Specter: [
+		entry('FIRE', 'Огонь', { value: -15 }),
+		entry('ARROWS', 'Снаряды', { value: 20 }),
+		entry('WEAPON', 'Оружие', { value: 15 }),
+	],
 	Demiurge: [
 		entry('IMITATION', 'Копирование', { immune: true }),
 		entry('AIR', 'Воздух', { value: 20 }),

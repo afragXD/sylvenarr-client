@@ -193,7 +193,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['debuff'],
 			},
 			4: {
-				mechanics: '4 МР: шанс снизить урон и силу цели (не под «Под охраной»).',
+				mechanics: '4 МР, КД 2: шанс 85+2L% снизить ⌊L/5⌋+1 ур. (вард Снижения уровня).',
 				tags: ['debuff'],
 			},
 			5: {
@@ -212,7 +212,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['attack', 'debuff'],
 			},
 			3: {
-				mechanics: '3 МР: шанс смены ряда цели (не под «Под охраной»).',
+				mechanics: '3 МР, КД 2: шанс 85+L% смены ряда цели.',
 				tags: ['debuff'],
 			},
 			4: {
@@ -220,7 +220,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				tags: ['attack', 'debuff'],
 			},
 			5: {
-				mechanics: '2 МР (задний ряд): ×0.9; шанс «Немота» · 2 р.',
+				mechanics: '3 МР, КД 2 (любой ряд): земля ×0.9; шанс «Немота» · 2 р.',
 				tags: ['attack', 'debuff'],
 			},
 		},
@@ -353,8 +353,9 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 	Pyro: {
 		slots: {
 			1: {
-				mechanics: 'Огнемёт: 2 случайные цели; шанс «Поджог» · 2 р.',
-				tags: ['attack', 'aoe', 'debuff'],
+				mechanics:
+					'Огнемёт: 2+⌊L/7⌋+⌊morale/30⌋ случайных целей; без «Поджога».',
+				tags: ['attack', 'aoe'],
 			},
 			2: {
 				mechanics: 'Арбалет (задний ряд): сильнее против цели с «Поджогом».',
@@ -362,7 +363,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			},
 			3: {
 				mechanics:
-					'«Поджог» всем на фронте · 2 р.; перемешать колонны врагов.',
+					'Бутылка (−1): «Поджог» (80+L)% фронту врага · 2 р.; шанс 35+L% отступить.',
 				tags: ['debuff', 'aoe'],
 			},
 			4: {
@@ -371,22 +372,24 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			},
 			5: {
 				mechanics:
-					'Самосожжение: себя убивает; цели −мораль и «Неудача»; бафф лидеру.',
-				tags: ['debuff', 'buff'],
+					'≥½ ОЗ: умирает; всем союзникам «Сосредоточение» 15+L · 2 р. и +1 крит-банк.',
+				tags: ['buff'],
 			},
 		},
 	},
 	Specter: {
-		passiveMechanics: 'В начале хода: −2 МР у лидера врагов.',
+		passiveMechanics:
+			'В начале хода: −(1+⌊L/7⌋) МР у каждого врага с силой магии > урона.',
 		slots: {
 			1: {
 				mechanics: 'До 2 целей: шанс «Оглушение» · 1 р. или урон.',
 				tags: ['attack', 'debuff'],
 			},
-		2: {
-			mechanics: 'Вард от Оружия цели (1 заряд); урон цели 3L+15.',
-			tags: ['attack', 'buff'],
-		},
+			2: {
+				mechanics:
+					'КД 2: союзнику вард Оружия (=1); −7 морали; −17 точности · 2 р.',
+				tags: ['buff', 'debuff'],
+			},
 			3: {
 				mechanics:
 					'«Метка» · (1+⌊L/4⌋) р.; «Головокружение» −(15+⌊L/2⌋) уклонения · (2+⌊L/7⌋) р.',
@@ -396,7 +399,10 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				mechanics: 'Шанс «Кровотечение» · 2 р.',
 				tags: ['debuff'],
 			},
-			5: { mechanics: 'Базовые действия.', tags: ['buff'] },
+			5: {
+				mechanics: 'КД 2: союзнику «Хамелеон» +(25+2L) уклонения · 2 р.',
+				tags: ['buff'],
+			},
 		},
 	},
 	Detective: {
@@ -559,6 +565,28 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				mechanics:
 					'Хвост: игнор 75% брони, если на цели «Метка», иначе без игнора.',
 				tags: ['attack'],
+			},
+		},
+	},
+	Zombie: {
+		slots: {
+			1: {
+				mechanics: 'Укус; −мораль; +25 точности против «Метки».',
+				tags: ['attack', 'debuff'],
+			},
+			2: {
+				mechanics:
+					'Заряд (−1), фронт: урон смертью; −(10+L) точности и −(10+2L) уклонения · 2 р.',
+				tags: ['attack', 'debuff'],
+			},
+			3: {
+				mechanics:
+					'С 5 ур.: шанс 50+2L% (+10%/союзный зомби, −10%/вражеский) превратить в зомби (Превращение).',
+				tags: ['debuff'],
+			},
+			4: {
+				mechanics: 'Взрыв по ряду цели: ОЗ / max(3, размер ряда); сам умирает.',
+				tags: ['attack', 'aoe'],
 			},
 		},
 	},

@@ -126,8 +126,8 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	},
 	Inquisitor: {
 		1: (ctx) => [atk(ctx, 1)],
-		3: (ctx) => [atk(ctx, 1.25)],
-		4: (ctx) => [atk(ctx, 0.9)],
+		4: (ctx) => [atk(ctx, 1.25)],
+		5: (ctx) => [atk(ctx, 0.9)],
 	},
 	Marauder: {
 		1: (ctx) => [atk(ctx, 1.25)],
