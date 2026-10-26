@@ -471,8 +471,8 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		passiveMechanics: 'В начале хода: −10…80 золота.',
 		slots: {
 			1: {
-				mechanics: 'Магия воды по врагу (сила магии); охрана не блокирует.',
-				tags: ['attack'],
+				mechanics: 'Союзнику +7+2L боевого духа.',
+				tags: ['buff'],
 			},
 			2: {
 				mechanics: '70+2L%: «Головокружение» · 2 р.',
@@ -483,7 +483,10 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 				mechanics: '«Отравление» · 2 р.; −1 заряд торпеды.',
 				tags: ['debuff'],
 			},
-			5: { mechanics: 'Базовые действия.', tags: ['buff'] },
+			5: {
+				mechanics: 'Магия воды по врагу (сила магии); охрана не блокирует.',
+				tags: ['attack'],
+			},
 		},
 	},
 	EvilTree: {

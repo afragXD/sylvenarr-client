@@ -186,7 +186,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		1: (ctx) => [atk(ctx, 0.9)],
 	},
 	BeerElemental: {
-		1: (ctx) => [atk(ctx, 1)],
+		5: (ctx) => [atk(ctx, 1)],
 	},
 	EvilTree: {
 		2: (ctx) => [atk(ctx, 1.2)],

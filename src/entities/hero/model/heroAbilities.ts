@@ -647,7 +647,7 @@ const PILOTS: Record<string, RawHeroAbilityDoc> = {
 			{
 				slot: 1,
 				title: 'Homie De Flanders',
-				body: 'Магический урон водой некачественным пивом. Игнорирует охрану.',
+				body: 'Поднимает боевой дух союзника на 7 + 2×уровень.',
 			},
 			{
 				slot: 2,
@@ -666,8 +666,8 @@ const PILOTS: Record<string, RawHeroAbilityDoc> = {
 			},
 			{
 				slot: 5,
-				title: 'Базовые действия',
-				body: 'Защита и ожидание — через обычные кнопки хода.',
+				title: 'Сливняк',
+				body: 'Магический урон водой некачественным пивом. Игнорирует охрану.',
 			},
 		],
 	},
