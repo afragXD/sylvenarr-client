@@ -122,6 +122,14 @@ export type PendingPrompt = {
 	options: { id: string; label: string; description?: string }[];
 };
 
+export type BattleSfxEvent = {
+	seq: number;
+	unitId: string;
+	heroClassCode: string;
+	kind: 'ability' | 'death';
+	slot?: 1 | 2 | 3 | 4 | 5;
+};
+
 export type BattleState = {
 	stage: number;
 	activeUnitId: string | null;
@@ -130,6 +138,8 @@ export type BattleState = {
 	winnerPlayerId: string | null;
 	drawOfferByPlayerId: string | null;
 	log: string[];
+	/** Звуковые события (хвост); у старого сервера поля нет. */
+	sfxEvents?: BattleSfxEvent[];
 	turnOrder: TurnOrderEntry[];
 	legalTargetIds: string[];
 	skillLabel: string | null;

@@ -1,3 +1,5 @@
+import { getBattleSfxSettings } from './battleSfx';
+
 let audioCtx: AudioContext | null = null;
 
 function getContext(): AudioContext | null {
@@ -33,6 +35,10 @@ export function unlockTurnAudio(): void {
  * Короткий двутоновый сигнал «ваш ход».
  */
 export function playYourTurnSound(): void {
+	const { muted, volume } = getBattleSfxSettings();
+	if (muted || volume <= 0) {
+		return;
+	}
 	const ctx = getContext();
 	if (!ctx) {
 		return;
@@ -41,7 +47,7 @@ export function playYourTurnSound(): void {
 		const now = ctx.currentTime;
 		const gain = ctx.createGain();
 		gain.gain.setValueAtTime(0.0001, now);
-		gain.gain.exponentialRampToValueAtTime(0.12, now + 0.02);
+		gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, 0.12 * volume), now + 0.02);
 		gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
 		gain.connect(ctx.destination);
 
@@ -59,7 +65,10 @@ export function playYourTurnSound(): void {
 	};
 
 	if (ctx.state === 'suspended') {
-		void ctx.resume().then(start).catch(() => undefined);
+		void ctx
+			.resume()
+			.then(start)
+			.catch(() => undefined);
 		return;
 	}
 	start();

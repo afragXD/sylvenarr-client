@@ -1,0 +1,13 @@
+.root {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+.slider {
+	width: 6.5rem;
+}
+
+.slider[data-silent="true"] {
+	opacity: 0.55;
+}

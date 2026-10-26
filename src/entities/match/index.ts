@@ -31,6 +31,7 @@ export {
 export type {
 	AbilityInfo,
 	BattleEffectBrief,
+	BattleSfxEvent,
 	BattleState,
 	BattleUnit,
 	ResistBrief,

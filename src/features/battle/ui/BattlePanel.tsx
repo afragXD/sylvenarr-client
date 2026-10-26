@@ -13,9 +13,11 @@ import type { AbilityInfo, BattleState, BattleUnit, Match } from '@/entities/mat
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 import { previewWeaponAttack, type AttackPreview } from '../lib/attackPreview';
+import { playBattleSfxEvents, preloadUnitSfx, unlockBattleSfx } from '../lib/battleSfx';
 import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
 import { AbilityTags } from './AbilityTags';
 import styles from './BattlePanel.module.css';
+import { BattleSoundControl } from './BattleSoundControl';
 import { CombatStat, CombatStatRow } from './CombatStat';
 import { PortraitHpCurtain } from './PortraitHpCurtain';
 import { TurnOrderStrip } from './TurnOrderStrip';
@@ -188,6 +190,34 @@ export const BattlePanel = ({
 		}
 		wasMyTurnRef.current = isMyTurn;
 	}, [isMyTurn]);
+
+	const unitCodesKey = battle
+		? [...new Set(battle.units.map((unit) => unit.heroClassCode))].sort().join(',')
+		: '';
+	useEffect(() => {
+		if (unitCodesKey) {
+			preloadUnitSfx(unitCodesKey.split(','));
+		}
+	}, [unitCodesKey]);
+
+	// Первый снимок только запоминает хвост: после входа в бой старые события не звучат.
+	const sfxEvents = battle?.sfxEvents;
+	const lastSfxSeqRef = useRef<number | null>(null);
+	useEffect(() => {
+		if (!sfxEvents) {
+			return;
+		}
+		const maxSeq = sfxEvents.reduce((max, event) => Math.max(max, event.seq), 0);
+		const lastSeq = lastSfxSeqRef.current;
+		lastSfxSeqRef.current = Math.max(lastSeq ?? 0, maxSeq);
+		if (lastSeq === null) {
+			return;
+		}
+		const fresh = sfxEvents.filter((event) => event.seq > lastSeq);
+		if (fresh.length > 0) {
+			playBattleSfxEvents(fresh);
+		}
+	}, [sfxEvents]);
 
 	// Автопрокрутка журнала к последним событиям.
 	const logLines = battle?.log;
@@ -364,13 +394,20 @@ export const BattlePanel = ({
 	};
 
 	return (
-		<div className={styles.panel} onPointerDownCapture={unlockTurnAudio}>
+		<div
+			className={styles.panel}
+			onPointerDownCapture={() => {
+				unlockTurnAudio();
+				unlockBattleSfx();
+			}}
+		>
 			<Group justify="space-between" wrap="wrap">
 				<Text fw={600}>
 					Раунд {battle.stage}
 					{battle.outcome === 'ongoing' ? (isMyTurn ? ' · ваш ход' : ' · ход соперника') : ''}
 				</Text>
 				<Group gap="sm" wrap="wrap">
+					<BattleSoundControl />
 					{active && battle.outcome === 'ongoing' && (
 						<Text size="sm" c="var(--app-text-muted)">
 							Ходит: {active.displayName}
