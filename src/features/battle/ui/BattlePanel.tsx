@@ -390,7 +390,7 @@ export const BattlePanel = ({
 		if (!active || pendingMode?.kind !== 'attack' || !highlightTargets.includes(unit.id)) {
 			return null;
 		}
-		return previewWeaponAttack(active, unit);
+		return previewWeaponAttack(active, unit, battle.attackKind ?? 'melee');
 	};
 
 	return (

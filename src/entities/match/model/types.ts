@@ -69,7 +69,6 @@ export type BattleUnit = {
 	maxHp: number;
 	alive: boolean;
 	defending: boolean;
-	attackStyle: 'melee' | 'ranged' | 'magic';
 	effects: BattleEffectBrief[];
 	isSummon: boolean;
 	horseIsDead: boolean;
@@ -107,12 +106,16 @@ export type TurnOrderEntry = {
 	lvl?: number;
 };
 
+export type AttackKind = 'melee' | 'ranged' | 'magic';
+
 export type AbilityInfo = {
 	slot: 1 | 2 | 3 | 4 | 5;
 	label: string;
 	needsTarget: boolean;
 	disabledReason: string | null;
 	legalTargetIds: string[];
+	/** Тип атаки способности; null/нет — способность без прямого урона. */
+	attackKind?: AttackKind | null;
 };
 
 export type PendingPrompt = {
@@ -142,6 +145,8 @@ export type BattleState = {
 	sfxEvents?: BattleSfxEvent[];
 	turnOrder: TurnOrderEntry[];
 	legalTargetIds: string[];
+	/** Тип кнопки «Атака» активного юнита; у старого сервера поля нет. */
+	attackKind?: AttackKind | null;
 	skillLabel: string | null;
 	legalSkillTargetIds: string[];
 	abilities: AbilityInfo[];

@@ -1,8 +1,8 @@
-import type { BattleUnit } from '@/entities/match';
+import type { AttackKind, BattleUnit } from '@/entities/match';
 
 /**
  * Клиентская оценка базовой атаки оружием по цели.
- * Дублирует формулы сервера (damage.ts): броня (×1.5 в защите), стиль атаки,
+ * Дублирует формулы сервера (damage.ts): броня (×1.5 в защите), тип атаки,
  * резисты/варды цели. Без классовых модификаторов урона — оценка диапазона.
  */
 export type AttackPreview = {
@@ -21,7 +21,7 @@ export type AttackPreview = {
 	source: 'WEAPON' | 'ARROWS' | 'FIRE';
 };
 
-const SOURCE_BY_STYLE = {
+const SOURCE_BY_KIND = {
 	melee: 'WEAPON',
 	ranged: 'ARROWS',
 	magic: 'FIRE',
@@ -30,6 +30,7 @@ const SOURCE_BY_STYLE = {
 export function previewWeaponAttack(
 	attacker: BattleUnit,
 	defender: BattleUnit,
+	kind: AttackKind,
 ): AttackPreview {
 	const hitChance = Math.min(95, Math.max(20, attacker.accuracy - defender.dodge / 2));
 
@@ -40,10 +41,10 @@ export function previewWeaponAttack(
 
 	let minRaw: number;
 	let maxRaw: number;
-	if (attacker.attackStyle === 'magic') {
+	if (kind === 'magic') {
 		minRaw = Math.max(1, Math.round(attacker.power * 0.8 - 3 - armor * 0.15));
 		maxRaw = Math.max(1, Math.round(attacker.power * 0.8 + 3 - armor * 0.15));
-	} else if (attacker.attackStyle === 'ranged') {
+	} else if (kind === 'ranged') {
 		minRaw = Math.max(1, Math.round(attacker.damage - armor * 0.5));
 		maxRaw = Math.max(1, Math.round(attacker.damage - armor * 0.5 + 2));
 	} else {
@@ -51,7 +52,7 @@ export function previewWeaponAttack(
 		maxRaw = Math.max(1, Math.round(attacker.damage - armor + 2));
 	}
 
-	const source = SOURCE_BY_STYLE[attacker.attackStyle];
+	const source = SOURCE_BY_KIND[kind];
 	const resist = (defender.resists ?? []).find((row) => row.source === source);
 
 	let blockedLabel: string | null = null;

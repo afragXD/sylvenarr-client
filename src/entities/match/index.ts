@@ -30,6 +30,7 @@ export {
 } from './model/matchRules';
 export type {
 	AbilityInfo,
+	AttackKind,
 	BattleEffectBrief,
 	BattleSfxEvent,
 	BattleState,
