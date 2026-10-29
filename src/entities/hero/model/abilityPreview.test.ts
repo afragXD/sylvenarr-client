@@ -99,6 +99,34 @@ describe('abilityPreview', () => {
 		expect(text).toContain('урона до брони');
 	});
 
+	test('Angel slot 3: урон от текущего ОЗ каждого врага', () => {
+		// lvl=5 → 20%; 150 ОЗ → 30, 7 ОЗ → max(1, 1)
+		const parts = getAbilityPreview(
+			'Angel',
+			3,
+			base({
+				lvl: 5,
+				enemies: [
+					{ displayName: 'Рыцарь', health: 150 },
+					{ displayName: 'Бес', health: 7 },
+				],
+			}),
+		);
+		expect(formatAbilityPreview(parts)).toBe(
+			'20% текущего ОЗ врага · Рыцарь: −30 ОЗ · Бес: −1 ОЗ',
+		);
+		expect(getAbilityPreview('Angel', 3, base({ lvl: 5 }))).toEqual([
+			{ kind: 'text', value: '20% текущего ОЗ врага' },
+		]);
+	});
+
+	test('Antipaladin slot 3: ⌊атака/3⌋ + 2L и шанс кровотечения', () => {
+		expect(getAbilityPreview('Antipaladin', 3, base({ lvl: 2, damage: 24 }))).toEqual([
+			{ kind: 'damage', value: 12 },
+			{ kind: 'chance', value: 54, label: 'кровотечение' },
+		]);
+	});
+
 	test('unknown slot returns null', () => {
 		expect(getAbilityPreview('Assassin', 5, base())).toBeNull();
 		expect(formatAbilityPreview(null)).toBeNull();

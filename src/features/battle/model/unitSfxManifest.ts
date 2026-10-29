@@ -24,6 +24,24 @@ export const UNIT_SFX: Record<string, UnitSfxEntry> = {
 		},
 		death: 'death',
 	},
+	Angel: {
+		slots: {
+			1: 'Touch_Of_Bliss',
+			2: 'Concealment',
+			3: 'Where_Are_Your_Wings',
+			4: 'Moment_Of_Glory',
+			5: 'Day_Of_The_Gods',
+		},
+		death: 'death',
+	},
+	Antipaladin: {
+		slots: {
+			1: 'Black_Axe',
+			2: 'Flurry_Of_Blows',
+			3: 'Sadist',
+			5: 'Taran',
+		},
+	},
 	Archlich: {
 		slots: {
 			1: 'Death_Cloud',
@@ -154,6 +172,14 @@ export const UNIT_SFX: Record<string, UnitSfxEntry> = {
 	Imp: {
 		slots: { 1: 'Imps_Revenge' },
 	},
+	Incub: {
+		slots: {
+			1: 'Runes_Of_Strength',
+			3: 'Sculptor_Of_Lies',
+			5: 'Rune_Of_Birth',
+		},
+		death: 'death',
+	},
 	Inquisitor: {
 		slots: {
 			1: 'Mace_Of_Order',
@@ -250,6 +276,16 @@ export const UNIT_SFX: Record<string, UnitSfxEntry> = {
 			4: 'Flay_Skin',
 			5: 'Ghostly_Form',
 		},
+	},
+	Titan: {
+		slots: {
+			1: 'Titans_Lightning',
+			2: 'Meteor_Shower',
+			3: 'Mighty_Fist',
+			4: 'Emperors_Triumph',
+			5: 'Electrical_Saturation',
+		},
+		death: 'death',
 	},
 	Werewolf: {
 		slots: {

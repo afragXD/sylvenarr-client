@@ -115,6 +115,25 @@ const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
 		entry('WEAPON', 'Оружие', { ward: 1 }),
 		entry('FIRE', 'Огонь', { value: -20 }),
 	],
+	Antipaladin: [
+		entry('WEAPON', 'Оружие', { value: 10 }),
+		entry('DEATH', 'Смерть', { value: 10 }),
+		entry('ARROWS', 'Снаряды', { value: 15 }),
+	],
+	Angel: [
+		entry('MIND', 'Разум', { value: 25, ward: 1 }),
+		entry('HOLY', 'Сакральный', { immune: true }),
+		entry('POLYMORPH', 'Превращение', { ward: 1 }),
+	],
+	Titan: [
+		entry('STUN', 'Оглушение', { value: 25, ward: 1 }),
+		entry('HOLY', 'Сакральный', { value: 25 }),
+		entry('DEATH', 'Смерть', { value: 25 }),
+	],
+	Incub: [
+		entry('MIND', 'Разум', { value: 30 }),
+		entry('FIRE', 'Огонь', { value: 25 }),
+	],
 };
 
 /** Базовые резисты/варды класса (пусто, если не заданы). */

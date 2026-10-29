@@ -233,6 +233,9 @@ export const BattlePanel = ({
 	}
 
 	const active = battle.units.find((unit) => unit.id === battle.activeUnitId) ?? null;
+	const activeEnemies = active
+		? battle.units.filter((unit) => unit.alive && unit.team !== active.team)
+		: [];
 	const inspectUnit =
 		inspectUnitId === null
 			? null
@@ -594,7 +597,7 @@ export const BattlePanel = ({
 											getAbilityPreview(
 												active.heroClassCode,
 												ability.slot,
-												previewCtxFromUnit(active),
+												previewCtxFromUnit(active, activeEnemies),
 											),
 										)
 									: null;

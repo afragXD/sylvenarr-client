@@ -60,6 +60,7 @@ export type EffectId =
 	| 'INTERFERENCE'
 	| 'SILENCE'
 	| 'IMPISH'
+	| 'DEFEND'
 	| 'POLYMORPH'
 	| 'FIRESHIELD'
 	| 'AIRSHIELD'
@@ -80,7 +81,11 @@ export type EffectId =
 	| 'ENSLAVED'
 	| 'ROW_FORTIFY'
 	| 'ASHILLNESS'
-	| 'ABSOLUTEPOWER';
+	| 'ABSOLUTEPOWER'
+	| 'BERSERK'
+	| 'IMAGINARY_HEALTH'
+	| 'IMMOLATION'
+	| 'DEATHWARD';
 
 export type EffectKind = 'buff' | 'debuff';
 
@@ -105,6 +110,7 @@ const exampleTypical = (value: string): string => `Типично: ${value}`;
 
 const BUFF_ORDER: EffectId[] = [
 	'GUARDED',
+	'DEFEND',
 	'STRENGTH',
 	'BLESSED',
 	'HAPPY',
@@ -127,6 +133,9 @@ const BUFF_ORDER: EffectId[] = [
 	'ROW_FORTIFY',
 	'STUN_IMMUNE',
 	'ABSOLUTEPOWER',
+	'BERSERK',
+	'IMAGINARY_HEALTH',
+	'DEATHWARD',
 ];
 
 const DEBUFF_ORDER: EffectId[] = [
@@ -151,6 +160,7 @@ const DEBUFF_ORDER: EffectId[] = [
 	'MAGIC_SHACKLES',
 	'ENSLAVED',
 	'ASHILLNESS',
+	'IMMOLATION',
 ];
 
 const CATALOG: Record<EffectId, EffectMeta> = {
@@ -364,11 +374,20 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	IMPISH: {
 		id: 'IMPISH',
 		label: 'Бес',
-		description: 'Полиморф: без брони и со штрафом к урону; броня вернётся.',
-		mechanics: 'броня → 0, −power урона · 2 р.',
-		exampleAtL: exampleTypical('−5 урона · 2 р.'),
+		description: 'Превращён в толстого беса: его абилки и облик; броня снята и вернётся.',
+		mechanics: 'класс Imp, броня 0 · 2 р., затем откат класса',
+		exampleAtL: exampleTypical('2 р.'),
 		Icon: Bug,
 		kind: 'debuff',
+	},
+	DEFEND: {
+		id: 'DEFEND',
+		label: 'Защитная стойка',
+		description: '+50 к сопротивлению оружию и стихиям до конца стойки.',
+		mechanics: '+50 WEAPON/FIRE/WATER/AIR/EARTH/DEATH/MIND · 1 р.',
+		exampleAtL: exampleTypical('½ урона от оружия и стихий'),
+		Icon: Shield,
+		kind: 'buff',
 	},
 	POLYMORPH: {
 		id: 'POLYMORPH',
@@ -549,6 +568,42 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		exampleAtL: exampleAtL('+50% силы магии · 1 р.'),
 		Icon: Sparkles,
 		kind: 'buff',
+	},
+	BERSERK: {
+		id: 'BERSERK',
+		label: 'Руна берсерка',
+		description: 'Вся броня превращается в атаку; по окончании броня возвращается.',
+		mechanics: 'броня → 0, атака + броня×(1 + L%) · 1 р.',
+		exampleAtL: exampleAtL('30 брони → +32 атаки · 1 р.'),
+		Icon: Swords,
+		kind: 'buff',
+	},
+	IMAGINARY_HEALTH: {
+		id: 'IMAGINARY_HEALTH',
+		label: 'Мнимое здоровье',
+		description: 'Добавляет здоровье сверх максимума; по окончании ровно столько же отнимает.',
+		mechanics: '+(50 + 5×L) ОЗ сверх максимума · 2 р.',
+		exampleAtL: exampleAtL('+75 ОЗ · 2 р.'),
+		Icon: Heart,
+		kind: 'buff',
+	},
+	DEATHWARD: {
+		id: 'DEATHWARD',
+		label: 'Оковы войны',
+		description: 'Носитель переживает смертельный удар с 1 ОЗ.',
+		mechanics: '+100% к «Смертельному удару» · 2 р.',
+		exampleAtL: exampleTypical('+100% · 2 р.'),
+		Icon: Link,
+		kind: 'buff',
+	},
+	IMMOLATION: {
+		id: 'IMMOLATION',
+		label: 'Нечистый договор',
+		description: 'Сила в долг: когда договор истекает, носитель теряет большую часть здоровья.',
+		mechanics: 'по истечении −75% макс. ОЗ · 2 р. (рассеивание отменяет расплату)',
+		exampleAtL: exampleTypical('−75% макс. ОЗ через 2 р.'),
+		Icon: Flame,
+		kind: 'debuff',
 	},
 };
 

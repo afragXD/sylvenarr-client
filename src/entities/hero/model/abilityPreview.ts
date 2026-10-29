@@ -16,6 +16,8 @@ export type PreviewCtx = {
 	/** Накопленная ярость Оркхана; в бою пока не в API — по умолчанию 0. */
 	readonly cumRage?: number;
 	readonly gold?: number;
+	/** Живые враги в бою — для урона от их текущего ОЗ (Ангел «Где твои крылья»). */
+	readonly enemies?: ReadonlyArray<{ readonly displayName: string; readonly health: number }>;
 };
 
 export type AbilitySlotKey = 1 | 2 | 3 | 4 | 5 | 'passive';
@@ -65,6 +67,18 @@ function mermaidBreeze(ctx: PreviewCtx): PreviewPart[] {
 		return [heal(base + bonus), acc];
 	}
 	return [{ kind: 'healRange', min: base + power, max: base + power * 2 }, acc];
+}
+
+function angelWings(ctx: PreviewCtx): PreviewPart[] {
+	const percent = 15 + ctx.lvl;
+	const parts: PreviewPart[] = [{ kind: 'text', value: `${percent}% текущего ОЗ врага` }];
+	for (const enemy of ctx.enemies ?? []) {
+		parts.push({
+			kind: 'text',
+			value: `${enemy.displayName}: −${Math.max(1, round((enemy.health * percent) / 100))} ОЗ`,
+		});
+	}
+	return parts;
 }
 
 /** Слоты и пассивки с числовым превью; нет записи → только текстовый mechanics. */
@@ -208,6 +222,48 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	Dracolich: {
 		1: (ctx) => [atk(ctx, 1)],
 	},
+	Antipaladin: {
+		1: (ctx) => [atk(ctx, 1), { kind: 'text', value: `игнор ${25 + ctx.lvl}% брони` }],
+		2: (ctx) => [atk(ctx, 1), { kind: 'text', value: `×${3 + Math.floor(ctx.lvl / 5)} удара` }],
+		3: (ctx) => [
+			{ kind: 'damage', value: Math.floor(ctx.damage / 3) + ctx.lvl * 2 },
+			{ kind: 'chance', value: 50 + ctx.lvl * 2, label: 'кровотечение' },
+		],
+		5: (ctx) => [atk(ctx, 1), { kind: 'text', value: '×1.2 по святым' }],
+	},
+	Angel: {
+		passive: (ctx) => [{ kind: 'text', value: `+${15 + ctx.lvl} удачи бойцу` }],
+		1: (ctx) => [heal(Math.floor(ctx.power / 2)), { kind: 'text', value: '×2 цели' }],
+		3: angelWings,
+		4: (ctx) => [{ kind: 'strength', value: 5 * ctx.lvl + 10 }],
+		5: (ctx) => [atk(ctx, 1), { kind: 'chance', value: 70 + ctx.lvl * 2, label: 'рассеивание' }],
+	},
+	Titan: {
+		passive: (ctx) => [{ kind: 'text', value: `+${2 + ctx.lvl} атаки воину` }],
+		1: (ctx) => [atk(ctx, 1)],
+		2: (ctx) => [
+			{ kind: 'damage', value: round(ctx.power * 0.8 * 0.5) },
+			{ kind: 'text', value: `−${Math.floor(ctx.lvl / 2) + 4} брони` },
+		],
+		3: (ctx) => [atk(ctx, 1), { kind: 'chance', value: 50 + ctx.lvl * 2, label: '−15% макс. ОЗ' }],
+		4: (ctx) => [
+			heal(Math.floor(ctx.power / 2) + ctx.lvl * 2),
+			{ kind: 'armor', value: 15 + ctx.lvl * 2 },
+		],
+		5: (ctx) => [{ kind: 'text', value: `+${15 + ctx.lvl} инициативы ряду` }],
+	},
+	Incub: {
+		passive: (ctx) => [
+			{ kind: 'chance', value: 60 + ctx.lvl, label: `−${5 + Math.floor(ctx.lvl / 2)} морали` },
+		],
+		1: (ctx) => [
+			{ kind: 'text', value: `${ctx.power} урона на ряд` },
+			{ kind: 'chance', value: 70 + ctx.lvl, label: 'головокружение' },
+		],
+		2: (ctx) => [{ kind: 'text', value: `+${50 + ctx.lvl * 5} мнимых ОЗ` }],
+		3: (ctx) => [{ kind: 'strength', value: 20 + ctx.lvl * 2 }],
+		4: (ctx) => [{ kind: 'text', value: `+${15 + ctx.lvl} удачи` }],
+	},
 };
 
 /**
@@ -293,16 +349,19 @@ export function previewCtxFromHero(hero: {
 	};
 }
 
-/** Контекст превью из боевого юнита. */
-export function previewCtxFromUnit(unit: {
-	readonly lvl?: number;
-	readonly damage: number;
-	readonly power: number;
-	readonly health: number;
-	readonly maxHp: number;
-	readonly luck?: number;
-	readonly gold?: number;
-}): PreviewCtx {
+/** Контекст превью из боевого юнита; `enemies` — живые враги для превью от их ОЗ. */
+export function previewCtxFromUnit(
+	unit: {
+		readonly lvl?: number;
+		readonly damage: number;
+		readonly power: number;
+		readonly health: number;
+		readonly maxHp: number;
+		readonly luck?: number;
+		readonly gold?: number;
+	},
+	enemies?: PreviewCtx['enemies'],
+): PreviewCtx {
 	return {
 		lvl: typeof unit.lvl === 'number' ? unit.lvl : 1,
 		damage: unit.damage,
@@ -312,5 +371,6 @@ export function previewCtxFromUnit(unit: {
 		luck: unit.luck,
 		gold: unit.gold,
 		cumRage: 0,
+		enemies,
 	};
 }

@@ -2,8 +2,8 @@ import type { AttackKind, BattleUnit } from '@/entities/match';
 
 /**
  * Клиентская оценка базовой атаки оружием по цели.
- * Дублирует формулы сервера (damage.ts): броня (×1.5 в защите), тип атаки,
- * резисты/варды цели. Без классовых модификаторов урона — оценка диапазона.
+ * Дублирует формулы сервера (damage.ts): броня, тип атаки, резисты/варды цели
+ * (защита даёт +50 к резистам — уже в defender.resists). Без классовых модов.
  */
 export type AttackPreview = {
 	/** Шанс попадания, % (20–95). */
@@ -34,10 +34,7 @@ export function previewWeaponAttack(
 ): AttackPreview {
 	const hitChance = Math.min(95, Math.max(20, attacker.accuracy - defender.dodge / 2));
 
-	let armor = defender.armor;
-	if (defender.defending) {
-		armor = Math.round(armor * 1.5);
-	}
+	const armor = defender.armor;
 
 	let minRaw: number;
 	let maxRaw: number;
