@@ -6,7 +6,7 @@ import type { AttackKind, BattleUnit } from '@/entities/match';
  * (защита даёт +50 к резистам — уже в defender.resists). Без классовых модов.
  */
 export type AttackPreview = {
-	/** Шанс попадания, % (20–95). */
+	/** Шанс попадания, % (как в боте: 100 − (dodge + 1 + 95 − accuracy)). */
 	hitChance: number;
 	/** Диапазон урона после брони и резистов (без крита). */
 	minDamage: number;
@@ -27,12 +27,21 @@ const SOURCE_BY_KIND = {
 	magic: 'FIRE',
 } as const;
 
+/** Порт evade(): miss = dodge + 1 + 95 − accuracy → hit = 100 − miss, clamp 0..100. */
+function previewHitChance(attacker: BattleUnit, defender: BattleUnit): number {
+	if ((defender.dodgeBank ?? 0) > 0) {
+		return 0;
+	}
+	const missChance = defender.dodge + 1 + 95 - attacker.accuracy;
+	return Math.max(0, Math.min(100, 100 - missChance));
+}
+
 export function previewWeaponAttack(
 	attacker: BattleUnit,
 	defender: BattleUnit,
 	kind: AttackKind,
 ): AttackPreview {
-	const hitChance = Math.min(95, Math.max(20, attacker.accuracy - defender.dodge / 2));
+	const hitChance = previewHitChance(attacker, defender);
 
 	const armor = defender.armor;
 
@@ -67,7 +76,7 @@ export function previewWeaponAttack(
 		hitChance: Math.round(hitChance),
 		minDamage: Math.max(0, Math.round(minRaw * multiplier)),
 		maxDamage: Math.max(0, Math.round(maxRaw * multiplier)),
-		critChance: attacker.critBank > 0 ? null : Math.min(40, attacker.luck),
+		critChance: attacker.critBank > 0 ? null : Math.max(0, attacker.luck),
 		blockedLabel,
 		resistValue,
 		source,
