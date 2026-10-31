@@ -26,6 +26,7 @@ import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 import { DraftPresetModal } from './DraftPresetModal';
+import draftStyles from './MatchRoomDraft.module.css';
 
 const POLL_MS = 2500;
 const PING_MS = 20_000;
@@ -35,11 +36,29 @@ const battleWsUrl = (matchId: string): string => {
 	return `${wsBase}/matches/ws/${encodeURIComponent(matchId)}`;
 };
 
-const RESULT_META_RETRY_MS = [150, 300, 600, 1000, 1500] as const;
+const RESULT_META_RETRY_MS = [80, 160, 320, 640] as const;
+
+type BattleEndedRating = {
+	playerId: string;
+	ptsBefore: number;
+	ptsAfter: number;
+	ptsDelta: number;
+};
+
+type BattleWsPayload = {
+	type?: string;
+	message?: string;
+	battle?: Match['battle'];
+	resultMeta?: {
+		durationSeconds: number | null;
+		ratings: BattleEndedRating[];
+	};
+};
 
 const mergeBattleFrame = (
 	prev: Match,
-	payload: { type?: string; battle?: Match['battle'] },
+	payload: BattleWsPayload,
+	viewerId: string | null,
 ): Match => {
 	const battle = payload.battle;
 	if (!battle) {
@@ -52,14 +71,30 @@ const mergeBattleFrame = (
 				? 'fighting'
 				: prev.status;
 	const justFinished = nextStatus === 'finished' && prev.status !== 'finished';
+	const meta = payload.resultMeta;
+	const ownRating =
+		meta && viewerId ? (meta.ratings.find((row) => row.playerId === viewerId) ?? null) : undefined;
+	const fromMeta =
+		justFinished && meta
+			? {
+					durationSeconds: meta.durationSeconds,
+					myRating: ownRating
+						? {
+								ptsBefore: ownRating.ptsBefore,
+								ptsAfter: ownRating.ptsAfter,
+								ptsDelta: ownRating.ptsDelta,
+							}
+						: null,
+					finishedAt: new Date().toISOString(),
+				}
+			: justFinished
+				? { myRating: undefined, durationSeconds: null, finishedAt: null }
+				: {};
 	return {
 		...prev,
 		status: nextStatus,
 		winnerPlayerId: battle.winnerPlayerId ?? prev.winnerPlayerId,
-		// Сбрасываем мету: WS-кадр её не несёт; покажет «Загрузка…», пока не придёт GET.
-		...(justFinished
-			? { myRating: undefined, durationSeconds: null, finishedAt: null }
-			: {}),
+		...fromMeta,
 		battle: {
 			...battle,
 			skillLabel: battle.skillLabel ?? null,
@@ -97,7 +132,12 @@ export const MatchRoomPage = () => {
 	const [presetModalOpen, setPresetModalOpen] = useState(false);
 	/** Ждём GET с ПТС/длительностью после battle:ended. */
 	const [resultMetaLoading, setResultMetaLoading] = useState(false);
+	/** Экран «Отряды собраны» перед боем. */
+	const [squadsReadyVisible, setSquadsReadyVisible] = useState(false);
+	const [focusedHeroCode, setFocusedHeroCode] = useState<string | null>(null);
 	const battleSocketRef = useRef<WebSocket | null>(null);
+	const playerIdRef = useRef<string | null>(null);
+	const prevMatchStatusRef = useRef<Match['status'] | null>(null);
 
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -105,9 +145,13 @@ export const MatchRoomPage = () => {
 		}),
 	);
 
+	playerIdRef.current = player?.id ?? null;
+
 	useEffect(() => {
 		let isMounted = true;
 		setResultMetaLoading(false);
+		setSquadsReadyVisible(false);
+		prevMatchStatusRef.current = null;
 		const boot = async () => {
 			try {
 				const [current, loaded, heroList] = await Promise.all([
@@ -199,6 +243,26 @@ export const MatchRoomPage = () => {
 		};
 	}, [activeMatchId, resultMetaLoading]);
 
+	/** Короткий экран «Отряды собраны» при переходе drafting → fighting. */
+	useEffect(() => {
+		const prev = prevMatchStatusRef.current;
+		const next = match?.status ?? null;
+		if (prev === 'drafting' && next === 'fighting') {
+			setSquadsReadyVisible(true);
+			const timer = window.setTimeout(() => {
+				setSquadsReadyVisible(false);
+			}, 1600);
+			prevMatchStatusRef.current = next;
+			return () => {
+				window.clearTimeout(timer);
+			};
+		}
+		if (next) {
+			prevMatchStatusRef.current = next;
+		}
+		return undefined;
+	}, [match?.status]);
+
 	useEffect(() => {
 		if (!activeMatchId || activeMatchStatus !== 'fighting') {
 			return;
@@ -232,11 +296,7 @@ export const MatchRoomPage = () => {
 					return;
 				}
 				try {
-					const payload = JSON.parse(String(event.data)) as {
-						type?: string;
-						message?: string;
-						battle?: Match['battle'];
-					};
+					const payload = JSON.parse(String(event.data)) as BattleWsPayload;
 					if (payload.type === 'error') {
 						setError(payload.message ?? 'Ошибка боя');
 						setIsBusy(false);
@@ -249,12 +309,15 @@ export const MatchRoomPage = () => {
 						(payload.type === 'battle:state' || payload.type === 'battle:ended') &&
 						payload.battle
 					) {
-						const ended =
-							payload.type === 'battle:ended' || payload.battle.outcome !== 'ongoing';
-						setMatch((prev) => (prev ? mergeBattleFrame(prev, payload) : prev));
+						const ended = payload.type === 'battle:ended' || payload.battle.outcome !== 'ongoing';
+						const hasMeta =
+							ended && payload.resultMeta != null && payload.resultMeta.durationSeconds != null;
+						setMatch((prev) =>
+							prev ? mergeBattleFrame(prev, payload, playerIdRef.current) : prev,
+						);
 						setIsBusy(false);
 						if (ended) {
-							setResultMetaLoading(true);
+							setResultMetaLoading(!hasMeta);
 						}
 					}
 				} catch {
@@ -542,8 +605,99 @@ export const MatchRoomPage = () => {
 		!lockedByPreset &&
 		(player.id === match.host.id || player.id === match.guest?.id);
 
+	const handlePickRow = (heroCode: string, row: number) => {
+		if (isBusy || lockedByPreset || match.draft.turnPlayerId !== player.id) {
+			return;
+		}
+		const hero = heroes.find((item) => item.code === heroCode);
+		if (!hero || mySize + hero.size > match.draft.initialTeamSize) {
+			return;
+		}
+		setIsBusy(true);
+		setError(null);
+		void draftPick({ matchId: match.id, heroCode, row })
+			.then((next) => setMatch(next))
+			.catch((err: unknown) => {
+				setError(err instanceof ApiError ? err.message : 'Ошибка выбора');
+			})
+			.finally(() => setIsBusy(false));
+	};
+
+	const selfIsHost = player.id === match.host.id;
+	const focusedHero = focusedHeroCode ? heroes.find((hero) => hero.code === focusedHeroCode) : null;
+	const projectedSize =
+		focusedHero && isMyTurn && !lockedByPreset ? mySize + focusedHero.size : null;
+	const quotaLabel =
+		projectedSize !== null && projectedSize <= match.draft.initialTeamSize
+			? `${mySize}/${match.draft.initialTeamSize} → ${projectedSize}/${match.draft.initialTeamSize}`
+			: `${mySize}/${match.draft.initialTeamSize}`;
+
+	const hostPanel = (
+		<TeamPanel
+			title={
+				<PlayerIdentity
+					name={match.host.displayName}
+					avatarUrl={match.host.avatarUrl}
+					prefix="Игрок 1"
+					size={28}
+				/>
+			}
+			ownerPlayerId={match.host.id}
+			size={match.draft.hostSize}
+			cap={match.draft.initialTeamSize}
+			projectedSize={selfIsHost ? projectedSize : null}
+			picks={match.draft.hostPicks}
+			isTurn={match.draft.turnPlayerId === match.host.id}
+			acceptDrops={player.id === match.host.id && !isBusy && !lockedByPreset}
+			canDragUnits={canDragUnits && player.id === match.host.id}
+			mirrorRows={selfIsHost}
+		/>
+	);
+	const guestPanel = (
+		<TeamPanel
+			title={
+				<PlayerIdentity
+					name={match.guest?.displayName ?? '…'}
+					avatarUrl={match.guest?.avatarUrl}
+					prefix="Игрок 2"
+					size={28}
+				/>
+			}
+			ownerPlayerId={match.guest?.id ?? 'guest'}
+			size={match.draft.guestSize}
+			cap={match.draft.initialTeamSize}
+			projectedSize={!selfIsHost ? projectedSize : null}
+			picks={match.draft.guestPicks}
+			isTurn={match.draft.turnPlayerId === match.guest?.id}
+			acceptDrops={
+				Boolean(match.guest) && player.id === match.guest?.id && !isBusy && !lockedByPreset
+			}
+			canDragUnits={canDragUnits && Boolean(match.guest) && player.id === match.guest?.id}
+			mirrorRows={!selfIsHost}
+		/>
+	);
+
 	return (
 		<PageFrame width="wide">
+			{squadsReadyVisible ? (
+				<output className={draftStyles.squadsReady} aria-live="polite">
+					<div className={draftStyles.squadsReadyCard}>
+						<h2 className={draftStyles.squadsReadyTitle}>Отряды собраны</h2>
+						<div className={draftStyles.squadsReadyTeams}>
+							<SquadPreview
+								title={match.host.displayName}
+								picks={match.draft.hostPicks}
+								fallbackUnits={match.battle?.units.filter((unit) => unit.team === 0)}
+							/>
+							<SquadPreview
+								title={match.guest?.displayName ?? 'Соперник'}
+								picks={match.draft.guestPicks}
+								fallbackUnits={match.battle?.units.filter((unit) => unit.team === 1)}
+							/>
+						</div>
+					</div>
+				</output>
+			) : null}
 			<DndContext sensors={sensors} onDragEnd={handleDragEnd}>
 				<Stack gap="lg" w="100%">
 					<Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
@@ -620,61 +774,32 @@ export const MatchRoomPage = () => {
 					)}
 
 					{match.status === 'drafting' && (
-						<>
-							<Group align="stretch" gap="xl" wrap="wrap" preventGrowOverflow={false}>
-								<TeamPanel
-									title={
-										<PlayerIdentity
-											name={match.host.displayName}
-											avatarUrl={match.host.avatarUrl}
-											prefix="Игрок 1"
-											size={28}
-										/>
-									}
-									ownerPlayerId={match.host.id}
-									size={match.draft.hostSize}
-									cap={match.draft.initialTeamSize}
-									picks={match.draft.hostPicks}
-									isTurn={match.draft.turnPlayerId === match.host.id}
-									acceptDrops={
-										player.id === match.host.id && !isBusy && !lockedByPreset
-									}
-									canDragUnits={canDragUnits && player.id === match.host.id}
-									mirrorRows
-								/>
-								<TeamPanel
-									title={
-										<PlayerIdentity
-											name={match.guest?.displayName ?? '…'}
-											avatarUrl={match.guest?.avatarUrl}
-											prefix="Игрок 2"
-											size={28}
-										/>
-									}
-									ownerPlayerId={match.guest?.id ?? 'guest'}
-									size={match.draft.guestSize}
-									cap={match.draft.initialTeamSize}
-									picks={match.draft.guestPicks}
-									isTurn={match.draft.turnPlayerId === match.guest?.id}
-									acceptDrops={
-										Boolean(match.guest) &&
-										player.id === match.guest?.id &&
-										!isBusy &&
-										!lockedByPreset
-									}
-									canDragUnits={
-										canDragUnits && Boolean(match.guest) && player.id === match.guest?.id
-									}
-								/>
-							</Group>
+						<div className={draftStyles.draftLayout}>
+							<div className={draftStyles.teamsColumn}>
+								{selfIsHost ? (
+									<>
+										{hostPanel}
+										{guestPanel}
+									</>
+								) : (
+									<>
+										{guestPanel}
+										{hostPanel}
+									</>
+								)}
+								<Text size="sm" c="var(--app-text-muted)">
+									Передний ряд принимает удар первым; задний ряд защищён, пока в переднем есть живые
+									герои.
+								</Text>
+							</div>
 
-							<Stack gap="md">
+							<div className={draftStyles.catalogPanel}>
 								<Group justify="space-between" align="center" wrap="wrap" gap="sm">
 									<Text fw={600}>
 										{lockedByPreset
 											? 'Отряд зафиксирован пресетом. Ждём соперника…'
 											: isMyTurn
-												? `Ваш ход · квота ${mySize}/${match.draft.initialTeamSize}. Перетащите героя на ряд.`
+												? `Ваш ход · квота ${quotaLabel}. Выберите героя кнопкой ряда или Enter.`
 												: 'Ход соперника…'}
 									</Text>
 									<Group gap="sm">
@@ -695,7 +820,7 @@ export const MatchRoomPage = () => {
 											disabled={!isMyTurn || lockedByPreset}
 											onClick={() => void handleRandom()}
 										>
-											Случайно
+											Случайный герой (+1)
 										</Button>
 									</Group>
 								</Group>
@@ -707,63 +832,66 @@ export const MatchRoomPage = () => {
 								{!lockedByPreset ? (
 									<>
 										<Text size="sm" c="var(--app-text-muted)">
-											Цифра в углу карточки — сколько слотов герой занимает в отряде: I — один, II —
-											два.
+											Цифра в углу — слоты в отряде (I / II). Перетаскивание на ряд тоже работает.
 										</Text>
-										<SimpleGrid
-											cols={{ base: 3, sm: 4, md: 6, lg: 8 }}
-											spacing="lg"
-											verticalSpacing="lg"
-										>
-											{[...heroes]
-												.sort(
-													(a, b) =>
-														b.size - a.size || a.displayName.localeCompare(b.displayName, 'ru'),
-												)
-												.map((hero) => {
-													const freeSlots = match.draft.initialTeamSize - mySize;
-													const fits = hero.size <= freeSlots;
-													const ownCodes = new Set(
-														[...match.draft.hostPicks, ...match.draft.guestPicks]
-															.filter((pick) => pick.playerId === player?.id)
-															.map((pick) => pick.heroClassCode),
-													);
-													const allCodes = new Set(
-														[...match.draft.hostPicks, ...match.draft.guestPicks].map(
-															(pick) => pick.heroClassCode,
-														),
-													);
-													const blockedByDupes =
-														(match.rules.heroDupes === 'uniqueTeam' &&
-															ownCodes.has(hero.code)) ||
-														(match.rules.heroDupes === 'uniqueMatch' &&
-															allCodes.has(hero.code));
-													const disabled =
-														!isMyTurn || isBusy || !fits || blockedByDupes;
-													const disabledReason = !isMyTurn
-														? 'Сейчас ход соперника'
-														: blockedByDupes
-															? match.rules.heroDupes === 'uniqueMatch'
-																? 'Этот класс уже выбран в матче'
-																: 'Этот класс уже есть в вашем отряде'
-															: !fits
-																? `Не хватает места: нужно ${hero.size}, свободно ${freeSlots}`
-																: undefined;
-													return (
-														<DraftHeroCard
-															key={hero.code}
-															hero={hero}
-															disabled={disabled}
-															disabledReason={disabledReason}
-															onOpen={setModalHeroCode}
-														/>
-													);
-												})}
-										</SimpleGrid>
+										<div className={draftStyles.catalogScroll}>
+											<SimpleGrid
+												cols={{ base: 2, sm: 3, md: 4, lg: 5 }}
+												spacing="md"
+												verticalSpacing="md"
+											>
+												{[...heroes]
+													.sort(
+														(a, b) =>
+															b.size - a.size || a.displayName.localeCompare(b.displayName, 'ru'),
+													)
+													.map((hero) => {
+														const freeSlots = match.draft.initialTeamSize - mySize;
+														const fits = hero.size <= freeSlots;
+														const ownCodes = new Set(
+															[...match.draft.hostPicks, ...match.draft.guestPicks]
+																.filter((pick) => pick.playerId === player.id)
+																.map((pick) => pick.heroClassCode),
+														);
+														const allCodes = new Set(
+															[...match.draft.hostPicks, ...match.draft.guestPicks].map(
+																(pick) => pick.heroClassCode,
+															),
+														);
+														const selected = ownCodes.has(hero.code);
+														const blockedByDupes =
+															(match.rules.heroDupes === 'uniqueTeam' && selected) ||
+															(match.rules.heroDupes === 'uniqueMatch' && allCodes.has(hero.code));
+														const disabled = !isMyTurn || isBusy || !fits || blockedByDupes;
+														const disabledReason = !isMyTurn
+															? 'Сейчас ход соперника'
+															: blockedByDupes
+																? match.rules.heroDupes === 'uniqueMatch'
+																	? 'Этот класс уже выбран в матче'
+																	: 'Этот класс уже есть в вашем отряде'
+																: !fits
+																	? `Не хватает места: нужно ${hero.size}, свободно ${freeSlots}`
+																	: undefined;
+														return (
+															<DraftHeroCard
+																key={hero.code}
+																hero={hero}
+																disabled={disabled}
+																disabledReason={disabledReason}
+																selected={selected}
+																focused={focusedHeroCode === hero.code}
+																onFocusHero={setFocusedHeroCode}
+																onOpen={setModalHeroCode}
+																onPickRow={handlePickRow}
+															/>
+														);
+													})}
+											</SimpleGrid>
+										</div>
 									</>
 								) : null}
-							</Stack>
-						</>
+							</div>
+						</div>
 					)}
 
 					{match.status === 'cancelled' && (
@@ -794,6 +922,7 @@ const TeamPanel = ({
 	ownerPlayerId,
 	size,
 	cap,
+	projectedSize,
 	picks,
 	isTurn,
 	acceptDrops,
@@ -804,11 +933,12 @@ const TeamPanel = ({
 	ownerPlayerId: string;
 	size: number;
 	cap: number;
+	projectedSize?: number | null;
 	picks: MatchDraftPick[];
 	isTurn: boolean;
 	acceptDrops: boolean;
 	canDragUnits: boolean;
-	/** Игрок 1: задний слева, передний справа (фронты к центру). */
+	/** Свой отряд: задний у внешнего края, передний к центру. */
 	mirrorRows?: boolean;
 }) => {
 	const front = picks.filter((pick) => pick.row === ROW_FRONT);
@@ -833,20 +963,24 @@ const TeamPanel = ({
 			canDragUnits={canDragUnits}
 		/>
 	);
+	const quotaText =
+		projectedSize != null && projectedSize !== size
+			? `${size}/${cap} → ${projectedSize}/${cap}`
+			: `${size}/${cap}`;
 	return (
 		<Box
 			className="sylvenarr-panel"
 			style={{
 				flex: '1 1 280px',
 				minWidth: 260,
-				outline: isTurn ? '2px solid var(--mantine-color-accent-filled)' : undefined,
+				outline: isTurn ? '2px solid var(--copper, #E9C08F)' : undefined,
 			}}
 		>
 			<Stack gap="sm">
 				<Group justify="space-between" align="center" wrap="nowrap">
 					{title}
 					<Text size="sm" c="var(--app-text-muted)">
-						{size}/{cap}
+						{quotaText}
 					</Text>
 				</Group>
 				<SimpleGrid cols={2} spacing="sm">
@@ -863,6 +997,49 @@ const TeamPanel = ({
 					)}
 				</SimpleGrid>
 			</Stack>
+		</Box>
+	);
+};
+
+const SquadPreview = ({
+	title,
+	picks,
+	fallbackUnits,
+}: {
+	title: string;
+	picks: MatchDraftPick[];
+	fallbackUnits?: ReadonlyArray<{ displayName: string; heroClassCode: string; id?: string }>;
+}) => {
+	const items =
+		picks.length > 0
+			? picks.map((pick) => ({
+					key: pick.id,
+					name: pick.displayName === 'Скрыто' || !pick.heroClassCode ? 'Скрыто' : pick.displayName,
+				}))
+			: (fallbackUnits ?? []).map((unit) => ({
+					key: unit.id ?? `${unit.heroClassCode}-${unit.displayName}`,
+					name: unit.displayName,
+				}));
+	return (
+		<Box>
+			<Text fw={700} mb={6}>
+				{title}
+			</Text>
+			<ul className={draftStyles.squadsReadyList}>
+				{items.length === 0 ? (
+					<li>
+						<Text size="sm" c="var(--app-text-muted)">
+							—
+						</Text>
+					</li>
+				) : (
+					items.map((item) => (
+						<li key={item.key}>
+							<Text size="sm">{item.name}</Text>
+						</li>
+					))
+				)}
+			</ul>
 		</Box>
 	);
 };

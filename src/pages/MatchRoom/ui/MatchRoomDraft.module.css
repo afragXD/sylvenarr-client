@@ -1,0 +1,89 @@
+.draftLayout {
+	display: grid;
+	grid-template-columns: minmax(260px, 1fr) minmax(0, 2.2fr);
+	gap: 1.25rem;
+	align-items: start;
+}
+
+@media (max-width: 64em) {
+	.draftLayout {
+		grid-template-columns: 1fr;
+	}
+}
+
+.teamsColumn {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	position: sticky;
+	top: 5rem;
+	max-height: calc(100dvh - 6rem);
+	overflow: auto;
+}
+
+.catalogPanel {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	min-width: 0;
+}
+
+.catalogScroll {
+	max-height: min(70dvh, 52rem);
+	overflow: auto;
+	padding-right: 0.25rem;
+}
+
+.squadsReady {
+	position: fixed;
+	inset: 0;
+	z-index: 40;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.5rem;
+	border: 0;
+	background: color-mix(in srgb, #17110c 92%, transparent);
+}
+
+.squadsReadyCard {
+	width: min(100%, 44rem);
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	padding: clamp(1.25rem, 3vw, 2rem);
+	background: var(--app-surface, #1a130e);
+	border: 1px solid color-mix(in srgb, var(--copper, #e9c08f) 55%, transparent);
+}
+
+.squadsReadyTitle {
+	margin: 0;
+	font-family: var(--mantine-font-family-headings);
+	font-size: clamp(1.75rem, 3vw, 2.25rem);
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	text-align: center;
+	color: var(--copper, #e9c08f);
+}
+
+.squadsReadyTeams {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+}
+
+@media (max-width: 40em) {
+	.squadsReadyTeams {
+		grid-template-columns: 1fr;
+	}
+}
+
+.squadsReadyList {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}

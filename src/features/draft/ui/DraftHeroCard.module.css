@@ -2,6 +2,8 @@
 	display: flex;
 	flex-direction: column;
 	width: 100%;
+	margin: 0;
+	min-inline-size: 0;
 	padding: 0;
 	text-align: left;
 	color: var(--app-text);
@@ -9,9 +11,6 @@
 	border: 1px solid var(--app-border);
 	border-radius: 0;
 	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 22%, transparent);
-	cursor: grab;
-	touch-action: none;
-	user-select: none;
 	overflow: hidden;
 	transition:
 		transform 120ms ease,
@@ -20,22 +19,41 @@
 		border-color 120ms ease;
 }
 
-.card:hover:not([data-disabled="true"]) {
+.card:hover:not([data-disabled='true']),
+.card[data-focused='true']:not([data-disabled='true']) {
 	transform: translateY(-2px);
-	border-color: var(--mantine-color-brand-5);
+	border-color: var(--copper, #e9c08f);
 	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-5) 45%, transparent),
-		0 0 0 1px color-mix(in srgb, var(--mantine-color-brand-6) 28%, transparent);
+		inset 0 0 0 1px color-mix(in srgb, var(--copper, #e9c08f) 45%, transparent),
+		0 0 0 1px color-mix(in srgb, var(--copper, #e9c08f) 28%, transparent);
 }
 
-.card:active:not([data-disabled="true"]) {
+.card:focus-visible {
+	outline: 2px solid var(--copper, #e9c08f);
+	outline-offset: 2px;
+}
+
+.card[data-selected='true'] {
+	border-color: var(--copper, #e9c08f);
+}
+
+.card[data-disabled='true'] {
+	opacity: 0.42;
+	filter: grayscale(0.2);
+}
+
+.dragSurface {
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
+}
+
+.dragSurface:active {
 	cursor: grabbing;
 }
 
-.card[data-disabled="true"] {
-	opacity: 0.42;
+.card[data-disabled='true'] .dragSurface {
 	cursor: default;
-	filter: grayscale(0.2);
 }
 
 .portrait {
@@ -68,17 +86,23 @@
 	font-weight: 700;
 	line-height: 1;
 	letter-spacing: 0.04em;
-	color: var(--mantine-color-accent-filled);
-	background: color-mix(in srgb, var(--app-surface) 86%, transparent);
-	border: 1px solid color-mix(in srgb, var(--mantine-color-accent-filled) 60%, var(--app-border));
+	/* Медь на тёмном дыме ≥4,5:1 */
+	color: var(--copper, #e9c08f);
+	background: #17110c;
+	border: 1px solid color-mix(in srgb, var(--copper, #e9c08f) 70%, var(--app-border));
 	box-shadow:
-		inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-accent-filled) 22%, transparent),
+		inset 0 0 0 1px color-mix(in srgb, var(--copper, #e9c08f) 22%, transparent),
 		0 2px 6px color-mix(in srgb, #000 35%, transparent);
 	cursor: help;
 }
 
+.slots:focus-visible {
+	outline: 2px solid var(--copper, #e9c08f);
+	outline-offset: 1px;
+}
+
 .name {
-	padding: 0.35rem 0.4rem 0.45rem;
+	padding: 0.35rem 0.4rem 0.4rem;
 	font-family: var(--mantine-font-family-headings);
 	font-size: 0.8rem;
 	font-weight: 600;
@@ -86,4 +110,53 @@
 	color: var(--app-text);
 	border-top: 1px solid var(--app-border);
 	background: color-mix(in srgb, var(--app-surface-muted) 55%, var(--app-surface));
+}
+
+.actions {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	padding: 0.35rem;
+	border-top: 1px solid var(--app-border);
+	background: color-mix(in srgb, var(--app-surface) 92%, #000);
+}
+
+.rowBtn,
+.infoBtn {
+	width: 100%;
+	margin: 0;
+	padding: 0.28rem 0.35rem;
+	font-family: var(--mantine-font-family-headings);
+	font-size: 0.68rem;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	line-height: 1.2;
+	border-radius: 0;
+	cursor: pointer;
+}
+
+.rowBtn {
+	color: #17110c;
+	background: var(--copper, #e9c08f);
+	border: 1px solid color-mix(in srgb, var(--copper, #e9c08f) 70%, #000);
+}
+
+.rowBtn:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--copper, #e9c08f) 88%, #fff);
+}
+
+.rowBtn:disabled {
+	opacity: 0.45;
+	cursor: default;
+}
+
+.infoBtn {
+	color: var(--copper, #e9c08f);
+	background: transparent;
+	border: 1px solid color-mix(in srgb, var(--copper, #e9c08f) 45%, transparent);
+}
+
+.infoBtn:hover {
+	background: color-mix(in srgb, var(--copper, #e9c08f) 12%, transparent);
 }
