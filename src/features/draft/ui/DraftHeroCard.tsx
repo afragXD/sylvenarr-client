@@ -152,6 +152,10 @@ export const DraftHeroCard = ({
 									event.stopPropagation();
 									slotsTipHandlers.toggle();
 								}}
+								onMouseEnter={slotsTipHandlers.open}
+								onMouseLeave={slotsTipHandlers.close}
+								onFocus={slotsTipHandlers.open}
+								onBlur={slotsTipHandlers.close}
 							>
 								{sizeToRoman(hero.size)}
 							</button>
