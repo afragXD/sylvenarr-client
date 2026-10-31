@@ -1,4 +1,13 @@
-import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import {
+	type CollisionDetection,
+	closestCenter,
+	DndContext,
+	type DragEndEvent,
+	PointerSensor,
+	pointerWithin,
+	useSensor,
+	useSensors,
+} from '@dnd-kit/core';
 import { Anchor, Box, Button, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
@@ -134,10 +143,18 @@ export const MatchRoomPage = () => {
 	const [resultMetaLoading, setResultMetaLoading] = useState(false);
 	/** Экран «Отряды собраны» перед боем. */
 	const [squadsReadyVisible, setSquadsReadyVisible] = useState(false);
+	const [squadsSnapshot, setSquadsSnapshot] = useState<{
+		hostName: string;
+		guestName: string;
+		hostPicks: MatchDraftPick[];
+		guestPicks: MatchDraftPick[];
+	} | null>(null);
 	const [focusedHeroCode, setFocusedHeroCode] = useState<string | null>(null);
 	const battleSocketRef = useRef<WebSocket | null>(null);
 	const playerIdRef = useRef<string | null>(null);
-	const prevMatchStatusRef = useRef<Match['status'] | null>(null);
+	const sawDraftingRef = useRef(false);
+	const squadsReadyShownForRef = useRef<string | null>(null);
+	const squadsReadyTimerRef = useRef(0);
 
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -145,13 +162,24 @@ export const MatchRoomPage = () => {
 		}),
 	);
 
+	const draftCollision: CollisionDetection = (args) => {
+		const hits = pointerWithin(args);
+		if (hits.length > 0) {
+			return hits;
+		}
+		return closestCenter(args);
+	};
+
 	playerIdRef.current = player?.id ?? null;
 
 	useEffect(() => {
 		let isMounted = true;
 		setResultMetaLoading(false);
 		setSquadsReadyVisible(false);
-		prevMatchStatusRef.current = null;
+		setSquadsSnapshot(null);
+		sawDraftingRef.current = false;
+		squadsReadyShownForRef.current = null;
+		window.clearTimeout(squadsReadyTimerRef.current);
 		const boot = async () => {
 			try {
 				const [current, loaded, heroList] = await Promise.all([
@@ -243,25 +271,48 @@ export const MatchRoomPage = () => {
 		};
 	}, [activeMatchId, resultMetaLoading]);
 
-	/** Короткий экран «Отряды собраны» при переходе drafting → fighting. */
+	/** Короткий экран «Отряды собраны»: только если в этой сессии видели drafting. */
 	useEffect(() => {
-		const prev = prevMatchStatusRef.current;
-		const next = match?.status ?? null;
-		if (prev === 'drafting' && next === 'fighting') {
+		if (!match) {
+			return;
+		}
+		if (match.status === 'drafting') {
+			sawDraftingRef.current = true;
+			setSquadsSnapshot({
+				hostName: match.host.displayName,
+				guestName: match.guest?.displayName ?? 'Соперник',
+				hostPicks: match.draft.hostPicks,
+				guestPicks: match.draft.guestPicks,
+			});
+			return;
+		}
+		if (
+			match.status === 'fighting' &&
+			sawDraftingRef.current &&
+			squadsReadyShownForRef.current !== match.id
+		) {
+			squadsReadyShownForRef.current = match.id;
+			setSquadsSnapshot((prev) => ({
+				hostName: match.host.displayName,
+				guestName: match.guest?.displayName ?? 'Соперник',
+				hostPicks:
+					match.draft.hostPicks.length > 0 ? match.draft.hostPicks : (prev?.hostPicks ?? []),
+				guestPicks:
+					match.draft.guestPicks.length > 0 ? match.draft.guestPicks : (prev?.guestPicks ?? []),
+			}));
 			setSquadsReadyVisible(true);
-			const timer = window.setTimeout(() => {
+			window.clearTimeout(squadsReadyTimerRef.current);
+			squadsReadyTimerRef.current = window.setTimeout(() => {
 				setSquadsReadyVisible(false);
 			}, 1600);
-			prevMatchStatusRef.current = next;
-			return () => {
-				window.clearTimeout(timer);
-			};
 		}
-		if (next) {
-			prevMatchStatusRef.current = next;
-		}
-		return undefined;
-	}, [match?.status]);
+	}, [match]);
+
+	useEffect(() => {
+		return () => {
+			window.clearTimeout(squadsReadyTimerRef.current);
+		};
+	}, []);
 
 	useEffect(() => {
 		if (!activeMatchId || activeMatchStatus !== 'fighting') {
@@ -679,26 +730,26 @@ export const MatchRoomPage = () => {
 
 	return (
 		<PageFrame width="wide">
-			{squadsReadyVisible ? (
+			{squadsReadyVisible && squadsSnapshot ? (
 				<output className={draftStyles.squadsReady} aria-live="polite">
 					<div className={draftStyles.squadsReadyCard}>
 						<h2 className={draftStyles.squadsReadyTitle}>Отряды собраны</h2>
 						<div className={draftStyles.squadsReadyTeams}>
 							<SquadPreview
-								title={match.host.displayName}
-								picks={match.draft.hostPicks}
+								title={squadsSnapshot.hostName}
+								picks={squadsSnapshot.hostPicks}
 								fallbackUnits={match.battle?.units.filter((unit) => unit.team === 0)}
 							/>
 							<SquadPreview
-								title={match.guest?.displayName ?? 'Соперник'}
-								picks={match.draft.guestPicks}
+								title={squadsSnapshot.guestName}
+								picks={squadsSnapshot.guestPicks}
 								fallbackUnits={match.battle?.units.filter((unit) => unit.team === 1)}
 							/>
 						</div>
 					</div>
 				</output>
 			) : null}
-			<DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+			<DndContext sensors={sensors} collisionDetection={draftCollision} onDragEnd={handleDragEnd}>
 				<Stack gap="lg" w="100%">
 					<Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
 						<Stack gap={6} maw={560}>
@@ -747,7 +798,7 @@ export const MatchRoomPage = () => {
 						</Box>
 					)}
 
-					{(match.status === 'fighting' || match.status === 'finished') && (
+					{(match.status === 'fighting' || match.status === 'finished') && !squadsReadyVisible && (
 						<Box className="sylvenarr-panel">
 							<Stack gap="md">
 								{error && (

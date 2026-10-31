@@ -73,16 +73,12 @@ export const DraftHeroCard = ({
 		onPickRow(hero.code, row);
 	};
 
-	const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-		if (disabled) {
+	const handleCardKeyDown = (event: KeyboardEvent<HTMLFieldSetElement>) => {
+		// Только когда фокус на самой карточке — не перехватывать Enter/Space у кнопок ряда.
+		if (disabled || event.target !== event.currentTarget) {
 			return;
 		}
-		if (event.key === 'Enter') {
-			event.preventDefault();
-			onPickRow(hero.code, ROW_FRONT);
-			return;
-		}
-		if (event.key === ' ') {
+		if (event.key === 'Enter' || event.key === ' ') {
 			event.preventDefault();
 			onPickRow(hero.code, ROW_FRONT);
 		}
@@ -125,11 +121,22 @@ export const DraftHeroCard = ({
 						<Tooltip
 							label={slotsLabel}
 							withArrow
+							openDelay={100}
 							events={{ hover: true, focus: true, touch: true }}
 						>
-							<span className={styles.slots} title={slotsLabel}>
+							<button
+								type="button"
+								className={styles.slots}
+								aria-label={slotsLabel}
+								onPointerDown={(event) => {
+									event.stopPropagation();
+								}}
+								onClick={(event) => {
+									event.stopPropagation();
+								}}
+							>
 								{sizeToRoman(hero.size)}
-							</span>
+							</button>
 						</Tooltip>
 					</Box>
 					<Text className={styles.name} lineClamp={1}>
