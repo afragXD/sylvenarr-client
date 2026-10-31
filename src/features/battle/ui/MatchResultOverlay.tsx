@@ -109,7 +109,7 @@ const resultIcon = (result: MatchResultKind): ReactNode => {
 
 const formatRatingLine = (myRating: MatchMyRating | null | undefined): string => {
 	if (!myRating) {
-		return 'Матч без рейтинга';
+		return 'Товарищеский матч — ПТС не изменён';
 	}
 	const sign = myRating.ptsDelta > 0 ? '+' : '';
 	return `ПТС ${myRating.ptsBefore} → ${myRating.ptsAfter}, ${sign}${myRating.ptsDelta}`;

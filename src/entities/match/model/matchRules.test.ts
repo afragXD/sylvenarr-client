@@ -69,4 +69,16 @@ describe('matchRules client', () => {
 			formatRulesSummary({ ...DEFAULT_MATCH_RULES, startingLevel: 10 }),
 		).toContain('ур. 10');
 	});
+
+	test('formatRulesSummary marks friendly match', () => {
+		expect(formatRulesSummary(DEFAULT_MATCH_RULES)).not.toContain('товарищеский');
+		expect(
+			formatRulesSummary({ ...DEFAULT_MATCH_RULES, rated: false }),
+		).toContain('товарищеский');
+	});
+
+	test('applyPreset keeps rated from base', () => {
+		const next = applyPreset('fast', { ...DEFAULT_MATCH_RULES, rated: false });
+		expect(next.rated).toBe(false);
+	});
 });

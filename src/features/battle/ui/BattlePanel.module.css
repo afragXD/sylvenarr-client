@@ -83,8 +83,8 @@
 }
 
 .unit[data-prompt-hover="true"] {
-	outline: 2px solid var(--mantine-color-yellow-5);
-	box-shadow: 0 0 0 2px color-mix(in srgb, var(--mantine-color-yellow-5) 35%, transparent);
+	outline: 2px solid var(--mantine-color-blue-5);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--mantine-color-blue-5) 40%, transparent);
 }
 
 .unit[data-inspectable="true"] {
@@ -94,6 +94,16 @@
 .unit[data-dead="true"] {
 	opacity: 0.4;
 	filter: grayscale(0.4);
+}
+
+.slotIndex {
+	flex-shrink: 0;
+	font-size: 0.72rem;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.02em;
+	color: var(--mantine-color-blue-6);
+	line-height: 1.2;
 }
 
 .lvl {

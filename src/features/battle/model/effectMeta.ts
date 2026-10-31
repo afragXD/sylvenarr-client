@@ -62,6 +62,7 @@ export type EffectId =
 	| 'IMPISH'
 	| 'DEFEND'
 	| 'POLYMORPH'
+	| 'INFECTED'
 	| 'FIRESHIELD'
 	| 'AIRSHIELD'
 	| 'LUCKY'
@@ -152,6 +153,7 @@ const DEBUFF_ORDER: EffectId[] = [
 	'INTERFERENCE',
 	'SILENCE',
 	'IMPISH',
+	'INFECTED',
 	'STUNNED',
 	'WEAKNESS',
 	'UNLUCKY',
@@ -397,6 +399,15 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		exampleAtL: exampleTypical('2 р.'),
 		Icon: Shuffle,
 		kind: 'buff',
+	},
+	INFECTED: {
+		id: 'INFECTED',
+		label: 'Инфицирован',
+		description: 'Временно стал зомби; по окончании возвращается к исходному облику.',
+		mechanics: 'класс Зомби · 2 р., затем откат',
+		exampleAtL: exampleTypical('2 р.'),
+		Icon: Shuffle,
+		kind: 'debuff',
 	},
 	FIRESHIELD: {
 		id: 'FIRESHIELD',

@@ -124,6 +124,15 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 				/>
 			</div>
 
+			<div className={styles.field}>
+				<Switch
+					label="Товарищеский матч"
+					description="Без изменения рейтинга (ПТС)"
+					checked={!rules.rated}
+					onChange={(event) => patch({ rated: !event.currentTarget.checked })}
+				/>
+			</div>
+
 			<Stack gap="sm">
 				<p className={styles.sectionTitle}>Отряд</p>
 				<div className={styles.field}>

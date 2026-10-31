@@ -885,6 +885,10 @@ const RowColumn = ({
 											/>
 										</PortraitHpCurtain>
 										<Text size="sm" lineClamp={1}>
+											<span className={styles.slotIndex} title="Место на поле">
+												{unit.row === 0 ? 'П' : 'З'}
+												{unit.column + 1}
+											</span>{' '}
 											{unit.isSummon ? '✦ ' : ''}
 											{unit.displayName}
 											{unit.defending ? ' 🛡' : ''}

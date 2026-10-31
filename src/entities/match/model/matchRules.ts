@@ -21,6 +21,8 @@ export type MatchRules = {
 	goldBonus: number;
 	/** Дубли классов в draft (не касается саммонов/эволюций). */
 	heroDupes: HeroDupesMode;
+	/** false = товарищеский матч без изменения ПТС. */
+	rated: boolean;
 };
 
 export const DEFAULT_MATCH_RULES: MatchRules = {
@@ -35,6 +37,7 @@ export const DEFAULT_MATCH_RULES: MatchRules = {
 	shopSize: 8,
 	goldBonus: 1,
 	heroDupes: 'allow',
+	rated: true,
 };
 
 export const MATCH_RULES_LIMITS = {
@@ -123,6 +126,7 @@ export function validateMatchRules(input: MatchRules): ValidateMatchRulesResult 
 		shopSize,
 		goldBonus,
 		heroDupes,
+		rated,
 	} = input;
 
 	if (
@@ -204,6 +208,7 @@ export function validateMatchRules(input: MatchRules): ValidateMatchRulesResult 
 				Math.max(MATCH_RULES_LIMITS.goldBonus.min, goldBonus),
 			),
 			heroDupes: normalizeHeroDupes(heroDupes),
+			rated: typeof rated === 'boolean' ? rated : DEFAULT_MATCH_RULES.rated,
 		},
 	};
 }
@@ -241,7 +246,8 @@ export function formatRulesSummary(rules: MatchRules): string {
 	const hp = healthBonusToPercent(rules.healthBonus);
 	const lvl =
 		rules.startingLevel > 1 ? ` · ур. ${rules.startingLevel}` : '';
-	const base = `Отряд ${rules.initialTeamSize}/${rules.maxTeamSize} · ряд ${rules.maxRowSize} · ${rules.maxRounds} р. · ОЗ ${hp}%${lvl}`;
+	const ratedMark = rules.rated ? '' : ' · товарищеский';
+	const base = `Отряд ${rules.initialTeamSize}/${rules.maxTeamSize} · ряд ${rules.maxRowSize} · ${rules.maxRounds} р. · ОЗ ${hp}%${lvl}${ratedMark}`;
 	if (rules.heroDupes === 'uniqueTeam') {
 		return `${base} · без дублей`;
 	}
