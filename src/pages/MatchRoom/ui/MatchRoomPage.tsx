@@ -203,11 +203,7 @@ export const MatchRoomPage = () => {
 		window.clearTimeout(squadsReadyTimerRef.current);
 		const boot = async () => {
 			try {
-				const [current, loaded, heroList] = await Promise.all([
-					fetchCurrentPlayer(),
-					fetchMatchById(matchId),
-					fetchHeroes(),
-				]);
+				const current = await fetchCurrentPlayer();
 				if (!isMounted) {
 					return;
 				}
@@ -215,13 +211,22 @@ export const MatchRoomPage = () => {
 					setBootError('guest');
 					return;
 				}
+				const [loaded, heroList] = await Promise.all([fetchMatchById(matchId), fetchHeroes()]);
+				if (!isMounted) {
+					return;
+				}
 				setPlayer(current);
 				setMatch(loaded);
 				setHeroes(heroList);
 			} catch (err) {
-				if (isMounted) {
-					setBootError(err instanceof ApiError ? err.message : 'Не удалось загрузить матч');
+				if (!isMounted) {
+					return;
 				}
+				if (err instanceof ApiError && err.status === 401) {
+					setBootError('guest');
+					return;
+				}
+				setBootError(err instanceof ApiError ? err.message : 'Не удалось загрузить матч');
 			}
 		};
 		void boot();
@@ -724,16 +729,39 @@ export const MatchRoomPage = () => {
 
 	if (bootError) {
 		const isGuest = bootError === 'guest';
+		const returnPath = `/lobby/${matchId}`;
 		return (
 			<PageFrame width="wide">
-				<Stack gap="md" maw={480}>
+				<Stack
+					gap="md"
+					maw={480}
+					className={isGuest ? 'sylvenarr-panel' : undefined}
+					p={isGuest ? 'md' : undefined}
+				>
 					<Title order={1}>Матч</Title>
-					<Text c={isGuest ? 'var(--app-text-muted)' : 'red'} role="alert">
-						{isGuest ? 'Войдите, чтобы открыть комнату матча.' : bootError}
-					</Text>
-					<Anchor component={Link} to={isGuest ? '/sign-in' : '/lobby'} c="brand" fw={600}>
-						{isGuest ? 'Войти и играть' : '← К лобби'}
-					</Anchor>
+					{isGuest ? (
+						<>
+							<Text c="var(--app-text-muted)">Войдите, чтобы посмотреть матч.</Text>
+							<Button
+								className="sylvenarr-plate-btn"
+								color="brand"
+								component={Link}
+								to="/sign-in"
+								search={{ redirect: returnPath }}
+							>
+								Войти и играть
+							</Button>
+						</>
+					) : (
+						<>
+							<Text c="red" role="alert">
+								{bootError}
+							</Text>
+							<Anchor component={Link} to="/lobby" c="brand" fw={600}>
+								← К лобби
+							</Anchor>
+						</>
+					)}
 				</Stack>
 			</PageFrame>
 		);

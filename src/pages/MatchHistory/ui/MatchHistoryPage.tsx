@@ -90,7 +90,13 @@ export const MatchHistoryPage = () => {
 			{sessionChecked && !player && (
 				<Stack gap="md" maw={480} className="sylvenarr-panel" p="md">
 					<Text c="var(--app-text-muted)">Войдите, чтобы видеть историю матчей.</Text>
-					<Button className="sylvenarr-plate-btn" color="brand" component={Link} to="/sign-in">
+					<Button
+						className="sylvenarr-plate-btn"
+						color="brand"
+						component={Link}
+						to="/sign-in"
+						search={{ redirect: '/matches' }}
+					>
 						Войти и играть
 					</Button>
 				</Stack>

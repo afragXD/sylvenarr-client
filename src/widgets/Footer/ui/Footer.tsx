@@ -39,7 +39,7 @@ export const Footer = () => {
 		{ to: '/news', label: 'Новости' },
 		{ to: '/#faq', label: 'Вопросы' },
 		{ to: '/privacy', label: 'Конфиденциальность' },
-		...(player ? [] : [{ to: '/sign-in', label: 'Войти' }]),
+		...(player ? [] : [{ to: '/sign-in', label: 'Войти и играть' }]),
 	];
 
 	const columns = [

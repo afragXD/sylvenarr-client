@@ -7,12 +7,15 @@ import { seo } from '@/shared/lib/seo/seo';
 type SignInSearch = {
 	auth?: 'error';
 	reason?: string;
+	/** Куда вернуться после входа (внутренний путь). */
+	redirect?: string;
 };
 
 export const Route = createFileRoute('/sign-in')({
 	validateSearch: (search: Record<string, unknown>): SignInSearch => ({
 		auth: search.auth === 'error' ? 'error' : undefined,
 		reason: typeof search.reason === 'string' ? search.reason : undefined,
+		redirect: typeof search.redirect === 'string' ? search.redirect : undefined,
 	}),
 	head: () => ({
 		meta: seo({

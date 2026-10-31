@@ -25,10 +25,20 @@ import {
 	playerUpdated,
 } from '@/entities/player';
 import { ApiError } from '@/shared/api/http';
+import { isSafeAppPath, setAuthRedirect, takeAuthRedirect } from '@/shared/lib/authRedirect';
 import { OAuthProviderButton } from '@/shared/ui/oauth';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 import { signInSchema } from '../model/signInSchema';
+
+const goAfterSignIn = async (navigate: ReturnType<typeof useNavigate>): Promise<void> => {
+	const redirect = takeAuthRedirect();
+	if (redirect) {
+		window.location.assign(redirect);
+		return;
+	}
+	await navigate({ to: '/lobby' });
+};
 
 function fieldErrorMessage(errors: unknown[]): string | undefined {
 	const first = errors[0];
@@ -61,6 +71,12 @@ export const SignInPage = () => {
 	const [serverError, setServerError] = useState<string | null>(null);
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+	useEffect(() => {
+		if (typeof search.redirect === 'string' && isSafeAppPath(search.redirect)) {
+			setAuthRedirect(search.redirect);
+		}
+	}, [search.redirect]);
+
 	const form = useForm({
 		defaultValues: {
 			loginOrEmail: '',
@@ -79,7 +95,7 @@ export const SignInPage = () => {
 					return;
 				}
 				playerUpdated(me);
-				await navigate({ to: '/lobby' });
+				await goAfterSignIn(navigate);
 			} catch (err) {
 				const message =
 					err instanceof ApiError
@@ -285,6 +301,9 @@ export const SignInPage = () => {
 										key={provider.id}
 										providerId={provider.id}
 										label={provider.label}
+										rememberRedirect={
+											typeof search.redirect === 'string' ? search.redirect : undefined
+										}
 									/>
 								))}
 							</Group>

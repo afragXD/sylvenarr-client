@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 
 import { $player, logoutFx, sessionRequested } from '@/entities/player';
 import { APP_TITLE } from '@/shared/constants';
+import { takeAuthRedirect } from '@/shared/lib/authRedirect';
 import { resolveStaticUrl } from '@/shared/lib/staticUrl';
 import { RuneGateIcon } from '@/shared/ui/BrandMark';
 import { OrnateLink } from '@/shared/ui/OrnateButton';
@@ -42,6 +43,22 @@ export const Header = () => {
 	useEffect(() => {
 		sessionRequested();
 	}, []);
+
+	/** После OAuth приземление на FRONTEND_URL — вернуть на сохранённую ссылку матча. */
+	useEffect(() => {
+		if (!player) {
+			return;
+		}
+		const redirect = takeAuthRedirect();
+		if (!redirect) {
+			return;
+		}
+		const here = `${window.location.pathname}${window.location.search}`;
+		if (redirect === here) {
+			return;
+		}
+		window.location.assign(redirect);
+	}, [player]);
 
 	const handleLogout = async () => {
 		setIsLoggingOut(true);

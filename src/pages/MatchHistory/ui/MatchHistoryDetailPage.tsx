@@ -1,4 +1,4 @@
-import { Anchor, Box, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { Anchor, Box, Button, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
@@ -9,6 +9,7 @@ import {
 	type MatchHistoryTeam,
 	type MatchHistoryUnit,
 } from '@/entities/match';
+import { fetchCurrentPlayer, playerUpdated } from '@/entities/player';
 import { CombatStat, CombatStatRow } from '@/features/battle';
 import { ApiError } from '@/shared/api/http';
 import { formatDuration } from '@/shared/lib/formatDuration';
@@ -27,12 +28,40 @@ const ROW_BACK = 1;
  */
 export const MatchHistoryDetailPage = () => {
 	const { matchId } = useParams({ from: '/matches/$matchId' });
+	const [signedIn, setSignedIn] = useState<boolean | null>(null);
 	const [detail, setDetail] = useState<MatchHistoryDetail | null>(null);
 	const [error, setError] = useState<string | null>(null);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		let mounted = true;
+		void fetchCurrentPlayer()
+			.then((me) => {
+				if (!mounted) {
+					return;
+				}
+				setSignedIn(Boolean(me));
+				if (me) {
+					playerUpdated(me);
+				}
+			})
+			.catch(() => {
+				if (mounted) {
+					setSignedIn(false);
+				}
+			});
+		return () => {
+			mounted = false;
+		};
+	}, []);
+
+	useEffect(() => {
+		if (signedIn !== true) {
+			return;
+		}
+		let mounted = true;
+		setLoading(true);
+		setError(null);
 		void fetchMyMatchDetail(matchId)
 			.then((item) => {
 				if (mounted) {
@@ -41,6 +70,10 @@ export const MatchHistoryDetailPage = () => {
 			})
 			.catch((err: unknown) => {
 				if (mounted) {
+					if (err instanceof ApiError && err.status === 401) {
+						setSignedIn(false);
+						return;
+					}
 					setError(err instanceof ApiError ? err.message : 'Не удалось загрузить матч');
 				}
 			})
@@ -52,7 +85,9 @@ export const MatchHistoryDetailPage = () => {
 		return () => {
 			mounted = false;
 		};
-	}, [matchId]);
+	}, [matchId, signedIn]);
+
+	const returnPath = `/matches/${matchId}`;
 
 	return (
 		<PageFrame
@@ -63,13 +98,29 @@ export const MatchHistoryDetailPage = () => {
 			scene={getSceneUrl('battle.webp')}
 		>
 			<Stack gap="md">
-				<Anchor component={Link} to="/matches" c="brand" size="sm">
-					← Мои матчи
-				</Anchor>
+				{signedIn === false ? (
+					<Stack gap="md" maw={480} className="sylvenarr-panel" p="md">
+						<Text c="var(--app-text-muted)">Войдите, чтобы посмотреть матч.</Text>
+						<Button
+							className="sylvenarr-plate-btn"
+							color="brand"
+							component={Link}
+							to="/sign-in"
+							search={{ redirect: returnPath }}
+						>
+							Войти и играть
+						</Button>
+					</Stack>
+				) : (
+					<Anchor component={Link} to="/matches" c="brand" size="sm">
+						← Мои матчи
+					</Anchor>
+				)}
 
-				{loading && <Loader color="brand" size="sm" />}
-				{error && (
-					<Text c="red" role="alert">
+				{signedIn === null && <Loader color="brand" size="sm" />}
+				{signedIn === true && loading && <Loader color="brand" size="sm" />}
+				{signedIn === true && error && (
+					<Text c="var(--app-text-muted)" role="alert">
 						{error}
 					</Text>
 				)}

@@ -159,7 +159,13 @@ export const LobbyPage = () => {
 						<Text c="var(--app-text-muted)">
 							Войдите, чтобы создавать матчи и заходить по коду.
 						</Text>
-						<Button className="sylvenarr-plate-btn" color="brand" component={Link} to="/sign-in">
+						<Button
+							className="sylvenarr-plate-btn"
+							color="brand"
+							component={Link}
+							to="/sign-in"
+							search={{ redirect: '/lobby' }}
+						>
 							Войти и играть
 						</Button>
 					</Stack>
