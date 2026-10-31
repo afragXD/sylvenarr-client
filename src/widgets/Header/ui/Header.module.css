@@ -39,7 +39,7 @@
 	flex: 0 0 auto;
 }
 
-/* В потоке — название (на линии контента); mark вынесен влево. */
+/* Название и mark в одном потоке; на широком — mark в gutter (см. min-width ниже). */
 .brand {
 	position: relative;
 	display: inline-flex;
@@ -48,27 +48,14 @@
 	text-decoration: none;
 	flex-shrink: 0;
 	overflow: visible;
-}
-
-.brand:not(.brandCompact) {
 	margin-right: clamp(0.85rem, 2vw, 1.75rem);
 }
 
 .mark {
-	position: absolute;
-	right: 100%;
-	top: 50%;
-	/* Зазор до названия / края контента; иконка сидит в левом gutter */
-	margin-right: 0.5rem;
-	transform: translateY(-50%);
 	display: inline-flex;
 	line-height: 0;
 	color: inherit;
-}
-
-.brandCompact {
-	/* Только иконка: нулевая ширина в потоке, nav остаётся на краю контента. */
-	width: 0;
+	margin-right: 0.55rem;
 }
 
 .wordmark {
@@ -174,16 +161,23 @@
 	}
 }
 
-/* На узкой ширине лого не обрезаем: чуть уменьшаем вынос. */
-@media (max-width: 40em) {
-	.mark {
-		margin-right: 0.45rem;
+/*
+ * Gutter-вынос mark только когда padding-inline ≈ max (3rem) и иконка
+ * не уезжает за край. На уже — mark остаётся в потоке (в т.ч. compact).
+ */
+@media (min-width: 80em) {
+	.brandCompact {
+		/* Только иконка: нулевая ширина в потоке, nav остаётся на краю контента. */
+		width: 0;
+		margin-right: 0;
 	}
 
-	.brand:not(.brandCompact) .mark {
-		position: static;
-		transform: none;
-		margin-right: 0.55rem;
+	.mark {
+		position: absolute;
+		right: 100%;
+		top: 50%;
+		margin-right: 0.5rem;
+		transform: translateY(-50%);
 	}
 }
 

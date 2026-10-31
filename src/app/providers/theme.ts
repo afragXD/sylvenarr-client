@@ -72,11 +72,15 @@ export const theme = createTheme({
 		appBorder: '#4A3F2E',
 		brass: '#CBB48C',
 		copper: '#E9C08F',
+		/** Враг / опасность (стайлгайд); поражение на итоге */
+		enemy: '#D9574A',
 		parchment: '#EFE2CC',
 		parchmentInk: '#2B2219',
 		wine: '#4E1418',
 		smoke: '#2A1F17',
 		smokeDeep: '#1A130E',
+		/** Фон оверлея итога матча */
+		matchResultBg: '#17110C',
 	},
 	components: {
 		Button: {
@@ -109,6 +113,8 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
 	variables: {
 		'--brass': theme.other.brass,
 		'--copper': theme.other.copper,
+		'--enemy': theme.other.enemy,
+		'--match-result-bg': theme.other.matchResultBg,
 		'--parchment': theme.other.parchment,
 		'--parchment-ink': theme.other.parchmentInk,
 		'--wine': theme.other.wine,

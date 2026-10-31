@@ -154,6 +154,13 @@ export type BattleState = {
 	units: BattleUnit[];
 };
 
+/** ПТС текущего игрока по матчу; null — матч без рейтинга. */
+export type MatchMyRating = {
+	ptsBefore: number;
+	ptsAfter: number;
+	ptsDelta: number;
+};
+
 export type Match = {
 	id: string;
 	status: MatchStatus;
@@ -163,6 +170,10 @@ export type Match = {
 	createdAt: string;
 	finishedAt: string | null;
 	winnerPlayerId: string | null;
+	/** Длительность боя; у незавершённых обычно null. */
+	durationSeconds?: number | null;
+	/** Рейтинг зрителя; null/отсутствует — «матч без рейтинга». */
+	myRating?: MatchMyRating | null;
 	rules: MatchRules;
 	draft: MatchDraftState;
 	battle: BattleState | null;

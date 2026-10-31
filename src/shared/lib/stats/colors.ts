@@ -1,12 +1,19 @@
 /**
- * Цвета результата матча и винрейта для Mantine prop `c`.
- * Победа — `moss` (не `brand`: латунь везде в UI).
+ * Цвета результата матча и винрейта.
+ * Победа — медь #E9C08F; поражение — враг #D9574A (AC-1).
  * Винрейт — плавный градиент accent → тёплый mid → moss (0–100%).
  */
 
 type Rgb = readonly [number, number, number];
 
-/** Accent 6 — поражение */
+/** Победа (медь / --copper) */
+export const MATCH_RESULT_WIN = '#E9C08F';
+/** Поражение (враг / --enemy), ≥4,5:1 на #17110C и #1A130E */
+export const MATCH_RESULT_LOSS = '#D9574A';
+/** Фон оверлея итога */
+export const MATCH_RESULT_OVERLAY_BG = '#17110C';
+
+/** Accent 6 — поражение в винрейте */
 const WINRATE_LOW: Rgb = [196, 92, 72];
 /** Тёплый камень между ember и moss (избегаем грязного RGB red↔green) */
 const WINRATE_MID: Rgb = [168, 140, 72];
@@ -22,10 +29,10 @@ const lerpRgb = (from: Rgb, to: Rgb, t: number): string => {
 
 export const getMatchResultColor = (result: 'win' | 'loss' | 'draw'): string | undefined => {
 	if (result === 'win') {
-		return 'moss';
+		return MATCH_RESULT_WIN;
 	}
 	if (result === 'loss') {
-		return 'accent';
+		return MATCH_RESULT_LOSS;
 	}
 	return 'var(--app-text-muted)';
 };

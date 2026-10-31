@@ -10,6 +10,8 @@ export {
 } from './model/effectMeta';
 export { AbilityTags } from './ui/AbilityTags';
 export { BattlePanel } from './ui/BattlePanel';
+export { MatchResultOverlay } from './ui/MatchResultOverlay';
+export type { MatchResultKind } from './ui/MatchResultOverlay';
 export { CombatStat, CombatStatRow } from './ui/CombatStat';
 export { ElementIcon, WardIcon } from './ui/DamageSourceIcon';
 export { PortraitHpCurtain } from './ui/PortraitHpCurtain';

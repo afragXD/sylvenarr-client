@@ -19,6 +19,10 @@ import { AbilityTags } from './AbilityTags';
 import styles from './BattlePanel.module.css';
 import { BattleSoundControl } from './BattleSoundControl';
 import { CombatStat, CombatStatRow } from './CombatStat';
+import {
+	MatchResultOverlay,
+	type MatchResultKind,
+} from './MatchResultOverlay';
 import { PortraitHpCurtain } from './PortraitHpCurtain';
 import { TurnOrderStrip } from './TurnOrderStrip';
 import { UnitEffects } from './UnitEffects';
@@ -139,6 +143,10 @@ type BattlePanelProps = {
 	onOfferDraw: () => void;
 	onAcceptDraw: () => void;
 	onDeclineDraw: () => void;
+	/** Итог матча: реванш / навигация (AC-1). */
+	onRematch?: () => void;
+	onLobby?: () => void;
+	onMatches?: () => void;
 };
 
 type PendingMode =
@@ -171,6 +179,9 @@ export const BattlePanel = ({
 	onOfferDraw,
 	onAcceptDraw,
 	onDeclineDraw,
+	onRematch,
+	onLobby,
+	onMatches,
 }: BattlePanelProps) => {
 	const battle = match.battle;
 	const [pendingMode, setPendingMode] = useState<PendingMode>(null);
@@ -229,6 +240,28 @@ export const BattlePanel = ({
 	}, [logLines]);
 
 	if (!battle) {
+		if (
+			match.status === 'finished' &&
+			onRematch &&
+			onLobby &&
+			onMatches
+		) {
+			return (
+				<div className={styles.panel}>
+					<div className={styles.battlefield} style={{ minHeight: '18rem' }}>
+						<MatchResultOverlay
+							result={resultFromMatch(match, playerId)}
+							myRating={match.myRating}
+							durationSeconds={match.durationSeconds}
+							busy={busy}
+							onRematch={onRematch}
+							onLobby={onLobby}
+							onMatches={onMatches}
+						/>
+					</div>
+				</div>
+			);
+		}
 		return <Text c="var(--app-text-muted)">Загрузка боя…</Text>;
 	}
 
@@ -477,6 +510,17 @@ export const BattlePanel = ({
 			/>
 
 			<div className={styles.battlefield}>
+				{battle.outcome !== 'ongoing' && onRematch && onLobby && onMatches && (
+					<MatchResultOverlay
+						result={toMatchResultKind(battle, playerId)}
+						myRating={match.myRating}
+						durationSeconds={match.durationSeconds}
+						busy={busy}
+						onRematch={onRematch}
+						onLobby={onLobby}
+						onMatches={onMatches}
+					/>
+				)}
 				<div className={styles.field}>
 					<TeamSide
 						title={
@@ -692,14 +736,6 @@ export const BattlePanel = ({
 						Ждать
 					</Button>
 				</div>
-			)}
-
-			{battle.outcome !== 'ongoing' && (
-				<Stack gap={4}>
-					<Text fw={700} c="accent">
-						{outcomeLabel(battle, playerId)}
-					</Text>
-				</Stack>
 			)}
 
 			<UnitInspectModal unit={inspectUnit} onClose={() => setInspectUnitId(null)} />
@@ -927,12 +963,22 @@ const RowColumn = ({
 	);
 };
 
-const outcomeLabel = (battle: BattleState, playerId: string): string => {
+const toMatchResultKind = (battle: BattleState, playerId: string): MatchResultKind => {
 	if (battle.outcome === 'draw') {
-		return 'Ничья.';
+		return 'draw';
 	}
 	if (battle.winnerPlayerId === playerId) {
-		return 'Победа!';
+		return 'win';
 	}
-	return 'Поражение.';
+	return 'loss';
+};
+
+const resultFromMatch = (match: Match, playerId: string): MatchResultKind => {
+	if (!match.winnerPlayerId) {
+		return 'draw';
+	}
+	if (match.winnerPlayerId === playerId) {
+		return 'win';
+	}
+	return 'loss';
 };

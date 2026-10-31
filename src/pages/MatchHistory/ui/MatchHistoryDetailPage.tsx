@@ -11,13 +11,13 @@ import {
 } from '@/entities/match';
 import { CombatStat, CombatStatRow } from '@/features/battle';
 import { ApiError } from '@/shared/api/http';
+import { formatDuration } from '@/shared/lib/formatDuration';
 import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { getMatchResultColor } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 import styles from './MatchHistoryDetailPage.module.css';
-import { formatDuration } from './MatchHistoryPage';
 
 const ROW_FRONT = 0;
 const ROW_BACK = 1;

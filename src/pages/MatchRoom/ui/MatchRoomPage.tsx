@@ -6,6 +6,7 @@ import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { fetchHeroes, type HeroClass } from '@/entities/hero';
 import {
 	cancelMatch,
+	createMatch,
 	draftPick,
 	draftPreset,
 	draftRandom,
@@ -354,6 +355,21 @@ export const MatchRoomPage = () => {
 		sendBattleFrame({ type: 'draw-decline' });
 	};
 
+	const handleRematch = async () => {
+		if (!match) {
+			return;
+		}
+		setIsBusy(true);
+		setError(null);
+		try {
+			const created = await createMatch(match.rules);
+			await navigate({ to: '/lobby/$matchId', params: { matchId: created.id } });
+		} catch (err) {
+			setError(err instanceof ApiError ? err.message : 'Не удалось создать реванш');
+			setIsBusy(false);
+		}
+	};
+
 	const handleDragEnd = (event: DragEndEvent) => {
 		if (!match || !player || isBusy) {
 			return;
@@ -545,21 +561,10 @@ export const MatchRoomPage = () => {
 									onOfferDraw={() => void handleOfferDraw()}
 									onAcceptDraw={() => void handleAcceptDraw()}
 									onDeclineDraw={() => void handleDeclineDraw()}
+									onRematch={() => void handleRematch()}
+									onLobby={() => void navigate({ to: '/lobby' })}
+									onMatches={() => void navigate({ to: '/matches' })}
 								/>
-								{match.status === 'finished' && (
-									<Group gap="sm">
-										<Button color="brand" onClick={() => void navigate({ to: '/lobby' })}>
-											В лобби
-										</Button>
-										<Button
-											variant="light"
-											color="brand"
-											onClick={() => void navigate({ to: '/matches' })}
-										>
-											Мои матчи
-										</Button>
-									</Group>
-								)}
 							</Stack>
 						</Box>
 					)}

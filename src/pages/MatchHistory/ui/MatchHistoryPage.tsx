@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { fetchMyMatches, type MatchHistoryItem } from '@/entities/match';
 import { ApiError } from '@/shared/api/http';
+import { formatDuration } from '@/shared/lib/formatDuration';
 import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { getMatchResultColor } from '@/shared/lib/stats';
 import { OrnateFrame } from '@/shared/ui/OrnateFrame';
@@ -130,11 +131,4 @@ const resultLabel = (result: MatchHistoryItem['result']): string => {
 	return 'Ничья';
 };
 
-export const formatDuration = (seconds: number | null): string => {
-	if (seconds === null || seconds < 0) {
-		return '—';
-	}
-	const m = Math.floor(seconds / 60);
-	const s = seconds % 60;
-	return `${m}:${String(s).padStart(2, '0')}`;
-};
+export { formatDuration } from '@/shared/lib/formatDuration';

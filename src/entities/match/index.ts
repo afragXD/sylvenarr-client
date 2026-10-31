@@ -37,6 +37,7 @@ export type {
 	BattleUnit,
 	ResistBrief,
 	Match,
+	MatchMyRating,
 	MatchDraftEntry,
 	MatchDraftPick,
 	MatchDraftPickSource,
