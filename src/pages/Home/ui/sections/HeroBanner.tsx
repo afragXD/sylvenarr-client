@@ -1,3 +1,7 @@
+import { Link } from '@tanstack/react-router';
+import { useUnit } from 'effector-react';
+
+import { $player } from '@/entities/player';
 import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { OrnateLink } from '@/shared/ui/OrnateButton';
 import { SmokeBackdrop } from '@/shared/ui/SmokeBackdrop';
@@ -5,6 +9,8 @@ import { SmokeBackdrop } from '@/shared/ui/SmokeBackdrop';
 import classes from '../HomePage.module.css';
 
 export const HeroBanner = () => {
+	const player = useUnit($player);
+
 	return (
 		<section className={classes.hero} aria-label="Sylvenarr">
 			<div className={classes.heroScene} aria-hidden>
@@ -24,15 +30,26 @@ export const HeroBanner = () => {
 					Пошаговые дуэли в тёмном технофэнтези: двадцать четыре класса, два ряда и ни одного
 					честного боя.
 				</p>
-				<div className={classes.heroCta}>
-					<OrnateLink to="/sign-in" variant="parchment" size="lg" withDiamonds={false}>
-						Начать бой
-					</OrnateLink>
-					<OrnateLink to="/heroes" size="lg">
-						Смотреть героев
-					</OrnateLink>
-				</div>
-				<p className={classes.heroMeta}>Бесплатно в браузере, вход через Яндекс</p>
+				{player ? (
+					<p className={classes.heroMeta}>
+						Вы вошли как {player.displayName} ·{' '}
+						<Link to="/lobby" className={classes.heroInlineLink}>
+							В лобби
+						</Link>
+					</p>
+				) : (
+					<>
+						<div className={classes.heroCta}>
+							<OrnateLink to="/sign-in" variant="parchment" size="lg" withDiamonds={false}>
+								Войти и играть
+							</OrnateLink>
+							<OrnateLink to="/heroes" size="lg">
+								Смотреть героев
+							</OrnateLink>
+						</div>
+						<p className={classes.heroMeta}>Вход через Яндекс или по логину</p>
+					</>
+				)}
 			</div>
 		</section>
 	);

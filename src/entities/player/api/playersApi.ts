@@ -51,10 +51,20 @@ const parseFavoriteHeroes = (data: unknown): FavoriteHero[] => {
 };
 
 /**
- * Текущий авторизованный игрок из сессии.
+ * Текущий игрок из сессии; null — гость (API отдаёт 200 без 401).
  */
-export async function fetchCurrentPlayer(): Promise<Player> {
-	return apiFetchJson('/players/me', undefined, parsePlayer, 'Требуется авторизация');
+export async function fetchCurrentPlayer(): Promise<Player | null> {
+	return apiFetchJson(
+		'/players/me',
+		undefined,
+		(data) => {
+			if (data === null) {
+				return null;
+			}
+			return parsePlayer(data);
+		},
+		'Не удалось проверить сессию',
+	);
 }
 
 /**
@@ -97,7 +107,7 @@ export async function uploadMyAvatar(file: File): Promise<Player> {
 }
 
 /**
- * Список включённых OAuth-провайдеров.
+ * Список включённых провайдеров входа.
  */
 export async function fetchAuthProviders(): Promise<AuthProvider[]> {
 	return apiFetchJson(
@@ -117,7 +127,7 @@ export async function fetchAuthProviders(): Promise<AuthProvider[]> {
 }
 
 /**
- * URL старта OAuth на API.
+ * URL старта входа через провайдера на API.
  */
 export function getOAuthStartUrl(providerId: string): string {
 	return `${API_BASE_URL}/auth/${encodeURIComponent(providerId)}`;

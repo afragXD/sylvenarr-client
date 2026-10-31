@@ -50,6 +50,10 @@ export const PresetsLibraryPage = () => {
 				if (!alive) {
 					return;
 				}
+				if (!me) {
+					void navigate({ to: '/sign-in' });
+					return;
+				}
 				setPlayer(me);
 				setHeroes(heroList);
 				await reload();
@@ -145,57 +149,57 @@ export const PresetsLibraryPage = () => {
 						items.map((preset) => {
 							const lead = firstSlot(preset);
 							return (
-							<Table.Tr key={preset.id}>
-								<Table.Td>
-									<Group gap="sm" wrap="nowrap">
-										{lead ? (
-											<HeroImage
-												code={lead.heroClassCode}
-												alt={lead.displayName}
-												w={36}
-												h={36}
-												radius={0}
-											/>
-										) : null}
-										<Text fw={600}>{preset.name}</Text>
-									</Group>
-								</Table.Td>
-								<Table.Td>{preset.teamSize}</Table.Td>
-								<Table.Td>
-									<Text size="sm" c="var(--app-text-muted)">
-										{preset.slots.map((slot) => slot.displayName).join(', ')}
-									</Text>
-								</Table.Td>
-								<Table.Td>
-									{editable ? (
-										<Group gap="xs" justify="flex-end">
-											<Button
-												size="compact-sm"
-												variant="default"
-												radius={0}
-												disabled={busy}
-												onClick={() => openEdit(preset)}
-											>
-												Править
-											</Button>
-											<Button
-												size="compact-sm"
-												variant="light"
-												color="red"
-												radius={0}
-												disabled={busy}
-												onClick={() => void handleDelete(preset)}
-											>
-												Удалить
-											</Button>
+								<Table.Tr key={preset.id}>
+									<Table.Td>
+										<Group gap="sm" wrap="nowrap">
+											{lead ? (
+												<HeroImage
+													code={lead.heroClassCode}
+													alt={lead.displayName}
+													w={36}
+													h={36}
+													radius={0}
+												/>
+											) : null}
+											<Text fw={600}>{preset.name}</Text>
 										</Group>
-									) : (
-										<Text size="sm" c="var(--app-text-muted)" ta="right">
-											Только просмотр
+									</Table.Td>
+									<Table.Td>{preset.teamSize}</Table.Td>
+									<Table.Td>
+										<Text size="sm" c="var(--app-text-muted)">
+											{preset.slots.map((slot) => slot.displayName).join(', ')}
 										</Text>
-									)}
-								</Table.Td>
-							</Table.Tr>
+									</Table.Td>
+									<Table.Td>
+										{editable ? (
+											<Group gap="xs" justify="flex-end">
+												<Button
+													size="compact-sm"
+													variant="default"
+													radius={0}
+													disabled={busy}
+													onClick={() => openEdit(preset)}
+												>
+													Править
+												</Button>
+												<Button
+													size="compact-sm"
+													variant="light"
+													color="red"
+													radius={0}
+													disabled={busy}
+													onClick={() => void handleDelete(preset)}
+												>
+													Удалить
+												</Button>
+											</Group>
+										) : (
+											<Text size="sm" c="var(--app-text-muted)" ta="right">
+												Только просмотр
+											</Text>
+										)}
+									</Table.Td>
+								</Table.Tr>
 							);
 						})
 					)}

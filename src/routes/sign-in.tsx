@@ -17,7 +17,7 @@ export const Route = createFileRoute('/sign-in')({
 	head: () => ({
 		meta: seo({
 			title: 'Войти',
-			description: 'Вход в Sylvenarr по логину, почте или через OAuth',
+			description: 'Вход в Sylvenarr через Яндекс или по логину',
 			url: absoluteUrl('/sign-in'),
 			noIndex: true,
 		}),

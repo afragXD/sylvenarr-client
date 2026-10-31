@@ -55,6 +55,7 @@ export const Header = () => {
 	};
 
 	const playTo = player ? '/lobby' : '/sign-in';
+	const playLabel = player ? 'В лобби' : 'Войти и играть';
 	const avatarSrc = resolveStaticUrl(player?.avatarUrl) ?? player?.avatarUrl ?? undefined;
 
 	return (
@@ -85,7 +86,7 @@ export const Header = () => {
 
 					<div className={classes.right}>
 						<OrnateLink to={playTo} variant="parchment" size="sm" withDiamonds={false}>
-							Играть
+							{playLabel}
 						</OrnateLink>
 						{player ? (
 							<Menu shadow="md" width={240} position="bottom-end" radius={0}>
@@ -105,13 +106,7 @@ export const Header = () => {
 								<Menu.Dropdown className={classes.menu}>
 									<Menu.Item component={Link} to="/profile/settings">
 										<Group gap="sm" wrap="nowrap" align="flex-start">
-											<Avatar
-												src={avatarSrc}
-												alt=""
-												radius="xl"
-												size={32}
-												color="brand"
-											>
+											<Avatar src={avatarSrc} alt="" radius="xl" size={32} color="brand">
 												{initialsFromName(player.displayName)}
 											</Avatar>
 											<Stack gap={2} style={{ minWidth: 0 }}>
@@ -180,6 +175,7 @@ export const Header = () => {
 				opened={menuOpen}
 				onClose={() => setMenuOpen(false)}
 				isAdmin={player?.role === 'admin'}
+				isSignedIn={Boolean(player)}
 			/>
 		</>
 	);

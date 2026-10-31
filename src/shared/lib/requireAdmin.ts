@@ -9,6 +9,9 @@ import { fetchCurrentPlayer } from '@/entities/player';
 export async function requireAdmin(): Promise<void> {
 	try {
 		const player = await fetchCurrentPlayer();
+		if (!player) {
+			throw redirect({ to: '/sign-in' });
+		}
 		if (player.role !== 'admin') {
 			throw redirect({ to: '/' });
 		}

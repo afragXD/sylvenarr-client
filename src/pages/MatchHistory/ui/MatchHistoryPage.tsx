@@ -1,8 +1,9 @@
-import { Anchor, Box, Loader, Table, Text } from '@mantine/core';
+import { Anchor, Box, Button, Loader, Stack, Table, Text } from '@mantine/core';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { fetchMyMatches, type MatchHistoryItem } from '@/entities/match';
+import { fetchCurrentPlayer, type Player, playerUpdated } from '@/entities/player';
 import { ApiError } from '@/shared/api/http';
 import { formatDuration } from '@/shared/lib/formatDuration';
 import { getSceneUrl } from '@/shared/lib/staticUrl';
@@ -16,12 +17,46 @@ import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
  */
 export const MatchHistoryPage = () => {
 	const navigate = useNavigate();
+	const [player, setPlayer] = useState<Player | null>(null);
+	const [sessionChecked, setSessionChecked] = useState(false);
 	const [rows, setRows] = useState<MatchHistoryItem[]>([]);
 	const [error, setError] = useState<string | null>(null);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		let mounted = true;
+		void fetchCurrentPlayer()
+			.then((me) => {
+				if (!mounted) {
+					return;
+				}
+				setPlayer(me);
+				if (me) {
+					playerUpdated(me);
+				}
+			})
+			.catch(() => {
+				if (mounted) {
+					setPlayer(null);
+				}
+			})
+			.finally(() => {
+				if (mounted) {
+					setSessionChecked(true);
+				}
+			});
+		return () => {
+			mounted = false;
+		};
+	}, []);
+
+	useEffect(() => {
+		if (!sessionChecked || !player) {
+			return;
+		}
+		let mounted = true;
+		setLoading(true);
+		setError(null);
 		void fetchMyMatches()
 			.then((items) => {
 				if (mounted) {
@@ -41,7 +76,7 @@ export const MatchHistoryPage = () => {
 		return () => {
 			mounted = false;
 		};
-	}, []);
+	}, [sessionChecked, player]);
 
 	return (
 		<PageFrame
@@ -51,13 +86,22 @@ export const MatchHistoryPage = () => {
 			lead="Завершённые бои: соперник, результат, длительность."
 			scene={getSceneUrl('battle.webp')}
 		>
-			{loading && <Loader color="brand" size="sm" />}
-			{error && (
-				<Text c="red" role="alert">
+			{!sessionChecked && <Loader color="brand" size="sm" />}
+			{sessionChecked && !player && (
+				<Stack gap="md" maw={480} className="sylvenarr-panel" p="md">
+					<Text c="var(--app-text-muted)">Войдите, чтобы видеть историю матчей.</Text>
+					<Button className="sylvenarr-plate-btn" color="brand" component={Link} to="/sign-in">
+						Войти и играть
+					</Button>
+				</Stack>
+			)}
+			{player && loading && <Loader color="brand" size="sm" />}
+			{player && error && (
+				<Text c="var(--app-text-muted)" role="alert">
 					{error}
 				</Text>
 			)}
-			{!loading && !error && rows.length === 0 && (
+			{player && !loading && !error && rows.length === 0 && (
 				<Text c="var(--app-text-muted)">
 					Пока нет завершённых матчей.{' '}
 					<Anchor component={Link} to="/lobby" c="brand">
@@ -65,7 +109,7 @@ export const MatchHistoryPage = () => {
 					</Anchor>
 				</Text>
 			)}
-			{rows.length > 0 && (
+			{player && rows.length > 0 && (
 				<OrnateFrame variant="panel">
 					<Box style={{ overflowX: 'auto' }} p="sm">
 						<Table

@@ -3,7 +3,7 @@ type YandexIconProps = {
 };
 
 /**
- * Знак Яндекса («Я») для OAuth-кнопки. viewBox как у эталона FAB.
+ * Знак Яндекса («Я») для кнопки входа. viewBox как у эталона FAB.
  */
 export const YandexIcon = ({ size = 20 }: YandexIconProps) => (
 	<svg

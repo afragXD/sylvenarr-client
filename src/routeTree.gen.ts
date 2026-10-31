@@ -10,9 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as HeroesRouteImport } from './routes/heroes'
 import { Route as LobbyRouteImport } from './routes/lobby'
 import { Route as MatchesRouteImport } from './routes/matches'
+import { Route as MeRouteImport } from './routes/me'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -45,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HeroesRoute = HeroesRouteImport.update({
   id: '/heroes',
   path: '/heroes',
@@ -58,6 +65,11 @@ const LobbyRoute = LobbyRouteImport.update({
 const MatchesRoute = MatchesRouteImport.update({
   id: '/matches',
   path: '/matches',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MeRoute = MeRouteImport.update({
+  id: '/me',
+  path: '/me',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewsRoute = NewsRouteImport.update({
@@ -193,9 +205,11 @@ const AdminNewsNewRoute = AdminNewsNewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/heroes': typeof HeroesRouteWithChildren
   '/lobby': typeof LobbyRouteWithChildren
   '/matches': typeof MatchesRouteWithChildren
+  '/me': typeof MeRoute
   '/news': typeof NewsRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRouteWithChildren
@@ -225,6 +239,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/me': typeof MeRoute
   '/privacy': typeof PrivacyRoute
   '/rating': typeof RatingRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -252,9 +268,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/heroes': typeof HeroesRouteWithChildren
   '/lobby': typeof LobbyRouteWithChildren
   '/matches': typeof MatchesRouteWithChildren
+  '/me': typeof MeRoute
   '/news': typeof NewsRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRouteWithChildren
@@ -286,9 +304,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
     | '/heroes'
     | '/lobby'
     | '/matches'
+    | '/me'
     | '/news'
     | '/privacy'
     | '/profile'
@@ -318,6 +338,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account'
+    | '/me'
     | '/privacy'
     | '/rating'
     | '/robots.txt'
@@ -344,9 +366,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/account'
     | '/heroes'
     | '/lobby'
     | '/matches'
+    | '/me'
     | '/news'
     | '/privacy'
     | '/profile'
@@ -377,9 +401,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
   HeroesRoute: typeof HeroesRouteWithChildren
   LobbyRoute: typeof LobbyRouteWithChildren
   MatchesRoute: typeof MatchesRouteWithChildren
+  MeRoute: typeof MeRoute
   NewsRoute: typeof NewsRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRouteWithChildren
@@ -398,6 +424,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/heroes': {
@@ -419,6 +452,13 @@ declare module '@tanstack/react-router' {
       path: '/matches'
       fullPath: '/matches'
       preLoaderRoute: typeof MatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/me': {
+      id: '/me'
+      path: '/me'
+      fullPath: '/me'
+      preLoaderRoute: typeof MeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/news': {
@@ -695,9 +735,11 @@ const AdminNewsRouteWithChildren = AdminNewsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
   HeroesRoute: HeroesRouteWithChildren,
   LobbyRoute: LobbyRouteWithChildren,
   MatchesRoute: MatchesRouteWithChildren,
+  MeRoute: MeRoute,
   NewsRoute: NewsRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRouteWithChildren,
@@ -711,12 +753,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

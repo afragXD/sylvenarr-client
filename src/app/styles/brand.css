@@ -117,20 +117,22 @@
 	color: var(--parchment-ink, #2b2219);
 }
 
-.sylvenarr-oauth-icon-btn.mantine-ActionIcon-root {
+.sylvenarr-oauth-btn.mantine-Button-root {
 	border: 1px solid color-mix(in srgb, var(--brass) 40%, transparent);
 	background: var(--app-surface);
 	border-radius: 0;
+	color: var(--app-text);
 }
 
-.sylvenarr-oauth-icon-btn--yandex.mantine-ActionIcon-root {
+.sylvenarr-oauth-btn--yandex.mantine-Button-root {
 	color: #fff;
 	background: #fc3f1d;
 	border-color: color-mix(in srgb, #8a1e0c 55%, #fc3f1d);
 }
 
-.sylvenarr-oauth-icon-btn--yandex.mantine-ActionIcon-root:hover {
+.sylvenarr-oauth-btn--yandex.mantine-Button-root:hover {
 	background: #e63516;
+	color: #fff;
 }
 
 /* tabular numbers for combat / rating */

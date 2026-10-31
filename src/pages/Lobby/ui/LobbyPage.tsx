@@ -6,11 +6,11 @@ import {
 	createMatch,
 	joinMatch,
 	loadLobbyRulesPrefs,
-	saveLobbyRulesPrefs,
 	type MatchRules,
+	saveLobbyRulesPrefs,
 	validateMatchRules,
 } from '@/entities/match';
-import { fetchCurrentPlayer, type Player } from '@/entities/player';
+import { fetchCurrentPlayer, type Player, playerUpdated } from '@/entities/player';
 import { fetchPresets, type SquadPreset } from '@/entities/presets';
 import { ApiError } from '@/shared/api/http';
 import { setPendingLobbyDraftPresetId } from '@/shared/lib/lobbyDraftPreset';
@@ -34,23 +34,26 @@ export const LobbyPage = () => {
 
 	useEffect(() => {
 		let isMounted = true;
-		const boot = async () => {
-			try {
-				const current = await fetchCurrentPlayer();
-				if (isMounted) {
-					setPlayer(current);
+		void fetchCurrentPlayer()
+			.then((current) => {
+				if (!isMounted) {
+					return;
 				}
-			} catch {
+				setPlayer(current);
+				if (current) {
+					playerUpdated(current);
+				}
+			})
+			.catch(() => {
 				if (isMounted) {
 					setPlayer(null);
 				}
-			} finally {
+			})
+			.finally(() => {
 				if (isMounted) {
 					setSessionChecked(true);
 				}
-			}
-		};
-		void boot();
+			});
 		return () => {
 			isMounted = false;
 		};
@@ -153,11 +156,11 @@ export const LobbyPage = () => {
 			{sessionChecked && !player && (
 				<Box className="sylvenarr-panel" maw={480}>
 					<Stack gap="md">
-						<Text>
-							Чтобы создавать матчи и заходить по коду, войдите через OAuth.
+						<Text c="var(--app-text-muted)">
+							Войдите, чтобы создавать матчи и заходить по коду.
 						</Text>
 						<Button className="sylvenarr-plate-btn" color="brand" component={Link} to="/sign-in">
-							Войти
+							Войти и играть
 						</Button>
 					</Stack>
 				</Box>
@@ -172,11 +175,7 @@ export const LobbyPage = () => {
 							<Text size="sm" c="var(--app-text-muted)">
 								Вы:
 							</Text>
-							<PlayerIdentity
-								name={player.displayName}
-								avatarUrl={player.avatarUrl}
-								size={28}
-							/>
+							<PlayerIdentity name={player.displayName} avatarUrl={player.avatarUrl} size={28} />
 						</Group>
 
 						{/* AC-3.13: пресет до «Создать матч» */}
@@ -219,9 +218,7 @@ export const LobbyPage = () => {
 								<TextInput
 									label="Код приглашения"
 									value={inviteInput}
-									onChange={(event) =>
-										setInviteInput(event.currentTarget.value.toUpperCase())
-									}
+									onChange={(event) => setInviteInput(event.currentTarget.value.toUpperCase())}
 									placeholder="ABC123"
 									style={{ flex: 1, minWidth: 0 }}
 									styles={{

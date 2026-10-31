@@ -38,6 +38,10 @@ export const ProfileSettingsPage = () => {
 	useEffect(() => {
 		void fetchCurrentPlayer()
 			.then((me) => {
+				if (!me) {
+					void navigate({ to: '/sign-in' });
+					return;
+				}
 				setPlayer(me);
 				setDisplayName(me.displayName);
 			})

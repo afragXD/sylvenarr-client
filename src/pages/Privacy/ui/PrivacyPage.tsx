@@ -16,7 +16,7 @@ const cookieRows = [
 		kind: 'Техническая, httpOnly',
 	},
 	{
-		name: 'oauthState',
+		name: 'yandexLoginState',
 		purpose: 'Защита входа через Яндекс ID от подмены запроса (CSRF).',
 		lifetime: '10 минут, только на время входа',
 		kind: 'Техническая, httpOnly',

@@ -11,13 +11,17 @@ import {
 } from '@mantine/core';
 import { useForm } from '@tanstack/react-form';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
+import { useUnit } from 'effector-react';
 import { useEffect, useState } from 'react';
 
 import {
+	$player,
 	type AuthProvider,
 	fetchAuthProviders,
 	fetchCurrentPlayer,
 	loginWithPassword,
+	logoutFx,
+	type Player,
 	playerUpdated,
 } from '@/entities/player';
 import { ApiError } from '@/shared/api/http';
@@ -42,16 +46,20 @@ function fieldErrorMessage(errors: unknown[]): string | undefined {
 }
 
 /**
- * Вход: логин/почта + пароль или OAuth.
+ * Вход: логин/почта + пароль или провайдер (Яндекс).
  */
 export const SignInPage = () => {
 	const search = useSearch({ from: '/sign-in' });
 	const navigate = useNavigate();
+	const storePlayer = useUnit($player);
 	const authError = search.auth === 'error';
 	const [providers, setProviders] = useState<AuthProvider[]>([]);
 	const [loadError, setLoadError] = useState<string | null>(null);
-	const [alreadySignedIn, setAlreadySignedIn] = useState(false);
+	/** undefined — ещё проверяем сессию; не показываем форму раньше времени. */
+	const [sessionChecked, setSessionChecked] = useState(false);
+	const [localPlayer, setLocalPlayer] = useState<Player | null>(null);
 	const [serverError, setServerError] = useState<string | null>(null);
+	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 	const form = useForm({
 		defaultValues: {
@@ -66,6 +74,10 @@ export const SignInPage = () => {
 			try {
 				await loginWithPassword(value);
 				const me = await fetchCurrentPlayer();
+				if (!me) {
+					setServerError('Не удалось подтвердить вход');
+					return;
+				}
 				playerUpdated(me);
 				await navigate({ to: '/lobby' });
 			} catch (err) {
@@ -95,14 +107,22 @@ export const SignInPage = () => {
 			});
 		void fetchCurrentPlayer()
 			.then((me) => {
-				if (mounted) {
+				if (!mounted) {
+					return;
+				}
+				setLocalPlayer(me);
+				if (me) {
 					playerUpdated(me);
-					setAlreadySignedIn(true);
 				}
 			})
 			.catch(() => {
 				if (mounted) {
-					setAlreadySignedIn(false);
+					setLocalPlayer(null);
+				}
+			})
+			.finally(() => {
+				if (mounted) {
+					setSessionChecked(true);
 				}
 			});
 		return () => {
@@ -110,27 +130,77 @@ export const SignInPage = () => {
 		};
 	}, []);
 
+	const signedIn = localPlayer ?? storePlayer;
+
+	const handleSwitchAccount = async () => {
+		setIsLoggingOut(true);
+		try {
+			await logoutFx();
+			setLocalPlayer(null);
+		} catch {
+			/* ignore */
+		} finally {
+			setIsLoggingOut(false);
+		}
+	};
+
+	if (!sessionChecked) {
+		return (
+			<PageFrame width="form" eyebrow="Арена" title="Войти" lead="Вход через Яндекс или по логину">
+				<Box className="sylvenarr-panel">
+					<Text c="var(--app-text-muted)">Проверяем сессию…</Text>
+				</Box>
+			</PageFrame>
+		);
+	}
+
+	if (signedIn) {
+		return (
+			<PageFrame width="form" eyebrow="Арена" title="Войти">
+				<Box className="sylvenarr-panel">
+					<Text>
+						Вы вошли как {signedIn.displayName} ·{' '}
+						<Text component={Link} to="/lobby" c="brand" span fw={600} td="underline">
+							В лобби
+						</Text>{' '}
+						·{' '}
+						<Text
+							component="button"
+							type="button"
+							c="brand"
+							span
+							fw={600}
+							td="underline"
+							style={{
+								background: 'none',
+								border: 0,
+								padding: 0,
+								cursor: isLoggingOut ? 'wait' : 'pointer',
+								font: 'inherit',
+							}}
+							disabled={isLoggingOut}
+							onClick={() => void handleSwitchAccount()}
+						>
+							Выйти и войти другим аккаунтом
+						</Text>
+					</Text>
+				</Box>
+			</PageFrame>
+		);
+	}
+
 	return (
 		<PageFrame
 			width="form"
 			eyebrow="Арена"
 			title="Войти"
-			lead="Войдите логином, почтой или через Яндекс. Рейтинг и история матчей закрепляются за вами."
+			lead="Вход через Яндекс или по логину. Рейтинг и история матчей закрепляются за вами."
 		>
 			<Box className="sylvenarr-panel">
 				<Stack gap="md">
 					{authError && (
 						<Alert color="red" title="Не удалось войти" role="alert">
-							Попробуйте ещё раз. Если ошибка повторяется — проверьте настройки OAuth.
-						</Alert>
-					)}
-					{alreadySignedIn && (
-						<Alert color="brand" title="Вы уже вошли">
-							Можно перейти в{' '}
-							<Text component={Link} to="/lobby" c="brand" span fw={600} td="underline">
-								лобби
-							</Text>
-							.
+							Попробуйте ещё раз. Если ошибка повторяется — проверьте настройки входа через Яндекс.
 						</Alert>
 					)}
 					{serverError && (

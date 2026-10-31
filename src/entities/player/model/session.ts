@@ -9,7 +9,7 @@ export const sessionRequested = createEvent();
 /** Локально подставить игрока после PATCH/upload аватара. */
 export const playerUpdated = createEvent<Player>();
 
-export const fetchSessionFx = createEffect(async (): Promise<Player> => {
+export const fetchSessionFx = createEffect(async (): Promise<Player | null> => {
 	return fetchCurrentPlayer();
 });
 

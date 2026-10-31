@@ -3,11 +3,7 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { HeroImage } from '@/entities/hero';
-import {
-	type FavoriteHero,
-	fetchCurrentPlayer,
-	fetchMyFavoriteHeroes,
-} from '@/entities/player';
+import { type FavoriteHero, fetchCurrentPlayer, fetchMyFavoriteHeroes } from '@/entities/player';
 import { ApiError } from '@/shared/api/http';
 
 /**
@@ -21,12 +17,19 @@ export const ProfileDossierPage = () => {
 	useEffect(() => {
 		let mounted = true;
 		void fetchCurrentPlayer()
-			.then(() => fetchMyFavoriteHeroes(24))
-			.then((items) => {
-				if (mounted) {
-					setHeroes(items);
-					setError(null);
+			.then((me) => {
+				if (!me) {
+					void navigate({ to: '/sign-in' });
+					return null;
 				}
+				return fetchMyFavoriteHeroes(24);
+			})
+			.then((items) => {
+				if (!mounted || items === null) {
+					return;
+				}
+				setHeroes(items);
+				setError(null);
 			})
 			.catch((err) => {
 				if (!mounted) {
@@ -90,10 +93,7 @@ export const ProfileDossierPage = () => {
 					</Table.Thead>
 					<Table.Tbody>
 						{heroes.map((hero, index) => (
-							<Table.Tr
-								key={hero.code}
-								style={{ borderBottom: '1px solid var(--app-border)' }}
-							>
+							<Table.Tr key={hero.code} style={{ borderBottom: '1px solid var(--app-border)' }}>
 								<Table.Td>
 									<Text span ff="monospace" c="var(--app-text-muted)">
 										{index + 1}

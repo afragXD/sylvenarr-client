@@ -102,6 +102,17 @@
 	color: var(--app-text-muted);
 }
 
+.heroInlineLink {
+	color: var(--copper);
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+}
+
+.heroInlineLink:hover {
+	color: var(--brass);
+}
+
 .heroCta {
 	display: flex;
 	flex-wrap: wrap;

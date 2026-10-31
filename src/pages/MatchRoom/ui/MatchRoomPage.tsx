@@ -2,8 +2,8 @@ import {
 	type CollisionDetection,
 	DndContext,
 	type DragEndEvent,
-	type DragStartEvent,
 	DragOverlay,
+	type DragStartEvent,
 	KeyboardSensor,
 	PointerSensor,
 	pointerWithin,
@@ -31,7 +31,12 @@ import {
 } from '@/entities/match';
 import { fetchCurrentPlayer, type Player } from '@/entities/player';
 import { BattlePanel } from '@/features/battle';
-import { DraftHeroCard, DraftRowDropZone, DraftUnitChipView, HeroDetailModal } from '@/features/draft';
+import {
+	DraftHeroCard,
+	DraftRowDropZone,
+	DraftUnitChipView,
+	HeroDetailModal,
+} from '@/features/draft';
 import { ApiError } from '@/shared/api/http';
 import { API_BASE_URL } from '@/shared/constants';
 import { takePendingLobbyDraftPresetId } from '@/shared/lib/lobbyDraftPreset';
@@ -204,6 +209,10 @@ export const MatchRoomPage = () => {
 					fetchHeroes(),
 				]);
 				if (!isMounted) {
+					return;
+				}
+				if (!current) {
+					setBootError('guest');
 					return;
 				}
 				setPlayer(current);
@@ -481,8 +490,7 @@ export const MatchRoomPage = () => {
 		if (lobbyPresetTriedRef.current === match.id) {
 			return;
 		}
-		const mySizeNow =
-			player.id === match.host.id ? match.draft.hostSize : match.draft.guestSize;
+		const mySizeNow = player.id === match.host.id ? match.draft.hostSize : match.draft.guestSize;
 		const myEntryNow =
 			player.id === match.host.id
 				? (match.draft.hostEntry ?? (mySizeNow > 0 ? 'draft' : 'empty'))
@@ -715,15 +723,16 @@ export const MatchRoomPage = () => {
 		!isBusy;
 
 	if (bootError) {
+		const isGuest = bootError === 'guest';
 		return (
 			<PageFrame width="wide">
 				<Stack gap="md" maw={480}>
 					<Title order={1}>Матч</Title>
-					<Text c="red" role="alert">
-						{bootError}
+					<Text c={isGuest ? 'var(--app-text-muted)' : 'red'} role="alert">
+						{isGuest ? 'Войдите, чтобы открыть комнату матча.' : bootError}
 					</Text>
-					<Anchor component={Link} to="/lobby" c="brand" fw={600}>
-						← К лобби
+					<Anchor component={Link} to={isGuest ? '/sign-in' : '/lobby'} c="brand" fw={600}>
+						{isGuest ? 'Войти и играть' : '← К лобби'}
 					</Anchor>
 				</Stack>
 			</PageFrame>
@@ -1055,11 +1064,7 @@ export const MatchRoomPage = () => {
 					)}
 				</Stack>
 				{/* AC-3.15a: snapCenterToCursor — чип по центру курсора, не от высоты карточки. */}
-				<DragOverlay
-					dropAnimation={null}
-					zIndex={1000}
-					modifiers={[snapCenterToCursor]}
-				>
+				<DragOverlay dropAnimation={null} zIndex={1000} modifiers={[snapCenterToCursor]}>
 					{activeDrag ? (
 						<DraftUnitChipView
 							displayName={activeDrag.displayName}

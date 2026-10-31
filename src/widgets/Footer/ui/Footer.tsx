@@ -1,5 +1,7 @@
 import { Link } from '@tanstack/react-router';
+import { useUnit } from 'effector-react';
 
+import { $player } from '@/entities/player';
 import {
 	AUTHOR_GITHUB_URL,
 	AUTHOR_NAME,
@@ -12,7 +14,7 @@ import { OrnateLink } from '@/shared/ui/OrnateButton';
 
 import classes from './Footer.module.css';
 
-const COLUMNS = [
+const BASE_COLUMNS = [
 	{
 		title: 'Игра',
 		links: [
@@ -28,34 +30,54 @@ const COLUMNS = [
 			{ to: '/rating', label: 'Рейтинг' },
 		],
 	},
-	{
-		title: 'Проект',
-		links: [
-			{ to: '/news', label: 'Новости' },
-			{ to: '/#faq', label: 'Вопросы' },
-			{ to: '/privacy', label: 'Конфиденциальность' },
-			{ to: '/sign-in', label: 'Войти' },
-		],
-	},
 ] as const;
 
 export const Footer = () => {
+	const player = useUnit($player);
+
+	const projectLinks = [
+		{ to: '/news', label: 'Новости' },
+		{ to: '/#faq', label: 'Вопросы' },
+		{ to: '/privacy', label: 'Конфиденциальность' },
+		...(player ? [] : [{ to: '/sign-in', label: 'Войти' }]),
+	];
+
+	const columns = [
+		...BASE_COLUMNS,
+		{
+			title: 'Проект',
+			links: projectLinks,
+		},
+	];
+
 	return (
 		<footer className={classes.root}>
 			<div className={classes.shell}>
 				<GoldRule align="center" className={classes.rule} />
 				<div className={classes.grid}>
 					<div>
-						<h2 className={classes.ctaTitle}>Ваш отряд ждёт</h2>
-						<p className={classes.ctaText}>
-							Войдите через Яндекс — рейтинг ПТС и история матчей сохранятся за вами.
-						</p>
-						<OrnateLink to="/sign-in" variant="parchment" withDiamonds={false}>
-							Войти и играть
-						</OrnateLink>
+						{player ? (
+							<>
+								<h2 className={classes.ctaTitle}>Ваш отряд ждёт</h2>
+								<p className={classes.ctaText}>
+									Перейдите в лобби и создайте матч или зайдите по коду.
+								</p>
+								<OrnateLink to="/lobby" variant="parchment" withDiamonds={false}>
+									В лобби
+								</OrnateLink>
+							</>
+						) : (
+							<>
+								<h2 className={classes.ctaTitle}>Ваш отряд ждёт</h2>
+								<p className={classes.ctaText}>Вход через Яндекс или по логину</p>
+								<OrnateLink to="/sign-in" variant="parchment" withDiamonds={false}>
+									Войти и играть
+								</OrnateLink>
+							</>
+						)}
 					</div>
 					<nav className={classes.columns} aria-label="Подвал">
-						{COLUMNS.map((column) => (
+						{columns.map((column) => (
 							<div key={column.title}>
 								<h3 className={classes.columnTitle}>{column.title}</h3>
 								<ul className={classes.list}>
