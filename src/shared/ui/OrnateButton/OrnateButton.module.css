@@ -26,7 +26,6 @@
 }
 
 .root:disabled {
-	opacity: 0.45;
 	cursor: not-allowed;
 }
 
@@ -90,6 +89,18 @@
 
 .parchment:hover:not(:disabled) {
 	filter: brightness(1.04);
+}
+
+/* AC-3: disabled без opacity — текст ≥4,5:1 к фону */
+.parchment:disabled {
+	color: #2b2219;
+	background: #c9b896;
+	box-shadow: none;
+	filter: none;
+}
+
+.outline:disabled {
+	opacity: 0.55;
 }
 
 .diamond {

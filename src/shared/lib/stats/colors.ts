@@ -51,14 +51,25 @@ export const START_PTS = 1500;
 
 /**
  * Цвет ПТС относительно нулевого уровня 1500:
- * ниже — accent, на уровне — muted, выше — moss.
+ * ниже — враг #D9574A (≥4,5:1 на дыме), на уровне — muted, выше — moss.
  */
 export const getPtsColor = (pts: number): string => {
 	if (pts > START_PTS) {
 		return 'moss';
 	}
 	if (pts < START_PTS) {
-		return 'accent';
+		return MATCH_RESULT_LOSS;
 	}
 	return 'var(--app-text-muted)';
+};
+
+/** Знак изменения ПТС для grayscale (AC-3). */
+export const getPtsTrendMark = (pts: number): string => {
+	if (pts > START_PTS) {
+		return '▲';
+	}
+	if (pts < START_PTS) {
+		return '▼';
+	}
+	return '';
 };

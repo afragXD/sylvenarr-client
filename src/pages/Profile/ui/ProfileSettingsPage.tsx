@@ -130,6 +130,11 @@ export const ProfileSettingsPage = () => {
 			>
 				{saving ? 'Сохранение…' : 'Сохранить имя'}
 			</OrnateButton>
+			{displayName.trim() === player.displayName ? (
+				<Text size="sm" c="var(--app-text-muted)">
+					Измените имя, чтобы сохранить
+				</Text>
+			) : null}
 		</Stack>
 	);
 };

@@ -1,6 +1,7 @@
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { Box, Text, Tooltip } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import type { KeyboardEvent, MouseEvent } from 'react';
 
 import { type HeroClass, HeroImage } from '@/entities/hero';
@@ -63,6 +64,7 @@ export const DraftHeroCard = ({
 
 	const reason = disabled ? disabledReason : undefined;
 	const slotsLabel = slotsHint(hero.size);
+	const [slotsTipOpened, slotsTipHandlers] = useDisclosure(false);
 
 	const handlePick = (row: number, event: MouseEvent | KeyboardEvent) => {
 		event.stopPropagation();
@@ -120,6 +122,7 @@ export const DraftHeroCard = ({
 				</div>
 				<Tooltip
 					label={slotsLabel}
+					opened={slotsTipOpened}
 					withArrow
 					withinPortal
 					position="top"
@@ -127,7 +130,19 @@ export const DraftHeroCard = ({
 					zIndex={400}
 					events={{ hover: true, focus: true, touch: true }}
 				>
-					<button type="button" className={styles.slots} aria-label={slotsLabel}>
+					<button
+						type="button"
+						className={styles.slots}
+						aria-label={slotsLabel}
+						onMouseEnter={slotsTipHandlers.open}
+						onMouseLeave={slotsTipHandlers.close}
+						onFocus={slotsTipHandlers.open}
+						onBlur={slotsTipHandlers.close}
+						onClick={(event) => {
+							event.stopPropagation();
+							slotsTipHandlers.toggle();
+						}}
+					>
 						{sizeToRoman(hero.size)}
 					</button>
 				</Tooltip>

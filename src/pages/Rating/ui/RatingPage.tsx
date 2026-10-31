@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { fetchRating, type RatingRow } from '@/entities/rating';
 import { ApiError } from '@/shared/api/http';
-import { getPtsColor, START_PTS } from '@/shared/lib/stats';
+import { getPtsColor, getPtsTrendMark, START_PTS } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
@@ -60,17 +60,17 @@ export const RatingPage = () => {
 				<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
 					После победы вы получаете ПТС, после поражения — теряете. Объём обмена зависит от разницы
 					рейтингов: победа над более сильным соперником даёт заметный прирост, а ему — ощутимый
-					штраф; победа над слабым приносит мало, и он теряет немного. Так система не даёт бесконечно
-					набивать очки на лёгких матчах и награждает апсеты.
+					штраф; победа над слабым приносит мало, и он теряет немного. Так система не даёт
+					бесконечно набивать очки на лёгких матчах и награждает апсеты.
 				</Text>
 				<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
-					Ничья не обнуляет результат: очки слегка сдвигаются в сторону выравнивания — у кого рейтинг
-					ниже, тот чуть прибавляет, у кого выше — чуть отдаёт. Если рейтинги равны, ничья ничего не
-					меняет. Ниже нуля опуститься нельзя: даже серия поражений остановится на полу.
+					Ничья не обнуляет результат: очки слегка сдвигаются в сторону выравнивания — у кого
+					рейтинг ниже, тот чуть прибавляет, у кого выше — чуть отдаёт. Если рейтинги равны, ничья
+					ничего не меняет. Ниже нуля опуститься нельзя: даже серия поражений остановится на полу.
 				</Text>
 				<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
-					В таблице рядом с ПТС — счёт побед, поражений и ничьих за все учтённые бои. Сортировка идёт
-					по очкам: сначала те, кто выше по ПТС.
+					В таблице рядом с ПТС — счёт побед, поражений и ничьих за все учтённые бои. Сортировка
+					идёт по очкам: сначала те, кто выше по ПТС.
 				</Text>
 			</Stack>
 			{isLoading && (
@@ -112,6 +112,7 @@ export const RatingPage = () => {
 							{rows.map((row, index) => {
 								const rank = index + 1;
 								const meta = TOP_RANK_ICONS[rank];
+								const ptsMark = getPtsTrendMark(row.pts);
 								return (
 									<Table.Tr
 										key={row.playerId}
@@ -135,19 +136,22 @@ export const RatingPage = () => {
 											</Group>
 										</Table.Td>
 										<Table.Td>
-											<PlayerIdentity
-												name={row.displayName}
-												avatarUrl={row.avatarUrl}
-												size={28}
-											/>
+											<PlayerIdentity name={row.displayName} avatarUrl={row.avatarUrl} size={28} />
 										</Table.Td>
 										<Table.Td
 											ff="monospace"
 											c={getPtsColor(row.pts)}
 											fw={700}
 											style={{ fontVariantNumeric: 'tabular-nums' }}
+											title={
+												row.pts > START_PTS
+													? 'Выше нулевого уровня 1500'
+													: row.pts < START_PTS
+														? 'Ниже нулевого уровня 1500'
+														: 'Нулевой уровень 1500'
+											}
 										>
-											{row.pts}
+											{ptsMark ? `${ptsMark} ${row.pts}` : row.pts}
 										</Table.Td>
 										<Table.Td ff="monospace" style={{ fontVariantNumeric: 'tabular-nums' }}>
 											{row.wins}

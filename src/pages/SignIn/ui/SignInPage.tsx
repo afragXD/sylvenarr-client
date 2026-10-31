@@ -1,4 +1,14 @@
-import { Alert, Box, Button, Divider, Group, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
+import {
+	Alert,
+	Box,
+	Button,
+	Divider,
+	Group,
+	PasswordInput,
+	Stack,
+	Text,
+	TextInput,
+} from '@mantine/core';
 import { useForm } from '@tanstack/react-form';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
@@ -182,7 +192,13 @@ export const SignInPage = () => {
 							</form.Field>
 							<form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
 								{([canSubmit, isSubmitting]) => (
-									<Button type="submit" fullWidth disabled={!canSubmit} loading={isSubmitting}>
+									<Button
+										type="submit"
+										color="brand"
+										fullWidth
+										disabled={!canSubmit}
+										loading={isSubmitting}
+									>
 										Войти
 									</Button>
 								)}

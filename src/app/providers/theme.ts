@@ -45,6 +45,10 @@ const moss: MantineColorsTuple = [
 export const theme = createTheme({
 	primaryColor: 'brand',
 	primaryShade: { light: 6, dark: 6 },
+	/** AC-3: filled brand (#CBB48C) → тёмный текст, не белый (~2:1). */
+	autoContrast: true,
+	luminanceThreshold: 0.3,
+	black: '#17110C',
 	colors: {
 		brand,
 		accent,
@@ -86,6 +90,7 @@ export const theme = createTheme({
 		Button: {
 			defaultProps: {
 				radius: 0,
+				autoContrast: true,
 			},
 			styles: {
 				root: {
@@ -104,6 +109,7 @@ export const theme = createTheme({
 		ActionIcon: {
 			defaultProps: {
 				radius: 0,
+				autoContrast: true,
 			},
 		},
 	},
@@ -127,6 +133,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
 	light: {
 		'--mantine-color-body': theme.other.appBg,
 		'--mantine-color-text': theme.other.appText,
+		'--mantine-color-placeholder': 'rgba(242, 236, 226, 0.78)',
 		'--app-surface': theme.other.appSurface,
 		'--app-surface-muted': theme.other.appSurfaceMuted,
 		'--app-text': theme.other.appText,
@@ -136,6 +143,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) => ({
 	dark: {
 		'--mantine-color-body': theme.other.appBg,
 		'--mantine-color-text': theme.other.appText,
+		'--mantine-color-placeholder': 'rgba(242, 236, 226, 0.78)',
 		'--app-surface': theme.other.appSurface,
 		'--app-surface-muted': theme.other.appSurfaceMuted,
 		'--app-text': theme.other.appText,

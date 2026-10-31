@@ -112,6 +112,11 @@
 	border: 1px solid color-mix(in srgb, var(--brass) 70%, var(--app-border));
 }
 
+/* AC-3: страховка, если autoContrast не сработал на filled brand */
+.sylvenarr-plate-btn.mantine-Button-root[data-variant='filled'] {
+	color: var(--parchment-ink, #2b2219);
+}
+
 .sylvenarr-oauth-icon-btn.mantine-ActionIcon-root {
 	border: 1px solid color-mix(in srgb, var(--brass) 40%, transparent);
 	background: var(--app-surface);

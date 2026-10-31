@@ -12,17 +12,14 @@ import {
 import type { AbilityInfo, BattleState, BattleUnit, Match } from '@/entities/match';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
-import { previewWeaponAttack, type AttackPreview } from '../lib/attackPreview';
+import { type AttackPreview, previewWeaponAttack } from '../lib/attackPreview';
 import { playBattleSfxEvents, preloadUnitSfx, unlockBattleSfx } from '../lib/battleSfx';
 import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
 import { AbilityTags } from './AbilityTags';
 import styles from './BattlePanel.module.css';
 import { BattleSoundControl } from './BattleSoundControl';
 import { CombatStat, CombatStatRow } from './CombatStat';
-import {
-	MatchResultOverlay,
-	type MatchResultKind,
-} from './MatchResultOverlay';
+import { type MatchResultKind, MatchResultOverlay } from './MatchResultOverlay';
 import { PortraitHpCurtain } from './PortraitHpCurtain';
 import { TurnOrderStrip } from './TurnOrderStrip';
 import { UnitEffects } from './UnitEffects';
@@ -243,12 +240,7 @@ export const BattlePanel = ({
 	}, [logLines]);
 
 	if (!battle) {
-		if (
-			match.status === 'finished' &&
-			onRematch &&
-			onLobby &&
-			onMatches
-		) {
+		if (match.status === 'finished' && onRematch && onLobby && onMatches) {
 			return (
 				<div className={styles.panel}>
 					<div className={styles.battlefield} style={{ minHeight: '18rem' }}>
@@ -290,9 +282,7 @@ export const BattlePanel = ({
 	const skillLabel = battle.skillLabel;
 	const skillNeedsTarget = (battle.legalSkillTargetIds?.length ?? 0) > 0;
 	const prompt = battle.pendingPrompt;
-	const abilityDocs = active
-		? getHeroAbilities(active.heroClassCode, true).slots
-		: [];
+	const abilityDocs = active ? getHeroAbilities(active.heroClassCode, true).slots : [];
 
 	const highlightTargets = (() => {
 		if (!pendingMode) {
@@ -330,9 +320,7 @@ export const BattlePanel = ({
 		const isAoe = Boolean(doc?.tags.includes('aoe'));
 		openConfirm({
 			title: ability.label,
-			detail: isAoe
-				? 'Действие затронет несколько целей или область.'
-				: 'Подтвердите применение.',
+			detail: isAoe ? 'Действие затронет несколько целей или область.' : 'Подтвердите применение.',
 			isAoe,
 			payload: {
 				unitId: active.id,
@@ -584,11 +572,7 @@ export const BattlePanel = ({
 						<Button color="accent" loading={busy} onClick={commitConfirm}>
 							Подтвердить
 						</Button>
-						<Button
-							variant="default"
-							disabled={busy}
-							onClick={() => setConfirm(null)}
-						>
+						<Button variant="default" disabled={busy} onClick={() => setConfirm(null)}>
 							Отмена
 						</Button>
 					</Group>
@@ -598,9 +582,7 @@ export const BattlePanel = ({
 			{battle.outcome === 'ongoing' && isMyTurn && active && prompt && (
 				<div className={styles.prompt}>
 					<Text size="sm" fw={600} mb={6}>
-						{prompt.kind === 'lich_final_form'
-							? 'Выберите финальную форму'
-							: 'Выберите вариант'}
+						{prompt.kind === 'lich_final_form' ? 'Выберите финальную форму' : 'Выберите вариант'}
 					</Text>
 					<div className={styles.promptOptions}>
 						{prompt.options.map((option) => {
@@ -672,7 +654,11 @@ export const BattlePanel = ({
 							return (
 								<Tooltip
 									key={ability.slot}
-									label={<Text size="xs" style={{ whiteSpace: 'pre-wrap' }}>{tip}</Text>}
+									label={
+										<Text size="xs" style={{ whiteSpace: 'pre-wrap' }}>
+											{tip}
+										</Text>
+									}
 									multiline
 									maw={280}
 								>
@@ -760,9 +746,15 @@ export const BattlePanel = ({
 						Отмена
 					</Button>
 					<Button
-						color="red"
 						radius={0}
 						loading={busy}
+						styles={{
+							root: {
+								background: 'var(--enemy, #D9574A)',
+								color: '#17110C',
+								border: '1px solid color-mix(in srgb, var(--enemy, #D9574A) 70%, #000)',
+							},
+						}}
 						onClick={() => {
 							surrenderHandlers.close();
 							onSurrender();
@@ -875,9 +867,7 @@ const RowColumn = ({
 								className={styles.unit}
 								data-active={unit.id === activeId ? 'true' : undefined}
 								data-target={legalTargets.includes(unit.id) ? 'true' : undefined}
-								data-prompt-hover={
-									unit.id === promptHoverUnitId ? 'true' : undefined
-								}
+								data-prompt-hover={unit.id === promptHoverUnitId ? 'true' : undefined}
 								data-dead={unit.alive ? undefined : 'true'}
 								data-summon={unit.isSummon ? 'true' : undefined}
 								data-inspectable="true"
