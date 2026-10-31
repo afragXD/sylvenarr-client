@@ -1,4 +1,4 @@
-import { apiFetchJson } from '@/shared/api/http';
+import { ApiError, apiFetch, apiFetchJson } from '@/shared/api/http';
 import { API_BASE_URL } from '@/shared/constants';
 
 import type { AuthProvider, Player } from '../model/types';
@@ -51,20 +51,45 @@ const parseFavoriteHeroes = (data: unknown): FavoriteHero[] => {
 };
 
 /**
- * Текущий игрок из сессии; null — гость (API отдаёт 200 без 401).
+ * Текущий игрок из сессии; null — гость (200 + JSON null / пустое тело / 401 / 204).
  */
 export async function fetchCurrentPlayer(): Promise<Player | null> {
-	return apiFetchJson(
-		'/players/me',
-		undefined,
-		(data) => {
-			if (data === null) {
-				return null;
+	const response = await apiFetch('/players/me');
+	if (response.status === 401 || response.status === 204) {
+		return null;
+	}
+	if (!response.ok) {
+		let message = 'Не удалось проверить сессию';
+		try {
+			const data: unknown = await response.json();
+			if (
+				typeof data === 'object' &&
+				data !== null &&
+				'message' in data &&
+				typeof (data as { message: unknown }).message === 'string'
+			) {
+				message = (data as { message: string }).message;
 			}
-			return parsePlayer(data);
-		},
-		'Не удалось проверить сессию',
-	);
+		} catch {
+			/* ignore */
+		}
+		throw new ApiError(message, response.status);
+	}
+	const text = await response.text();
+	const trimmed = text.trim();
+	if (!trimmed || trimmed === 'null') {
+		return null;
+	}
+	let data: unknown;
+	try {
+		data = JSON.parse(trimmed) as unknown;
+	} catch {
+		return null;
+	}
+	if (data === null) {
+		return null;
+	}
+	return parsePlayer(data);
 }
 
 /**

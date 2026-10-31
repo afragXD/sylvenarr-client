@@ -44,6 +44,7 @@ export const OAuthProviderButton = ({
 			}
 			onClick={() => {
 				if (rememberRedirect) {
+					/* sanitize внутри setAuthRedirect */
 					setAuthRedirect(rememberRedirect);
 				}
 			}}

@@ -222,9 +222,21 @@ export const MatchRoomPage = () => {
 				if (!isMounted) {
 					return;
 				}
-				if (err instanceof ApiError && err.status === 401) {
+				/* Сессия/пустое тело /players/me — гость, не красный тупик */
+				if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
 					setBootError('guest');
 					return;
+				}
+				if (!(err instanceof ApiError) && err instanceof Error) {
+					const msg = err.message.toLowerCase();
+					if (
+						msg.includes('json') ||
+						msg.includes('некорректный ответ') ||
+						msg.includes('unexpected end')
+					) {
+						setBootError('guest');
+						return;
+					}
 				}
 				setBootError(err instanceof ApiError ? err.message : 'Не удалось загрузить матч');
 			}

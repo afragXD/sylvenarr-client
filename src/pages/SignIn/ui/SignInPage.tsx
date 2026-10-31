@@ -25,7 +25,7 @@ import {
 	playerUpdated,
 } from '@/entities/player';
 import { ApiError } from '@/shared/api/http';
-import { isSafeAppPath, setAuthRedirect, takeAuthRedirect } from '@/shared/lib/authRedirect';
+import { setAuthRedirect, takeAuthRedirect } from '@/shared/lib/authRedirect';
 import { OAuthProviderButton } from '@/shared/ui/oauth';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
@@ -72,7 +72,8 @@ export const SignInPage = () => {
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 	useEffect(() => {
-		if (typeof search.redirect === 'string' && isSafeAppPath(search.redirect)) {
+		if (typeof search.redirect === 'string') {
+			/* небезопасное → sanitize → «/» (без open redirect) */
 			setAuthRedirect(search.redirect);
 		}
 	}, [search.redirect]);
