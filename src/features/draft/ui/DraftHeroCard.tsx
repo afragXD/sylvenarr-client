@@ -84,29 +84,24 @@ export const DraftHeroCard = ({
 		}
 	};
 
-	return (
-		<Tooltip
-			label={reason}
-			disabled={!reason}
-			withArrow
-			openDelay={150}
-			events={{ hover: true, focus: true, touch: true }}
+	const card = (
+		<fieldset
+			ref={setNodeRef}
+			className={styles.card}
+			style={style}
+			data-disabled={disabled ? 'true' : undefined}
+			data-selected={selected ? 'true' : undefined}
+			data-focused={focused ? 'true' : undefined}
+			data-slots={hero.size}
+			data-hero-name={hero.displayName}
+			aria-label={`${hero.displayName}, ${slotsLabel}${selected ? ', выбран' : ''}${disabled ? ', недоступен' : ''}`}
+			tabIndex={disabled ? -1 : 0}
+			onFocus={() => onFocusHero?.(hero.code)}
+			onBlur={() => onFocusHero?.(null)}
+			onKeyDown={handleCardKeyDown}
 		>
-			<fieldset
-				ref={setNodeRef}
-				className={styles.card}
-				style={style}
-				data-disabled={disabled ? 'true' : undefined}
-				data-selected={selected ? 'true' : undefined}
-				data-focused={focused ? 'true' : undefined}
-				data-slots={hero.size}
-				data-hero-name={hero.displayName}
-				aria-label={`${hero.displayName}, ${slotsLabel}${selected ? ', выбран' : ''}${disabled ? ', недоступен' : ''}`}
-				tabIndex={disabled ? -1 : 0}
-				onFocus={() => onFocusHero?.(hero.code)}
-				onBlur={() => onFocusHero?.(null)}
-				onKeyDown={handleCardKeyDown}
-			>
+			<div className={styles.media}>
+				{/* Drag только на портрет+имя — бейдж слотов снаружи, иначе Tooltip не ловит hover. */}
 				<div className={styles.dragSurface} {...(disabled ? {} : { ...listeners, ...attributes })}>
 					<Box className={styles.portrait}>
 						<HeroImage
@@ -118,60 +113,69 @@ export const DraftHeroCard = ({
 							fit="cover"
 							bg="transparent"
 						/>
-						<Tooltip
-							label={slotsLabel}
-							withArrow
-							openDelay={100}
-							events={{ hover: true, focus: true, touch: true }}
-						>
-							<button
-								type="button"
-								className={styles.slots}
-								aria-label={slotsLabel}
-								onPointerDown={(event) => {
-									event.stopPropagation();
-								}}
-								onClick={(event) => {
-									event.stopPropagation();
-								}}
-							>
-								{sizeToRoman(hero.size)}
-							</button>
-						</Tooltip>
 					</Box>
 					<Text className={styles.name} lineClamp={1}>
 						{hero.displayName}
 					</Text>
 				</div>
-				<div className={styles.actions}>
-					<button
-						type="button"
-						className={styles.rowBtn}
-						disabled={disabled}
-						onClick={(event) => handlePick(ROW_FRONT, event)}
-					>
-						В передний ряд
+				<Tooltip
+					label={slotsLabel}
+					withArrow
+					withinPortal
+					position="top"
+					openDelay={80}
+					zIndex={400}
+					events={{ hover: true, focus: true, touch: true }}
+				>
+					<button type="button" className={styles.slots} aria-label={slotsLabel}>
+						{sizeToRoman(hero.size)}
 					</button>
-					<button
-						type="button"
-						className={styles.rowBtn}
-						disabled={disabled}
-						onClick={(event) => handlePick(ROW_BACK, event)}
-					>
-						В задний ряд
-					</button>
-					<button
-						type="button"
-						className={styles.infoBtn}
-						onClick={(event) => {
-							event.stopPropagation();
-							onOpen(hero.code);
-						}}
-					>
-						Справка
-					</button>
-				</div>
-			</fieldset>
+				</Tooltip>
+			</div>
+			<div className={styles.actions}>
+				<button
+					type="button"
+					className={styles.rowBtn}
+					disabled={disabled}
+					onClick={(event) => handlePick(ROW_FRONT, event)}
+				>
+					В передний ряд
+				</button>
+				<button
+					type="button"
+					className={styles.rowBtn}
+					disabled={disabled}
+					onClick={(event) => handlePick(ROW_BACK, event)}
+				>
+					В задний ряд
+				</button>
+				<button
+					type="button"
+					className={styles.infoBtn}
+					onClick={(event) => {
+						event.stopPropagation();
+						onOpen(hero.code);
+					}}
+				>
+					Справка
+				</button>
+			</div>
+		</fieldset>
+	);
+
+	if (!reason) {
+		return card;
+	}
+
+	return (
+		<Tooltip
+			label={reason}
+			withArrow
+			withinPortal
+			openDelay={150}
+			events={{ hover: true, focus: true, touch: true }}
+		>
+			{card}
 		</Tooltip>
 	);
 };

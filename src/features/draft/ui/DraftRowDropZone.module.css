@@ -1,3 +1,16 @@
+.zone {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	height: 100%;
+	min-height: 180px;
+	pointer-events: auto;
+}
+
+.label {
+	flex-shrink: 0;
+}
+
 .row {
 	display: flex;
 	flex-direction: column;
@@ -12,8 +25,8 @@
 		outline 120ms ease;
 }
 
-.row[data-over="true"] {
-	border-color: var(--mantine-color-accent-filled);
-	background: color-mix(in srgb, var(--mantine-color-accent-filled) 12%, var(--app-surface));
-	outline: 1px solid color-mix(in srgb, var(--mantine-color-accent-filled) 45%, transparent);
+.zone[data-over='true'] .row {
+	border-color: var(--copper, #e9c08f);
+	background: color-mix(in srgb, var(--copper, #e9c08f) 12%, var(--app-surface));
+	outline: 1px solid color-mix(in srgb, var(--copper, #e9c08f) 45%, transparent);
 }

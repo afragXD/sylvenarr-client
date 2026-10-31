@@ -2,6 +2,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { Stack, Text } from '@mantine/core';
 
 import type { MatchDraftPick } from '@/entities/match';
+
 import styles from './DraftRowDropZone.module.css';
 import { DraftUnitChip } from './DraftUnitChip';
 
@@ -32,15 +33,16 @@ export const DraftRowDropZone = ({
 	});
 
 	return (
-		<Stack gap={4} h="100%">
-			<Text size="xs" c="var(--app-text-muted)" tt="uppercase">
+		<div
+			ref={setNodeRef}
+			className={styles.zone}
+			data-over={acceptDrops && isOver ? 'true' : undefined}
+			data-row={row}
+		>
+			<Text size="xs" c="var(--app-text-muted)" tt="uppercase" className={styles.label}>
 				{label}
 			</Text>
-			<div
-				ref={setNodeRef}
-				className={styles.row}
-				data-over={acceptDrops && isOver ? 'true' : undefined}
-			>
+			<div className={styles.row}>
 				{picks.length === 0 ? (
 					<Text size="sm" c="var(--app-text-muted)">
 						—
@@ -53,6 +55,6 @@ export const DraftRowDropZone = ({
 					</Stack>
 				)}
 			</div>
-		</Stack>
+		</div>
 	);
 };

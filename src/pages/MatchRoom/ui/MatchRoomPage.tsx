@@ -5,6 +5,7 @@ import {
 	type DragEndEvent,
 	PointerSensor,
 	pointerWithin,
+	rectIntersection,
 	useSensor,
 	useSensors,
 } from '@dnd-kit/core';
@@ -163,11 +164,17 @@ export const MatchRoomPage = () => {
 	);
 
 	const draftCollision: CollisionDetection = (args) => {
-		const hits = pointerWithin(args);
-		if (hits.length > 0) {
-			return hits;
+		const rowOnly = <T extends { id: string | number }>(list: T[]): T[] =>
+			list.filter((item) => String(item.id).startsWith('row:'));
+		const pointerHits = rowOnly(pointerWithin(args));
+		if (pointerHits.length > 0) {
+			return pointerHits;
 		}
-		return closestCenter(args);
+		const rectHits = rowOnly(rectIntersection(args));
+		if (rectHits.length > 0) {
+			return rectHits;
+		}
+		return rowOnly(closestCenter(args));
 	};
 
 	playerIdRef.current = player?.id ?? null;
@@ -845,7 +852,13 @@ export const MatchRoomPage = () => {
 							</div>
 
 							<div className={draftStyles.catalogPanel}>
-								<Group justify="space-between" align="center" wrap="wrap" gap="sm">
+								<Group
+									className={draftStyles.turnBar}
+									justify="space-between"
+									align="center"
+									wrap="wrap"
+									gap="sm"
+								>
 									<Text fw={600}>
 										{lockedByPreset
 											? 'Отряд зафиксирован пресетом. Ждём соперника…'

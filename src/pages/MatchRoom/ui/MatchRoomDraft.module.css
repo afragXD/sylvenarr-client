@@ -34,6 +34,23 @@
 	min-width: 0;
 }
 
+/* На узком экране строка хода не уезжает под фиксированную шапку. */
+.turnBar {
+	scroll-margin-top: 4.75rem;
+}
+
+@media (max-width: 64em) {
+	.turnBar {
+		position: sticky;
+		top: 4.5rem;
+		z-index: 6;
+		margin-inline: -0.15rem;
+		padding: 0.55rem 0.35rem;
+		background: color-mix(in srgb, var(--app-surface, #1a130e) 94%, #000);
+		border-bottom: 1px solid color-mix(in srgb, var(--app-border, #4a3f2e) 70%, transparent);
+	}
+}
+
 .catalogScroll {
 	max-height: min(70dvh, 52rem);
 	overflow: auto;
