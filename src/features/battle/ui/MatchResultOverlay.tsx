@@ -18,6 +18,8 @@ type MatchResultOverlayProps = {
 	result: MatchResultKind;
 	myRating: MatchMyRating | null | undefined;
 	durationSeconds: number | null | undefined;
+	/** Пока тянем ПТС/длительность после окончания — не показывать «без рейтинга». */
+	metaLoading?: boolean;
 	busy?: boolean;
 	onRematch: () => void;
 	onLobby: () => void;
@@ -37,6 +39,7 @@ export const MatchResultOverlay = ({
 	result,
 	myRating,
 	durationSeconds,
+	metaLoading = false,
 	busy = false,
 	onRematch,
 	onLobby,
@@ -52,10 +55,11 @@ export const MatchResultOverlay = ({
 				</div>
 				<div className={styles.meta}>
 					<Text size="md" c="var(--app-text)">
-						{formatRatingLine(myRating)}
+						{metaLoading ? 'Загрузка…' : formatRatingLine(myRating)}
 					</Text>
 					<Text size="sm" c="var(--app-text-muted)">
-						Длительность: {formatDuration(durationSeconds ?? null)}
+						Длительность:{' '}
+						{metaLoading ? '…' : formatDuration(durationSeconds ?? null)}
 					</Text>
 				</div>
 				<div className={styles.actions}>

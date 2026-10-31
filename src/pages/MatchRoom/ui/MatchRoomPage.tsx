@@ -35,6 +35,8 @@ const battleWsUrl = (matchId: string): string => {
 	return `${wsBase}/matches/ws/${encodeURIComponent(matchId)}`;
 };
 
+const RESULT_META_RETRY_MS = [150, 300, 600, 1000, 1500] as const;
+
 const mergeBattleFrame = (
 	prev: Match,
 	payload: { type?: string; battle?: Match['battle'] },
@@ -49,10 +51,15 @@ const mergeBattleFrame = (
 			: prev.status === 'fighting'
 				? 'fighting'
 				: prev.status;
+	const justFinished = nextStatus === 'finished' && prev.status !== 'finished';
 	return {
 		...prev,
 		status: nextStatus,
 		winnerPlayerId: battle.winnerPlayerId ?? prev.winnerPlayerId,
+		// Сбрасываем мету: WS-кадр её не несёт; покажет «Загрузка…», пока не придёт GET.
+		...(justFinished
+			? { myRating: undefined, durationSeconds: null, finishedAt: null }
+			: {}),
 		battle: {
 			...battle,
 			skillLabel: battle.skillLabel ?? null,
@@ -69,6 +76,11 @@ const mergeBattleFrame = (
 		},
 	};
 };
+
+const sleep = (ms: number): Promise<void> =>
+	new Promise((resolve) => {
+		window.setTimeout(resolve, ms);
+	});
 const ROW_FRONT = 0;
 const ROW_BACK = 1;
 
@@ -83,6 +95,8 @@ export const MatchRoomPage = () => {
 	const [bootError, setBootError] = useState<string | null>(null);
 	const [modalHeroCode, setModalHeroCode] = useState<string | null>(null);
 	const [presetModalOpen, setPresetModalOpen] = useState(false);
+	/** Ждём GET с ПТС/длительностью после battle:ended. */
+	const [resultMetaLoading, setResultMetaLoading] = useState(false);
 	const battleSocketRef = useRef<WebSocket | null>(null);
 
 	const sensors = useSensors(
@@ -93,6 +107,7 @@ export const MatchRoomPage = () => {
 
 	useEffect(() => {
 		let isMounted = true;
+		setResultMetaLoading(false);
 		const boot = async () => {
 			try {
 				const [current, loaded, heroList] = await Promise.all([
@@ -144,6 +159,46 @@ export const MatchRoomPage = () => {
 		};
 	}, [activeMatchId, activeMatchStatus]);
 
+	/**
+	 * После окончания боя WS-эффект размонтируется (status ≠ fighting) и отменяет
+	 * inline-refetch. Отдельно тянем мету (ПТС / длительность) с повторами.
+	 */
+	useEffect(() => {
+		if (!activeMatchId || !resultMetaLoading) {
+			return;
+		}
+		let cancelled = false;
+		const loadResultMeta = async () => {
+			for (let attempt = 0; attempt < RESULT_META_RETRY_MS.length; attempt += 1) {
+				if (attempt > 0) {
+					await sleep(RESULT_META_RETRY_MS[attempt - 1] ?? 300);
+				}
+				if (cancelled) {
+					return;
+				}
+				try {
+					const next = await fetchMatchById(activeMatchId);
+					if (cancelled) {
+						return;
+					}
+					if (next.durationSeconds != null || attempt === RESULT_META_RETRY_MS.length - 1) {
+						setMatch(next);
+						setResultMetaLoading(false);
+						return;
+					}
+				} catch {
+					if (attempt === RESULT_META_RETRY_MS.length - 1 && !cancelled) {
+						setResultMetaLoading(false);
+					}
+				}
+			}
+		};
+		void loadResultMeta();
+		return () => {
+			cancelled = true;
+		};
+	}, [activeMatchId, resultMetaLoading]);
+
 	useEffect(() => {
 		if (!activeMatchId || activeMatchStatus !== 'fighting') {
 			return;
@@ -194,18 +249,12 @@ export const MatchRoomPage = () => {
 						(payload.type === 'battle:state' || payload.type === 'battle:ended') &&
 						payload.battle
 					) {
+						const ended =
+							payload.type === 'battle:ended' || payload.battle.outcome !== 'ongoing';
 						setMatch((prev) => (prev ? mergeBattleFrame(prev, payload) : prev));
 						setIsBusy(false);
-						if (payload.type === 'battle:ended' || payload.battle.outcome !== 'ongoing') {
-							void fetchMatchById(activeMatchId)
-								.then((next) => {
-									if (!closed) {
-										setMatch(next);
-									}
-								})
-								.catch(() => {
-									/* снимок боя уже применён */
-								});
+						if (ended) {
+							setResultMetaLoading(true);
 						}
 					}
 				} catch {
@@ -556,6 +605,7 @@ export const MatchRoomPage = () => {
 									match={match}
 									playerId={player.id}
 									busy={isBusy}
+									resultMetaLoading={resultMetaLoading}
 									onAction={(input) => void handleBattleAction(input)}
 									onSurrender={() => void handleSurrender()}
 									onOfferDraw={() => void handleOfferDraw()}

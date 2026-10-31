@@ -147,6 +147,8 @@ type BattlePanelProps = {
 	onRematch?: () => void;
 	onLobby?: () => void;
 	onMatches?: () => void;
+	/** Ждём myRating / durationSeconds после battle:ended. */
+	resultMetaLoading?: boolean;
 };
 
 type PendingMode =
@@ -182,6 +184,7 @@ export const BattlePanel = ({
 	onRematch,
 	onLobby,
 	onMatches,
+	resultMetaLoading = false,
 }: BattlePanelProps) => {
 	const battle = match.battle;
 	const [pendingMode, setPendingMode] = useState<PendingMode>(null);
@@ -253,6 +256,7 @@ export const BattlePanel = ({
 							result={resultFromMatch(match, playerId)}
 							myRating={match.myRating}
 							durationSeconds={match.durationSeconds}
+							metaLoading={resultMetaLoading}
 							busy={busy}
 							onRematch={onRematch}
 							onLobby={onLobby}
@@ -515,6 +519,7 @@ export const BattlePanel = ({
 						result={toMatchResultKind(battle, playerId)}
 						myRating={match.myRating}
 						durationSeconds={match.durationSeconds}
+						metaLoading={resultMetaLoading}
 						busy={busy}
 						onRematch={onRematch}
 						onLobby={onLobby}
