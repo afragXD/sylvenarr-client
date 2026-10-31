@@ -1,6 +1,6 @@
-import { Anchor, Box, Button, Group, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Anchor, Box, Button, Group, Select, Stack, Text, TextInput, Title } from '@mantine/core';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
 	createMatch,
@@ -11,7 +11,9 @@ import {
 	validateMatchRules,
 } from '@/entities/match';
 import { fetchCurrentPlayer, type Player } from '@/entities/player';
+import { fetchPresets, type SquadPreset } from '@/entities/presets';
 import { ApiError } from '@/shared/api/http';
+import { setPendingLobbyDraftPresetId } from '@/shared/lib/lobbyDraftPreset';
 import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
@@ -26,6 +28,9 @@ export const LobbyPage = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [isBusy, setIsBusy] = useState(false);
 	const [rules, setRules] = useState<MatchRules>(() => loadLobbyRulesPrefs());
+	const [presets, setPresets] = useState<SquadPreset[]>([]);
+	const [presetsLoading, setPresetsLoading] = useState(false);
+	const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -51,6 +56,51 @@ export const LobbyPage = () => {
 		};
 	}, []);
 
+	useEffect(() => {
+		if (!player) {
+			setPresets([]);
+			setSelectedPresetId(null);
+			return;
+		}
+		let alive = true;
+		setPresetsLoading(true);
+		void fetchPresets({ teamSize: rules.initialTeamSize, scope: 'mine' })
+			.then((list) => {
+				if (!alive) {
+					return;
+				}
+				const personal = list.filter((preset) => !preset.isGlobal);
+				setPresets(personal);
+				setSelectedPresetId((prev) =>
+					prev && personal.some((preset) => preset.id === prev) ? prev : null,
+				);
+			})
+			.catch(() => {
+				if (alive) {
+					setPresets([]);
+					setSelectedPresetId(null);
+				}
+			})
+			.finally(() => {
+				if (alive) {
+					setPresetsLoading(false);
+				}
+			});
+		return () => {
+			alive = false;
+		};
+	}, [player, rules.initialTeamSize]);
+
+	const presetOptions = useMemo(
+		() => presets.map((preset) => ({ value: preset.id, label: preset.name })),
+		[presets],
+	);
+
+	const stashPresetAndNavigate = async (matchId: string) => {
+		setPendingLobbyDraftPresetId(selectedPresetId);
+		await navigate({ to: '/lobby/$matchId', params: { matchId } });
+	};
+
 	const handleCreate = async () => {
 		if (!player) {
 			return;
@@ -65,7 +115,7 @@ export const LobbyPage = () => {
 		try {
 			const created = await createMatch(validated.rules);
 			saveLobbyRulesPrefs(validated.rules);
-			await navigate({ to: '/lobby/$matchId', params: { matchId: created.id } });
+			await stashPresetAndNavigate(created.id);
 		} catch (err) {
 			setError(err instanceof ApiError ? err.message : 'Ошибка создания матча');
 		} finally {
@@ -81,7 +131,7 @@ export const LobbyPage = () => {
 		setError(null);
 		try {
 			const joined = await joinMatch(inviteInput.trim());
-			await navigate({ to: '/lobby/$matchId', params: { matchId: joined.id } });
+			await stashPresetAndNavigate(joined.id);
 		} catch (err) {
 			setError(err instanceof ApiError ? err.message : 'Ошибка входа в матч');
 		} finally {
@@ -128,6 +178,28 @@ export const LobbyPage = () => {
 								size={28}
 							/>
 						</Group>
+
+						{/* AC-3.13: пресет до «Создать матч» */}
+						{presetsLoading ? (
+							<Text size="sm" c="var(--app-text-muted)">
+								Загрузка пресетов…
+							</Text>
+						) : presets.length === 0 ? (
+							<Text size="sm" c="var(--app-text-muted)" className={styles.presetEmpty}>
+								Пресетов пока нет
+							</Text>
+						) : (
+							<Select
+								label="Пресет отряда"
+								description="Применится в драфте, если отряд ещё пуст"
+								placeholder="Без пресета"
+								clearable
+								data={presetOptions}
+								value={selectedPresetId}
+								onChange={setSelectedPresetId}
+								disabled={isBusy}
+							/>
+						)}
 
 						<Button
 							className="sylvenarr-plate-btn"

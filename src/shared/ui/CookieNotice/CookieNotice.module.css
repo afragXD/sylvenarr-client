@@ -43,3 +43,8 @@
 .link:hover {
 	color: var(--mantine-color-brand-3);
 }
+
+.accept.mantine-Button-root,
+.accept.mantine-Button-root[data-variant='filled'] {
+	color: var(--parchment-ink, #2b2219);
+}

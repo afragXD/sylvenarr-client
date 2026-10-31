@@ -1,3 +1,14 @@
+.dragSource {
+	width: 100%;
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
+}
+
+.dragSource[data-dragging='true'] {
+	opacity: 0.4;
+}
+
 .unit {
 	display: flex;
 	align-items: center;
@@ -7,13 +18,13 @@
 	background: var(--app-surface-muted);
 	border: 1px solid var(--app-border);
 	color: var(--app-text);
-	cursor: grab;
-	touch-action: none;
-	user-select: none;
+	box-sizing: border-box;
 }
 
-.unit[data-dragging="true"] {
-	opacity: 0.55;
+.unit[data-overlay='true'] {
+	cursor: grabbing;
+	box-shadow: 0 8px 20px color-mix(in srgb, #000 45%, transparent);
+	width: min(240px, 70vw);
 }
 
 .name {

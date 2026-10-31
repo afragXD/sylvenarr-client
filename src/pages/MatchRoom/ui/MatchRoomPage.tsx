@@ -1,8 +1,10 @@
 import {
 	type CollisionDetection,
-	closestCenter,
 	DndContext,
 	type DragEndEvent,
+	type DragStartEvent,
+	DragOverlay,
+	KeyboardSensor,
 	PointerSensor,
 	pointerWithin,
 	rectIntersection,
@@ -28,9 +30,10 @@ import {
 } from '@/entities/match';
 import { fetchCurrentPlayer, type Player } from '@/entities/player';
 import { BattlePanel } from '@/features/battle';
-import { DraftHeroCard, DraftRowDropZone, HeroDetailModal } from '@/features/draft';
+import { DraftHeroCard, DraftRowDropZone, DraftUnitChipView, HeroDetailModal } from '@/features/draft';
 import { ApiError } from '@/shared/api/http';
 import { API_BASE_URL } from '@/shared/constants';
+import { takePendingLobbyDraftPresetId } from '@/shared/lib/lobbyDraftPreset';
 import { InviteCodeChip } from '@/shared/ui/InviteCodeChip';
 import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
@@ -151,18 +154,26 @@ export const MatchRoomPage = () => {
 		guestPicks: MatchDraftPick[];
 	} | null>(null);
 	const [focusedHeroCode, setFocusedHeroCode] = useState<string | null>(null);
+	const [activeDrag, setActiveDrag] = useState<{
+		displayName: string;
+		heroClassCode: string | null;
+		size: number;
+	} | null>(null);
 	const battleSocketRef = useRef<WebSocket | null>(null);
 	const playerIdRef = useRef<string | null>(null);
 	const sawDraftingRef = useRef(false);
 	const squadsReadyShownForRef = useRef<string | null>(null);
 	const squadsReadyTimerRef = useRef(0);
+	const lobbyPresetTriedRef = useRef<string | null>(null);
 
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
 			activationConstraint: { distance: 8 },
 		}),
+		useSensor(KeyboardSensor),
 	);
 
+	/** Только реальное наведение на ряд — без closestCenter (AC-3.14: drop мимо = без смены ряда). */
 	const draftCollision: CollisionDetection = (args) => {
 		const rowOnly = <T extends { id: string | number }>(list: T[]): T[] =>
 			list.filter((item) => String(item.id).startsWith('row:'));
@@ -170,11 +181,7 @@ export const MatchRoomPage = () => {
 		if (pointerHits.length > 0) {
 			return pointerHits;
 		}
-		const rectHits = rowOnly(rectIntersection(args));
-		if (rectHits.length > 0) {
-			return rectHits;
-		}
-		return rowOnly(closestCenter(args));
+		return rowOnly(rectIntersection(args));
 	};
 
 	playerIdRef.current = player?.id ?? null;
@@ -186,6 +193,7 @@ export const MatchRoomPage = () => {
 		setSquadsSnapshot(null);
 		sawDraftingRef.current = false;
 		squadsReadyShownForRef.current = null;
+		lobbyPresetTriedRef.current = null;
 		window.clearTimeout(squadsReadyTimerRef.current);
 		const boot = async () => {
 			try {
@@ -464,6 +472,39 @@ export const MatchRoomPage = () => {
 		}
 	};
 
+	/** AC-3.13: пресет из /lobby при пустом отряде. */
+	useEffect(() => {
+		if (!match || !player || match.status !== 'drafting' || isBusy) {
+			return;
+		}
+		if (lobbyPresetTriedRef.current === match.id) {
+			return;
+		}
+		const mySizeNow =
+			player.id === match.host.id ? match.draft.hostSize : match.draft.guestSize;
+		const myEntryNow =
+			player.id === match.host.id
+				? (match.draft.hostEntry ?? (mySizeNow > 0 ? 'draft' : 'empty'))
+				: (match.draft.guestEntry ?? (mySizeNow > 0 ? 'draft' : 'empty'));
+		if (myEntryNow !== 'empty' || mySizeNow > 0) {
+			lobbyPresetTriedRef.current = match.id;
+			return;
+		}
+		const presetId = takePendingLobbyDraftPresetId();
+		lobbyPresetTriedRef.current = match.id;
+		if (!presetId) {
+			return;
+		}
+		setIsBusy(true);
+		setError(null);
+		void draftPreset({ matchId: match.id, presetId })
+			.then((next) => setMatch(next))
+			.catch((err: unknown) => {
+				setError(err instanceof ApiError ? err.message : 'Ошибка пресета');
+			})
+			.finally(() => setIsBusy(false));
+	}, [match, player, isBusy]);
+
 	const sendBattleFrame = (frame: Record<string, unknown>) => {
 		const socket = battleSocketRef.current;
 		if (!socket || socket.readyState !== WebSocket.OPEN) {
@@ -540,7 +581,40 @@ export const MatchRoomPage = () => {
 		}
 	};
 
+	const handleDragStart = (event: DragStartEvent) => {
+		const data = event.active.data.current as
+			| {
+					type?: string;
+					displayName?: string;
+					heroClassCode?: string | null;
+					heroCode?: string;
+					size?: number;
+			  }
+			| undefined;
+		if (data?.type === 'pick') {
+			setActiveDrag({
+				displayName: data.displayName ?? 'Юнит',
+				heroClassCode: data.heroClassCode ?? null,
+				size: data.size ?? 1,
+			});
+			return;
+		}
+		if (data?.type === 'hero' && data.heroCode) {
+			const hero = heroes.find((item) => item.code === data.heroCode);
+			setActiveDrag({
+				displayName: data.displayName ?? hero?.displayName ?? data.heroCode,
+				heroClassCode: data.heroCode,
+				size: data.size ?? hero?.size ?? 1,
+			});
+		}
+	};
+
+	const handleDragCancel = () => {
+		setActiveDrag(null);
+	};
+
 	const handleDragEnd = (event: DragEndEvent) => {
+		setActiveDrag(null);
 		if (!match || !player || isBusy) {
 			return;
 		}
@@ -756,7 +830,13 @@ export const MatchRoomPage = () => {
 					</div>
 				</output>
 			) : null}
-			<DndContext sensors={sensors} collisionDetection={draftCollision} onDragEnd={handleDragEnd}>
+			<DndContext
+				sensors={sensors}
+				collisionDetection={draftCollision}
+				onDragStart={handleDragStart}
+				onDragEnd={handleDragEnd}
+				onDragCancel={handleDragCancel}
+			>
 				<Stack gap="lg" w="100%">
 					<Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
 						<Stack gap={6} maw={560}>
@@ -967,6 +1047,17 @@ export const MatchRoomPage = () => {
 						</Box>
 					)}
 				</Stack>
+				{/* AC-3.15: поверх sticky _teamsColumn (overflow:auto клипает оригинал). */}
+				<DragOverlay dropAnimation={null} zIndex={1000}>
+					{activeDrag ? (
+						<DraftUnitChipView
+							displayName={activeDrag.displayName}
+							heroClassCode={activeDrag.heroClassCode}
+							size={activeDrag.size}
+							overlay
+						/>
+					) : null}
+				</DragOverlay>
 			</DndContext>
 
 			<HeroDetailModal code={modalHeroCode} onClose={() => setModalHeroCode(null)} />

@@ -43,7 +43,19 @@ export const CookieNotice = () => {
 					Подробнее
 				</Link>
 			</Text>
-			<Button color="brand" size="sm" onClick={handleAccept} style={{ flexShrink: 0 }}>
+			{/* AC-3: тёмный текст на brand ≥4,5:1 (autoContrast на баннере ненадёжен). */}
+			<Button
+				className={`sylvenarr-plate-btn ${styles.accept}`}
+				color="brand"
+				size="sm"
+				onClick={handleAccept}
+				styles={{
+					root: {
+						flexShrink: 0,
+						color: 'var(--parchment-ink, #2b2219)',
+					},
+				}}
+			>
 				Понятно
 			</Button>
 		</section>

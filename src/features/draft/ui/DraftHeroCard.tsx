@@ -1,5 +1,4 @@
 import { useDraggable } from '@dnd-kit/core';
-import { CSS } from '@dnd-kit/utilities';
 import { Box, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import type { KeyboardEvent, MouseEvent } from 'react';
@@ -50,16 +49,20 @@ export const DraftHeroCard = ({
 	onOpen,
 	onPickRow,
 }: DraftHeroCardProps) => {
-	const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+	const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
 		id: `hero:${hero.code}`,
 		disabled,
-		data: { type: 'hero', heroCode: hero.code, size: hero.size },
+		data: {
+			type: 'hero',
+			heroCode: hero.code,
+			size: hero.size,
+			displayName: hero.displayName,
+		},
 	});
 
+	/** Оригинал на месте; копия — DragOverlay (AC-3.14/3.15). */
 	const style = {
-		transform: CSS.Translate.toString(transform),
-		opacity: isDragging ? 0.55 : undefined,
-		zIndex: isDragging ? 20 : undefined,
+		opacity: isDragging ? 0.4 : undefined,
 	};
 
 	const reason = disabled ? disabledReason : undefined;
