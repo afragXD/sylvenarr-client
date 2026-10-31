@@ -54,7 +54,8 @@
 .catalogScroll {
 	max-height: min(70dvh, 52rem);
 	overflow: auto;
-	padding-right: 0.25rem;
+	/* Запас под свечение absolute-карточки у края (AC-3.15b). */
+	padding: 0.5rem 0.25rem 0.75rem;
 }
 
 .squadsReady {

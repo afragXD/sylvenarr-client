@@ -1,5 +1,5 @@
 import { useDraggable } from '@dnd-kit/core';
-import { Box, Text, Tooltip } from '@mantine/core';
+import { Box, Popover, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import type { KeyboardEvent, MouseEvent } from 'react';
 
@@ -90,95 +90,107 @@ export const DraftHeroCard = ({
 	};
 
 	const card = (
-		<fieldset
-			ref={setNodeRef}
-			className={styles.card}
-			style={style}
-			data-disabled={disabled ? 'true' : undefined}
-			data-selected={selected ? 'true' : undefined}
-			data-focused={focused ? 'true' : undefined}
-			data-slots={hero.size}
-			data-hero-name={hero.displayName}
-			aria-label={`${hero.displayName}, ${slotsLabel}${selected ? ', выбран' : ''}${disabled ? ', недоступен' : ''}`}
-			tabIndex={disabled ? -1 : 0}
-			onFocus={() => onFocusHero?.(hero.code)}
-			onBlur={() => onFocusHero?.(null)}
-			onKeyDown={handleCardKeyDown}
-		>
-			<div className={styles.media}>
-				{/* Drag только на портрет+имя — бейдж слотов снаружи, иначе Tooltip не ловит hover. */}
-				<div className={styles.dragSurface} {...(disabled ? {} : { ...listeners, ...attributes })}>
-					<Box className={styles.portrait}>
-						<HeroImage
-							code={hero.code}
-							alt={hero.displayName}
-							w="100%"
-							h="100%"
-							radius={0}
-							fit="cover"
-							bg="transparent"
-						/>
-					</Box>
-					<Text className={styles.name} lineClamp={1}>
-						{hero.displayName}
-					</Text>
+		<div className={styles.cell}>
+			<fieldset
+				ref={setNodeRef}
+				className={styles.card}
+				style={style}
+				data-disabled={disabled ? 'true' : undefined}
+				data-selected={selected ? 'true' : undefined}
+				data-focused={focused ? 'true' : undefined}
+				data-slots={hero.size}
+				data-hero-name={hero.displayName}
+				aria-label={`${hero.displayName}, ${slotsLabel}${selected ? ', выбран' : ''}${disabled ? ', недоступен' : ''}`}
+				tabIndex={disabled ? -1 : 0}
+				onFocus={() => onFocusHero?.(hero.code)}
+				onBlur={() => onFocusHero?.(null)}
+				onKeyDown={handleCardKeyDown}
+			>
+				<div className={styles.media}>
+					{/* Drag только на портрет+имя — бейдж слотов снаружи. */}
+					<div className={styles.dragSurface} {...(disabled ? {} : { ...listeners, ...attributes })}>
+						<Box className={styles.portrait}>
+							<HeroImage
+								code={hero.code}
+								alt={hero.displayName}
+								w="100%"
+								h="100%"
+								radius={0}
+								fit="cover"
+								bg="transparent"
+							/>
+						</Box>
+						<Text className={styles.name} lineClamp={1}>
+							{hero.displayName}
+						</Text>
+					</div>
+					{/* Popover по тапу — на 390 Tooltip touch ненадёжен (AC-3). */}
+					<Popover
+						opened={slotsTipOpened}
+						onChange={(next) => {
+							if (next) {
+								slotsTipHandlers.open();
+							} else {
+								slotsTipHandlers.close();
+							}
+						}}
+						position="top"
+						withArrow
+						shadow="md"
+						radius={0}
+						withinPortal
+						zIndex={400}
+						middlewares={{ flip: true, shift: true }}
+					>
+						<Popover.Target>
+							<button
+								type="button"
+								className={styles.slots}
+								aria-label={slotsLabel}
+								aria-expanded={slotsTipOpened}
+								onClick={(event) => {
+									event.stopPropagation();
+									slotsTipHandlers.toggle();
+								}}
+							>
+								{sizeToRoman(hero.size)}
+							</button>
+						</Popover.Target>
+						<Popover.Dropdown p="xs" role="tooltip">
+							<Text size="sm">{slotsLabel}</Text>
+						</Popover.Dropdown>
+					</Popover>
 				</div>
-				<Tooltip
-					label={slotsLabel}
-					opened={slotsTipOpened}
-					withArrow
-					withinPortal
-					position="top"
-					openDelay={80}
-					zIndex={400}
-					events={{ hover: true, focus: true, touch: true }}
-				>
+				<div className={styles.actions}>
 					<button
 						type="button"
-						className={styles.slots}
-						aria-label={slotsLabel}
-						onMouseEnter={slotsTipHandlers.open}
-						onMouseLeave={slotsTipHandlers.close}
-						onFocus={slotsTipHandlers.open}
-						onBlur={slotsTipHandlers.close}
+						className={styles.rowBtn}
+						disabled={disabled}
+						onClick={(event) => handlePick(ROW_FRONT, event)}
+					>
+						В передний ряд
+					</button>
+					<button
+						type="button"
+						className={styles.rowBtn}
+						disabled={disabled}
+						onClick={(event) => handlePick(ROW_BACK, event)}
+					>
+						В задний ряд
+					</button>
+					<button
+						type="button"
+						className={styles.infoBtn}
 						onClick={(event) => {
 							event.stopPropagation();
-							slotsTipHandlers.toggle();
+							onOpen(hero.code);
 						}}
 					>
-						{sizeToRoman(hero.size)}
+						Справка
 					</button>
-				</Tooltip>
-			</div>
-			<div className={styles.actions}>
-				<button
-					type="button"
-					className={styles.rowBtn}
-					disabled={disabled}
-					onClick={(event) => handlePick(ROW_FRONT, event)}
-				>
-					В передний ряд
-				</button>
-				<button
-					type="button"
-					className={styles.rowBtn}
-					disabled={disabled}
-					onClick={(event) => handlePick(ROW_BACK, event)}
-				>
-					В задний ряд
-				</button>
-				<button
-					type="button"
-					className={styles.infoBtn}
-					onClick={(event) => {
-						event.stopPropagation();
-						onOpen(hero.code);
-					}}
-				>
-					Справка
-				</button>
-			</div>
-		</fieldset>
+				</div>
+			</fieldset>
+		</div>
 	);
 
 	if (!reason) {

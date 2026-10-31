@@ -11,6 +11,7 @@ import {
 	useSensor,
 	useSensors,
 } from '@dnd-kit/core';
+import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { Anchor, Box, Button, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
@@ -609,12 +610,18 @@ export const MatchRoomPage = () => {
 		}
 	};
 
-	const handleDragCancel = () => {
+	const clearDragHint = () => {
 		setActiveDrag(null);
+		setFocusedHeroCode(null);
+	};
+
+	const handleDragCancel = () => {
+		clearDragHint();
 	};
 
 	const handleDragEnd = (event: DragEndEvent) => {
-		setActiveDrag(null);
+		// AC-3: сброс «0/3 → 1/3» после любого конца drag (в т.ч. miss / невалидный over).
+		clearDragHint();
 		if (!match || !player || isBusy) {
 			return;
 		}
@@ -1047,8 +1054,12 @@ export const MatchRoomPage = () => {
 						</Box>
 					)}
 				</Stack>
-				{/* AC-3.15: поверх sticky _teamsColumn (overflow:auto клипает оригинал). */}
-				<DragOverlay dropAnimation={null} zIndex={1000}>
+				{/* AC-3.15a: snapCenterToCursor — чип по центру курсора, не от высоты карточки. */}
+				<DragOverlay
+					dropAnimation={null}
+					zIndex={1000}
+					modifiers={[snapCenterToCursor]}
+				>
 					{activeDrag ? (
 						<DraftUnitChipView
 							displayName={activeDrag.displayName}
