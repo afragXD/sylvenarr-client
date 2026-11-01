@@ -124,29 +124,25 @@ export const HeroDetailPage = () => {
 									{hero.roleSummary}
 								</Text>
 							) : null}
-							<div className={classes.levelSlider}>
-								<Group justify="space-between" mb={4}>
-									<Text size="sm" fw={600}>
-										Уровень
-									</Text>
-									<Text size="sm" style={{ fontVariantNumeric: 'tabular-nums' }}>
-										{level}
-									</Text>
-								</Group>
-								<Slider
-									min={1}
-									max={100}
-									step={1}
-									value={level}
-									onChange={setLevel}
-									label={(value) => `${value} ур.`}
-									marks={[
-										{ value: 1, label: '1' },
-										{ value: 50, label: '50' },
-										{ value: 100, label: '100' },
-									]}
-									mb="md"
-								/>
+							<div className={classes.levelField}>
+								<span className={classes.levelFieldLabel}>Уровень</span>
+								<div className={classes.levelSliderRow}>
+									<Slider
+										style={{ flex: 1 }}
+										min={1}
+										max={100}
+										step={1}
+										value={level}
+										onChange={setLevel}
+										label={null}
+										marks={[
+											{ value: 1, label: '1' },
+											{ value: 50, label: '50' },
+											{ value: 100, label: '100' },
+										]}
+									/>
+									<span className={classes.levelSliderValue}>{level}</span>
+								</div>
 							</div>
 							<OrnateFrame variant="panel" className={classes.stats}>
 								{highlightStats.map((stat) => (

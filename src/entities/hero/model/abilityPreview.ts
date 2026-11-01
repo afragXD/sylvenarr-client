@@ -91,9 +91,10 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		2: (ctx) => [atk(ctx, 0.75)],
 		3: (ctx) => [
 			{ kind: 'gold', value: 100 + ctx.lvl * 2 },
-			{ kind: 'strength', value: 20 + ctx.lvl * 2 },
+			{ kind: 'strength', value: 15 + ctx.lvl },
+			{ kind: 'duration', value: 1 + Math.floor(ctx.lvl / 5), label: 'р. «Сила»' },
 		],
-		4: () => [{ kind: 'armor', value: 3 }, { kind: 'duration', value: 2, label: 'р.' }],
+		4: () => [{ kind: 'duration', value: 2, label: 'р. «Под охраной»' }],
 	},
 	OrcKing: {
 		passive: (ctx) => [
@@ -159,13 +160,16 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		1: (ctx) => [atk(ctx, 1.1)],
 	},
 	Herbalist: {
-		// STRENGTH от урона цели; без выбранной цели — оценка от своего урона.
+		// STRENGTH: round(damage × min(0.5+0.05L, 0.95)); длительность 1+⌊L/9⌋ (AC-4).
 		1: (ctx) => [
 			{
 				kind: 'strength',
-				value: Math.max(1, round(ctx.damage * (0.5 + 0.05 * ctx.lvl))),
+				value: Math.max(
+					1,
+					round(ctx.damage * Math.min(0.5 + 0.05 * ctx.lvl, 0.95)),
+				),
 			},
-			{ kind: 'duration', value: 1 + Math.floor(ctx.lvl / 6), label: 'р.' },
+			{ kind: 'duration', value: 1 + Math.floor(ctx.lvl / 9), label: 'р.' },
 		],
 		2: (ctx) => [{ kind: 'accuracy', value: 20 + ctx.lvl }],
 		4: (ctx) => [heal(5 + ctx.lvl)],
@@ -187,6 +191,8 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 			},
 			{ kind: 'text', value: '+15% max ОЗ' },
 		],
+		// CUT AC-10: Чудесный доктор (бывший слот Инкуба).
+		5: (ctx) => [{ kind: 'text', value: `+${50 + ctx.lvl * 5} мнимых ОЗ` }],
 	},
 	Demiurge: {
 		1: (ctx) => [atk(ctx, 1)],
@@ -212,13 +218,16 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	},
 	EvilTree: {
 		2: (ctx) => [atk(ctx, 1.2)],
-		3: (ctx) => [
-			{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 4), label: 'р. запрет лечения' },
-		],
+		3: () => [{ kind: 'duration', value: 2, label: 'р. запрет лечения' }],
 		4: (ctx) => [
 			{ kind: 'duration', value: 3 + Math.floor(ctx.lvl / 4), label: 'р. урока' },
 		],
-		5: () => [{ kind: 'text', value: '+3 уровня цели' }],
+		5: (ctx) => [
+			{
+				kind: 'text',
+				value: `+${1 + Math.floor(ctx.lvl / 5)} ур. цели`,
+			},
+		],
 	},
 	Mermaid: {
 		1: mermaidBreeze,
@@ -268,7 +277,16 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 			{ kind: 'text', value: `${ctx.power} урона на ряд` },
 			{ kind: 'chance', value: 70 + ctx.lvl, label: 'головокружение' },
 		],
-		2: (ctx) => [{ kind: 'text', value: `+${50 + ctx.lvl * 5} мнимых ОЗ` }],
+		// CUT AC-10: Огненный хлыст (магия огня), не мнимые ОЗ.
+		2: (ctx) => [
+			atk(ctx, 1),
+			{
+				kind: 'duration',
+				value: 2 + Math.floor(ctx.lvl / 8),
+				label: 'р. «Извержение»',
+			},
+			{ kind: 'text', value: '−5 пп Огню навсегда' },
+		],
 		3: (ctx) => [{ kind: 'strength', value: 20 + ctx.lvl * 2 }],
 		4: (ctx) => [{ kind: 'text', value: `+${15 + ctx.lvl} удачи` }],
 	},

@@ -86,7 +86,11 @@ export type EffectId =
 	| 'BERSERK'
 	| 'IMAGINARY_HEALTH'
 	| 'IMMOLATION'
-	| 'DEATHWARD';
+	| 'DEATHWARD'
+	| 'PAIN_REFLECT'
+	| 'LIFE_FETTERS'
+	| 'LIFE_THREAD'
+	| 'ERUPTION';
 
 export type EffectKind = 'buff' | 'debuff';
 
@@ -137,6 +141,8 @@ const BUFF_ORDER: EffectId[] = [
 	'BERSERK',
 	'IMAGINARY_HEALTH',
 	'DEATHWARD',
+	'PAIN_REFLECT',
+	'LIFE_THREAD',
 ];
 
 const DEBUFF_ORDER: EffectId[] = [
@@ -163,6 +169,8 @@ const DEBUFF_ORDER: EffectId[] = [
 	'ENSLAVED',
 	'ASHILLNESS',
 	'IMMOLATION',
+	'LIFE_FETTERS',
+	'ERUPTION',
 ];
 
 const CATALOG: Record<EffectId, EffectMeta> = {
@@ -187,9 +195,9 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	STRENGTH: {
 		id: 'STRENGTH',
 		label: 'Сила',
-		description: 'Увеличивает наносимый урон.',
-		mechanics: '+(20 + 2L) урона · (1 + ⌊L/5⌋) р.',
-		exampleAtL: exampleAtL('+30 урона · 2 р.'),
+		description: 'Увеличивает наносимый урон (величина и длительность зависят от источника).',
+		mechanics: '+power к урону · N р. (напр. баллада +(15+L) · 1+⌊L/5⌋ р.)',
+		exampleAtL: exampleAtL('баллада L5: +20 урона · 2 р.'),
 		Icon: Sword,
 		kind: 'buff',
 	},
@@ -259,9 +267,9 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	FEAR: {
 		id: 'FEAR',
 		label: 'Ужас',
-		description: 'Штраф к урону от подавляющего страха.',
-		mechanics: '−power к урону · 2 р. (снимается с откатом)',
-		exampleAtL: exampleTypical('−3 урона · 2 р.'),
+		description: 'Каждый ход носитель теряет боевой дух (сила эффекта × резист Разума).',
+		mechanics: '−мораль каждый ход · 2 р.',
+		exampleAtL: exampleTypical('потеря морали каждый ход · 2 р.'),
 		Icon: Ghost,
 		kind: 'debuff',
 	},
@@ -378,8 +386,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'IMPISH',
 		label: 'Бес',
 		description: 'Превращён в толстого беса: его абилки и облик; броня снята и вернётся.',
-		mechanics: 'класс Imp, броня 0 · 2 р., затем откат класса',
-		exampleAtL: exampleTypical('2 р.'),
+		mechanics: 'класс Imp, броня 0 · 1 р., затем откат класса',
+		exampleAtL: exampleTypical('1 р.'),
 		Icon: Bug,
 		kind: 'debuff',
 	},
@@ -532,8 +540,8 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'INTERDICT',
 		label: 'Запрет лечения',
 		description: 'Цель временно не получает лечения.',
-		mechanics: 'лечение → 0 · (2 + ⌊L/4⌋) р.',
-		exampleAtL: exampleAtL('3 р.'),
+		mechanics: 'лечение → 0 · 2 р.',
+		exampleAtL: exampleTypical('2 р.'),
 		Icon: Ban,
 		kind: 'debuff',
 	},
@@ -608,6 +616,44 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		exampleAtL: exampleTypical('+100% · 2 р.'),
 		Icon: Link,
 		kind: 'buff',
+	},
+	PAIN_REFLECT: {
+		id: 'PAIN_REFLECT',
+		label: 'Отражение боли',
+		description: 'При ближнем ударе возвращает атакующему половину фактически нанесённого урона.',
+		mechanics: 'melee → 50% урона обратно (без цепочек отражения) · 2 р.',
+		exampleAtL: exampleTypical('50% отражения · 2 р.'),
+		Icon: Swords,
+		kind: 'buff',
+	},
+	LIFE_FETTERS: {
+		id: 'LIFE_FETTERS',
+		label: 'Оковы взаимного терпения',
+		description:
+			'Связь с Воином-призраком: 100% полученного им урона переносится на носителя источником Жизнь (без резистов и без Отражения боли).',
+		mechanics: 'перенос урона с носителя связи · 3 р.',
+		exampleAtL: exampleTypical('3 р.'),
+		Icon: Link,
+		kind: 'debuff',
+	},
+	LIFE_THREAD: {
+		id: 'LIFE_THREAD',
+		label: 'Жизнь на нитке',
+		description: 'Урон растёт от потерянного здоровья: +1% урона за 1% потерянных ОЗ (кап +75%).',
+		mechanics: '+min(75%, % потерянных ОЗ) к урону атак · (2+⌊L/7⌋) р.',
+		exampleAtL: exampleAtL('при L5 · 2 р.; на 50% ОЗ → +50% урона'),
+		Icon: HeartPulse,
+		kind: 'buff',
+	},
+	ERUPTION: {
+		id: 'ERUPTION',
+		label: 'Извержение',
+		description:
+			'При смерти носителя союзники получают огненный урон: ¼ max ОЗ своему ряду и половину того — другому; пока висит — сопротивление Огню уже снижено.',
+		mechanics: 'при смерти: FIRE ¼ maxОЗ ряду / ½ тому другому ряду · (2+⌊L/8⌋) р.',
+		exampleAtL: exampleAtL('L5 → 2 р.; смерть при 200 max → 50/25 Огнём'),
+		Icon: Flame,
+		kind: 'debuff',
 	},
 	IMMOLATION: {
 		id: 'IMMOLATION',

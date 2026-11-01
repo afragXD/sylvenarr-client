@@ -100,4 +100,47 @@ describe('attackPreview AC-13', () => {
 		expect(boosted).toBeTruthy();
 		expect(boosted!.minDamage).toBeGreaterThan(plain.minDamage);
 	});
+
+	test('AC-13: previewSource DEATH учитывает резист 85% (Archlich → GhostWarrior)', () => {
+		const archlich = unit({ id: 'lich', power: 100, accuracy: 100 });
+		const ghost = unit({
+			id: 'ghost',
+			armor: 0,
+			dodge: 0,
+			resists: [{ source: 'DEATH', value: 85, immune: false, wardCharges: null }],
+		});
+		const base = {
+			slot: 1 as const,
+			label: 'Облако смерти',
+			needsTarget: true,
+			disabledReason: null,
+			legalTargetIds: ['ghost'],
+			attackKind: 'magic' as const,
+			previewDamageMult: 1.1,
+			previewArmorIgnore: 0.15,
+		};
+
+		const death = previewAbilityOnTarget(archlich, ghost, {
+			...base,
+			previewSource: 'DEATH',
+		});
+		const fire = previewAbilityOnTarget(archlich, ghost, {
+			...base,
+			previewSource: 'FIRE',
+		});
+		const missing = previewAbilityOnTarget(archlich, ghost, base);
+
+		expect(death).toBeTruthy();
+		expect(fire).toBeTruthy();
+		expect(missing).toBeTruthy();
+		expect(death!.source).toBe('DEATH');
+		expect(death!.resistValue).toBe(85);
+		expect(fire!.source).toBe('FIRE');
+		expect(missing!.source).toBe('FIRE');
+		expect(death!.maxDamage).toBeLessThan(fire!.maxDamage);
+		expect(death!.minDamage).toBeLessThan(fire!.minDamage);
+		expect(death!.maxDamage).toBeLessThan(missing!.maxDamage);
+		// 85% резист → остаётся ~15% от урона без резиста.
+		expect(death!.maxDamage).toBeLessThanOrEqual(Math.round(fire!.maxDamage * 0.15) + 1);
+	});
 });

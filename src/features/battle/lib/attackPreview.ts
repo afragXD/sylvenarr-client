@@ -27,6 +27,7 @@ export type DamagePreviewOpts = {
 	readonly accuracyPenalty?: number;
 };
 
+/** Fallback, если abilityMeta не передала previewSource (магия без source → FIRE). */
 const SOURCE_BY_KIND: Record<AttackKind, string> = {
 	melee: 'WEAPON',
 	ranged: 'ARROWS',

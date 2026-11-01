@@ -83,6 +83,44 @@ describe('abilityPreview', () => {
 		expect(parts).toEqual([{ kind: 'damage', value: 21 }]);
 	});
 
+	test('Knight slot 3: STRENGTH +(15+L), не +(20+2L)', () => {
+		const parts = getAbilityPreview('Knight', 3, base({ lvl: 10 }));
+		expect(parts).toEqual([
+			{ kind: 'gold', value: 120 },
+			{ kind: 'strength', value: 25 },
+			{ kind: 'duration', value: 3, label: 'р. «Сила»' },
+		]);
+	});
+
+	test('Knight slot 4: только длительность охраны', () => {
+		expect(getAbilityPreview('Knight', 4, base())).toEqual([
+			{ kind: 'duration', value: 2, label: 'р. «Под охраной»' },
+		]);
+	});
+
+	test('Herbalist slot 1: кап 0.95 и длительность 1+⌊L/9⌋', () => {
+		const parts = getAbilityPreview('Herbalist', 1, base({ lvl: 10, damage: 40 }));
+		expect(parts).toEqual([
+			{ kind: 'strength', value: 38 },
+			{ kind: 'duration', value: 2, label: 'р.' },
+		]);
+	});
+
+	test('EvilTree: Запретное слово 2 р.; Взращивание 1+⌊L/5⌋', () => {
+		expect(getAbilityPreview('EvilTree', 3, base({ lvl: 20 }))).toEqual([
+			{ kind: 'duration', value: 2, label: 'р. запрет лечения' },
+		]);
+		expect(getAbilityPreview('EvilTree', 5, base({ lvl: 4 }))).toEqual([
+			{ kind: 'text', value: '+1 ур. цели' },
+		]);
+		expect(getAbilityPreview('EvilTree', 5, base({ lvl: 5 }))).toEqual([
+			{ kind: 'text', value: '+2 ур. цели' },
+		]);
+		expect(getAbilityPreview('EvilTree', 5, base({ lvl: 10 }))).toEqual([
+			{ kind: 'text', value: '+3 ур. цели' },
+		]);
+	});
+
 	test('registry label на 1 ур.', () => {
 		const ctx = previewCtxFromHero({
 			damage: 16,
@@ -130,5 +168,21 @@ describe('abilityPreview', () => {
 	test('unknown slot returns null', () => {
 		expect(getAbilityPreview('Assassin', 5, base())).toBeNull();
 		expect(formatAbilityPreview(null)).toBeNull();
+	});
+
+	test('Incub slot 2: огненный хлыст, без мнимых ОЗ', () => {
+		const parts = getAbilityPreview('Incub', 2, base({ lvl: 1, damage: 0, power: 30 }));
+		expect(parts).toEqual([
+			{ kind: 'damage', value: 30 },
+			{ kind: 'duration', value: 2, label: 'р. «Извержение»' },
+			{ kind: 'text', value: '−5 пп Огню навсегда' },
+		]);
+		expect(formatAbilityPreview(parts)).not.toContain('мнимых');
+	});
+
+	test('Oracle slot 5: мнимые ОЗ Чудесного доктора', () => {
+		expect(getAbilityPreview('Oracle', 5, base({ lvl: 1 }))).toEqual([
+			{ kind: 'text', value: '+55 мнимых ОЗ' },
+		]);
 	});
 });
