@@ -1,3 +1,4 @@
+import type { PreviewPart } from '@/entities/hero';
 import type { AbilityInfo, AttackKind, BattleUnit } from '@/entities/match';
 
 /**
@@ -131,6 +132,27 @@ export function previewHeal(min: number, max: number): AttackPreview {
 		source: null,
 		lowDamage: false,
 	};
+}
+
+/**
+ * Фоллбек превью лечения из частей getAbilityPreview.
+ * null parts / без heal|healRange → null (не падать на .find).
+ */
+export function previewHealFromAbilityParts(
+	parts: PreviewPart[] | null,
+): AttackPreview | null {
+	if (!parts) {
+		return null;
+	}
+	const healExact = parts.find((part) => part.kind === 'heal');
+	if (healExact && healExact.kind === 'heal') {
+		return previewHeal(healExact.value, healExact.value);
+	}
+	const healRange = parts.find((part) => part.kind === 'healRange');
+	if (healRange && healRange.kind === 'healRange') {
+		return previewHeal(healRange.min, healRange.max);
+	}
+	return null;
 }
 
 /** Оценка по AbilityInfo: урон (attackKind) или явное лечение. */

@@ -15,6 +15,7 @@ import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 import {
 	type AttackPreview,
 	previewAbilityOnTarget,
+	previewHealFromAbilityParts,
 	previewWeaponAttack,
 } from '../lib/attackPreview';
 import { playBattleSfxEvents, preloadUnitSfx, unlockBattleSfx } from '../lib/battleSfx';
@@ -439,38 +440,12 @@ export const BattlePanel = ({
 				return fromServer;
 			}
 			// Фоллбек: формулы страницы героя (лечение и т.п. без attackKind).
-			const parts = getAbilityPreview(active.heroClassCode, ability.slot, {
-				...previewCtxFromUnit(active),
-				targetHpRatio: unit.maxHp > 0 ? unit.health / unit.maxHp : 1,
-			});
-			const healExact = parts.find((part) => part.kind === 'heal');
-			if (healExact && healExact.kind === 'heal') {
-				return {
-					mode: 'heal',
-					hitChance: null,
-					minDamage: healExact.value,
-					maxDamage: healExact.value,
-					critChance: null,
-					blockedLabel: null,
-					resistValue: 0,
-					source: null,
-					lowDamage: false,
-				};
-			}
-			const healRange = parts.find((part) => part.kind === 'healRange');
-			if (healRange && healRange.kind === 'healRange') {
-				return {
-					mode: 'heal',
-					hitChance: null,
-					minDamage: healRange.min,
-					maxDamage: healRange.max,
-					critChance: null,
-					blockedLabel: null,
-					resistValue: 0,
-					source: null,
-					lowDamage: false,
-				};
-			}
+			return previewHealFromAbilityParts(
+				getAbilityPreview(active.heroClassCode, ability.slot, {
+					...previewCtxFromUnit(active),
+					targetHpRatio: unit.maxHp > 0 ? unit.health / unit.maxHp : 1,
+				}),
+			);
 		}
 		return null;
 	};

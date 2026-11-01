@@ -2,7 +2,12 @@ import { describe, expect, test } from 'bun:test';
 
 import type { BattleUnit } from '@/entities/match';
 
-import { previewAbilityOnTarget, previewHeal, previewWeaponAttack } from './attackPreview';
+import {
+	previewAbilityOnTarget,
+	previewHeal,
+	previewHealFromAbilityParts,
+	previewWeaponAttack,
+} from './attackPreview';
 
 const unit = (over: Partial<BattleUnit> = {}): BattleUnit =>
 	({
@@ -66,6 +71,17 @@ describe('attackPreview AC-13', () => {
 		const preview = previewHeal(10, 10);
 		expect(preview.lowDamage).toBe(false);
 		expect(preview.minDamage).toBe(10);
+	});
+
+	test('previewHealFromAbilityParts: null parts не падает', () => {
+		expect(previewHealFromAbilityParts(null)).toBeNull();
+		expect(previewHealFromAbilityParts([{ kind: 'damage', value: 10 }])).toBeNull();
+		expect(previewHealFromAbilityParts([{ kind: 'heal', value: 25 }])).toEqual(
+			previewHeal(25, 25),
+		);
+		expect(
+			previewHealFromAbilityParts([{ kind: 'healRange', min: 10, max: 40 }]),
+		).toEqual(previewHeal(10, 40));
 	});
 
 	test('ability damage mult', () => {

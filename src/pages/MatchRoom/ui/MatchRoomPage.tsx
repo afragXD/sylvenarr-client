@@ -92,7 +92,9 @@ const mergeBattleFrame = (
 	const justFinished = nextStatus === 'finished' && prev.status !== 'finished';
 	const meta = payload.resultMeta;
 	const ownRating =
-		meta && viewerId ? (meta.ratings.find((row) => row.playerId === viewerId) ?? null) : undefined;
+		meta && viewerId
+			? (meta.ratings?.find((row) => row.playerId === viewerId) ?? null)
+			: undefined;
 	const fromMeta =
 		justFinished && meta
 			? {
