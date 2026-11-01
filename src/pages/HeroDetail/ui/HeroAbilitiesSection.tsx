@@ -15,8 +15,10 @@ import styles from './HeroAbilitiesSection.module.css';
 type HeroAbilitiesSectionProps = {
 	code: string;
 	isPlayable: boolean;
-	/** Статы каталога для числового превью (ур. 1). */
-	hero: Pick<HeroClass, 'damage' | 'power' | 'health' | 'luck' | 'gold'>;
+	/** Статы (уже на выбранном уровне) для числового превью. */
+	hero: Pick<HeroClass, 'damage' | 'power' | 'health' | 'luck' | 'gold'> & {
+		lvl?: number;
+	};
 };
 
 /**
@@ -24,8 +26,9 @@ type HeroAbilitiesSectionProps = {
  */
 export const HeroAbilitiesSection = ({ code, isPlayable, hero }: HeroAbilitiesSectionProps) => {
 	const doc = getHeroAbilities(code, isPlayable);
-	const ctx = previewCtxFromHero({ ...hero, lvl: 1 });
-	const atLevelLabel = 'на 1 ур.';
+	const lvl = hero.lvl ?? 1;
+	const ctx = previewCtxFromHero({ ...hero, lvl });
+	const atLevelLabel = `на ${lvl} ур.`;
 	const passivePreview = formatAbilityPreview(getAbilityPreview(code, 'passive', ctx), {
 		atLevelLabel,
 	});

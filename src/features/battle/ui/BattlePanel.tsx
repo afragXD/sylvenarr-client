@@ -12,7 +12,11 @@ import {
 import type { AbilityInfo, BattleState, BattleUnit, Match } from '@/entities/match';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
-import { type AttackPreview, previewWeaponAttack } from '../lib/attackPreview';
+import {
+	type AttackPreview,
+	previewAbilityOnTarget,
+	previewWeaponAttack,
+} from '../lib/attackPreview';
 import { playBattleSfxEvents, preloadUnitSfx, unlockBattleSfx } from '../lib/battleSfx';
 import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
 import { AbilityTags } from './AbilityTags';
@@ -21,9 +25,13 @@ import { BattleSoundControl } from './BattleSoundControl';
 import { CombatStat, CombatStatRow } from './CombatStat';
 import { type MatchResultKind, MatchResultOverlay } from './MatchResultOverlay';
 import { PortraitHpCurtain } from './PortraitHpCurtain';
+import { PresetNamesBanner } from './PresetNamesBanner';
 import { TurnOrderStrip } from './TurnOrderStrip';
 import { UnitEffects } from './UnitEffects';
 import { UnitInspectModal } from './UnitInspectModal';
+
+/** CUT AC-13 п.16: портреты на поле +25% (было 28). */
+const FIELD_PORTRAIT = 35;
 
 type BattleActionKind = 'attack' | 'defend' | 'wait' | 'skill' | 'ability' | 'move';
 
@@ -413,12 +421,58 @@ export const BattlePanel = ({
 		setPromptHoverUnitId(null);
 	};
 
-	/** Оценка базовой атаки по цели при выборе «Атака» (для hover-попапа). */
+	/** CUT AC-13 п.25: прогноз урона/лечения/попадания при наведении на цель. */
 	const attackPreviewFor = (unit: BattleUnit): AttackPreview | null => {
-		if (!active || pendingMode?.kind !== 'attack' || !highlightTargets.includes(unit.id)) {
+		if (!active || !pendingMode || !highlightTargets.includes(unit.id)) {
 			return null;
 		}
-		return previewWeaponAttack(active, unit, battle.attackKind ?? 'melee');
+		if (pendingMode.kind === 'attack') {
+			return previewWeaponAttack(active, unit, battle.attackKind ?? 'melee');
+		}
+		if (pendingMode.kind === 'ability') {
+			const ability = abilities.find((item) => item.slot === pendingMode.slot);
+			if (!ability) {
+				return null;
+			}
+			const fromServer = previewAbilityOnTarget(active, unit, ability);
+			if (fromServer) {
+				return fromServer;
+			}
+			// Фоллбек: формулы страницы героя (лечение и т.п. без attackKind).
+			const parts = getAbilityPreview(active.heroClassCode, ability.slot, {
+				...previewCtxFromUnit(active),
+				targetHpRatio: unit.maxHp > 0 ? unit.health / unit.maxHp : 1,
+			});
+			const healExact = parts.find((part) => part.kind === 'heal');
+			if (healExact && healExact.kind === 'heal') {
+				return {
+					mode: 'heal',
+					hitChance: null,
+					minDamage: healExact.value,
+					maxDamage: healExact.value,
+					critChance: null,
+					blockedLabel: null,
+					resistValue: 0,
+					source: null,
+					lowDamage: false,
+				};
+			}
+			const healRange = parts.find((part) => part.kind === 'healRange');
+			if (healRange && healRange.kind === 'healRange') {
+				return {
+					mode: 'heal',
+					hitChance: null,
+					minDamage: healRange.min,
+					maxDamage: healRange.max,
+					critChance: null,
+					blockedLabel: null,
+					resistValue: 0,
+					source: null,
+					lowDamage: false,
+				};
+			}
+		}
+		return null;
 	};
 
 	return (
@@ -514,6 +568,15 @@ export const BattlePanel = ({
 						onMatches={onMatches}
 					/>
 				)}
+				<div className={styles.presetBannerSlot}>
+					<PresetNamesBanner
+						active={battle.outcome === 'ongoing'}
+						hostName={match.host.displayName}
+						guestName={match.guest?.displayName ?? '…'}
+						hostPresetName={match.draft.hostPresetName}
+						guestPresetName={match.draft.guestPresetName}
+					/>
+				</div>
 				<div className={styles.field}>
 					<TeamSide
 						title={
@@ -521,7 +584,7 @@ export const BattlePanel = ({
 								name={match.host.displayName}
 								avatarUrl={match.host.avatarUrl}
 								prefix="Игрок 1"
-								size={28}
+								size={FIELD_PORTRAIT}
 							/>
 						}
 						units={hostUnits}
@@ -538,7 +601,7 @@ export const BattlePanel = ({
 								name={match.guest?.displayName ?? '…'}
 								avatarUrl={match.guest?.avatarUrl}
 								prefix="Игрок 2"
-								size={28}
+								size={FIELD_PORTRAIT}
 							/>
 						}
 						units={guestUnits}
@@ -879,8 +942,8 @@ const RowColumn = ({
 											<HeroImage
 												code={unit.heroClassCode}
 												alt={unit.displayName}
-												w={28}
-												h={28}
+												w={FIELD_PORTRAIT}
+												h={FIELD_PORTRAIT}
 												radius={0}
 											/>
 										</PortraitHpCurtain>
@@ -921,6 +984,11 @@ const RowColumn = ({
 						if (!preview) {
 							return button;
 						}
+						const amountColor = preview.lowDamage ? 'red' : undefined;
+						const amountLabel =
+							preview.minDamage === preview.maxDamage
+								? `≈${preview.minDamage}`
+								: `≈${preview.minDamage}–${preview.maxDamage}`;
 						return (
 							<Tooltip
 								key={unit.id}
@@ -930,19 +998,23 @@ const RowColumn = ({
 								label={
 									<Stack gap={2}>
 										<Text size="xs" fw={600}>
-											Оценка атаки
+											{preview.mode === 'heal' ? 'Прогноз лечения' : 'Прогноз урона'}
 										</Text>
 										{preview.blockedLabel ? (
 											<Text size="xs">Удар заблокирован: {preview.blockedLabel}</Text>
 										) : (
-											<Text size="xs">
-												≈{preview.minDamage}–{preview.maxDamage} урона
+											<Text size="xs" c={amountColor} fw={preview.lowDamage ? 700 : undefined}>
+												{amountLabel} {preview.mode === 'heal' ? 'лечения' : 'урона'}
 											</Text>
 										)}
-										<Text size="xs" c="dimmed">
-											Попадание {preview.hitChance}% · крит{' '}
-											{preview.critChance === null ? 'гарантирован' : `${preview.critChance}%`}
-										</Text>
+										{preview.hitChance !== null ? (
+											<Text size="xs" c="dimmed">
+												Попадание {preview.hitChance}%
+												{preview.mode === 'damage'
+													? ` · крит ${preview.critChance === null ? 'гарантирован' : `${preview.critChance}%`}`
+													: ''}
+											</Text>
+										) : null}
 										{preview.resistValue !== 0 ? (
 											<Text size="xs" c="dimmed">
 												Резист цели: {preview.resistValue > 0 ? '−' : '+'}

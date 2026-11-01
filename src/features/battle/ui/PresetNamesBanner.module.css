@@ -1,0 +1,48 @@
+.banner {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	margin: 0 0 0.5rem;
+	pointer-events: none;
+}
+
+.banner[data-phase='fade'] {
+	animation: presetFade 1s ease forwards;
+}
+
+.line {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.55rem 0.85rem;
+}
+
+.nick {
+	font-size: 0.95rem;
+	color: var(--app-text-muted);
+}
+
+.preset {
+	font-family: var(--mantine-font-family-headings);
+	font-size: clamp(1.75rem, 2.4vw, 2rem); /* ≥28px */
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	line-height: 1.15;
+	color: var(--app-text);
+}
+
+@keyframes presetFade {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.banner[data-phase='fade'] {
+		animation: none;
+		opacity: 0;
+	}
+}

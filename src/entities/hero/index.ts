@@ -1,6 +1,8 @@
 export { fetchFavoriteHeroes, fetchHeroByCode, fetchHeroes } from './api/heroesApi';
 export type { FavoriteHeroStat } from './api/heroesApi';
 export { displayAttack } from './lib/displayAttack';
+export { expectedRandInt, pyRound } from './lib/expectedValue';
+export { heroStatsAtLevel, type HeroStatsSnapshot } from './lib/heroStatsAtLevel';
 export {
 	getHeroCharacterUrl,
 	getHeroDefaultPortraitUrl,

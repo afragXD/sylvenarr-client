@@ -680,7 +680,7 @@ const PILOTS: Record<string, RawHeroAbilityDoc> = {
 			{
 				slot: 1,
 				title: 'Шёпот леса',
-				body: 'Сосредоточение и удача союзнику.',
+				body: 'Повышение точности и удача союзнику.',
 			},
 			{
 				slot: 2,

@@ -349,9 +349,10 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	DEATHSENTENCE: {
 		id: 'DEATHSENTENCE',
 		label: 'Смертный приговор',
-		description: 'Ослабляет защиту (прокси резистов Разум/Смерть).',
-		mechanics: '−power к броне · 2 р.',
-		exampleAtL: exampleTypical('−8 брони · 2 р.'),
+		description:
+			'Сразу снижает броню цели на величину силы эффекта; пока висит — броня остаётся пониженной. По окончании (или при снятии) броня возвращается на ту же величину.',
+		mechanics: '−power брони наложить; +power брони при спадении · 2 р.',
+		exampleAtL: exampleTypical('−8 брони · 2 р., затем возврат'),
 		Icon: Skull,
 		kind: 'debuff',
 	},
@@ -429,10 +430,10 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	},
 	FOCUSED: {
 		id: 'FOCUSED',
-		label: 'Сосредоточение',
-		description: 'Повышает точность.',
-		mechanics: '+power точности · 2 р.',
-		exampleAtL: exampleTypical('+15 точности · 2 р.'),
+		label: 'Изменение точности',
+		description: 'Меняет точность носителя на величину силы (знак силы задаёт направление).',
+		mechanics: '±power точности · обычно 1–2 р.',
+		exampleAtL: exampleTypical('+15 или −17 точности · 2 р.'),
 		Icon: Focus,
 		kind: 'buff',
 	},
@@ -475,9 +476,10 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	GALL: {
 		id: 'GALL',
 		label: 'Желчь',
-		description: 'Урон водой каждый ход и разъедание брони.',
-		mechanics: '20 × сила за ход + −броня · (2 + ⌊L/5⌋) р.',
-		exampleAtL: exampleAtL('≈25 урона за ход · 3 р.'),
+		description:
+			'Каждый ход наносит урон водой и навсегда разъедает броню; после конца эффекта броня не возвращается.',
+		mechanics: '(10 + L) Вода/тик + −(2 + ⌊L/5⌋) брони/тик · (2 + ⌊L/8⌋) р.',
+		exampleAtL: exampleAtL('20 Вода и −4 брони за тик · 3 р.'),
 		Icon: Biohazard,
 		kind: 'debuff',
 	},
@@ -628,12 +630,36 @@ const FALLBACK: EffectMeta = {
 	kind: 'buff',
 };
 
-export function getEffectMeta(id: string): EffectMeta {
+/**
+ * Мета эффекта. Для FOCUSED учитывает знак силы (CUT AC-12):
+ * + → «Повышение точности» (buff), − → «Снижение точности» (debuff, красная иконка).
+ */
+export function getEffectMeta(id: string, power?: number): EffectMeta {
 	const known = CATALOG[id as EffectId];
-	if (known) {
-		return known;
+	if (!known) {
+		return { ...FALLBACK, label: id || FALLBACK.label };
 	}
-	return { ...FALLBACK, label: id || FALLBACK.label };
+	if (id === 'FOCUSED' && typeof power === 'number') {
+		if (power > 0) {
+			return {
+				...known,
+				label: 'Повышение точности',
+				description: 'Повышает точность носителя.',
+				mechanics: `+${Math.round(power)} точности`,
+				kind: 'buff',
+			};
+		}
+		if (power < 0) {
+			return {
+				...known,
+				label: 'Снижение точности',
+				description: 'Снижает точность носителя.',
+				mechanics: `${Math.round(power)} точности`,
+				kind: 'debuff',
+			};
+		}
+	}
+	return known;
 }
 
 export function listEffectCatalog(): EffectMeta[] {

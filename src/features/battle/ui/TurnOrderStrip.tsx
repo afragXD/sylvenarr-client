@@ -97,7 +97,8 @@ export const TurnOrderStrip = ({
 						const phase = resolvePhase(entry);
 						const isActive = phase === 'active' || entry.isActive;
 						const interactive = entry.alive && Boolean(onSelectUnit);
-						const size = isActive ? 44 : 36;
+						/** CUT AC-13 п.16: +25% к прежним 44/36. */
+						const size = isActive ? 55 : 45;
 						const hp = hpByUnitId?.get(entry.unitId);
 						const image = (
 							<HeroImage

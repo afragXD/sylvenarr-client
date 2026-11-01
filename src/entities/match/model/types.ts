@@ -41,6 +41,9 @@ export type MatchDraftState = {
 	initialTeamSize: number;
 	hostEntry?: MatchDraftEntry;
 	guestEntry?: MatchDraftEntry;
+	/** Имя пресета хозяина (если отряд из пресета); для баннера в начале боя. */
+	hostPresetName?: string | null;
+	guestPresetName?: string | null;
 };
 
 export type BattleEffectBrief = {
@@ -116,6 +119,13 @@ export type AbilityInfo = {
 	legalTargetIds: string[];
 	/** Тип атаки способности; null/нет — способность без прямого урона. */
 	attackKind?: AttackKind | null;
+	/** CUT AC-13: параметры превью урона/лечения при наведении на цель. */
+	previewDamageMult?: number;
+	previewArmorIgnore?: number;
+	previewSource?: string;
+	previewAccuracyPenalty?: number;
+	previewHealMin?: number;
+	previewHealMax?: number;
 };
 
 export type PendingPrompt = {

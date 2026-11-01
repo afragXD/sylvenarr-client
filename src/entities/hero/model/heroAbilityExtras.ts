@@ -280,7 +280,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			},
 			2: {
 				mechanics:
-					'1 МР: ряду «Сила» (+25%) + «Сосредоточение» · 1 р.',
+					'1 МР: ряду «Сила» (+25%) + «Повышение точности» · 1 р.',
 				tags: ['buff', 'aoe'],
 			},
 			3: {
@@ -373,7 +373,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 			},
 			5: {
 				mechanics:
-					'≥½ ОЗ: умирает; всем союзникам «Сосредоточение» 15+L · 2 р. и +1 крит-банк.',
+					'≥½ ОЗ: умирает; всем союзникам «Повышение точности» 15+L · 2 р. и +1 крит-банк.',
 				tags: ['buff'],
 			},
 		},
@@ -496,7 +496,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		slots: {
 			1: {
 				mechanics:
-					'«Сосредоточение» + «Удача» союзнику (длительность от L).',
+					'«Повышение точности» + «Удача» союзнику (длительность от L).',
 				tags: ['buff'],
 			},
 			2: {

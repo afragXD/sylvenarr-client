@@ -14,6 +14,11 @@
 	align-items: stretch;
 }
 
+.battlefield > :global([class*='PresetNamesBanner']),
+.presetBannerSlot {
+	grid-column: 1 / -1;
+}
+
 .field {
 	display: grid;
 	grid-template-columns: 1fr 1fr;

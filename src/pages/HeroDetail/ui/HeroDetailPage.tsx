@@ -1,7 +1,7 @@
-import { Anchor, Group, Loader, Stack, Text } from '@mantine/core';
+import { Anchor, Group, Loader, Slider, Stack, Text } from '@mantine/core';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
 	$hero,
@@ -14,6 +14,7 @@ import {
 	HeroRoleTags,
 	heroesPageMounted,
 	heroPageOpened,
+	heroStatsAtLevel,
 	isTransformForm,
 } from '@/entities/hero';
 import { ArtFade } from '@/shared/ui/ArtFade';
@@ -26,28 +27,15 @@ import classes from './HeroDetailPage.module.css';
 import { HeroResistsSection } from './HeroResistsSection';
 import { HeroSummonsSection } from './HeroSummonsSection';
 
-const highlightStats: ReadonlyArray<{ key: keyof StatSource; label: string }> = [
+const highlightStats: ReadonlyArray<{
+	key: 'size' | 'damage' | 'initiative' | 'health';
+	label: string;
+}> = [
 	{ key: 'size', label: 'Ряд / слоты' },
 	{ key: 'damage', label: 'Атака' },
 	{ key: 'initiative', label: 'Инициатива' },
 	{ key: 'health', label: 'Здоровье' },
 ];
-
-type StatSource = {
-	size: number;
-	health: number;
-	damage: number;
-	armor: number;
-	initiative: number;
-	dodge: number;
-	luck: number;
-	morale: number;
-	mana: number;
-	maxMana: number;
-	power: number;
-	accuracy: number;
-	gold: number;
-};
 
 export const HeroDetailPage = () => {
 	const { code } = useParams({ from: '/heroes/$code' });
@@ -58,6 +46,8 @@ export const HeroDetailPage = () => {
 		isPending: $heroPending,
 		heroes: $heroes,
 	});
+	/** CUT AC-14: слайдер уровня 1–100. */
+	const [level, setLevel] = useState(1);
 
 	useEffect(() => {
 		heroesPageMounted();
@@ -65,6 +55,7 @@ export const HeroDetailPage = () => {
 
 	useEffect(() => {
 		heroPageOpened(code);
+		setLevel(1);
 	}, [code]);
 
 	const railItems = useMemo(
@@ -77,6 +68,11 @@ export const HeroDetailPage = () => {
 					src: getHeroPortraitUrl(item.code),
 				})),
 		[heroes],
+	);
+
+	const stats = useMemo(
+		() => (hero ? heroStatsAtLevel(hero, level) : null),
+		[hero, level],
 	);
 
 	const statusLabel = hero
@@ -115,7 +111,7 @@ export const HeroDetailPage = () => {
 					{error}. Вернитесь в реестр и выберите другого героя.
 				</Text>
 			)}
-			{hero && !isPending && (
+			{hero && stats && !isPending && (
 				<>
 					<div className={classes.layout}>
 						<div className={classes.copy}>
@@ -128,18 +124,42 @@ export const HeroDetailPage = () => {
 									{hero.roleSummary}
 								</Text>
 							) : null}
+							<div className={classes.levelSlider}>
+								<Group justify="space-between" mb={4}>
+									<Text size="sm" fw={600}>
+										Уровень
+									</Text>
+									<Text size="sm" style={{ fontVariantNumeric: 'tabular-nums' }}>
+										{level}
+									</Text>
+								</Group>
+								<Slider
+									min={1}
+									max={100}
+									step={1}
+									value={level}
+									onChange={setLevel}
+									label={(value) => `${value} ур.`}
+									marks={[
+										{ value: 1, label: '1' },
+										{ value: 50, label: '50' },
+										{ value: 100, label: '100' },
+									]}
+									mb="md"
+								/>
+							</div>
 							<OrnateFrame variant="panel" className={classes.stats}>
 								{highlightStats.map((stat) => (
 									<div key={stat.key}>
 										<span className={classes.statLabel}>{stat.label}</span>
 										<span className={classes.statValue}>
 											{stat.key === 'size'
-												? hero.size > 1
+												? stats.size > 1
 													? 'II'
 													: 'I'
 												: stat.key === 'damage'
-													? displayAttack(hero.damage, hero.power)
-													: hero[stat.key]}
+													? displayAttack(stats.damage, stats.power)
+													: stats[stat.key]}
 										</span>
 									</div>
 								))}
@@ -193,7 +213,7 @@ export const HeroDetailPage = () => {
 												className="sylvenarr-stat-cell__value"
 												style={{ fontVariantNumeric: 'tabular-nums' }}
 											>
-												{key === 'size' ? (hero.size > 1 ? 'II' : 'I') : hero[key]}
+												{key === 'size' ? (stats.size > 1 ? 'II' : 'I') : stats[key]}
 											</Text>
 										</div>
 									))}
@@ -201,7 +221,18 @@ export const HeroDetailPage = () => {
 							</Stack>
 						</OrnateFrame>
 						<HeroResistsSection code={hero.code} />
-						<HeroAbilitiesSection code={hero.code} isPlayable={hero.isPlayable} hero={hero} />
+						<HeroAbilitiesSection
+							code={hero.code}
+							isPlayable={hero.isPlayable}
+							hero={{
+								damage: stats.damage,
+								power: stats.power,
+								health: stats.health,
+								luck: stats.luck,
+								gold: stats.gold,
+								lvl: level,
+							}}
+						/>
 						<HeroSummonsSection summonerCode={hero.code} />
 					</div>
 				</>

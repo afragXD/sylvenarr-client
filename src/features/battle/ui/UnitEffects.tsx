@@ -45,7 +45,7 @@ export const UnitEffects = ({ effects, resists, variant = 'compact' }: UnitEffec
 					</div>
 				))}
 				{effects.map((effect) => {
-					const meta = getEffectMeta(effect.id);
+					const meta = getEffectMeta(effect.id, effect.power);
 					const roundsLabel = formatEffectRounds(effect.rounds);
 					const Icon = meta.Icon;
 					return (
@@ -123,7 +123,7 @@ const WardBadge = ({ ward }: { ward: ResistBrief }) => {
 };
 
 const EffectBadge = ({ effect }: { effect: BattleEffectBrief }) => {
-	const meta = getEffectMeta(effect.id);
+	const meta = getEffectMeta(effect.id, effect.power);
 	const roundsLabel = formatEffectRounds(effect.rounds);
 	const Icon = meta.Icon;
 
@@ -167,7 +167,7 @@ const OverflowBadge = ({ effects }: { effects: BattleEffectBrief[] }) => (
 		label={
 			<Stack gap={4}>
 				{effects.map((effect) => {
-					const meta = getEffectMeta(effect.id);
+					const meta = getEffectMeta(effect.id, effect.power);
 					return (
 						<Text key={effect.id} size="xs">
 							{meta.label}
