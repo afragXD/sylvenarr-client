@@ -1,6 +1,6 @@
-import { Button, Group, Modal, Stack, Table, Tabs, Text } from '@mantine/core';
-import { useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { Anchor, Button, Group, Modal, Skeleton, Stack, Table, Tabs, Text } from '@mantine/core';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { useCallback, useEffect, useState } from 'react';
 
 import { fetchHeroes, type HeroClass, HeroImage } from '@/entities/hero';
 import { fetchCurrentPlayer, type Player } from '@/entities/player';
@@ -12,6 +12,7 @@ import {
 	updatePreset,
 } from '@/entities/presets';
 import { ApiError } from '@/shared/api/http';
+import { useAc6DeferredLoad } from '@/shared/lib/useAc6DeferredLoad';
 import { OrnateButton } from '@/shared/ui/OrnateButton';
 
 import { PresetEditorForm } from './PresetEditorForm';
@@ -21,56 +22,59 @@ const firstSlot = (preset: SquadPreset) =>
 
 type ProfilePresetsTab = 'personal' | 'global';
 
+type BootPayload = {
+	player: Player;
+	heroes: HeroClass[];
+	presets: SquadPreset[];
+};
+
 /**
- * Библиотека пресетов: личные (CRUD) + глобальные (просмотр; admin — CRUD).
+ * Библиотека пресетов (AC-6: skeleton, 4–6 с retry, empty personal).
  */
 export const PresetsLibraryPage = () => {
 	const navigate = useNavigate();
-	const [player, setPlayer] = useState<Player | null>(null);
-	const [heroes, setHeroes] = useState<HeroClass[]>([]);
 	const [presets, setPresets] = useState<SquadPreset[]>([]);
+	const [heroes, setHeroes] = useState<HeroClass[]>([]);
+	const [player, setPlayer] = useState<Player | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [busy, setBusy] = useState(false);
 	const [editorOpen, setEditorOpen] = useState(false);
 	const [editing, setEditing] = useState<SquadPreset | null>(null);
 	const [profileTab, setProfileTab] = useState<ProfilePresetsTab>('personal');
 
+	const loadBoot = useCallback(async (): Promise<BootPayload | null> => {
+		const me = await fetchCurrentPlayer();
+		if (!me) {
+			void navigate({ to: '/sign-in' });
+			return null;
+		}
+		const [heroList, list] = await Promise.all([fetchHeroes(), fetchPresets({ scope: 'all' })]);
+		return { player: me, heroes: heroList, presets: list };
+	}, [navigate]);
+
+	const { state, data, retry } = useAc6DeferredLoad(loadBoot, [loadBoot]);
+
+	useEffect(() => {
+		if (state !== 'ok' || !data) {
+			return;
+		}
+		setPlayer(data.player);
+		setHeroes(data.heroes);
+		setPresets(data.presets);
+	}, [state, data]);
+
+	if (state === 'ok' && data === null) {
+		return null;
+	}
+
 	const canEditGlobal = player?.role === 'admin';
+	const mine = presets.filter((preset) => !preset.isGlobal);
+	const globals = presets.filter((preset) => preset.isGlobal);
 
 	const reload = async () => {
 		const list = await fetchPresets({ scope: 'all' });
 		setPresets(list);
 	};
-
-	useEffect(() => {
-		let alive = true;
-		void (async () => {
-			try {
-				const [me, heroList] = await Promise.all([fetchCurrentPlayer(), fetchHeroes()]);
-				if (!alive) {
-					return;
-				}
-				if (!me) {
-					void navigate({ to: '/sign-in' });
-					return;
-				}
-				setPlayer(me);
-				setHeroes(heroList);
-				await reload();
-			} catch {
-				if (alive) {
-					void navigate({ to: '/sign-in' });
-				}
-			}
-		})();
-		return () => {
-			alive = false;
-		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- boot once
-	}, [navigate]);
-
-	const mine = presets.filter((preset) => !preset.isGlobal);
-	const globals = presets.filter((preset) => preset.isGlobal);
 
 	const openCreate = () => {
 		setEditing(null);
@@ -125,7 +129,28 @@ export const PresetsLibraryPage = () => {
 		}
 	};
 
-	const renderTable = (items: SquadPreset[], editable: boolean) => (
+	if (state === 'loading') {
+		return (
+			<Stack gap="sm" maw={560} aria-busy>
+				<Skeleton height={32} radius={0} />
+				<Skeleton height={120} radius={0} />
+				<Skeleton height={120} radius={0} />
+			</Stack>
+		);
+	}
+
+	if (state === 'error') {
+		return (
+			<Text c="var(--app-text-muted)" role="alert">
+				Не удалось загрузить ·{' '}
+				<Button variant="subtle" color="brand" size="compact-sm" radius={0} onClick={retry}>
+					Повторить
+				</Button>
+			</Text>
+		);
+	}
+
+	const renderTable = (items: SquadPreset[], editable: boolean, emptyPersonal: boolean) => (
 		<div className="sylvenarr-panel">
 			<Table className="sylvenarr-registry-table" highlightOnHover>
 				<Table.Thead>
@@ -140,9 +165,20 @@ export const PresetsLibraryPage = () => {
 					{items.length === 0 ? (
 						<Table.Tr>
 							<Table.Td colSpan={4}>
-								<Text c="var(--app-text-muted)" size="sm">
-									Пока пусто
-								</Text>
+								{emptyPersonal ? (
+									<Stack gap={6}>
+										<Text c="var(--app-text-muted)" size="sm">
+											Пресетов пока нет. Сохраните отряд после драфта.
+										</Text>
+										<Anchor component={Link} to="/lobby" c="brand" size="sm" fw={600}>
+											В лобби
+										</Anchor>
+									</Stack>
+								) : (
+									<Text c="var(--app-text-muted)" size="sm">
+										Пока пусто
+									</Text>
+								)}
 							</Table.Td>
 						</Table.Tr>
 					) : (
@@ -220,7 +256,7 @@ export const PresetsLibraryPage = () => {
 					withDiamonds={false}
 					size="sm"
 					onClick={openCreate}
-					disabled={busy}
+					disabled={busy || !player}
 				>
 					Новый пресет
 				</OrnateButton>
@@ -245,10 +281,10 @@ export const PresetsLibraryPage = () => {
 					<Tabs.Tab value="global">Глобальные</Tabs.Tab>
 				</Tabs.List>
 				<Tabs.Panel value="personal" pt="sm">
-					{renderTable(mine, true)}
+					{renderTable(mine, true, true)}
 				</Tabs.Panel>
 				<Tabs.Panel value="global" pt="sm">
-					{renderTable(globals, canEditGlobal)}
+					{renderTable(globals, Boolean(canEditGlobal), false)}
 				</Tabs.Panel>
 			</Tabs>
 
@@ -267,7 +303,7 @@ export const PresetsLibraryPage = () => {
 				<PresetEditorForm
 					heroes={heroes}
 					initial={editing}
-					allowGlobal={canEditGlobal}
+					allowGlobal={Boolean(canEditGlobal)}
 					busy={busy}
 					onSubmit={handleSubmit}
 					onCancel={() => {

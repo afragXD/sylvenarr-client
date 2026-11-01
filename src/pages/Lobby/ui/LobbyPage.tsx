@@ -1,6 +1,6 @@
 import { Anchor, Box, Button, Group, Select, Stack, Text, TextInput, Title } from '@mantine/core';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
 	createMatch,
@@ -17,20 +17,31 @@ import { setPendingLobbyDraftPresetId } from '@/shared/lib/lobbyDraftPreset';
 import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
+import { Route } from '../../../routes/lobby.index';
 import styles from './LobbyPage.module.css';
 import { LobbyRulesForm } from './LobbyRulesForm';
 
+type BusyAction = 'create' | 'join' | null;
+
+const sanitizeInviteCode = (raw: string): string =>
+	raw
+		.toUpperCase()
+		.replace(/[^A-Z0-9]/g, '')
+		.slice(0, 6);
+
 export const LobbyPage = () => {
 	const navigate = useNavigate();
+	const search = Route.useSearch();
 	const [player, setPlayer] = useState<Player | null>(null);
 	const [sessionChecked, setSessionChecked] = useState(false);
-	const [inviteInput, setInviteInput] = useState('');
+	const [inviteInput, setInviteInput] = useState(() => search.code ?? '');
 	const [error, setError] = useState<string | null>(null);
-	const [isBusy, setIsBusy] = useState(false);
+	const [busy, setBusy] = useState<BusyAction>(null);
 	const [rules, setRules] = useState<MatchRules>(() => loadLobbyRulesPrefs());
 	const [presets, setPresets] = useState<SquadPreset[]>([]);
 	const [presetsLoading, setPresetsLoading] = useState(false);
 	const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
+	const autoJoinTried = useRef(false);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -105,7 +116,7 @@ export const LobbyPage = () => {
 	};
 
 	const handleCreate = async () => {
-		if (!player) {
+		if (!player || busy) {
 			return;
 		}
 		const validated = validateMatchRules(rules);
@@ -113,7 +124,7 @@ export const LobbyPage = () => {
 			setError(validated.message);
 			return;
 		}
-		setIsBusy(true);
+		setBusy('create');
 		setError(null);
 		try {
 			const created = await createMatch(validated.rules);
@@ -122,30 +133,43 @@ export const LobbyPage = () => {
 		} catch (err) {
 			setError(err instanceof ApiError ? err.message : 'Ошибка создания матча');
 		} finally {
-			setIsBusy(false);
+			setBusy(null);
 		}
 	};
 
-	const handleJoin = async () => {
-		if (!player) {
+	const handleJoin = useCallback(
+		async (codeOverride?: string) => {
+			if (!player || busy) {
+				return;
+			}
+			const code = sanitizeInviteCode(codeOverride ?? inviteInput);
+			if (code.length === 0) {
+				setError('Введите код');
+				return;
+			}
+			setBusy('join');
+			setError(null);
+			try {
+				const joined = await joinMatch(code);
+				await stashPresetAndNavigate(joined.id);
+			} catch (err) {
+				setError(err instanceof ApiError ? err.message : 'Ошибка входа в матч');
+			} finally {
+				setBusy(null);
+			}
+		},
+		[busy, inviteInput, player, selectedPresetId, navigate],
+	);
+
+	/** AC-7: ссылка /lobby?code=… у второго аккаунта → join → драфт. */
+	useEffect(() => {
+		if (!sessionChecked || !player || autoJoinTried.current || !search.code) {
 			return;
 		}
-		const code = inviteInput.trim();
-		if (code.length === 0) {
-			setError('Введите код');
-			return;
-		}
-		setIsBusy(true);
-		setError(null);
-		try {
-			const joined = await joinMatch(code);
-			await stashPresetAndNavigate(joined.id);
-		} catch (err) {
-			setError(err instanceof ApiError ? err.message : 'Ошибка входа в матч');
-		} finally {
-			setIsBusy(false);
-		}
-	};
+		autoJoinTried.current = true;
+		setInviteInput(search.code);
+		void handleJoin(search.code);
+	}, [sessionChecked, player, search.code, handleJoin]);
 
 	const canCreate = validateMatchRules(rules).ok;
 
@@ -154,7 +178,7 @@ export const LobbyPage = () => {
 			<Stack gap={6} maw={640}>
 				<Title order={1}>Лобби</Title>
 				<Text c="var(--app-text-muted)">
-					Создайте матч и передайте код другу. После входа начнётся набор отряда.
+					Создайте матч и передайте ссылку другу. После входа начнётся набор отряда.
 				</Text>
 			</Stack>
 
@@ -169,7 +193,11 @@ export const LobbyPage = () => {
 							color="brand"
 							component={Link}
 							to="/sign-in"
-							search={{ redirect: '/lobby' }}
+							search={{
+								redirect: search.code
+									? `/lobby?code=${encodeURIComponent(search.code)}`
+									: '/lobby',
+							}}
 						>
 							Войти и играть
 						</Button>
@@ -189,7 +217,6 @@ export const LobbyPage = () => {
 							<PlayerIdentity name={player.displayName} avatarUrl={player.avatarUrl} size={28} />
 						</Group>
 
-						{/* AC-3.13: пресет до «Создать матч» */}
 						{presetsLoading ? (
 							<Text size="sm" c="var(--app-text-muted)">
 								Загрузка пресетов…
@@ -207,15 +234,15 @@ export const LobbyPage = () => {
 								data={presetOptions}
 								value={selectedPresetId}
 								onChange={setSelectedPresetId}
-								disabled={isBusy}
+								disabled={busy !== null}
 							/>
 						)}
 
 						<Button
 							className="sylvenarr-plate-btn"
 							color="brand"
-							loading={isBusy}
-							disabled={!canCreate}
+							loading={busy === 'create'}
+							disabled={!canCreate || busy === 'join'}
 							onClick={() => void handleCreate()}
 						>
 							Создать матч
@@ -230,8 +257,9 @@ export const LobbyPage = () => {
 									label="Код приглашения"
 									description="6 символов, латиница"
 									value={inviteInput}
+									maxLength={6}
 									onChange={(event) => {
-										setInviteInput(event.currentTarget.value.toUpperCase());
+										setInviteInput(sanitizeInviteCode(event.currentTarget.value));
 										if (error === 'Введите код') {
 											setError(null);
 										}
@@ -244,12 +272,13 @@ export const LobbyPage = () => {
 											letterSpacing: '0.08em',
 										},
 									}}
+									disabled={busy !== null}
 								/>
 								<Button
 									variant="light"
 									color="accent"
-									loading={isBusy}
-									disabled={isBusy}
+									loading={busy === 'join'}
+									disabled={busy === 'create'}
 									onClick={() => void handleJoin()}
 								>
 									Войти

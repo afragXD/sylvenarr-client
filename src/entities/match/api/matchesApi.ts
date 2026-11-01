@@ -226,11 +226,22 @@ export async function battleAction(input: {
 	);
 }
 
+/** Кеш списка /matches — повторный заход показывает сразу (AC-6). */
+let myMatchesCache: MatchHistoryItem[] | null = null;
+
+export function peekMyMatchesCache(): MatchHistoryItem[] | null {
+	return myMatchesCache;
+}
+
+export function clearMyMatchesCache(): void {
+	myMatchesCache = null;
+}
+
 /**
  * История завершённых матчей текущего игрока.
  */
 export async function fetchMyMatches(): Promise<MatchHistoryItem[]> {
-	return apiFetchJson(
+	const items = await apiFetchJson(
 		'/players/me/matches',
 		undefined,
 		(data) => {
@@ -241,6 +252,8 @@ export async function fetchMyMatches(): Promise<MatchHistoryItem[]> {
 		},
 		'Не удалось загрузить историю матчей',
 	);
+	myMatchesCache = items;
+	return items;
 }
 
 /**

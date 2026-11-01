@@ -1,12 +1,15 @@
 import { Box, Group, Loader, Stack, Table, Text } from '@mantine/core';
 import { type LucideIcon, Medal, Trophy } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import { fetchCurrentPlayer } from '@/entities/player';
 import { fetchRating, type RatingRow } from '@/entities/rating';
 import { ApiError } from '@/shared/api/http';
 import { getPtsColor, getPtsTrendMark, START_PTS } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
+
+import styles from './RatingPage.module.css';
 
 const TOP_RANK_ICONS: Record<number, { Icon: LucideIcon; color: string }> = {
 	1: { Icon: Trophy, color: '#CBB48C' },
@@ -16,16 +19,20 @@ const TOP_RANK_ICONS: Record<number, { Icon: LucideIcon; color: string }> = {
 
 export const RatingPage = () => {
 	const [rows, setRows] = useState<RatingRow[]>([]);
+	const [myId, setMyId] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
+	const [myRowOffscreen, setMyRowOffscreen] = useState(false);
+	const myRowRef = useRef<HTMLTableRowElement | null>(null);
 
 	useEffect(() => {
 		let isMounted = true;
 		const load = async () => {
 			try {
-				const items = await fetchRating();
+				const [items, me] = await Promise.all([fetchRating(), fetchCurrentPlayer()]);
 				if (isMounted) {
 					setRows(items);
+					setMyId(me?.id ?? null);
 					setError(null);
 				}
 			} catch (err) {
@@ -44,6 +51,24 @@ export const RatingPage = () => {
 		};
 	}, []);
 
+	const myRank = myId ? rows.findIndex((row) => row.playerId === myId) + 1 : 0;
+
+	useEffect(() => {
+		const node = myRowRef.current;
+		if (!node || myRank <= 0) {
+			setMyRowOffscreen(false);
+			return;
+		}
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				setMyRowOffscreen(!entry?.isIntersecting);
+			},
+			{ root: null, threshold: 0 },
+		);
+		observer.observe(node);
+		return () => observer.disconnect();
+	}, [myRank, rows.length, isLoading]);
+
 	return (
 		<PageFrame
 			width="wide"
@@ -52,26 +77,19 @@ export const RatingPage = () => {
 			lead={`Все начинают с ${START_PTS}. Победа над сильным даёт больше, ничья тоже считается.`}
 		>
 			<Stack gap={8}>
-				<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
-					У каждого игрока есть очки рейтинга — ПТС. Это главный показатель силы в таблице: чем выше
-					число, тем выше место. Новый игрок начинает с {START_PTS} — это «нулевой» уровень, от
-					которого растут и падают очки после боёв.
-				</Text>
-				<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
-					После победы вы получаете ПТС, после поражения — теряете. Объём обмена зависит от разницы
-					рейтингов: победа над более сильным соперником даёт заметный прирост, а ему — ощутимый
-					штраф; победа над слабым приносит мало, и он теряет немного. Так система не даёт
-					бесконечно набивать очки на лёгких матчах и награждает апсеты.
-				</Text>
-				<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
-					Ничья не обнуляет результат: очки слегка сдвигаются в сторону выравнивания — у кого
-					рейтинг ниже, тот чуть прибавляет, у кого выше — чуть отдаёт. Если рейтинги равны, ничья
-					ничего не меняет. Ниже нуля опуститься нельзя: даже серия поражений остановится на полу.
-				</Text>
-				<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55 }}>
-					В таблице рядом с ПТС — счёт побед, поражений и ничьих за все учтённые бои. Сортировка
-					идёт по очкам: сначала те, кто выше по ПТС.
-				</Text>
+				<details className={styles.details}>
+					<summary className={styles.summary}>Как считается ПТС?</summary>
+					<Stack gap={8} mt="sm">
+						<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55, maxWidth: '75ch' }}>
+							У каждого игрока есть очки рейтинга — ПТС. Новый игрок начинает с {START_PTS}. После
+							победы вы получаете ПТС, после поражения — теряете; объём зависит от разницы рейтингов.
+						</Text>
+						<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55, maxWidth: '75ch' }}>
+							Ничья слегка выравнивает очки. Ниже нуля опуститься нельзя. В таблице — ПТС и счёт
+							побед, поражений и ничьих.
+						</Text>
+					</Stack>
+				</details>
 			</Stack>
 			{isLoading && (
 				<Group gap="sm">
@@ -113,9 +131,12 @@ export const RatingPage = () => {
 								const rank = index + 1;
 								const meta = TOP_RANK_ICONS[rank];
 								const ptsMark = getPtsTrendMark(row.pts);
+								const isYou = Boolean(myId && row.playerId === myId);
 								return (
 									<Table.Tr
 										key={row.playerId}
+										ref={isYou ? myRowRef : undefined}
+										className={isYou ? styles.youRow : undefined}
 										style={{ borderBottom: '1px solid var(--app-border)' }}
 									>
 										<Table.Td>
@@ -136,7 +157,14 @@ export const RatingPage = () => {
 											</Group>
 										</Table.Td>
 										<Table.Td>
-											<PlayerIdentity name={row.displayName} avatarUrl={row.avatarUrl} size={28} />
+											<Group gap={8} wrap="nowrap">
+												<PlayerIdentity
+													name={row.displayName}
+													avatarUrl={row.avatarUrl}
+													size={28}
+												/>
+												{isYou ? <span className={styles.youBadge}>вы</span> : null}
+											</Group>
 										</Table.Td>
 										<Table.Td
 											ff="monospace"
@@ -177,6 +205,11 @@ export const RatingPage = () => {
 					</Table>
 				</Box>
 			)}
+			{myRank > 0 && myRowOffscreen ? (
+				<div className={styles.stickyPlace} role="status">
+					Ваше место: {myRank}
+				</div>
+			) : null}
 		</PageFrame>
 	);
 };

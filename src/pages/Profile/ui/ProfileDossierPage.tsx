@@ -1,70 +1,62 @@
-import { Anchor, Box, Group, Loader, Stack, Table, Text } from '@mantine/core';
+import { Anchor, Box, Button, Group, Skeleton, Stack, Table, Text } from '@mantine/core';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 import { HeroImage } from '@/entities/hero';
 import { type FavoriteHero, fetchCurrentPlayer, fetchMyFavoriteHeroes } from '@/entities/player';
 import { ApiError } from '@/shared/api/http';
+import { useAc6DeferredLoad } from '@/shared/lib/useAc6DeferredLoad';
 
 /**
- * Досье: личный топ героев по числу выборов в драфте.
+ * Досье: личный топ героев по числу выборов в драфте (AC-6: skeleton + 4–6 с retry).
  */
 export const ProfileDossierPage = () => {
 	const navigate = useNavigate();
-	const [heroes, setHeroes] = useState<FavoriteHero[] | null>(null);
-	const [error, setError] = useState<string | null>(null);
 
-	useEffect(() => {
-		let mounted = true;
-		void fetchCurrentPlayer()
-			.then((me) => {
-				if (!me) {
-					void navigate({ to: '/sign-in' });
-					return null;
-				}
-				return fetchMyFavoriteHeroes(24);
-			})
-			.then((items) => {
-				if (!mounted || items === null) {
-					return;
-				}
-				setHeroes(items);
-				setError(null);
-			})
-			.catch((err) => {
-				if (!mounted) {
-					return;
-				}
-				if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
-					void navigate({ to: '/sign-in' });
-					return;
-				}
-				setError(err instanceof Error ? err.message : 'Не удалось загрузить');
-				setHeroes([]);
-			});
-		return () => {
-			mounted = false;
-		};
+	const load = useCallback(async (): Promise<FavoriteHero[]> => {
+		const me = await fetchCurrentPlayer();
+		if (!me) {
+			void navigate({ to: '/sign-in' });
+			return [];
+		}
+		try {
+			return await fetchMyFavoriteHeroes(24);
+		} catch (err) {
+			if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+				void navigate({ to: '/sign-in' });
+				return [];
+			}
+			throw err;
+		}
 	}, [navigate]);
 
-	if (heroes === null) {
+	const { state, data, retry } = useAc6DeferredLoad(load, [load]);
+
+	if (state === 'loading') {
 		return (
-			<Group gap="sm">
-				<Loader color="brand" size="sm" />
-				<Text size="sm" c="var(--app-text-muted)">
-					Загрузка…
-				</Text>
-			</Group>
+			<Stack gap="sm" maw={480} aria-busy>
+				<Skeleton height={28} radius={0} />
+				<Skeleton height={28} radius={0} />
+				<Skeleton height={28} radius={0} />
+				<Skeleton height={28} radius={0} />
+			</Stack>
 		);
 	}
 
-	if (error) {
+	if (state === 'error') {
 		return (
-			<Text c="accent" role="alert">
-				{error}
-			</Text>
+			<Stack gap="sm">
+				<Text c="var(--app-text-muted)" role="alert">
+					Не удалось загрузить ·{' '}
+					<Button variant="subtle" color="brand" size="compact-sm" radius={0} onClick={retry}>
+						Повторить
+					</Button>
+				</Text>
+			</Stack>
 		);
 	}
+
+	const heroes = data ?? [];
 
 	if (heroes.length === 0) {
 		return (

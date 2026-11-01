@@ -22,6 +22,7 @@ import { playBattleSfxEvents, preloadUnitSfx, unlockBattleSfx } from '../lib/bat
 import { formatAbilityBlockReason } from '../lib/formatAbilityBlockReason';
 import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
 import { AbilityTags } from './AbilityTags';
+import { renderBattleLogLine } from './BattleLogLine';
 import styles from './BattlePanel.module.css';
 import { BattleSoundControl } from './BattleSoundControl';
 import { CombatStat, CombatStatRow } from './CombatStat';
@@ -56,105 +57,6 @@ type DamageFloat = {
 const FIELD_PORTRAIT = 35;
 
 type BattleActionKind = 'attack' | 'defend' | 'wait' | 'skill' | 'ability' | 'move';
-
-type LogDamageSrc =
-	| 'fire'
-	| 'holy'
-	| 'water'
-	| 'death'
-	| 'weapon'
-	| 'air'
-	| 'earth'
-	| 'arrows'
-	| 'mind';
-
-/** `(42)⟦FIRE⟧` — маркер источника; без маркера — эвристика. */
-const DAMAGE_MARKED_RE = /(\()(-?\d+)(\))(?:⟦([A-Z_]+)⟧)?/g;
-
-const SOURCE_TO_SRC: Record<string, LogDamageSrc> = {
-	FIRE: 'fire',
-	HOLY: 'holy',
-	WATER: 'water',
-	DEATH: 'death',
-	WEAPON: 'weapon',
-	DEFAULT: 'weapon',
-	AIR: 'air',
-	EARTH: 'earth',
-	ARROWS: 'arrows',
-	MIND: 'mind',
-	STUN: 'weapon',
-	DESTROYARMOR: 'weapon',
-	POLYMORPH: 'weapon',
-	IMITATION: 'weapon',
-	MOVEMENT: 'weapon',
-	FINALSTRIKE: 'death',
-	LOWERINGLEVEL: 'mind',
-};
-
-function detectLogDamageSrc(line: string): LogDamageSrc {
-	const lower = line.toLowerCase();
-	if (/поджог|огн|плам|горит|burning|fire/.test(lower)) {
-		return 'fire';
-	}
-	if (/свят|holy|копь[её] солнца|сакрал/.test(lower)) {
-		return 'holy';
-	}
-	if (/вод|слиз|шлёп|шлеп|water/.test(lower)) {
-		return 'water';
-	}
-	if (/яд|смерт|отрав|death|poison|bleeding|желч/.test(lower)) {
-		return 'death';
-	}
-	if (/молн|разряд|воздух|air/.test(lower)) {
-		return 'air';
-	}
-	if (/земл|ядр|earth|корн/.test(lower)) {
-		return 'earth';
-	}
-	if (/стрел|болт|пращ|лук|arrows/.test(lower)) {
-		return 'arrows';
-	}
-	return 'weapon';
-}
-
-function renderBattleLogLine(line: string): ReactNode {
-	if (/^——\s*ХОД:/u.test(line) || /^——\s*ход:/iu.test(line)) {
-		const withAuto = /\(авто\)/u.test(line) ? line : line;
-		return <div className={styles.logTurn}>{withAuto}</div>;
-	}
-	// CAPS-заголовок действия (одна строка без скобок урона, целиком капсом)
-	if (
-		line.length > 1 &&
-		!/\(\s*-?\d+\s*\)/.test(line) &&
-		!/^——/.test(line) &&
-		line === line.toLocaleUpperCase('ru-RU') &&
-		/[A-ZА-ЯЁ]/.test(line)
-	) {
-		return <div className={styles.logActionCaps}>{line}</div>;
-	}
-	const fallbackSrc = detectLogDamageSrc(line);
-	const parts: ReactNode[] = [];
-	let last = 0;
-	let match: RegExpExecArray | null;
-	DAMAGE_MARKED_RE.lastIndex = 0;
-	while ((match = DAMAGE_MARKED_RE.exec(line)) !== null) {
-		if (match.index > last) {
-			parts.push(line.slice(last, match.index));
-		}
-		const tagged = match[4];
-		const src = (tagged && SOURCE_TO_SRC[tagged]) || fallbackSrc;
-		parts.push(
-			<span key={`${match.index}-${match[2]}`} className={styles.logDmg} data-src={src}>
-				{`(${match[2]})`}
-			</span>,
-		);
-		last = match.index + match[0].length;
-	}
-	if (last < line.length) {
-		parts.push(line.slice(last));
-	}
-	return <div className={styles.logLine}>{parts.length > 0 ? parts : line}</div>;
-}
 
 type BattlePanelProps = {
 	match: Match;

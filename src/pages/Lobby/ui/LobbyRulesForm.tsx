@@ -133,7 +133,7 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 				/>
 			</div>
 
-			<Stack gap="sm">
+			<Stack gap={6}>
 				<p className={styles.sectionTitle}>Отряд</p>
 				<div className={styles.field}>
 					<span className={styles.fieldLabel}>Стартовая квота</span>
@@ -188,7 +188,7 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 				)}
 			</Stack>
 
-			<Stack gap="md">
+			<Stack gap={6}>
 				<p className={styles.sectionTitle}>Бой</p>
 				<div className={styles.field}>
 					<span className={styles.fieldLabel}>Стартовое здоровье</span>
@@ -250,9 +250,13 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 				</div>
 			</Stack>
 
-			<div className={styles.fairBlock}>
-				<p className={styles.sectionTitle}>Ярмарка</p>
-				<Switch label="Ярмарка" description="В разработке" checked={false} disabled />
+			<div className={styles.fairBlock} aria-disabled="true">
+				<span className={styles.fairLabel}>
+					Ярмарка <span className={styles.fairSoon}>скоро</span>
+				</span>
+				<Text size="xs" c="var(--app-text-muted)" style={{ lineHeight: 1.35 }}>
+					Покупка героев между раундами — пока недоступна.
+				</Text>
 			</div>
 		</div>
 	);

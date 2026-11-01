@@ -12,8 +12,9 @@ import {
 	useSensors,
 } from '@dnd-kit/core';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
-import { Anchor, Box, Button, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { Anchor, Box, Button, Group, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
+import { Check, Link2 } from 'lucide-react';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import { fetchHeroes, type HeroClass } from '@/entities/hero';
@@ -24,7 +25,7 @@ import {
 	draftPreset,
 	draftRandom,
 	fetchMatchById,
-	formatRulesSummary,
+	formatRulesPlain,
 	type Match,
 	type MatchDraftPick,
 	moveDraftPick,
@@ -38,7 +39,7 @@ import {
 	HeroDetailModal,
 } from '@/features/draft';
 import { ApiError } from '@/shared/api/http';
-import { API_BASE_URL } from '@/shared/constants';
+import { absoluteUrl, API_BASE_URL } from '@/shared/constants';
 import { takePendingLobbyDraftPresetId } from '@/shared/lib/lobbyDraftPreset';
 import { InviteCodeChip } from '@/shared/ui/InviteCodeChip';
 import { PageFrame } from '@/shared/ui/PageFrame';
@@ -56,6 +57,13 @@ const battleWsUrl = (matchId: string): string => {
 };
 
 const RESULT_META_RETRY_MS = [80, 160, 320, 640] as const;
+
+const formatWaitClock = (totalSeconds: number): string => {
+	const safe = Math.max(0, Math.floor(totalSeconds));
+	const minutes = Math.floor(safe / 60);
+	const seconds = safe % 60;
+	return `${minutes}:${String(seconds).padStart(2, '0')}`;
+};
 
 type BattleEndedRating = {
 	playerId: string;
@@ -907,8 +915,8 @@ export const MatchRoomPage = () => {
 								<InviteCodeChip code={match.inviteCode} compact />
 							</Text>
 							{match.rules && (
-								<Text size="sm" c="var(--app-text-muted)" ff="monospace">
-									{formatRulesSummary(match.rules)}
+								<Text size="sm" c="var(--app-text-muted)">
+									{formatRulesPlain(match.rules)}
 								</Text>
 							)}
 						</Stack>
@@ -925,22 +933,7 @@ export const MatchRoomPage = () => {
 					</Group>
 
 					{match.status === 'waiting' && (
-						<Box className="sylvenarr-panel" maw={520}>
-							<Stack gap="sm">
-								<Text fw={600}>Ожидание соперника</Text>
-								<Text size="sm" c="var(--app-text-muted)">
-									Передайте код другу. После входа начнётся набор отряда — ходит игрок 1.
-								</Text>
-								<InviteCodeChip code={match.inviteCode} />
-								<PlayerIdentity
-									name={match.host.displayName}
-									avatarUrl={match.host.avatarUrl}
-									prefix="Игрок 1"
-									size={28}
-									muted
-								/>
-							</Stack>
-						</Box>
+						<WaitingOpponentPanel match={match} />
 					)}
 
 					{(match.status === 'fighting' || match.status === 'finished') && !squadsReadyVisible && (
@@ -1253,6 +1246,81 @@ const SquadPreview = ({
 					))
 				)}
 			</ul>
+		</Box>
+	);
+};
+
+/** AC-7: живой таймер ожидания + копия ссылки-приглашения. */
+const WaitingOpponentPanel = ({ match }: { match: Match }) => {
+	const [elapsedSec, setElapsedSec] = useState(() => {
+		const started = Date.parse(match.createdAt);
+		return Number.isFinite(started) ? Math.max(0, (Date.now() - started) / 1000) : 0;
+	});
+	const [linkCopied, setLinkCopied] = useState(false);
+
+	useEffect(() => {
+		const started = Date.parse(match.createdAt);
+		if (!Number.isFinite(started)) {
+			return;
+		}
+		const tick = () => setElapsedSec(Math.max(0, (Date.now() - started) / 1000));
+		tick();
+		const id = window.setInterval(tick, 1000);
+		return () => window.clearInterval(id);
+	}, [match.createdAt]);
+
+	const inviteUrl = absoluteUrl(`/lobby?code=${encodeURIComponent(match.inviteCode)}`);
+
+	const handleCopyLink = async () => {
+		try {
+			await navigator.clipboard.writeText(inviteUrl);
+			setLinkCopied(true);
+			window.setTimeout(() => setLinkCopied(false), 1600);
+		} catch {
+			/* ignore clipboard errors */
+		}
+	};
+
+	return (
+		<Box className="sylvenarr-panel" maw={520}>
+			<Stack gap="sm">
+				<Group gap="sm" align="center" wrap="nowrap">
+					<Loader color="brand" size="sm" type="dots" />
+					<Text fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
+						ждём соперника · {formatWaitClock(elapsedSec)}
+					</Text>
+				</Group>
+				<Text size="sm" c="var(--app-text-muted)">
+					Передайте ссылку или код другу. После входа начнётся набор отряда — ходит игрок 1.
+				</Text>
+				{match.rules && (
+					<Text size="sm" c="var(--app-text-muted)">
+						{formatRulesPlain(match.rules)}
+					</Text>
+				)}
+				<InviteCodeChip code={match.inviteCode} />
+				<Button
+					variant="light"
+					color="accent"
+					leftSection={
+						linkCopied ? (
+							<Check size={16} aria-hidden />
+						) : (
+							<Link2 size={16} aria-hidden />
+						)
+					}
+					onClick={() => void handleCopyLink()}
+				>
+					{linkCopied ? 'Скопировано' : 'Скопировать ссылку'}
+				</Button>
+				<PlayerIdentity
+					name={match.host.displayName}
+					avatarUrl={match.host.avatarUrl}
+					prefix="Игрок 1"
+					size={28}
+					muted
+				/>
+			</Stack>
 		</Box>
 	);
 };

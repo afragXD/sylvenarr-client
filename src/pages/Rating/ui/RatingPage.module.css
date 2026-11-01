@@ -1,0 +1,44 @@
+.details {
+	max-width: 42rem;
+}
+
+.summary {
+	cursor: pointer;
+	font-weight: 600;
+	color: var(--copper, #e9c08f);
+	list-style: none;
+}
+
+.summary::-webkit-details-marker {
+	display: none;
+}
+
+.youRow {
+	background: color-mix(in srgb, var(--copper, #e9c08f) 12%, var(--app-surface));
+	box-shadow: inset 3px 0 0 var(--copper, #e9c08f);
+}
+
+.youBadge {
+	flex-shrink: 0;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	color: #1a130e;
+	background: var(--copper, #e9c08f);
+	padding: 0.1rem 0.35rem;
+	line-height: 1.2;
+}
+
+.stickyPlace {
+	position: sticky;
+	bottom: 0.75rem;
+	z-index: 5;
+	margin-top: 0.75rem;
+	padding: 0.55rem 0.85rem;
+	border: 1px solid color-mix(in srgb, var(--brass, #cbb48c) 50%, var(--app-border));
+	background: color-mix(in srgb, #1a130e 92%, var(--copper, #e9c08f));
+	color: var(--app-text);
+	font-weight: 700;
+	font-family: var(--mantine-font-family-headings);
+	pointer-events: none;
+}

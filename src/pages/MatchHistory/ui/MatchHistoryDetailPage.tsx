@@ -10,10 +10,9 @@ import {
 	type MatchHistoryUnit,
 } from '@/entities/match';
 import { fetchCurrentPlayer, playerUpdated } from '@/entities/player';
-import { CombatStat, CombatStatRow } from '@/features/battle';
+import { CombatStat, CombatStatRow, renderBattleLogLine } from '@/features/battle';
 import { ApiError } from '@/shared/api/http';
 import { formatDuration } from '@/shared/lib/formatDuration';
-import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { getMatchResultColor } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
@@ -95,7 +94,6 @@ export const MatchHistoryDetailPage = () => {
 			eyebrow="Арена"
 			title="Карточка матча"
 			lead="Составы, статы и лог завершённого боя."
-			scene={getSceneUrl('battle.webp')}
 		>
 			<Stack gap="md">
 				{signedIn === false ? (
@@ -184,8 +182,8 @@ export const MatchHistoryDetailPage = () => {
 									Ход боя
 								</Text>
 								<div className={styles.log}>
-									{detail.log.map((line) => (
-										<div key={line}>{line}</div>
+									{detail.log.map((line, index) => (
+										<span key={`${index}-${line}`}>{renderBattleLogLine(line)}</span>
 									))}
 								</div>
 							</Box>

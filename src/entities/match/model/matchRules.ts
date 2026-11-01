@@ -256,3 +256,32 @@ export function formatRulesSummary(rules: MatchRules): string {
 	}
 	return base;
 }
+
+/**
+ * AC-7: правила словами для лобби / ожидания.
+ * Пример: «3 героя из 8 слотов · до 4 в ряду · 20 раундов · старт с 65 % здоровья».
+ */
+export function formatRulesPlain(rules: MatchRules): string {
+	const hp = healthBonusToPercent(rules.healthBonus);
+	const heroWord =
+		rules.initialTeamSize === 1 ? 'герой' : rules.initialTeamSize < 5 ? 'героя' : 'героев';
+	const parts = [
+		`${rules.initialTeamSize} ${heroWord} из ${rules.maxTeamSize} слотов`,
+		`до ${rules.maxRowSize} в ряду`,
+		`${rules.maxRounds} раундов`,
+		`старт с ${hp} % здоровья`,
+	];
+	if (rules.startingLevel > 1) {
+		parts.push(`старт с ур. ${rules.startingLevel}`);
+	}
+	if (!rules.rated) {
+		parts.push('товарищеский');
+	}
+	if (rules.heroDupes === 'uniqueTeam') {
+		parts.push('без дублей в отряде');
+	}
+	if (rules.heroDupes === 'uniqueMatch') {
+		parts.push('классы уникальны в матче');
+	}
+	return parts.join(' · ');
+}

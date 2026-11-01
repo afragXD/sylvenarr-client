@@ -9,6 +9,7 @@ export {
 	MAX_VISIBLE_EFFECTS,
 } from './model/effectMeta';
 export { AbilityTags } from './ui/AbilityTags';
+export { renderBattleLogLine } from './ui/BattleLogLine';
 export { BattlePanel } from './ui/BattlePanel';
 export { MatchResultOverlay } from './ui/MatchResultOverlay';
 export type { MatchResultKind } from './ui/MatchResultOverlay';
