@@ -11,6 +11,7 @@ export {
 export type { FavoriteHero } from './api/playersApi';
 export {
 	$player,
+	$sessionChecked,
 	logoutFx,
 	playerUpdated,
 	sessionRequested,

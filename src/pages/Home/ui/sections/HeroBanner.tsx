@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
 
-import { $player } from '@/entities/player';
+import { $player, $sessionChecked } from '@/entities/player';
 import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { OrnateLink } from '@/shared/ui/OrnateButton';
 import { SmokeBackdrop } from '@/shared/ui/SmokeBackdrop';
@@ -10,6 +10,7 @@ import classes from '../HomePage.module.css';
 
 export const HeroBanner = () => {
 	const player = useUnit($player);
+	const sessionChecked = useUnit($sessionChecked);
 
 	return (
 		<section className={classes.hero} aria-label="Sylvenarr">
@@ -30,7 +31,13 @@ export const HeroBanner = () => {
 					Пошаговые дуэли в тёмном технофэнтези: двадцать четыре класса, два ряда и ни одного
 					честного боя.
 				</p>
-				{player ? (
+				{!sessionChecked ? (
+					<div className={classes.heroCta}>
+						<OrnateLink to="/heroes" size="lg">
+							Смотреть героев
+						</OrnateLink>
+					</div>
+				) : player ? (
 					<p className={classes.heroMeta}>
 						Вы вошли как {player.displayName} ·{' '}
 						<Link to="/lobby" className={classes.heroInlineLink}>

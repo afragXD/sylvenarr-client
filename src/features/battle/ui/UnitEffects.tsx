@@ -100,6 +100,7 @@ const WardBadge = ({ ward }: { ward: ResistBrief }) => {
 			multiline
 			w={220}
 			withArrow
+			events={{ hover: true, focus: true, touch: true }}
 			label={
 				<Stack gap={4}>
 					<Text size="sm" fw={600}>
@@ -113,6 +114,7 @@ const WardBadge = ({ ward }: { ward: ResistBrief }) => {
 			<span
 				className={styles.effectTag}
 				data-kind="buff"
+				tabIndex={0}
 				aria-label={`Вард — ${ward.label}${ward.wardCharges ? ` · ${ward.wardCharges}` : ''}`}
 			>
 				<WardIcon source={ward.source} size={14} />
@@ -132,6 +134,7 @@ const EffectBadge = ({ effect }: { effect: BattleEffectBrief }) => {
 			multiline
 			w={220}
 			withArrow
+			events={{ hover: true, focus: true, touch: true }}
 			label={
 				<Stack gap={4}>
 					<Text size="sm" fw={600}>
@@ -151,7 +154,12 @@ const EffectBadge = ({ effect }: { effect: BattleEffectBrief }) => {
 				</Stack>
 			}
 		>
-			<span className={styles.effectTag} data-kind={meta.kind}>
+			<span
+				className={styles.effectTag}
+				data-kind={meta.kind}
+				tabIndex={0}
+				aria-label={`${meta.label}${roundsLabel ? ` · ${roundsLabel}` : ''}`}
+			>
 				<Icon size={12} strokeWidth={2} aria-hidden />
 				{effect.rounds > 0 ? <span className={styles.effectRounds}>{effect.rounds}</span> : null}
 			</span>

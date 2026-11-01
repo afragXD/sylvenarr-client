@@ -4,6 +4,13 @@
 	gap: 0.35rem;
 }
 
+.label {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--app-text-muted);
+	letter-spacing: 0.02em;
+}
+
 .slider {
 	width: 6.5rem;
 }

@@ -23,6 +23,14 @@ export const $player = createStore<Player | null>(null)
 	.on(fetchSessionFx.fail, () => null)
 	.reset(logoutFx.done);
 
+/**
+ * Сессия уже опрошена (успех или ошибка).
+ * До true не показывать гостевые CTA — иначе вошедший мельком видит «Войти и играть» (AC-4).
+ */
+export const $sessionChecked = createStore(false)
+	.on(fetchSessionFx.done, () => true)
+	.on(fetchSessionFx.fail, () => true);
+
 sample({
 	clock: sessionRequested,
 	target: fetchSessionFx,

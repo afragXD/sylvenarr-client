@@ -82,10 +82,18 @@ const STATS: ReadonlyArray<{
 ];
 
 function formatMorale(value: number): string {
+	/* AC-5 / R2-M2: без «N/A»; особая мораль нежити — тире. */
 	if (value < -150) {
-		return 'N/A';
+		return '—';
 	}
 	return value > 0 ? `+${value}` : String(value);
+}
+
+function classRoleLabel(isSummon: boolean): string {
+	if (isSummon) {
+		return 'саммон';
+	}
+	return 'герой';
 }
 
 /**
@@ -123,8 +131,7 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 						<div>
 							<Group gap={6} wrap="wrap">
 								<Text size="sm" c="var(--app-text-muted)">
-									{unit.heroClassCode}
-									{unit.isSummon ? ' · саммон' : ''}
+									{classRoleLabel(Boolean(unit.isSummon))}
 									{unit.defending ? ' · защита' : ''}
 								</Text>
 								{!unit.alive ? <CombatStat kind="fallen" size={14} /> : null}
@@ -140,15 +147,12 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 									ряд {unit.row + 1}
 								</Text>
 							</CombatStatRow>
-						{(unit.effects?.length ?? 0) > 0 || (unit.resists?.length ?? 0) > 0 ? (
-							<div className={styles.effects}>
-								<UnitEffects
-									effects={unit.effects ?? []}
-									resists={unit.resists ?? []}
-									variant="inline"
-								/>
-							</div>
-						) : null}
+							{/* Эффекты без вардов — варды только в блоке ниже (AC-5, без дубля). */}
+							{(unit.effects?.length ?? 0) > 0 ? (
+								<div className={styles.effects}>
+									<UnitEffects effects={unit.effects ?? []} resists={[]} variant="inline" />
+								</div>
+							) : null}
 						</div>
 					</Group>
 

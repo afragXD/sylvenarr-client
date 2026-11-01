@@ -5,7 +5,7 @@ import { useUnit } from 'effector-react';
 import { LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { $player, logoutFx, sessionRequested } from '@/entities/player';
+import { $player, $sessionChecked, logoutFx, sessionRequested } from '@/entities/player';
 import { APP_TITLE } from '@/shared/constants';
 import { takeAuthRedirect } from '@/shared/lib/authRedirect';
 import { resolveStaticUrl } from '@/shared/lib/staticUrl';
@@ -35,6 +35,7 @@ const initialsFromName = (name: string): string => {
 
 export const Header = () => {
 	const player = useUnit($player);
+	const sessionChecked = useUnit($sessionChecked);
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [scroll] = useWindowScroll();
@@ -73,6 +74,7 @@ export const Header = () => {
 
 	const playTo = player ? '/lobby' : '/sign-in';
 	const playLabel = player ? 'В лобби' : 'Войти и играть';
+	const showPlayCta = sessionChecked;
 	const avatarSrc = resolveStaticUrl(player?.avatarUrl) ?? player?.avatarUrl ?? undefined;
 
 	return (
@@ -102,9 +104,11 @@ export const Header = () => {
 					</div>
 
 					<div className={classes.right}>
-						<OrnateLink to={playTo} variant="parchment" size="sm" withDiamonds={false}>
-							{playLabel}
-						</OrnateLink>
+						{showPlayCta ? (
+							<OrnateLink to={playTo} variant="parchment" size="sm" withDiamonds={false}>
+								{playLabel}
+							</OrnateLink>
+						) : null}
 						{player ? (
 							<Menu shadow="md" width={240} position="bottom-end" radius={0}>
 								<Menu.Target>
@@ -193,6 +197,7 @@ export const Header = () => {
 				onClose={() => setMenuOpen(false)}
 				isAdmin={player?.role === 'admin'}
 				isSignedIn={Boolean(player)}
+				sessionChecked={sessionChecked}
 			/>
 		</>
 	);

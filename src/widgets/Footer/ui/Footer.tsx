@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
 
-import { $player } from '@/entities/player';
+import { $player, $sessionChecked } from '@/entities/player';
 import {
 	AUTHOR_GITHUB_URL,
 	AUTHOR_NAME,
@@ -34,12 +34,13 @@ const BASE_COLUMNS = [
 
 export const Footer = () => {
 	const player = useUnit($player);
+	const sessionChecked = useUnit($sessionChecked);
 
 	const projectLinks = [
 		{ to: '/news', label: 'Новости' },
 		{ to: '/#faq', label: 'Вопросы' },
 		{ to: '/privacy', label: 'Конфиденциальность' },
-		...(player ? [] : [{ to: '/sign-in', label: 'Войти и играть' }]),
+		...(sessionChecked && !player ? [{ to: '/sign-in', label: 'Войти и играть' }] : []),
 	];
 
 	const columns = [
@@ -56,7 +57,12 @@ export const Footer = () => {
 				<GoldRule align="center" className={classes.rule} />
 				<div className={classes.grid}>
 					<div>
-						{player ? (
+						{!sessionChecked ? (
+							<>
+								<h2 className={classes.ctaTitle}>Ваш отряд ждёт</h2>
+								<p className={classes.ctaText}>Пошаговые дуэли на арене Sylvenarr.</p>
+							</>
+						) : player ? (
 							<>
 								<h2 className={classes.ctaTitle}>Ваш отряд ждёт</h2>
 								<p className={classes.ctaText}>

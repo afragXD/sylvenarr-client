@@ -173,7 +173,7 @@ export const SignInPage = () => {
 
 	if (signedIn) {
 		return (
-			<PageFrame width="form" eyebrow="Арена" title="Войти">
+			<PageFrame width="form" eyebrow="Арена" title="Аккаунт">
 				<Box className="sylvenarr-panel">
 					<Text>
 						Вы вошли как {signedIn.displayName} ·{' '}

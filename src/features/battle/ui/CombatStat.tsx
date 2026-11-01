@@ -1,4 +1,4 @@
-import { Text } from '@mantine/core';
+import { Text, Tooltip } from '@mantine/core';
 import { Gauge, Heart, HeartOff, Shield, Sword, Zap, type LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
@@ -8,16 +8,16 @@ type CombatStatKind = 'health' | 'damage' | 'armor' | 'initiative' | 'level' | '
 
 const META: Record<
 	CombatStatKind,
-	{ label: string; Icon?: LucideIcon; abbrev?: string }
+	{ label: string; hint: string; Icon?: LucideIcon; abbrev?: string }
 > = {
-	health: { Icon: Heart, label: 'ОЗ' },
-	damage: { Icon: Sword, label: 'Урон' },
-	armor: { Icon: Shield, label: 'Броня' },
-	initiative: { Icon: Gauge, label: 'Инициатива' },
+	health: { Icon: Heart, label: 'ОЗ', hint: 'Запас жизни' },
+	damage: { Icon: Sword, label: 'Урон', hint: 'Сила обычной атаки' },
+	armor: { Icon: Shield, label: 'Броня', hint: 'Снижает входящий урон' },
+	initiative: { Icon: Gauge, label: 'Инициатива', hint: 'Порядок хода в раунде' },
 	// Как Lv./Ур. в RPG — текст читается однозначнее любой иконки.
-	level: { label: 'Уровень', abbrev: 'Ур.' },
-	fallen: { Icon: HeartOff, label: 'Пал' },
-	mana: { Icon: Zap, label: 'Мана' },
+	level: { label: 'Уровень', abbrev: 'Ур.', hint: 'Сила приростов и способностей' },
+	fallen: { Icon: HeartOff, label: 'Пал', hint: 'Юнит повержен' },
+	mana: { Icon: Zap, label: 'Мана', hint: 'Ресурс для способностей' },
 };
 
 type CombatStatProps = {
@@ -29,21 +29,23 @@ type CombatStatProps = {
 };
 
 /**
- * Стат боя: иконка (или краткая метка) + значение.
+ * Стат боя: иконка (или краткая метка) + значение; подсказка по hover/focus (AC-5).
  */
 export const CombatStat = ({
 	kind,
 	value,
-	size = 12,
-	textSize = 'xs',
+	size = 14,
+	textSize = 'sm',
 	muted = false,
 }: CombatStatProps) => {
-	const { Icon, label, abbrev } = META[kind];
-	return (
+	const { Icon, label, abbrev, hint } = META[kind];
+	const aria =
+		value !== undefined && value !== null ? `${label}: ${String(value)}. ${hint}` : `${label}. ${hint}`;
+	const body = (
 		<span
 			className={`${styles.stat}${kind === 'fallen' ? ` ${styles.fallen}` : ''}`}
-			title={label}
-			aria-label={value !== undefined && value !== null ? `${label}: ${String(value)}` : label}
+			tabIndex={0}
+			aria-label={aria}
 		>
 			{abbrev ? (
 				<Text
@@ -63,12 +65,21 @@ export const CombatStat = ({
 					component="span"
 					size={textSize}
 					c={muted ? 'var(--app-text-muted)' : undefined}
-					style={{ fontVariantNumeric: 'tabular-nums' }}
+					style={{ fontVariantNumeric: 'tabular-nums', fontSize: textSize === 'sm' ? 14 : undefined }}
 				>
 					{value}
 				</Text>
 			)}
 		</span>
+	);
+	return (
+		<Tooltip
+			label={`${label} — ${hint}`}
+			withArrow
+			events={{ hover: true, focus: true, touch: true }}
+		>
+			{body}
+		</Tooltip>
 	);
 };
 

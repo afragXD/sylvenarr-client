@@ -41,6 +41,8 @@ type SiteMenuProps = {
 	isAdmin?: boolean;
 	/** Вошедший — промо ведёт в /lobby, гость — на вход. */
 	isSignedIn?: boolean;
+	/** Пока false — не показывать гостевой CTA (AC-4). */
+	sessionChecked?: boolean;
 };
 
 /**
@@ -51,9 +53,12 @@ export const SiteMenu = ({
 	onClose,
 	isAdmin = false,
 	isSignedIn = false,
+	sessionChecked = false,
 }: SiteMenuProps) => {
 	const promoTo = isSignedIn ? '/lobby' : '/sign-in';
 	const promoCta = isSignedIn ? 'В лобби' : 'Войти и играть';
+	const showGuestPromo = sessionChecked && !isSignedIn;
+	const showSignedInPromo = sessionChecked && isSignedIn;
 	return (
 		<Drawer
 			opened={opened}
@@ -115,14 +120,25 @@ export const SiteMenu = ({
 					<div className={classes.promo}>
 						<OrnateFrame variant="card">
 							<p className={classes.promoTitle}>Сыграть сейчас</p>
-							<p className={classes.promoText}>
-								{isSignedIn
-									? 'Соберите отряд и выйдите на арену с другом.'
-									: 'Вход через Яндекс или по логину'}
-							</p>
-							<Link to={promoTo} onClick={onClose} style={{ textDecoration: 'none' }}>
-								<span className={classes.promoCta}>{promoCta}</span>
-							</Link>
+							{showSignedInPromo ? (
+								<>
+									<p className={classes.promoText}>
+										Соберите отряд и выйдите на арену с другом.
+									</p>
+									<Link to={promoTo} onClick={onClose} style={{ textDecoration: 'none' }}>
+										<span className={classes.promoCta}>{promoCta}</span>
+									</Link>
+								</>
+							) : showGuestPromo ? (
+								<>
+									<p className={classes.promoText}>Вход через Яндекс или по логину</p>
+									<Link to={promoTo} onClick={onClose} style={{ textDecoration: 'none' }}>
+										<span className={classes.promoCta}>{promoCta}</span>
+									</Link>
+								</>
+							) : (
+								<p className={classes.promoText}>Пошаговые дуэли на арене Sylvenarr.</p>
+							)}
 						</OrnateFrame>
 					</div>
 				</div>

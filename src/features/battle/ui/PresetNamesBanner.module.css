@@ -1,37 +1,52 @@
-.banner {
+.callsign {
 	display: flex;
 	flex-direction: column;
-	gap: 0.35rem;
-	margin: 0 0 0.5rem;
+	gap: 0.15rem;
+	margin: 0.2rem 0 0.45rem;
+	min-width: 0;
 	pointer-events: none;
 }
 
-.banner[data-phase='fade'] {
-	animation: presetFade 1s ease forwards;
+.callsign[data-align='end'] {
+	align-items: flex-end;
+	text-align: right;
 }
 
-.line {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: baseline;
-	gap: 0.55rem 0.85rem;
+.callsign[data-align='start'] {
+	align-items: flex-start;
+	text-align: left;
+}
+
+.callsign[data-phase='fade'] {
+	animation: presetDissolve 1s ease forwards;
 }
 
 .nick {
-	font-size: 0.95rem;
+	font-size: 0.85rem;
+	line-height: 1.2;
 	color: var(--app-text-muted);
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .preset {
 	font-family: var(--mantine-font-family-headings);
-	font-size: clamp(1.75rem, 2.4vw, 2rem); /* ≥28px */
+	font-size: clamp(1.75rem, 2.2vw, 2rem); /* ≥28px */
 	font-weight: 700;
-	letter-spacing: 0.02em;
-	line-height: 1.15;
-	color: var(--app-text);
+	letter-spacing: 0.01em;
+	line-height: 1.1;
+	color: var(--copper, #e9c08f);
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding-bottom: 0.2rem;
+	border-bottom: 1px solid color-mix(in srgb, var(--brass, #cbb48c) 55%, transparent);
 }
 
-@keyframes presetFade {
+@keyframes presetDissolve {
 	from {
 		opacity: 1;
 	}
@@ -41,7 +56,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.banner[data-phase='fade'] {
+	.callsign[data-phase='fade'] {
 		animation: none;
 		opacity: 0;
 	}

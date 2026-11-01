@@ -17,7 +17,11 @@ type TurnOrderStripProps = {
 	entries: TurnOrderEntry[];
 	stage: number;
 	hpByUnitId?: ReadonlyMap<string, UnitHpSnapshot>;
-	onSelectUnit?: (unitId: string) => void;
+	/** Режим выбора цели: клик по портрету бьёт, если id в targetUnitIds (AC-5). */
+	targeting?: boolean;
+	targetUnitIds?: readonly string[];
+	onCastAtUnit?: (unitId: string) => void;
+	onInspectUnit?: (unitId: string) => void;
 };
 
 function resolvePhase(entry: TurnOrderEntry): TurnOrderPhase {
@@ -52,12 +56,16 @@ function entryTitle(entry: TurnOrderEntry, phase: TurnOrderPhase): string {
 
 /**
  * Шкала текущего раунда: ходившие → активный (playhead) → ожидающие.
+ * AC-5: в режиме цели клик бьёт; модалка — «i» / ПКМ.
  */
 export const TurnOrderStrip = ({
 	entries,
 	stage,
 	hpByUnitId,
-	onSelectUnit,
+	targeting = false,
+	targetUnitIds = [],
+	onCastAtUnit,
+	onInspectUnit,
 }: TurnOrderStripProps) => {
 	const reduceMotion =
 		typeof window !== 'undefined' &&
@@ -73,6 +81,7 @@ export const TurnOrderStrip = ({
 	});
 
 	const activeId = entries.find((entry) => entry.isActive || entry.phase === 'active')?.unitId;
+	const targets = new Set(targetUnitIds);
 
 	useEffect(() => {
 		if (!activeId) {
@@ -96,7 +105,9 @@ export const TurnOrderStrip = ({
 					{entries.map((entry) => {
 						const phase = resolvePhase(entry);
 						const isActive = phase === 'active' || entry.isActive;
-						const interactive = entry.alive && Boolean(onSelectUnit);
+						const isLegalTarget = targeting && entry.alive && targets.has(entry.unitId);
+						const canCast = Boolean(targeting && isLegalTarget && onCastAtUnit);
+						const canInspect = Boolean(onInspectUnit);
 						/** CUT AC-13 п.16: +25% к прежним 44/36. */
 						const size = isActive ? 55 : 45;
 						const hp = hpByUnitId?.get(entry.unitId);
@@ -110,32 +121,60 @@ export const TurnOrderStrip = ({
 							/>
 						);
 						return (
-							<button
-								key={entry.unitId}
-								type="button"
-								ref={isActive ? targetRef : undefined}
-								className={styles.portrait}
-								data-phase={phase}
-								data-active={isActive ? 'true' : undefined}
-								data-team={entry.team}
-								title={entryTitle(entry, phase)}
-								aria-current={isActive ? 'true' : undefined}
-								aria-label={entryTitle(entry, phase)}
-								disabled={!interactive}
-								onClick={() => {
-									if (interactive) {
-										onSelectUnit?.(entry.unitId);
+							<div key={entry.unitId} className={styles.slot}>
+								<button
+									type="button"
+									ref={isActive ? targetRef : undefined}
+									className={styles.portrait}
+									data-phase={phase}
+									data-active={isActive ? 'true' : undefined}
+									data-team={entry.team}
+									data-target={isLegalTarget ? 'true' : undefined}
+									title={entryTitle(entry, phase)}
+									aria-current={isActive ? 'true' : undefined}
+									aria-label={
+										targeting
+											? isLegalTarget
+												? `${entryTitle(entry, phase)} · выбрать целью`
+												: `${entryTitle(entry, phase)} · нельзя выбрать`
+											: entryTitle(entry, phase)
 									}
-								}}
-							>
-								{hp ? (
-									<PortraitHpCurtain health={hp.health} maxHp={hp.maxHp}>
-										{image}
-									</PortraitHpCurtain>
-								) : (
-									image
-								)}
-							</button>
+									disabled={!entry.alive && !canInspect}
+									onClick={() => {
+										if (targeting) {
+											if (canCast) {
+												onCastAtUnit?.(entry.unitId);
+											}
+											return;
+										}
+									}}
+									onContextMenu={(event) => {
+										event.preventDefault();
+										if (canInspect) {
+											onInspectUnit?.(entry.unitId);
+										}
+									}}
+								>
+									{hp ? (
+										<PortraitHpCurtain health={hp.health} maxHp={hp.maxHp}>
+											{image}
+										</PortraitHpCurtain>
+									) : (
+										image
+									)}
+								</button>
+								{canInspect ? (
+									<button
+										type="button"
+										className={styles.infoBtn}
+										aria-label={`Сведения: ${entry.displayName}`}
+										title="Сведения о герое"
+										onClick={() => onInspectUnit?.(entry.unitId)}
+									>
+										i
+									</button>
+								) : null}
+							</div>
 						);
 					})}
 				</div>

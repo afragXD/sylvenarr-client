@@ -130,10 +130,15 @@ export const LobbyPage = () => {
 		if (!player) {
 			return;
 		}
+		const code = inviteInput.trim();
+		if (code.length === 0) {
+			setError('Введите код');
+			return;
+		}
 		setIsBusy(true);
 		setError(null);
 		try {
-			const joined = await joinMatch(inviteInput.trim());
+			const joined = await joinMatch(code);
 			await stashPresetAndNavigate(joined.id);
 		} catch (err) {
 			setError(err instanceof ApiError ? err.message : 'Ошибка входа в матч');
@@ -223,8 +228,14 @@ export const LobbyPage = () => {
 							<Group align="flex-end" gap="sm" wrap="nowrap">
 								<TextInput
 									label="Код приглашения"
+									description="6 символов, латиница"
 									value={inviteInput}
-									onChange={(event) => setInviteInput(event.currentTarget.value.toUpperCase())}
+									onChange={(event) => {
+										setInviteInput(event.currentTarget.value.toUpperCase());
+										if (error === 'Введите код') {
+											setError(null);
+										}
+									}}
 									placeholder="ABC123"
 									style={{ flex: 1, minWidth: 0 }}
 									styles={{
@@ -238,7 +249,7 @@ export const LobbyPage = () => {
 									variant="light"
 									color="accent"
 									loading={isBusy}
-									disabled={inviteInput.trim().length < 4}
+									disabled={isBusy}
 									onClick={() => void handleJoin()}
 								>
 									Войти

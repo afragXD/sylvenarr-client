@@ -15,6 +15,7 @@ export const BattleSoundControl = () => {
 
 	return (
 		<div className={styles.root}>
+			<span className={styles.label}>Звук</span>
 			<Tooltip label={silent ? 'Включить звук' : 'Выключить звук'} withArrow>
 				<ActionIcon
 					variant="subtle"

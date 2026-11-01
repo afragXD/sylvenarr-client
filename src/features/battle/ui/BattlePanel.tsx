@@ -19,6 +19,7 @@ import {
 	previewWeaponAttack,
 } from '../lib/attackPreview';
 import { playBattleSfxEvents, preloadUnitSfx, unlockBattleSfx } from '../lib/battleSfx';
+import { formatAbilityBlockReason } from '../lib/formatAbilityBlockReason';
 import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
 import { AbilityTags } from './AbilityTags';
 import styles from './BattlePanel.module.css';
@@ -26,10 +27,30 @@ import { BattleSoundControl } from './BattleSoundControl';
 import { CombatStat, CombatStatRow } from './CombatStat';
 import { type MatchResultKind, MatchResultOverlay } from './MatchResultOverlay';
 import { PortraitHpCurtain } from './PortraitHpCurtain';
-import { PresetNamesBanner } from './PresetNamesBanner';
+import { PresetCallsign } from './PresetNamesBanner';
 import { TurnOrderStrip } from './TurnOrderStrip';
 import { UnitEffects } from './UnitEffects';
 import { UnitInspectModal } from './UnitInspectModal';
+
+const ABILITY_TOOLTIP_STYLES = {
+	tooltip: {
+		background: '#1A130E',
+		color: '#E8DFD0',
+		fontSize: 14,
+		lineHeight: 1.35,
+		padding: '0.55rem 0.7rem',
+		border: '1px solid color-mix(in srgb, #E9C08F 35%, #5E4A33)',
+		borderRadius: 0,
+		boxShadow: 'none',
+	},
+} as const;
+
+type DamageFloat = {
+	id: string;
+	unitId: string;
+	amount: number;
+	heal: boolean;
+};
 
 /** CUT AC-13 п.16: портреты на поле +25% (было 28). */
 const FIELD_PORTRAIT = 35;
@@ -98,7 +119,8 @@ function detectLogDamageSrc(line: string): LogDamageSrc {
 
 function renderBattleLogLine(line: string): ReactNode {
 	if (/^——\s*ХОД:/u.test(line) || /^——\s*ход:/iu.test(line)) {
-		return <div className={styles.logTurn}>{line}</div>;
+		const withAuto = /\(авто\)/u.test(line) ? line : line;
+		return <div className={styles.logTurn}>{withAuto}</div>;
 	}
 	// CAPS-заголовок действия (одна строка без скобок урона, целиком капсом)
 	if (
@@ -198,8 +220,12 @@ export const BattlePanel = ({
 	const [promptHoverUnitId, setPromptHoverUnitId] = useState<string | null>(null);
 	const [inspectUnitId, setInspectUnitId] = useState<string | null>(null);
 	const [surrenderOpened, surrenderHandlers] = useDisclosure(false);
+	const [damageFloats, setDamageFloats] = useState<DamageFloat[]>([]);
+	const [cachedMyAbilities, setCachedMyAbilities] = useState<AbilityInfo[]>([]);
 	const wasMyTurnRef = useRef(false);
 	const logRef = useRef<HTMLDivElement>(null);
+	const prevHpRef = useRef<Map<string, number> | null>(null);
+	const floatSeqRef = useRef(0);
 
 	const isMyTurn =
 		Boolean(battle) && battle!.turnPlayerId === playerId && battle!.outcome === 'ongoing';
@@ -208,8 +234,80 @@ export const BattlePanel = ({
 		if (isMyTurn && !wasMyTurnRef.current) {
 			playYourTurnSound();
 		}
+		if (!isMyTurn) {
+			setPendingMode(null);
+			setConfirm(null);
+		}
 		wasMyTurnRef.current = isMyTurn;
 	}, [isMyTurn]);
+
+	/** AC-5: Esc отменяет выбор цели. */
+	useEffect(() => {
+		if (!pendingMode) {
+			return;
+		}
+		const onKey = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				event.preventDefault();
+				setPendingMode(null);
+			}
+		};
+		window.addEventListener('keydown', onKey);
+		return () => window.removeEventListener('keydown', onKey);
+	}, [pendingMode]);
+
+	/** AC-5: всплывающие числа урона/лечения по diff ОЗ. */
+	useEffect(() => {
+		if (!battle) {
+			prevHpRef.current = null;
+			return;
+		}
+		const next = new Map(battle.units.map((unit) => [unit.id, unit.health]));
+		const prev = prevHpRef.current;
+		prevHpRef.current = next;
+		if (!prev) {
+			return;
+		}
+		const spawned: DamageFloat[] = [];
+		for (const unit of battle.units) {
+			const before = prev.get(unit.id);
+			if (typeof before !== 'number' || before === unit.health) {
+				continue;
+			}
+			const delta = unit.health - before;
+			floatSeqRef.current += 1;
+			spawned.push({
+				id: `${unit.id}-${floatSeqRef.current}`,
+				unitId: unit.id,
+				amount: Math.abs(delta),
+				heal: delta > 0,
+			});
+		}
+		if (spawned.length === 0) {
+			return;
+		}
+		setDamageFloats((list) => [...list, ...spawned]);
+		const timers = spawned.map((item) =>
+			window.setTimeout(() => {
+				setDamageFloats((list) => list.filter((entry) => entry.id !== item.id));
+			}, 950),
+		);
+		return () => {
+			for (const timer of timers) {
+				window.clearTimeout(timer);
+			}
+		};
+	}, [battle]);
+
+	/** Свои способности на ход соперника — серый снимок последнего своего хода (AC-5). */
+	useEffect(() => {
+		if (!battle || battle.outcome !== 'ongoing') {
+			return;
+		}
+		if (battle.turnPlayerId === playerId && (battle.abilities?.length ?? 0) > 0) {
+			setCachedMyAbilities(battle.abilities ?? []);
+		}
+	}, [battle, playerId]);
 
 	const unitCodesKey = battle
 		? [...new Set(battle.units.map((unit) => unit.heroClassCode))].sort().join(',')
@@ -385,26 +483,34 @@ export const BattlePanel = ({
 		setConfirm(null);
 	};
 
-	const handleUnitClick = (unit: BattleUnit) => {
-		if (pendingMode && active && isMyTurn && !prompt && highlightTargets.includes(unit.id)) {
-			if (pendingMode.kind === 'ability') {
-				const ability = abilities.find((item) => item.slot === pendingMode.slot);
-				if (ability) {
-					castNow({
-						unitId: active.id,
-						action: 'ability',
-						slot: ability.slot,
-						targetId: unit.id,
-					});
-				}
-			} else if (pendingMode.kind === 'attack') {
-				castNow({ unitId: active.id, action: 'attack', targetId: unit.id });
-			} else {
-				castNow({ unitId: active.id, action: 'skill', targetId: unit.id });
+	const castAtUnitId = (unitId: string) => {
+		if (!pendingMode || !active || !isMyTurn || prompt || !highlightTargets.includes(unitId)) {
+			return;
+		}
+		if (pendingMode.kind === 'ability') {
+			const ability = abilities.find((item) => item.slot === pendingMode.slot);
+			if (ability) {
+				castNow({
+					unitId: active.id,
+					action: 'ability',
+					slot: ability.slot,
+					targetId: unitId,
+				});
 			}
 			return;
 		}
-		setInspectUnitId(unit.id);
+		if (pendingMode.kind === 'attack') {
+			castNow({ unitId: active.id, action: 'attack', targetId: unitId });
+			return;
+		}
+		castNow({ unitId: active.id, action: 'skill', targetId: unitId });
+	};
+
+	/** AC-5: клик по юниту бьёт только в режиме цели; модалка — «i» / ПКМ. */
+	const handleUnitClick = (unit: BattleUnit) => {
+		if (pendingMode) {
+			castAtUnitId(unit.id);
+		}
 	};
 
 	const handlePromptChoice = (choiceId: string) => {
@@ -469,7 +575,7 @@ export const BattlePanel = ({
 						<Text size="sm" c="var(--app-text-muted)">
 							Ходит: {active.displayName}
 							{typeof active.mana === 'number' && (active.mana > 0 || active.maxMana > 0)
-								? ` · МР ${active.mana}/${active.maxMana || active.mana}`
+								? ` · Мана ${active.mana}/${active.maxMana || active.mana}`
 								: ''}
 						</Text>
 					)}
@@ -525,9 +631,10 @@ export const BattlePanel = ({
 				entries={battle.turnOrder ?? []}
 				stage={battle.stage}
 				hpByUnitId={hpByUnitId}
-				onSelectUnit={(unitId) => {
-					setInspectUnitId(unitId);
-				}}
+				targeting={Boolean(pendingMode && isMyTurn && !prompt)}
+				targetUnitIds={highlightTargets}
+				onCastAtUnit={castAtUnitId}
+				onInspectUnit={(unitId) => setInspectUnitId(unitId)}
 			/>
 
 			<div className={styles.battlefield}>
@@ -543,15 +650,6 @@ export const BattlePanel = ({
 						onMatches={onMatches}
 					/>
 				)}
-				<div className={styles.presetBannerSlot}>
-					<PresetNamesBanner
-						active={battle.outcome === 'ongoing'}
-						hostName={match.host.displayName}
-						guestName={match.guest?.displayName ?? '…'}
-						hostPresetName={match.draft.hostPresetName}
-						guestPresetName={match.draft.guestPresetName}
-					/>
-				</div>
 				<div className={styles.field}>
 					<TeamSide
 						title={
@@ -562,13 +660,19 @@ export const BattlePanel = ({
 								size={FIELD_PORTRAIT}
 							/>
 						}
+						playerName={match.host.displayName}
+						presetName={match.draft.hostPresetName}
+						presetActive={battle.outcome === 'ongoing'}
+						presetAlign="start"
 						units={hostUnits}
 						mirror
 						activeId={battle.activeUnitId}
 						legalTargets={highlightTargets}
 						promptHoverUnitId={promptHoverUnitId}
 						onUnitClick={handleUnitClick}
+						onInspectUnit={(unitId) => setInspectUnitId(unitId)}
 						attackPreviewFor={attackPreviewFor}
+						damageFloats={damageFloats}
 					/>
 					<TeamSide
 						title={
@@ -579,13 +683,19 @@ export const BattlePanel = ({
 								size={FIELD_PORTRAIT}
 							/>
 						}
+						playerName={match.guest?.displayName ?? '…'}
+						presetName={match.draft.guestPresetName}
+						presetActive={battle.outcome === 'ongoing'}
+						presetAlign="end"
 						units={guestUnits}
 						mirror={false}
 						activeId={battle.activeUnitId}
 						legalTargets={highlightTargets}
 						promptHoverUnitId={promptHoverUnitId}
 						onUnitClick={handleUnitClick}
+						onInspectUnit={(unitId) => setInspectUnitId(unitId)}
 						attackPreviewFor={attackPreviewFor}
+						damageFloats={damageFloats}
 					/>
 				</div>
 				<div className={styles.log} aria-live="polite" ref={logRef}>
@@ -653,117 +763,174 @@ export const BattlePanel = ({
 				</div>
 			)}
 
-			{battle.outcome === 'ongoing' && isMyTurn && active && !prompt && !confirm && (
-				<div className={styles.actions}>
-					{isPilot ? (
-						abilities.map((ability) => {
-							const selecting =
-								pendingMode?.kind === 'ability' && pendingMode.slot === ability.slot;
-							const doc = abilityDocs.find((slot) => slot.slot === ability.slot);
-							const preview =
-								active && doc
-									? formatAbilityPreview(
-											getAbilityPreview(
-												active.heroClassCode,
-												ability.slot,
-												previewCtxFromUnit(active, activeEnemies),
-											),
-										)
-									: null;
-							const tip = ability.disabledReason
-								? ability.disabledReason
-								: doc
-									? `${doc.title}: ${doc.body}\n${doc.mechanics}${preview ? `\n${preview}` : ''}`
-									: ability.label;
-							const button = (
-								<Button
-									key={ability.slot}
-									variant={ability.slot === 1 ? 'filled' : 'light'}
-									color="accent"
-									loading={busy}
-									disabled={Boolean(ability.disabledReason)}
-									onClick={() => handleAbilityClick(ability)}
-									leftSection={doc ? <AbilityTags tags={doc.tags} size={12} /> : undefined}
-								>
-									[{ability.slot}] {ability.label}
-									{selecting ? ' — цель' : ''}
-								</Button>
-							);
-							return (
-								<Tooltip
-									key={ability.slot}
-									label={
-										<Text size="xs" style={{ whiteSpace: 'pre-wrap' }}>
-											{tip}
-										</Text>
-									}
-									multiline
-									maw={280}
-								>
-									<span>{button}</span>
-								</Tooltip>
-							);
-						})
-					) : (
+			{battle.outcome === 'ongoing' && !prompt && !confirm && (
+				<div className={styles.actions} data-opponent={isMyTurn ? undefined : 'true'}>
+					{pendingMode && isMyTurn ? (
+						<div className={styles.targetHint} role="status">
+							Выберите цель · Esc — отмена
+						</div>
+					) : null}
+					{!isMyTurn && active ? (
+						<div className={styles.opponentTurn}>
+							<HeroImage
+								code={active.heroClassCode}
+								alt={active.displayName}
+								w={40}
+								h={40}
+								radius={0}
+							/>
+							<div>
+								<Text size="sm" fw={600}>
+									Ходит соперник: {active.displayName}
+								</Text>
+								<Text size="sm" c="var(--app-text-muted)">
+									Ожидание хода
+								</Text>
+							</div>
+							<span className={styles.opponentWait} aria-label="Ожидание" />
+						</div>
+					) : null}
+					{isMyTurn && active ? (
 						<>
-							<Button
-								color="accent"
-								loading={busy}
-								onClick={handleAttackClick}
-								disabled={battle.legalTargetIds.length === 0}
-							>
-								Атака
-								{pendingMode?.kind === 'attack' ? ' — выберите цель' : ''}
-							</Button>
-							{skillLabel && (
-								<Button
-									variant="light"
-									color="accent"
-									loading={busy}
-									onClick={handleSkillClick}
-									disabled={skillNeedsTarget && battle.legalSkillTargetIds.length === 0}
-								>
-									{skillLabel}
-									{pendingMode?.kind === 'skill' ? ' — выберите цель' : ''}
-								</Button>
+							{isPilot ? (
+								abilities.map((ability) => {
+									const selecting =
+										pendingMode?.kind === 'ability' && pendingMode.slot === ability.slot;
+									const doc = abilityDocs.find((slot) => slot.slot === ability.slot);
+									const preview =
+										active && doc
+											? formatAbilityPreview(
+													getAbilityPreview(
+														active.heroClassCode,
+														ability.slot,
+														previewCtxFromUnit(active, activeEnemies),
+													),
+												)
+											: null;
+									const blockReason = ability.disabledReason
+										? formatAbilityBlockReason(
+												ability.disabledReason,
+												active.mana,
+												active.maxMana,
+											)
+										: null;
+									const tip = (
+										<div className={styles.abilityTip}>
+											<strong>{doc?.title ?? ability.label}</strong>
+											{doc ? <span>{doc.body}</span> : null}
+											{doc?.mechanics ? (
+												<span className={styles.abilityTipMeta}>{doc.mechanics}</span>
+											) : null}
+											{preview ? (
+												<span className={styles.abilityTipMeta}>{preview}</span>
+											) : null}
+											{blockReason ? (
+												<span className={styles.abilityTipMeta}>{blockReason}</span>
+											) : null}
+										</div>
+									);
+									const button = (
+										<Button
+											variant={ability.slot === 1 ? 'filled' : 'light'}
+											color="accent"
+											loading={busy}
+											disabled={Boolean(ability.disabledReason)}
+											onClick={() => handleAbilityClick(ability)}
+											leftSection={doc ? <AbilityTags tags={doc.tags} size={12} /> : undefined}
+										>
+											[{ability.slot}] {ability.label}
+											{selecting ? ' — цель' : ''}
+											{blockReason ? (
+												<span className={styles.abilityBtnReason}>{blockReason}</span>
+											) : null}
+										</Button>
+									);
+									return (
+										<Tooltip
+											key={ability.slot}
+											label={tip}
+											multiline
+											maw={300}
+											events={{ hover: true, focus: true, touch: true }}
+											styles={ABILITY_TOOLTIP_STYLES}
+										>
+											<span tabIndex={0}>{button}</span>
+										</Tooltip>
+									);
+								})
+							) : (
+								<>
+									<Button
+										color="accent"
+										loading={busy}
+										onClick={handleAttackClick}
+										disabled={battle.legalTargetIds.length === 0}
+									>
+										Атака
+										{pendingMode?.kind === 'attack' ? ' — выберите цель' : ''}
+									</Button>
+									{skillLabel && (
+										<Button
+											variant="light"
+											color="accent"
+											loading={busy}
+											onClick={handleSkillClick}
+											disabled={skillNeedsTarget && battle.legalSkillTargetIds.length === 0}
+										>
+											{skillLabel}
+											{pendingMode?.kind === 'skill' ? ' — выберите цель' : ''}
+										</Button>
+									)}
+								</>
 							)}
+							<Button
+								variant="light"
+								color="brand"
+								loading={busy}
+								onClick={() => {
+									setPendingMode(null);
+									setConfirm(null);
+									onAction({ unitId: active.id, action: 'defend' });
+								}}
+							>
+								Защита
+							</Button>
+							<Button
+								variant="light"
+								color="brand"
+								loading={busy}
+								onClick={() => {
+									setPendingMode(null);
+									setConfirm(null);
+									onAction({ unitId: active.id, action: 'move' });
+								}}
+							>
+								Сменить ряд
+							</Button>
+							<Button
+								variant="default"
+								loading={busy}
+								onClick={() => {
+									setPendingMode(null);
+									setConfirm(null);
+									onAction({ unitId: active.id, action: 'wait' });
+								}}
+							>
+								Ждать
+							</Button>
 						</>
+					) : (
+						(cachedMyAbilities.length > 0 ? cachedMyAbilities : abilities).map((ability) => (
+							<Button
+								key={`opp-${ability.slot}`}
+								variant={ability.slot === 1 ? 'filled' : 'light'}
+								color="accent"
+								disabled
+							>
+								[{ability.slot}] {ability.label}
+							</Button>
+						))
 					)}
-					<Button
-						variant="light"
-						color="brand"
-						loading={busy}
-						onClick={() => {
-							setPendingMode(null);
-							setConfirm(null);
-							onAction({ unitId: active.id, action: 'defend' });
-						}}
-					>
-						Защита
-					</Button>
-					<Button
-						variant="light"
-						color="brand"
-						loading={busy}
-						onClick={() => {
-							setPendingMode(null);
-							setConfirm(null);
-							onAction({ unitId: active.id, action: 'move' });
-						}}
-					>
-						Сменить ряд
-					</Button>
-					<Button
-						variant="default"
-						loading={busy}
-						onClick={() => {
-							setPendingMode(null);
-							setConfirm(null);
-							onAction({ unitId: active.id, action: 'wait' });
-						}}
-					>
-						Ждать
-					</Button>
 				</div>
 			)}
 
@@ -808,22 +975,34 @@ export const BattlePanel = ({
 
 const TeamSide = ({
 	title,
+	playerName,
+	presetName,
+	presetActive,
+	presetAlign,
 	units,
 	mirror,
 	activeId,
 	legalTargets,
 	promptHoverUnitId,
 	onUnitClick,
+	onInspectUnit,
 	attackPreviewFor,
+	damageFloats,
 }: {
 	title: ReactNode;
+	playerName: string;
+	presetName: string | null | undefined;
+	presetActive: boolean;
+	presetAlign: 'start' | 'end';
 	units: BattleUnit[];
 	mirror: boolean;
 	activeId: string | null;
 	legalTargets: string[];
 	promptHoverUnitId: string | null;
 	onUnitClick: (unit: BattleUnit) => void;
+	onInspectUnit: (unitId: string) => void;
 	attackPreviewFor: (unit: BattleUnit) => AttackPreview | null;
+	damageFloats: DamageFloat[];
 }) => {
 	const front = units.filter((unit) => unit.row === 0);
 	const back = units.filter((unit) => unit.row === 1);
@@ -835,6 +1014,12 @@ const TeamSide = ({
 	return (
 		<div className={styles.side}>
 			<div className={styles.sideTitle}>{title}</div>
+			<PresetCallsign
+				playerName={playerName}
+				presetName={presetName}
+				active={presetActive}
+				align={presetAlign}
+			/>
 			<div className={styles.rows}>
 				<RowColumn
 					label={leftLabel}
@@ -843,7 +1028,9 @@ const TeamSide = ({
 					legalTargets={legalTargets}
 					promptHoverUnitId={promptHoverUnitId}
 					onUnitClick={onUnitClick}
+					onInspectUnit={onInspectUnit}
 					attackPreviewFor={attackPreviewFor}
+					damageFloats={damageFloats}
 				/>
 				<RowColumn
 					label={rightLabel}
@@ -852,7 +1039,9 @@ const TeamSide = ({
 					legalTargets={legalTargets}
 					promptHoverUnitId={promptHoverUnitId}
 					onUnitClick={onUnitClick}
+					onInspectUnit={onInspectUnit}
 					attackPreviewFor={attackPreviewFor}
+					damageFloats={damageFloats}
 				/>
 			</div>
 		</div>
@@ -874,7 +1063,9 @@ const RowColumn = ({
 	legalTargets,
 	promptHoverUnitId,
 	onUnitClick,
+	onInspectUnit,
 	attackPreviewFor,
+	damageFloats,
 }: {
 	label: string;
 	units: BattleUnit[];
@@ -882,7 +1073,9 @@ const RowColumn = ({
 	legalTargets: string[];
 	promptHoverUnitId: string | null;
 	onUnitClick: (unit: BattleUnit) => void;
+	onInspectUnit: (unitId: string) => void;
 	attackPreviewFor: (unit: BattleUnit) => AttackPreview | null;
+	damageFloats: DamageFloat[];
 }) => {
 	const ordered = sortRowUnits(units);
 	return (
@@ -898,21 +1091,48 @@ const RowColumn = ({
 				) : (
 					ordered.map((unit) => {
 						const preview = attackPreviewFor(unit);
+						const isTarget = legalTargets.includes(unit.id);
+						const ratio = unit.maxHp > 0 ? Math.max(0, Math.min(1, unit.health / unit.maxHp)) : 0;
+						const floats = damageFloats.filter((item) => item.unitId === unit.id);
 						const button = (
-							<button
+							<div
 								key={unit.id}
-								type="button"
 								className={styles.unit}
+								style={{ position: 'relative' }}
 								data-active={unit.id === activeId ? 'true' : undefined}
-								data-target={legalTargets.includes(unit.id) ? 'true' : undefined}
+								data-target={isTarget ? 'true' : undefined}
 								data-prompt-hover={unit.id === promptHoverUnitId ? 'true' : undefined}
 								data-dead={unit.alive ? undefined : 'true'}
 								data-summon={unit.isSummon ? 'true' : undefined}
-								data-inspectable="true"
+								role={isTarget ? 'button' : undefined}
+								tabIndex={isTarget ? 0 : undefined}
 								onClick={() => onUnitClick(unit)}
+								onKeyDown={(event) => {
+									if (!isTarget) {
+										return;
+									}
+									if (event.key === 'Enter' || event.key === ' ') {
+										event.preventDefault();
+										onUnitClick(unit);
+									}
+								}}
+								onContextMenu={(event) => {
+									event.preventDefault();
+									onInspectUnit(unit.id);
+								}}
 							>
-								<Group gap={6} wrap="nowrap" justify="space-between" w="100%">
-									<Group gap={6} wrap="nowrap" style={{ minWidth: 0 }}>
+								{floats.map((item) => (
+									<span
+										key={item.id}
+										className={styles.damageFloat}
+										data-heal={item.heal ? 'true' : undefined}
+										aria-hidden
+									>
+										{item.heal ? `+${item.amount}` : `−${item.amount}`}
+									</span>
+								))}
+								<div className={styles.unitHead}>
+									<Group gap={6} wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
 										<PortraitHpCurtain health={unit.health} maxHp={unit.maxHp}>
 											<HeroImage
 												code={unit.heroClassCode}
@@ -933,28 +1153,68 @@ const RowColumn = ({
 											{unit.horseIsDead ? ' ✗конь' : ''}
 										</Text>
 									</Group>
-									{typeof unit.lvl === 'number' ? (
-										<span className={styles.lvl} title="Уровень" aria-label={`Уровень ${unit.lvl}`}>
-											Ур.{unit.lvl}
-										</span>
-									) : null}
-								</Group>
+									<Group gap={4} wrap="nowrap">
+										{typeof unit.lvl === 'number' ? (
+											<span
+												className={styles.lvl}
+												title="Уровень"
+												aria-label={`Уровень ${unit.lvl}`}
+											>
+												Ур.{unit.lvl}
+											</span>
+										) : null}
+										<button
+											type="button"
+											className={styles.unitInfoBtn}
+											aria-label={`Сведения: ${unit.displayName}`}
+											title="Сведения о герое"
+											onClick={(event) => {
+												event.stopPropagation();
+												onInspectUnit(unit.id);
+											}}
+										>
+											i
+										</button>
+									</Group>
+								</div>
+								<div
+									className={styles.hpBar}
+									aria-label={`ОЗ: ${unit.health} из ${unit.maxHp}`}
+								>
+									<div className={styles.hpBarTrack}>
+										<div
+											className={styles.hpBarFill}
+											data-low={ratio <= 0.35 ? 'true' : undefined}
+											style={{ width: `${Math.round(ratio * 100)}%` }}
+										/>
+									</div>
+									<span className={styles.hpBarValue}>
+										{unit.health}/{unit.maxHp}
+									</span>
+								</div>
 								<CombatStatRow className={styles.hp}>
-									<CombatStat kind="health" value={`${unit.health}/${unit.maxHp}`} />
+									<CombatStat
+										kind="health"
+										value={`${unit.health}/${unit.maxHp}`}
+										size={14}
+										textSize="sm"
+									/>
 									{typeof unit.armor === 'number' ? (
-										<CombatStat kind="armor" value={unit.armor} muted />
+										<CombatStat kind="armor" value={unit.armor} size={14} textSize="sm" muted />
 									) : null}
 									{unit.alive && (unit.mana > 0 || unit.maxMana > 0) ? (
 										<CombatStat
 											kind="mana"
 											value={`${unit.mana}/${unit.maxMana || unit.mana}`}
+											size={14}
+											textSize="sm"
 											muted
 										/>
 									) : null}
-									{!unit.alive ? <CombatStat kind="fallen" /> : null}
+									{!unit.alive ? <CombatStat kind="fallen" size={14} textSize="sm" /> : null}
 								</CombatStatRow>
 								<UnitEffects effects={unit.effects ?? []} resists={unit.resists ?? []} />
-							</button>
+							</div>
 						);
 						if (!preview) {
 							return button;

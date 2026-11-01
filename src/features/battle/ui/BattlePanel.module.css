@@ -14,11 +14,6 @@
 	align-items: stretch;
 }
 
-.battlefield > :global([class*='PresetNamesBanner']),
-.presetBannerSlot {
-	grid-column: 1 / -1;
-}
-
 .field {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
@@ -92,13 +87,111 @@
 	box-shadow: 0 0 0 2px color-mix(in srgb, var(--mantine-color-blue-5) 40%, transparent);
 }
 
-.unit[data-inspectable="true"] {
-	cursor: pointer;
-}
-
 .unit[data-dead="true"] {
 	opacity: 0.4;
 	filter: grayscale(0.4);
+}
+
+.unitHead {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 0.35rem;
+	width: 100%;
+}
+
+.unitInfoBtn {
+	flex-shrink: 0;
+	margin: 0;
+	padding: 0;
+	width: 1.35rem;
+	height: 1.35rem;
+	border: 1px solid var(--app-border);
+	background: #1a130e;
+	color: #e9c08f;
+	font-size: 0.75rem;
+	font-weight: 700;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.unitInfoBtn:focus-visible {
+	outline: 2px solid #e9c08f;
+	outline-offset: 1px;
+}
+
+.hpBar {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	width: 100%;
+	min-height: 1.15rem;
+}
+
+.hpBarTrack {
+	flex: 1;
+	min-width: 0;
+	height: 0.45rem;
+	border: 1px solid var(--app-border);
+	background: color-mix(in srgb, #1a130e 70%, #000);
+	overflow: hidden;
+}
+
+.hpBarFill {
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		color-mix(in srgb, var(--enemy, #d9574a) 80%, #7a2e28),
+		color-mix(in srgb, #84a36c 70%, #4a6b3a)
+	);
+}
+
+.hpBarFill[data-low='true'] {
+	background: var(--enemy, #d9574a);
+}
+
+.hpBarValue {
+	flex-shrink: 0;
+	font-size: 14px;
+	line-height: 1.2;
+	font-variant-numeric: tabular-nums;
+	color: var(--app-text);
+}
+
+.damageFloat {
+	position: absolute;
+	left: 50%;
+	top: 0.15rem;
+	transform: translateX(-50%);
+	z-index: 2;
+	pointer-events: none;
+	font-size: 1.05rem;
+	font-weight: 700;
+	color: var(--enemy, #d9574a);
+	text-shadow: 0 1px 2px #1a130e;
+	animation: damageFloatUp 900ms ease-out forwards;
+}
+
+.damageFloat[data-heal='true'] {
+	color: #84a36c;
+}
+
+@keyframes damageFloatUp {
+	0% {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+	100% {
+		opacity: 0;
+		transform: translate(-50%, -1.4rem);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.damageFloat {
+		animation: none;
+		opacity: 1;
+	}
 }
 
 .slotIndex {
@@ -123,14 +216,84 @@
 
 .hp {
 	font-variant-numeric: tabular-nums;
-	font-size: 0.78rem;
+	font-size: 14px;
 	color: var(--app-text-muted);
 }
 
 .actions {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: stretch;
 	gap: 0.5rem;
+	min-height: 5.5rem;
+}
+
+.actions[data-opponent='true'] {
+	opacity: 0.92;
+}
+
+.opponentTurn {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+	flex: 1 1 12rem;
+	min-height: 3.25rem;
+	padding: 0.45rem 0.65rem;
+	border: 1px solid var(--app-border);
+	background: color-mix(in srgb, var(--app-surface-muted) 70%, #1a130e);
+}
+
+.opponentWait {
+	width: 0.85rem;
+	height: 0.85rem;
+	border: 2px solid color-mix(in srgb, #e9c08f 55%, transparent);
+	border-top-color: #e9c08f;
+	border-radius: 50%;
+	animation: opponentSpin 0.8s linear infinite;
+}
+
+@keyframes opponentSpin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.opponentWait {
+		animation: none;
+		opacity: 0.7;
+	}
+}
+
+.targetHint {
+	width: 100%;
+	padding: 0.35rem 0.55rem;
+	border: 1px solid color-mix(in srgb, #e9c08f 45%, var(--app-border));
+	background: #1a130e;
+	color: #e8dfd0;
+	font-size: 14px;
+}
+
+.abilityTip {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	font-size: 14px;
+	line-height: 1.35;
+	color: #e8dfd0;
+}
+
+.abilityTipMeta {
+	color: color-mix(in srgb, #e8dfd0 72%, #9a8f7e);
+	font-size: 14px;
+}
+
+.abilityBtnReason {
+	display: block;
+	font-size: 12px;
+	font-weight: 600;
+	opacity: 0.9;
+	line-height: 1.2;
 }
 
 .prompt {
