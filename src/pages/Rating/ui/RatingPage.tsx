@@ -24,6 +24,7 @@ export const RatingPage = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [myRowOffscreen, setMyRowOffscreen] = useState(false);
 	const myRowRef = useRef<HTMLTableRowElement | null>(null);
+	const myListRef = useRef<HTMLLIElement | null>(null);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -54,7 +55,7 @@ export const RatingPage = () => {
 	const myRank = myId ? rows.findIndex((row) => row.playerId === myId) + 1 : 0;
 
 	useEffect(() => {
-		const node = myRowRef.current;
+		const node = myRowRef.current ?? myListRef.current;
 		if (!node || myRank <= 0) {
 			setMyRowOffscreen(false);
 			return;
@@ -75,8 +76,9 @@ export const RatingPage = () => {
 			eyebrow="Арена"
 			title="Рейтинг ПТС"
 			lead={`Все начинают с ${START_PTS}. Победа над сильным даёт больше, ничья тоже считается.`}
+			compactOnMobile
 		>
-			<Stack gap={8}>
+			<Stack gap={8} className={styles.explain}>
 				<details className={styles.details}>
 					<summary className={styles.summary}>Как считается ПТС?</summary>
 					<Stack gap={8} mt="sm">
@@ -108,102 +110,135 @@ export const RatingPage = () => {
 				<Text c="var(--app-text-muted)">Пока нет записей — сыграйте первый бой.</Text>
 			)}
 			{!isLoading && rows.length > 0 && (
-				<Box style={{ overflowX: 'auto' }}>
-					<Table
-						className="sylvenarr-registry-table"
-						highlightOnHover
-						horizontalSpacing="md"
-						verticalSpacing="sm"
-						style={{ borderCollapse: 'collapse', minWidth: 560 }}
-					>
-						<Table.Thead>
-							<Table.Tr>
-								<Table.Th w={80}>#</Table.Th>
-								<Table.Th>Игрок</Table.Th>
-								<Table.Th>ПТС</Table.Th>
-								<Table.Th>Победы</Table.Th>
-								<Table.Th>Поражения</Table.Th>
-								<Table.Th>Ничьи</Table.Th>
-							</Table.Tr>
-						</Table.Thead>
-						<Table.Tbody>
-							{rows.map((row, index) => {
-								const rank = index + 1;
-								const meta = TOP_RANK_ICONS[rank];
-								const ptsMark = getPtsTrendMark(row.pts);
-								const isYou = Boolean(myId && row.playerId === myId);
-								return (
-									<Table.Tr
-										key={row.playerId}
-										ref={isYou ? myRowRef : undefined}
-										className={isYou ? styles.youRow : undefined}
-										style={{ borderBottom: '1px solid var(--app-border)' }}
-									>
-										<Table.Td>
-											<Group gap={6} wrap="nowrap" align="center">
-												{meta && (
-													<meta.Icon
-														size={16}
-														strokeWidth={1.75}
-														color={meta.color}
-														fill={meta.color}
-														fillOpacity={0.22}
-														aria-hidden
-													/>
-												)}
-												<Text span ff="monospace" c="var(--app-text-muted)">
-													{rank}
-												</Text>
-											</Group>
-										</Table.Td>
-										<Table.Td>
-											<Group gap={8} wrap="nowrap">
-												<PlayerIdentity
-													name={row.displayName}
-													avatarUrl={row.avatarUrl}
-													size={28}
-												/>
-												{isYou ? <span className={styles.youBadge}>вы</span> : null}
-											</Group>
-										</Table.Td>
-										<Table.Td
-											ff="monospace"
-											c={getPtsColor(row.pts)}
-											fw={700}
-											style={{ fontVariantNumeric: 'tabular-nums' }}
-											title={
-												row.pts > START_PTS
-													? 'Выше нулевого уровня 1500'
-													: row.pts < START_PTS
-														? 'Ниже нулевого уровня 1500'
-														: 'Нулевой уровень 1500'
-											}
-										>
-											{ptsMark ? `${ptsMark} ${row.pts}` : row.pts}
-										</Table.Td>
-										<Table.Td ff="monospace" style={{ fontVariantNumeric: 'tabular-nums' }}>
-											{row.wins}
-										</Table.Td>
-										<Table.Td
-											ff="monospace"
-											c="var(--app-text-muted)"
-											style={{ fontVariantNumeric: 'tabular-nums' }}
-										>
-											{row.losses}
-										</Table.Td>
-										<Table.Td
-											ff="monospace"
-											c="var(--app-text-muted)"
-											style={{ fontVariantNumeric: 'tabular-nums' }}
-										>
-											{row.draws}
-										</Table.Td>
+				<>
+					<div className={styles.desktopTable}>
+						<Box style={{ overflowX: 'auto' }}>
+							<Table
+								className="sylvenarr-registry-table"
+								highlightOnHover
+								horizontalSpacing="md"
+								verticalSpacing="sm"
+								style={{ borderCollapse: 'collapse', minWidth: 560 }}
+							>
+								<Table.Thead>
+									<Table.Tr>
+										<Table.Th w={80}>#</Table.Th>
+										<Table.Th>Игрок</Table.Th>
+										<Table.Th>ПТС</Table.Th>
+										<Table.Th>Победы</Table.Th>
+										<Table.Th>Поражения</Table.Th>
+										<Table.Th>Ничьи</Table.Th>
 									</Table.Tr>
-								);
-							})}
-						</Table.Tbody>
-					</Table>
-				</Box>
+								</Table.Thead>
+								<Table.Tbody>
+									{rows.map((row, index) => {
+										const rank = index + 1;
+										const meta = TOP_RANK_ICONS[rank];
+										const ptsMark = getPtsTrendMark(row.pts);
+										const isYou = Boolean(myId && row.playerId === myId);
+										return (
+											<Table.Tr
+												key={row.playerId}
+												ref={isYou ? myRowRef : undefined}
+												className={isYou ? styles.youRow : undefined}
+												style={{ borderBottom: '1px solid var(--app-border)' }}
+											>
+												<Table.Td>
+													<Group gap={6} wrap="nowrap" align="center">
+														{meta && (
+															<meta.Icon
+																size={16}
+																strokeWidth={1.75}
+																color={meta.color}
+																fill={meta.color}
+																fillOpacity={0.22}
+																aria-hidden
+															/>
+														)}
+														<Text span ff="monospace" c="var(--app-text-muted)">
+															{rank}
+														</Text>
+													</Group>
+												</Table.Td>
+												<Table.Td>
+													<Group gap={8} wrap="nowrap">
+														<PlayerIdentity
+															name={row.displayName}
+															avatarUrl={row.avatarUrl}
+															size={28}
+														/>
+														{isYou ? <span className={styles.youBadge}>вы</span> : null}
+													</Group>
+												</Table.Td>
+												<Table.Td
+													ff="monospace"
+													c={getPtsColor(row.pts)}
+													fw={700}
+													style={{ fontVariantNumeric: 'tabular-nums' }}
+													title={
+														row.pts > START_PTS
+															? 'Выше нулевого уровня 1500'
+															: row.pts < START_PTS
+																? 'Ниже нулевого уровня 1500'
+																: 'Нулевой уровень 1500'
+													}
+												>
+													{ptsMark ? `${ptsMark} ${row.pts}` : row.pts}
+												</Table.Td>
+												<Table.Td ff="monospace" style={{ fontVariantNumeric: 'tabular-nums' }}>
+													{row.wins}
+												</Table.Td>
+												<Table.Td
+													ff="monospace"
+													c="var(--app-text-muted)"
+													style={{ fontVariantNumeric: 'tabular-nums' }}
+												>
+													{row.losses}
+												</Table.Td>
+												<Table.Td
+													ff="monospace"
+													c="var(--app-text-muted)"
+													style={{ fontVariantNumeric: 'tabular-nums' }}
+												>
+													{row.draws}
+												</Table.Td>
+											</Table.Tr>
+										);
+									})}
+								</Table.Tbody>
+							</Table>
+						</Box>
+					</div>
+					{/* AC-9: 390×844 — список «место · игрок · ПТС», без горизонтального скролла */}
+					<ol className={styles.mobileList}>
+						{rows.map((row, index) => {
+							const rank = index + 1;
+							const ptsMark = getPtsTrendMark(row.pts);
+							const isYou = Boolean(myId && row.playerId === myId);
+							return (
+								<li
+									key={row.playerId}
+									ref={isYou ? myListRef : undefined}
+									className={[styles.mobileRow, isYou ? styles.youRow : null]
+										.filter(Boolean)
+										.join(' ')}
+								>
+									<span className={styles.mobileRank}>{rank}</span>
+									<span className={styles.mobilePlayer}>
+										<PlayerIdentity name={row.displayName} avatarUrl={row.avatarUrl} size={28} />
+										{isYou ? <span className={styles.youBadge}>вы</span> : null}
+									</span>
+									<span
+										className={styles.mobilePts}
+										style={{ color: getPtsColor(row.pts) }}
+									>
+										{ptsMark ? `${ptsMark} ${row.pts}` : row.pts}
+									</span>
+								</li>
+							);
+						})}
+					</ol>
+				</>
 			)}
 			{myRank > 0 && myRowOffscreen ? (
 				<div className={styles.stickyPlace} role="status">

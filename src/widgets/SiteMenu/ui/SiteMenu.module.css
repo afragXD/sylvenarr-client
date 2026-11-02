@@ -15,6 +15,7 @@
 	gap: 2rem;
 	padding: clamp(1.25rem, 4vw, 3rem);
 	color: var(--app-text);
+	background: #1a130e; /* AC-11 */
 }
 
 .backdrop {
@@ -47,22 +48,14 @@
 	color: var(--copper);
 }
 
-.close {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
+/* Заглушка под размер бургера в шапке — закрытие только там (AC-9). */
+.closeSlot {
+	display: inline-block;
 	width: 40px;
 	height: 40px;
-	border: 1px solid color-mix(in srgb, var(--brass) 45%, transparent);
-	background: transparent;
-	color: var(--brass);
-	cursor: pointer;
-}
-
-.close:hover,
-.close:focus-visible {
-	background: color-mix(in srgb, var(--brass) 14%, transparent);
-	outline: none;
+	flex-shrink: 0;
+	visibility: hidden;
+	pointer-events: none;
 }
 
 .columns {
@@ -114,6 +107,33 @@
 .link:focus-visible {
 	color: var(--copper);
 	outline: none;
+}
+
+.logout {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.55rem;
+	margin: 0;
+	padding: 0.35rem 0.55rem;
+	border: 1px solid color-mix(in srgb, var(--enemy, #d9574a) 55%, transparent);
+	background: color-mix(in srgb, var(--enemy, #d9574a) 22%, #1a130e);
+	color: #f2ece2; /* ≥4,5:1 к #1A130E */
+	font: inherit;
+	font-family: var(--mantine-font-family-headings);
+	font-size: 0.95rem;
+	letter-spacing: 0.04em;
+	cursor: pointer;
+}
+
+.logout:hover:not(:disabled),
+.logout:focus-visible:not(:disabled) {
+	background: color-mix(in srgb, var(--enemy, #d9574a) 35%, #1a130e);
+	outline: none;
+}
+
+.logout:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
 }
 
 .artCol {

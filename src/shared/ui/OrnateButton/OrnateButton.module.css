@@ -1,11 +1,11 @@
+/* Оболочка без clip-path: focus-ring ≥2px не срезается (AC-8 / WG-003). */
 .root {
 	position: relative;
 	display: inline-flex;
-	align-items: center;
+	align-items: stretch;
 	justify-content: center;
-	gap: 0.5rem;
 	min-height: 42px;
-	padding: 0.65rem 1.6rem;
+	padding: 0;
 	font-family: var(--mantine-font-family-headings);
 	font-weight: 700;
 	font-size: 0.92rem;
@@ -13,11 +13,10 @@
 	text-transform: uppercase;
 	text-decoration: none;
 	border: none;
+	background: transparent;
+	color: inherit;
 	cursor: pointer;
-	transition:
-		filter 140ms ease,
-		background-color 140ms ease,
-		color 140ms ease;
+	transition: filter 140ms ease;
 }
 
 .root:focus-visible {
@@ -29,7 +28,23 @@
 	cursor: not-allowed;
 }
 
-.outline {
+.face {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	width: 100%;
+	min-height: inherit;
+	padding: 0.65rem 1.6rem;
+	box-sizing: border-box;
+	transition:
+		filter 140ms ease,
+		background-color 140ms ease,
+		color 140ms ease;
+}
+
+.face_outline {
 	color: var(--app-text);
 	background: color-mix(in srgb, var(--app-surface) 70%, transparent);
 	border: 1px solid var(--brass);
@@ -44,12 +59,12 @@
 	padding-inline: 1.85rem;
 }
 
-.outline:hover:not(:disabled) {
+.root.outline:hover:not(:disabled) .face_outline {
 	background: color-mix(in srgb, var(--brass) 18%, var(--app-surface));
 	filter: brightness(1.05);
 }
 
-.parchment {
+.face_parchment {
 	color: var(--parchment-ink);
 	background: var(--parchment);
 	clip-path: polygon(
@@ -67,8 +82,8 @@
 		0 4px 14px color-mix(in srgb, #000 45%, transparent);
 }
 
-.parchment::before,
-.parchment::after {
+.face_parchment::before,
+.face_parchment::after {
 	content: "";
 	position: absolute;
 	left: 50%;
@@ -79,27 +94,27 @@
 	border: 1px solid color-mix(in srgb, var(--parchment-ink) 18%, transparent);
 }
 
-.parchment::before {
+.face_parchment::before {
 	top: -5px;
 }
 
-.parchment::after {
+.face_parchment::after {
 	bottom: -5px;
 }
 
-.parchment:hover:not(:disabled) {
+.root.parchment:hover:not(:disabled) .face_parchment {
 	filter: brightness(1.04);
 }
 
 /* AC-3: disabled без opacity — текст ≥4,5:1 к фону */
-.parchment:disabled {
+.root.parchment:disabled .face_parchment {
 	color: #2b2219;
 	background: #c9b896;
 	box-shadow: none;
 	filter: none;
 }
 
-.outline:disabled {
+.root.outline:disabled .face_outline {
 	opacity: 0.55;
 }
 
@@ -114,12 +129,26 @@
 
 .sm {
 	min-height: 34px;
-	padding: 0.4rem 1.15rem;
 	font-size: 0.8rem;
+}
+
+.sm .face {
+	padding: 0.4rem 1.15rem;
+}
+
+.sm .face_outline {
+	padding-inline: 1.35rem;
 }
 
 .lg {
 	min-height: 52px;
-	padding: 0.85rem 2rem;
 	font-size: 1rem;
+}
+
+.lg .face {
+	padding: 0.85rem 2rem;
+}
+
+.lg .face_outline {
+	padding-inline: 2.25rem;
 }

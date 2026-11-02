@@ -16,7 +16,7 @@ export const MarkdownBody = ({ children, className }: MarkdownBodyProps) => {
 	const blocks = children.trim().split(/\n{2,}/);
 
 	return (
-		<div className={className}>
+		<div className={className} style={{ maxWidth: '75ch' }}>
 			{blocks.map((block, index) => {
 				const key = `${index}-${block.slice(0, 24)}`;
 				const trimmed = block.trim();

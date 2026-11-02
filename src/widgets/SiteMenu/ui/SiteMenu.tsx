@@ -1,6 +1,6 @@
 import { Drawer } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
-import { X } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 import { getHeroCharacterUrl } from '@/entities/hero';
 import { ArtFade } from '@/shared/ui/ArtFade';
@@ -43,6 +43,9 @@ type SiteMenuProps = {
 	isSignedIn?: boolean;
 	/** Пока false — не показывать гостевой CTA (AC-4). */
 	sessionChecked?: boolean;
+	displayName?: string;
+	onLogout?: () => void;
+	isLoggingOut?: boolean;
 };
 
 /**
@@ -54,6 +57,9 @@ export const SiteMenu = ({
 	isAdmin = false,
 	isSignedIn = false,
 	sessionChecked = false,
+	displayName,
+	onLogout,
+	isLoggingOut = false,
 }: SiteMenuProps) => {
 	const promoTo = isSignedIn ? '/lobby' : '/sign-in';
 	const promoCta = isSignedIn ? 'В лобби' : 'Войти и играть';
@@ -77,14 +83,8 @@ export const SiteMenu = ({
 				<div className={classes.content}>
 					<div className={classes.top}>
 						<span className={classes.label}>Карта сайта</span>
-						<button
-							type="button"
-							className={classes.close}
-							aria-label="Закрыть меню"
-							onClick={onClose}
-						>
-							<X size={18} />
-						</button>
+						{/* Закрытие — кнопка бургера в Header (AC-9: тот же bounding box). */}
+						<span className={classes.closeSlot} aria-hidden />
 					</div>
 					<nav className={classes.columns} aria-label="Разделы сайта">
 						{COLUMNS.map((column) => (
@@ -98,16 +98,57 @@ export const SiteMenu = ({
 											</Link>
 										</li>
 									))}
-									{column.title === 'Проект' && isAdmin ? (
-										<li>
-											<Link to="/admin/news" className={classes.link} onClick={onClose}>
-												Управление новостями
-											</Link>
-										</li>
-									) : null}
 								</ul>
 							</div>
 						))}
+						{isSignedIn ? (
+							<div>
+								<h2 className={classes.columnTitle}>Аккаунт</h2>
+								<ul className={classes.list}>
+									<li>
+										<Link to="/profile/dossier" className={classes.link} onClick={onClose}>
+											Досье
+										</Link>
+									</li>
+									<li>
+										<Link to="/profile/presets" className={classes.link} onClick={onClose}>
+											Пресеты
+										</Link>
+									</li>
+									<li>
+										<Link to="/profile/settings" className={classes.link} onClick={onClose}>
+											Настройки
+										</Link>
+									</li>
+									<li>
+										<Link to="/matches" className={classes.link} onClick={onClose}>
+											Мои матчи
+										</Link>
+									</li>
+									{isAdmin ? (
+										<li>
+											<Link to="/admin/news" className={classes.link} onClick={onClose}>
+												Новости (админ)
+											</Link>
+										</li>
+									) : null}
+									<li>
+										<button
+											type="button"
+											className={classes.logout}
+											disabled={isLoggingOut}
+											onClick={() => {
+												onLogout?.();
+												onClose();
+											}}
+										>
+											<LogOut size={14} aria-hidden />
+											Выйти{displayName ? ` (${displayName})` : ''}
+										</button>
+									</li>
+								</ul>
+							</div>
+						) : null}
 					</nav>
 				</div>
 				<div className={classes.artCol}>

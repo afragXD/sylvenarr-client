@@ -2,7 +2,7 @@ import { Avatar, Group, Menu, Stack, Text, UnstyledButton } from '@mantine/core'
 import { useWindowScroll } from '@mantine/hooks';
 import { Link } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
-import { LogOut } from 'lucide-react';
+import { LogOut, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { $player, $sessionChecked, logoutFx, sessionRequested } from '@/entities/player';
@@ -112,16 +112,22 @@ export const Header = () => {
 						{player ? (
 							<Menu shadow="md" width={240} position="bottom-end" radius={0}>
 								<Menu.Target>
-									<UnstyledButton aria-label="Меню аккаунта" className={classes.avatar}>
+									<UnstyledButton aria-label="Меню аккаунта" className={classes.accountBtn}>
 										<Avatar
 											src={avatarSrc}
-											alt={player.displayName}
+											alt=""
 											radius="xl"
 											size={36}
 											color="brand"
 										>
 											{initialsFromName(player.displayName)}
 										</Avatar>
+										<span className={classes.accountName}>
+											{player.displayName}
+											<span className={classes.accountCaret} aria-hidden>
+												▾
+											</span>
+										</span>
 									</UnstyledButton>
 								</Menu.Target>
 								<Menu.Dropdown className={classes.menu}>
@@ -163,12 +169,12 @@ export const Header = () => {
 									</Menu.Item>
 									{player.role === 'admin' ? (
 										<Menu.Item component={Link} to="/admin/news">
-											Управление новостями
+											Новости (админ)
 										</Menu.Item>
 									) : null}
 									<Menu.Divider />
 									<Menu.Item
-										color="red"
+										className={classes.logoutItem}
 										leftSection={<LogOut size={14} />}
 										disabled={isLoggingOut}
 										onClick={() => void handleLogout()}
@@ -180,14 +186,22 @@ export const Header = () => {
 						) : null}
 						<button
 							type="button"
-							className={classes.burger}
-							aria-label="Открыть меню"
+							className={[classes.burger, menuOpen ? classes.burgerOpen : null]
+								.filter(Boolean)
+								.join(' ')}
+							aria-label={menuOpen ? 'Закрыть меню' : 'Открыть меню'}
 							aria-expanded={menuOpen}
-							onClick={() => setMenuOpen(true)}
+							onClick={() => setMenuOpen((open) => !open)}
 						>
-							<span />
-							<span />
-							<span />
+							{menuOpen ? (
+								<X size={18} aria-hidden />
+							) : (
+								<>
+									<span />
+									<span />
+									<span />
+								</>
+							)}
 						</button>
 					</div>
 				</div>
@@ -198,6 +212,9 @@ export const Header = () => {
 				isAdmin={player?.role === 'admin'}
 				isSignedIn={Boolean(player)}
 				sessionChecked={sessionChecked}
+				displayName={player?.displayName}
+				onLogout={() => void handleLogout()}
+				isLoggingOut={isLoggingOut}
 			/>
 		</>
 	);

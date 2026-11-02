@@ -1,4 +1,4 @@
-import { Anchor, Box, Button, Group, Select, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Anchor, Box, Button, Group, Select, Stack, Text, TextInput } from '@mantine/core';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -174,14 +174,12 @@ export const LobbyPage = () => {
 	const canCreate = validateMatchRules(rules).ok;
 
 	return (
-		<PageFrame width="wide">
-			<Stack gap={6} maw={640}>
-				<Title order={1}>Лобби</Title>
-				<Text c="var(--app-text-muted)">
-					Создайте матч и передайте ссылку другу. После входа начнётся набор отряда.
-				</Text>
-			</Stack>
-
+		<PageFrame
+			width="wide"
+			eyebrow="Арена"
+			title="Лобби"
+			lead="Создайте матч и передайте ссылку другу. После входа начнётся набор отряда."
+		>
 			{sessionChecked && !player && (
 				<Box className="sylvenarr-panel" maw={480}>
 					<Stack gap="md">

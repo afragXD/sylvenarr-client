@@ -11,11 +11,12 @@ export const AppShellLayout = ({ children }: AppShellLayoutProps) => {
 		<AppShell header={{ height: 72, offset: 0 }} padding={0} withBorder={false}>
 			<AppShell.Header
 				withBorder={false}
-				style={{ background: 'transparent', overflow: 'visible' }}
+				/* Выше SiteMenu Drawer (400): бургер «Закрыть» остаётся на месте (AC-9). */
+				style={{ background: 'transparent', overflow: 'visible', zIndex: 450 }}
 			>
 				<Header />
 			</AppShell.Header>
-			<AppShell.Main>
+			<AppShell.Main style={{ paddingBottom: 'var(--cookie-notice-offset, 0px)' }}>
 				{children}
 				<Footer />
 			</AppShell.Main>

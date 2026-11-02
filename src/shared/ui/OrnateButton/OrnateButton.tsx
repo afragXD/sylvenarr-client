@@ -23,11 +23,28 @@ const buildClass = (
 		.filter(Boolean)
 		.join(' ');
 
+const Face = ({
+	variant,
+	withDiamonds,
+	children,
+}: {
+	variant: OrnateButtonVariant;
+	withDiamonds: boolean;
+	children: ReactNode;
+}) => (
+	<span className={`${classes.face} ${classes[`face_${variant}`]}`}>
+		{withDiamonds ? <span className={classes.diamond} aria-hidden /> : null}
+		{children}
+		{withDiamonds ? <span className={classes.diamond} aria-hidden /> : null}
+	</span>
+);
+
 type OrnateButtonProps = StyleProps &
 	Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'className'>;
 
 /**
  * Кнопка в стиле BG3: контурная или пергаментная.
+ * clip-path на внутреннем .face — focus-ring на .root не срезается (AC-8).
  */
 export const OrnateButton = ({
 	children,
@@ -40,9 +57,9 @@ export const OrnateButton = ({
 }: OrnateButtonProps) => {
 	return (
 		<button type={type} className={buildClass(variant, size, className)} {...rest}>
-			{withDiamonds ? <span className={classes.diamond} aria-hidden /> : null}
-			{children}
-			{withDiamonds ? <span className={classes.diamond} aria-hidden /> : null}
+			<Face variant={variant} withDiamonds={withDiamonds}>
+				{children}
+			</Face>
 		</button>
 	);
 };
@@ -64,9 +81,9 @@ export const OrnateLink = ({
 }: OrnateLinkProps) => {
 	return (
 		<Link to={to} className={buildClass(variant, size, className)}>
-			{withDiamonds ? <span className={classes.diamond} aria-hidden /> : null}
-			{children}
-			{withDiamonds ? <span className={classes.diamond} aria-hidden /> : null}
+			<Face variant={variant} withDiamonds={withDiamonds}>
+				{children}
+			</Face>
 		</Link>
 	);
 };

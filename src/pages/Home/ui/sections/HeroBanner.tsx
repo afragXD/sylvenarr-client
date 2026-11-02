@@ -2,15 +2,23 @@ import { Link } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
 
 import { $player, $sessionChecked } from '@/entities/player';
+import { formatHeroClassCount } from '@/shared/lib/ruPlural';
 import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { OrnateLink } from '@/shared/ui/OrnateButton';
 import { SmokeBackdrop } from '@/shared/ui/SmokeBackdrop';
 
 import classes from '../HomePage.module.css';
 
-export const HeroBanner = () => {
+type HeroBannerProps = {
+	/** AC-10: число героев из API; null — пока грузится. */
+	heroCount?: number | null;
+};
+
+export const HeroBanner = ({ heroCount = null }: HeroBannerProps) => {
 	const player = useUnit($player);
 	const sessionChecked = useUnit($sessionChecked);
+	const classesPhrase =
+		heroCount !== null && heroCount > 0 ? formatHeroClassCount(heroCount) : 'классы арены';
 
 	return (
 		<section className={classes.hero} aria-label="Sylvenarr">
@@ -28,8 +36,8 @@ export const HeroBanner = () => {
 					Переиграй соперника.
 				</h1>
 				<p className={classes.heroLead}>
-					Пошаговые дуэли в тёмном технофэнтези: двадцать четыре класса, два ряда и ни одного
-					честного боя.
+					Пошаговые дуэли в тёмном технофэнтези: {classesPhrase}, два ряда и ни одного честного
+					боя.
 				</p>
 				{!sessionChecked ? (
 					<div className={classes.heroCta}>

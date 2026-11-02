@@ -31,7 +31,7 @@
 
 .stickyPlace {
 	position: sticky;
-	bottom: 0.75rem;
+	bottom: calc(0.75rem + var(--cookie-notice-offset, 0px));
 	z-index: 5;
 	margin-top: 0.75rem;
 	padding: 0.55rem 0.85rem;
@@ -41,4 +41,66 @@
 	font-weight: 700;
 	font-family: var(--mantine-font-family-headings);
 	pointer-events: none;
+}
+
+.desktopTable {
+	display: block;
+}
+
+.mobileList {
+	display: none;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	flex-direction: column;
+	gap: 0;
+	border: 1px solid var(--app-border);
+}
+
+.mobileRow {
+	display: grid;
+	grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+	gap: 0.55rem;
+	align-items: center;
+	padding: 0.55rem 0.7rem;
+	border-bottom: 1px solid var(--app-border);
+}
+
+.mobileRow:last-child {
+	border-bottom: none;
+}
+
+.mobileRank {
+	font-family: var(--mantine-font-family-monospace);
+	color: var(--app-text-muted);
+	font-size: 0.9rem;
+}
+
+.mobilePlayer {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+	min-width: 0;
+}
+
+.mobilePts {
+	font-family: var(--mantine-font-family-monospace);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	font-size: 0.95rem;
+}
+
+/* AC-9: первая строка рейтинга в первом экране 390×844 */
+@media (max-width: 48em) {
+	.desktopTable {
+		display: none;
+	}
+
+	.mobileList {
+		display: flex;
+	}
+
+	.explain {
+		display: none;
+	}
 }

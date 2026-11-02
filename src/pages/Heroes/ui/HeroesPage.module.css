@@ -1,0 +1,70 @@
+/* AC-9: на 390×844 — карточки без горизонтального скролла */
+.desktopTable {
+	display: block;
+}
+
+.mobileCards {
+	display: none;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	flex-direction: column;
+	gap: 0.65rem;
+}
+
+.card {
+	display: grid;
+	grid-template-columns: 48px minmax(0, 1fr);
+	gap: 0.75rem;
+	align-items: start;
+	padding: 0.75rem 0.85rem;
+	border: 1px solid var(--app-border);
+	background: var(--app-surface);
+	text-decoration: none;
+	color: inherit;
+}
+
+.card:hover,
+.card:focus-visible {
+	border-color: color-mix(in srgb, var(--brass) 55%, var(--app-border));
+	outline: none;
+}
+
+.cardBody {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.cardName {
+	font-weight: 600;
+	color: var(--mantine-color-brand-4);
+	text-decoration: none;
+}
+
+.cardMeta {
+	font-size: 0.82rem;
+	color: var(--app-text-muted);
+	line-height: 1.35;
+}
+
+.cardStats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem 0.75rem;
+	margin-top: 0.2rem;
+	font-family: var(--mantine-font-family-monospace);
+	font-size: 0.78rem;
+	color: var(--app-text-muted);
+}
+
+@media (max-width: 48em) {
+	.desktopTable {
+		display: none;
+	}
+
+	.mobileCards {
+		display: flex;
+	}
+}

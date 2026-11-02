@@ -273,6 +273,9 @@ export const SignInPage = () => {
 											onBlur={field.handleBlur}
 											onChange={(event) => field.handleChange(event.currentTarget.value)}
 											error={error}
+											visibilityToggleButtonProps={{
+												'aria-label': 'Показать пароль',
+											}}
 										/>
 									);
 								}}

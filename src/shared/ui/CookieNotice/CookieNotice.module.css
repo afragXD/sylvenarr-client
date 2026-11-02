@@ -35,6 +35,9 @@
 }
 
 .link {
+	display: inline-flex;
+	align-items: center;
+	min-height: 24px; /* AC-8: «Подробнее» в баннере */
 	color: var(--mantine-color-brand-4);
 	text-decoration: underline;
 	text-underline-offset: 3px;

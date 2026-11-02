@@ -18,6 +18,8 @@ type PageFrameProps = {
 	title?: string;
 	lead?: string;
 	scene?: string;
+	/** AC-9: на узком экране убрать lead и сжать шапку (первая строка рейтинга в вьюпорте). */
+	compactOnMobile?: boolean;
 };
 
 /**
@@ -34,8 +36,14 @@ export const PageFrame = ({
 	title,
 	lead,
 	scene,
+	compactOnMobile = false,
 }: PageFrameProps) => {
-	const rootClass = [veil ? 'sylvenarr-page-veil' : null, classes.root, className]
+	const rootClass = [
+		veil ? 'sylvenarr-page-veil' : null,
+		classes.root,
+		compactOnMobile ? classes.compactMobile : null,
+		className,
+	]
 		.filter(Boolean)
 		.join(' ');
 	const hasHeader = Boolean(title);
@@ -58,7 +66,12 @@ export const PageFrame = ({
 							.join(' ')}
 					>
 						<Stack gap="sm">
-							<SectionHeading title={title ?? ''} eyebrow={eyebrow} align="start" />
+							<SectionHeading
+								title={title ?? ''}
+								eyebrow={eyebrow}
+								align="start"
+								order={1}
+							/>
 							{lead ? (
 								<Text c="var(--app-text-muted)" className={classes.lead}>
 									{lead}

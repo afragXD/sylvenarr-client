@@ -8,10 +8,15 @@ import {
 	$heroesError,
 	$heroesPending,
 	$heroesReady,
+	displayAttack,
+	HeroImage,
 	heroesPageMounted,
 } from '@/entities/hero';
 import { HeroesTable } from '@/features/HeroesTable';
+import { formatHeroClassCount } from '@/shared/lib/ruPlural';
 import { PageFrame } from '@/shared/ui/PageFrame';
+
+import styles from './HeroesPage.module.css';
 
 export const HeroesPage = () => {
 	const { heroes, error, isPending, isReady } = useUnit({
@@ -47,7 +52,11 @@ export const HeroesPage = () => {
 			width="wide"
 			eyebrow="Каталог"
 			title="Реестр героев"
-			lead="Двадцать четыре класса: статы, роли и кого брать в отряд."
+			lead={
+				heroes.length > 0
+					? `${formatHeroClassCount(heroes.length)}: статы, роли и кого брать в отряд.`
+					: 'Статы, роли и кого брать в отряд.'
+			}
 		>
 			<Group justify="space-between" align="flex-end" wrap="wrap" gap="md">
 				<Stack gap={6} maw={640}>
@@ -99,9 +108,44 @@ export const HeroesPage = () => {
 				<Text c="var(--app-text-muted)">Ничего не найдено по запросу «{query.trim()}».</Text>
 			)}
 			{showTable && filtered.length > 0 && (
-				<Box style={{ overflowX: 'auto' }}>
-					<HeroesTable data={filtered} />
-				</Box>
+				<>
+					<div className={styles.desktopTable}>
+						<Box style={{ overflowX: 'auto' }}>
+							<HeroesTable data={filtered} />
+						</Box>
+					</div>
+					<ul className={styles.mobileCards}>
+						{filtered.map((hero) => (
+							<li key={hero.code}>
+								<Link
+									to="/heroes/$code"
+									params={{ code: hero.code }}
+									className={styles.card}
+								>
+									<HeroImage
+										code={hero.code}
+										alt={hero.displayName}
+										variant="portrait"
+										w={48}
+										h={48}
+									/>
+									<div className={styles.cardBody}>
+										<span className={styles.cardName}>{hero.displayName}</span>
+										{hero.roleSummary ? (
+											<span className={styles.cardMeta}>{hero.roleSummary}</span>
+										) : null}
+										<div className={styles.cardStats}>
+											<span>ОЗ {hero.health}</span>
+											<span>Урон {displayAttack(hero.damage, hero.power)}</span>
+											<span>Броня {hero.armor}</span>
+											<span>Иниц. {hero.initiative}</span>
+										</div>
+									</div>
+								</Link>
+							</li>
+						))}
+					</ul>
+				</>
 			)}
 		</PageFrame>
 	);

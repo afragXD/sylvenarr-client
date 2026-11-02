@@ -7,6 +7,7 @@ import {
 	getHeroPortraitUrl,
 	type HeroClass,
 } from '@/entities/hero';
+import { formatHeroClassCount } from '@/shared/lib/ruPlural';
 import { OrnateLink } from '@/shared/ui/OrnateButton';
 import { OrnateFrame } from '@/shared/ui/OrnateFrame';
 import { PortraitRail } from '@/shared/ui/PortraitRail';
@@ -15,7 +16,12 @@ import { SectionHeading } from '@/shared/ui/SectionHeading';
 import { FEATURED_HERO_CODES } from '../../model/featuredHeroes';
 import classes from '../HomePage.module.css';
 
-export const HeroesShowcase = () => {
+type HeroesShowcaseProps = {
+	/** AC-10: длина списка героев из API. */
+	heroCount?: number | null;
+};
+
+export const HeroesShowcase = ({ heroCount = null }: HeroesShowcaseProps) => {
 	const [heroes, setHeroes] = useState<HeroClass[]>([]);
 	const [selected, setSelected] = useState<string>(FEATURED_HERO_CODES[0]);
 
@@ -92,7 +98,11 @@ export const HeroesShowcase = () => {
 				</div>
 			) : null}
 			<div className={classes.moreHeroes}>
-				<OrnateLink to="/heroes">Все двадцать четыре класса</OrnateLink>
+				<OrnateLink to="/heroes">
+					{heroCount !== null && heroCount > 0
+						? `Все ${formatHeroClassCount(heroCount)}`
+						: 'Все классы'}
+				</OrnateLink>
 			</div>
 		</section>
 	);

@@ -12,7 +12,7 @@ import {
 	useSensors,
 } from '@dnd-kit/core';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
-import { Anchor, Box, Button, Group, Loader, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { Anchor, Box, Button, Group, Loader, SimpleGrid, Stack, Text } from '@mantine/core';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { Check, Link2 } from 'lucide-react';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
@@ -753,27 +753,28 @@ export const MatchRoomPage = () => {
 		const isGuest = bootError === 'guest';
 		const returnPath = `/lobby/${matchId}`;
 		return (
-			<PageFrame width="wide">
+			<PageFrame
+				width="wide"
+				eyebrow="Арена"
+				title="Матч"
+				lead={isGuest ? 'Войдите, чтобы посмотреть матч.' : undefined}
+			>
 				<Stack
 					gap="md"
 					maw={480}
 					className={isGuest ? 'sylvenarr-panel' : undefined}
 					p={isGuest ? 'md' : undefined}
 				>
-					<Title order={1}>Матч</Title>
 					{isGuest ? (
-						<>
-							<Text c="var(--app-text-muted)">Войдите, чтобы посмотреть матч.</Text>
-							<Button
-								className="sylvenarr-plate-btn"
-								color="brand"
-								component={Link}
-								to="/sign-in"
-								search={{ redirect: returnPath }}
-							>
-								Войти и играть
-							</Button>
-						</>
+						<Button
+							className="sylvenarr-plate-btn"
+							color="brand"
+							component={Link}
+							to="/sign-in"
+							search={{ redirect: returnPath }}
+						>
+							Войти и играть
+						</Button>
 					) : (
 						<>
 							<Text c="red" role="alert">
@@ -876,7 +877,12 @@ export const MatchRoomPage = () => {
 	);
 
 	return (
-		<PageFrame width="wide">
+		<PageFrame
+			width="wide"
+			eyebrow="Арена"
+			title="Матч"
+			lead={`Статус: ${statusLabel(match.status)}`}
+		>
 			{squadsReadyVisible && squadsSnapshot ? (
 				<output className={draftStyles.squadsReady} aria-live="polite">
 					<div className={draftStyles.squadsReadyCard}>
@@ -909,16 +915,14 @@ export const MatchRoomPage = () => {
 							<Anchor component={Link} to="/lobby" c="brand" fw={600} size="sm">
 								← Лобби
 							</Anchor>
-							<Title order={1}>Матч</Title>
 							<Text c="var(--app-text-muted)">
-								Статус: {statusLabel(match.status)}. Код:{' '}
-								<InviteCodeChip code={match.inviteCode} compact />
+								Код: <InviteCodeChip code={match.inviteCode} compact />
 							</Text>
-							{match.rules && (
+							{match.rules ? (
 								<Text size="sm" c="var(--app-text-muted)">
 									{formatRulesPlain(match.rules)}
 								</Text>
-							)}
+							) : null}
 						</Stack>
 						{isHost && (match.status === 'waiting' || match.status === 'drafting') && (
 							<Button

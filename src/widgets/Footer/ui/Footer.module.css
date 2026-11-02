@@ -67,6 +67,7 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 0.45rem;
+	min-height: 24px; /* AC-8: высота цели ≥24px */
 	color: var(--app-text-muted);
 	text-decoration: none;
 	font-size: 0.92rem;
@@ -96,6 +97,9 @@
 }
 
 .credits a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 24px; /* AC-8: Wormgod / enlacroix / arenamsterbot */
 	color: var(--copper);
 	text-decoration: none;
 }

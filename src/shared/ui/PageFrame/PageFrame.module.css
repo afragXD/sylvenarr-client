@@ -56,4 +56,18 @@
 	.headerGridWithScene {
 		grid-template-columns: 1fr;
 	}
+
+	.compactMobile .header {
+		padding-top: 1rem;
+		padding-bottom: 0.35rem;
+	}
+
+	.compactMobile .body {
+		padding-top: 0.75rem;
+		padding-bottom: 1rem;
+	}
+
+	.compactMobile .lead {
+		display: none;
+	}
 }

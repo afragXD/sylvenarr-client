@@ -100,6 +100,7 @@
 .burger {
 	display: inline-flex;
 	flex-direction: column;
+	align-items: center;
 	justify-content: center;
 	gap: 5px;
 	width: 40px;
@@ -110,6 +111,13 @@
 	color: var(--brass);
 	cursor: pointer;
 	flex-shrink: 0;
+}
+
+/* AC-9: «Закрыть» на месте «Открыть» (±8px), поверх Drawer */
+.burgerOpen {
+	position: relative;
+	z-index: 450;
+	background: color-mix(in srgb, #000 72%, transparent);
 }
 
 .burger:hover,
@@ -136,23 +144,70 @@
 	width: 85%;
 }
 
-.avatar {
+.accountBtn {
 	display: inline-flex;
-	line-height: 0;
+	align-items: center;
+	gap: 0.45rem;
 	padding: 0;
-	border: 1px solid color-mix(in srgb, var(--brass) 45%, transparent);
-	border-radius: 999px;
+	border: none;
+	background: transparent;
+	color: var(--app-text);
+	cursor: pointer;
 	outline: none;
+	min-width: 0;
 }
 
-.avatar:hover,
-.avatar:focus-visible {
+.accountBtn:hover .accountName,
+.accountBtn:focus-visible .accountName {
+	color: var(--copper);
+}
+
+.accountBtn:focus-visible {
 	box-shadow: 0 0 0 2px color-mix(in srgb, var(--brass) 35%, transparent);
+}
+
+.accountBtn :global(.mantine-Avatar-root) {
+	border: 1px solid color-mix(in srgb, var(--brass) 45%, transparent);
+	flex-shrink: 0;
+}
+
+.accountName {
+	display: none;
+	align-items: center;
+	gap: 0.25rem;
+	font-family: var(--mantine-font-family-headings);
+	font-size: 0.85rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	max-width: 10rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.accountCaret {
+	flex-shrink: 0;
+	opacity: 0.75;
 }
 
 .menu {
 	border: 1px solid color-mix(in srgb, var(--brass) 45%, transparent);
-	background: var(--app-surface);
+	background: #1a130e; /* AC-11 */
+}
+
+.logoutItem {
+	color: #f2ece2 !important;
+	background: color-mix(in srgb, var(--enemy, #d9574a) 22%, #1a130e);
+}
+
+.logoutItem:hover {
+	background: color-mix(in srgb, var(--enemy, #d9574a) 35%, #1a130e) !important;
+}
+
+@media (min-width: 40em) {
+	.accountName {
+		display: inline-flex;
+	}
 }
 
 @media (min-width: 56em) {

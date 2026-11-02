@@ -5,14 +5,15 @@ type SectionHeadingProps = {
 	title: string;
 	eyebrow?: string;
 	align?: 'start' | 'center';
-	order?: 2 | 3;
+	/** 1 — H1 страницы (AC-10); 2/3 — секции. */
+	order?: 1 | 2 | 3;
 	withRule?: boolean;
 	className?: string;
 	id?: string;
 };
 
 /**
- * Заголовок секции: опциональная подпись, капители, золотая линия.
+ * Заголовок: надзаголовок + H1/H2/H3 + ромб/линия (AC-10).
  */
 export const SectionHeading = ({
 	title,
@@ -23,9 +24,10 @@ export const SectionHeading = ({
 	className,
 	id,
 }: SectionHeadingProps) => {
-	const Tag = order === 3 ? 'h3' : 'h2';
+	const Tag = order === 1 ? 'h1' : order === 3 ? 'h3' : 'h2';
+	const sizeClass = order === 1 ? classes.h1 : order === 3 ? classes.h3 : classes.h2;
 	const rootClass = [classes.root, classes[align], className].filter(Boolean).join(' ');
-	const titleClass = [classes.title, order === 3 ? classes.h3 : classes.h2].join(' ');
+	const titleClass = [classes.title, sizeClass].join(' ');
 
 	return (
 		<div className={rootClass}>
