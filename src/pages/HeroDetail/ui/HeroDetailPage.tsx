@@ -1,4 +1,4 @@
-import { Anchor, Group, Loader, Slider, Stack, Text } from '@mantine/core';
+import { Anchor, Group, Loader, Stack, Text } from '@mantine/core';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useUnit } from 'effector-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -18,6 +18,7 @@ import {
 	isTransformForm,
 } from '@/entities/hero';
 import { ArtFade } from '@/shared/ui/ArtFade';
+import { LevelSlider } from '@/shared/ui/LevelSlider';
 import { OrnateFrame } from '@/shared/ui/OrnateFrame';
 import { PageFrame } from '@/shared/ui/PageFrame';
 import { PortraitRail } from '@/shared/ui/PortraitRail';
@@ -124,26 +125,12 @@ export const HeroDetailPage = () => {
 									{hero.roleSummary}
 								</Text>
 							) : null}
-							<div className={classes.levelField}>
-								<span className={classes.levelFieldLabel}>Уровень</span>
-								<div className={classes.levelSliderRow}>
-									<Slider
-										style={{ flex: 1 }}
-										min={1}
-										max={100}
-										step={1}
-										value={level}
-										onChange={setLevel}
-										label={null}
-										marks={[
-											{ value: 1, label: '1' },
-											{ value: 50, label: '50' },
-											{ value: 100, label: '100' },
-										]}
-									/>
-									<span className={classes.levelSliderValue}>{level}</span>
-								</div>
-							</div>
+							<LevelSlider
+								className={classes.levelField}
+								label="Уровень"
+								value={level}
+								onChange={setLevel}
+							/>
 							<OrnateFrame variant="panel" className={classes.stats}>
 								{highlightStats.map((stat) => (
 									<div key={stat.key}>
