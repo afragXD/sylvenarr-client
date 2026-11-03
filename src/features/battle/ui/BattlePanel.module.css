@@ -43,6 +43,10 @@
 }
 
 .sideTitle {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.25rem 0.5rem;
 	font-family: var(--mantine-font-family-headings);
 	font-weight: 600;
 	margin-bottom: 0.5rem;
@@ -146,11 +150,11 @@
 	background: #84a36c; /* ≥50% */
 }
 
-.hpBarFill[data-band='mid'] {
+.hpBarFill[data-band="mid"] {
 	background: #e9c08f; /* 25–49%, ровно 25% = золото */
 }
 
-.hpBarFill[data-band='low'] {
+.hpBarFill[data-band="low"] {
 	background: #ec5e4f; /* <25% */
 }
 
@@ -162,7 +166,7 @@
 	color: var(--app-text);
 }
 
-.hpBarValue[data-band='low'] {
+.hpBarValue[data-band="low"] {
 	color: #ec5e4f;
 }
 
@@ -180,7 +184,7 @@
 	animation: damageFloatUp 900ms ease-out forwards;
 }
 
-.damageFloat[data-heal='true'] {
+.damageFloat[data-heal="true"] {
 	color: #84a36c;
 }
 
@@ -250,7 +254,7 @@
 	min-height: 5.5rem;
 }
 
-.actions[data-opponent='true'] {
+.actions[data-opponent="true"] {
 	opacity: 0.92;
 }
 
@@ -417,47 +421,47 @@
 	color: color-mix(in srgb, var(--copper) 70%, var(--app-text));
 }
 
-.logDmg[data-src='fire'] {
+.logDmg[data-src="fire"] {
 	color: color-mix(in srgb, var(--mantine-color-accent-3) 75%, var(--app-text));
 	font-weight: 700;
 }
 
-.logDmg[data-src='holy'] {
+.logDmg[data-src="holy"] {
 	color: color-mix(in srgb, var(--brass) 80%, var(--app-text));
 	font-weight: 700;
 }
 
-.logDmg[data-src='water'] {
+.logDmg[data-src="water"] {
 	color: color-mix(in srgb, var(--copper) 85%, var(--app-text));
 	font-weight: 700;
 }
 
-.logDmg[data-src='death'] {
+.logDmg[data-src="death"] {
 	color: color-mix(in srgb, var(--wine) 55%, var(--parchment));
 	font-weight: 700;
 }
 
-.logDmg[data-src='weapon'] {
+.logDmg[data-src="weapon"] {
 	color: var(--app-text);
 	font-weight: 700;
 }
 
-.logDmg[data-src='air'] {
+.logDmg[data-src="air"] {
 	color: color-mix(in srgb, #7eb6d9 70%, var(--app-text));
 	font-weight: 700;
 }
 
-.logDmg[data-src='earth'] {
+.logDmg[data-src="earth"] {
 	color: color-mix(in srgb, #8b7355 75%, var(--app-text));
 	font-weight: 700;
 }
 
-.logDmg[data-src='arrows'] {
+.logDmg[data-src="arrows"] {
 	color: color-mix(in srgb, var(--brass) 55%, var(--app-text));
 	font-weight: 700;
 }
 
-.logDmg[data-src='mind'] {
+.logDmg[data-src="mind"] {
 	color: color-mix(in srgb, #9b7bb8 65%, var(--app-text));
 	font-weight: 700;
 }
@@ -468,6 +472,6 @@
 	background: color-mix(in srgb, var(--app-surface-muted) 50%, var(--app-surface));
 }
 
-.confirm[data-aoe='true'] {
+.confirm[data-aoe="true"] {
 	border-color: color-mix(in srgb, var(--mantine-color-accent-filled) 65%, var(--app-border));
 }

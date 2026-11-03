@@ -1,17 +1,16 @@
 import { Group, Modal, SimpleGrid, Stack, Text } from '@mantine/core';
 import {
-	Coins,
-	Crosshair,
 	Clover,
+	Crosshair,
 	Gauge,
 	Ghost,
 	Heart,
+	type LucideIcon,
 	Shield,
 	Sparkles,
 	Sword,
 	WandSparkles,
 	Zap,
-	type LucideIcon,
 } from 'lucide-react';
 
 import {
@@ -54,7 +53,6 @@ type NumericStatKey =
 	| 'accuracy'
 	| 'power'
 	| 'mana'
-	| 'gold'
 	| 'critBank'
 	| 'ultaCharges'
 	| 'morale';
@@ -75,7 +73,6 @@ const STATS: ReadonlyArray<{
 	{ key: 'accuracy', label: 'Точность', hint: 'Шанс попасть по цели', Icon: Crosshair },
 	{ key: 'power', label: 'Сила магии', hint: 'Мощность заклинаний', Icon: WandSparkles },
 	{ key: 'mana', label: 'Мана', hint: 'Ресурс для способностей', Icon: Zap },
-	{ key: 'gold', label: 'Золото', hint: 'Трофеи юнита', Icon: Coins },
 	{ key: 'critBank', label: 'Крит-банк', hint: 'Накопленный критический запас', Icon: Sword },
 	{ key: 'ultaCharges', label: 'Заряды', hint: 'Заряды ультимативной способности', Icon: Sparkles },
 	{ key: 'morale', label: 'Мораль', hint: 'Боевой дух', Icon: Ghost },
@@ -222,7 +219,11 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 															Вард — {ward.label}
 														</Text>
 														{charges ? (
-															<Text size="sm" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
+															<Text
+																size="sm"
+																fw={600}
+																style={{ fontVariantNumeric: 'tabular-nums' }}
+															>
 																{charges}
 															</Text>
 														) : null}

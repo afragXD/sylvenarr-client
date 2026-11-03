@@ -29,6 +29,7 @@ import { CombatStat, CombatStatRow } from './CombatStat';
 import { type MatchResultKind, MatchResultOverlay } from './MatchResultOverlay';
 import { PortraitHpCurtain } from './PortraitHpCurtain';
 import { PresetCallsign } from './PresetNamesBanner';
+import { TeamWallet } from './TeamWallet';
 import { TurnOrderStrip } from './TurnOrderStrip';
 import { UnitEffects } from './UnitEffects';
 import { UnitInspectModal } from './UnitInspectModal';
@@ -450,7 +451,10 @@ export const BattlePanel = ({
 			// Фоллбек: формулы страницы героя (лечение и т.п. без attackKind).
 			return previewHealFromAbilityParts(
 				getAbilityPreview(active.heroClassCode, ability.slot, {
-					...previewCtxFromUnit(active),
+					...previewCtxFromUnit({
+						...active,
+						gold: battle.teams?.[active.team]?.gold ?? 0,
+					}),
 					targetHpRatio: unit.maxHp > 0 ? unit.health / unit.maxHp : 1,
 				}),
 			);
@@ -563,6 +567,7 @@ export const BattlePanel = ({
 								size={FIELD_PORTRAIT}
 							/>
 						}
+						teamGold={battle.teams?.[0]?.gold ?? 0}
 						playerName={match.host.displayName}
 						presetName={match.draft.hostPresetName}
 						presetActive={battle.outcome === 'ongoing'}
@@ -586,6 +591,7 @@ export const BattlePanel = ({
 								size={FIELD_PORTRAIT}
 							/>
 						}
+						teamGold={battle.teams?.[1]?.gold ?? 0}
 						playerName={match.guest?.displayName ?? '…'}
 						presetName={match.draft.guestPresetName}
 						presetActive={battle.outcome === 'ongoing'}
@@ -706,16 +712,18 @@ export const BattlePanel = ({
 													getAbilityPreview(
 														active.heroClassCode,
 														ability.slot,
-														previewCtxFromUnit(active, activeEnemies),
+														previewCtxFromUnit(
+															{
+																...active,
+																gold: battle.teams?.[active.team]?.gold ?? 0,
+															},
+															activeEnemies,
+														),
 													),
 												)
 											: null;
 									const blockReason = ability.disabledReason
-										? formatAbilityBlockReason(
-												ability.disabledReason,
-												active.mana,
-												active.maxMana,
-											)
+										? formatAbilityBlockReason(ability.disabledReason, active.mana, active.maxMana)
 										: null;
 									const tip = (
 										<div className={styles.abilityTip}>
@@ -724,9 +732,7 @@ export const BattlePanel = ({
 											{doc?.mechanics ? (
 												<span className={styles.abilityTipMeta}>{doc.mechanics}</span>
 											) : null}
-											{preview ? (
-												<span className={styles.abilityTipMeta}>{preview}</span>
-											) : null}
+											{preview ? <span className={styles.abilityTipMeta}>{preview}</span> : null}
 											{blockReason ? (
 												<span className={styles.abilityTipMeta}>{blockReason}</span>
 											) : null}
@@ -878,6 +884,7 @@ export const BattlePanel = ({
 
 const TeamSide = ({
 	title,
+	teamGold,
 	playerName,
 	presetName,
 	presetActive,
@@ -893,6 +900,7 @@ const TeamSide = ({
 	damageFloats,
 }: {
 	title: ReactNode;
+	teamGold: number;
 	playerName: string;
 	presetName: string | null | undefined;
 	presetActive: boolean;
@@ -916,7 +924,10 @@ const TeamSide = ({
 
 	return (
 		<div className={styles.side}>
-			<div className={styles.sideTitle}>{title}</div>
+			<div className={styles.sideTitle}>
+				{title}
+				<TeamWallet gold={teamGold} />
+			</div>
 			<PresetCallsign
 				playerName={playerName}
 				presetName={presetName}
@@ -1081,10 +1092,7 @@ const RowColumn = ({
 										</button>
 									</Group>
 								</div>
-								<div
-									className={styles.hpBar}
-									aria-label={`ОЗ: ${unit.health} из ${unit.maxHp}`}
-								>
+								<div className={styles.hpBar} aria-label={`ОЗ: ${unit.health} из ${unit.maxHp}`}>
 									<div className={styles.hpBarTrack}>
 										<div
 											className={styles.hpBarFill}

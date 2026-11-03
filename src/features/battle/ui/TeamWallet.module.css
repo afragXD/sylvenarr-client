@@ -1,0 +1,55 @@
+.wallet {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.35rem;
+	margin-left: 0.5rem;
+	font-variant-numeric: tabular-nums;
+	color: #e9c08f;
+	font-weight: 600;
+}
+
+.amount::before {
+	content: "";
+	display: inline-block;
+	width: 0.55em;
+	height: 0.55em;
+	margin-right: 0.3em;
+	border-radius: 50%;
+	background: #e9c08f;
+	vertical-align: 0.05em;
+}
+
+.deltaUp,
+.deltaDown {
+	font-size: 0.85em;
+	font-weight: 600;
+	animation: walletFlash 1s ease-out forwards;
+}
+
+.deltaUp {
+	color: #84a36c;
+}
+
+.deltaDown {
+	color: #e87a6e;
+}
+
+@keyframes walletFlash {
+	0% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		transform: translateY(-0.35rem);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.deltaUp,
+	.deltaDown {
+		animation: none;
+		opacity: 1;
+		transform: none;
+	}
+}

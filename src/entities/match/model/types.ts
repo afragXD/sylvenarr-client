@@ -84,7 +84,6 @@ export type BattleUnit = {
 	luck: number;
 	accuracy: number;
 	power: number;
-	gold: number;
 	critBank: number;
 	ultaCharges: number;
 	/** Уровень юнита в бою. */
@@ -93,6 +92,11 @@ export type BattleUnit = {
 	morale?: number;
 	/** Ненулевые сопротивления / варды / иммунитеты. */
 	resists?: ResistBrief[];
+};
+
+/** Кошелёк отряда в сводке боя (CUT-2026-11-03b T3). */
+export type BattleTeamEconomy = {
+	gold: number;
 };
 
 export type TurnOrderPhase = 'acted' | 'active' | 'waiting' | 'delayed' | 'dead';
@@ -162,6 +166,8 @@ export type BattleState = {
 	abilities: AbilityInfo[];
 	pendingPrompt: PendingPrompt | null;
 	units: BattleUnit[];
+	/** Кошельки [host, guest]; у старого сервера поля нет. */
+	teams?: [BattleTeamEconomy, BattleTeamEconomy];
 };
 
 /** ПТС текущего игрока по матчу; null — матч без рейтинга. */

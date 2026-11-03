@@ -125,9 +125,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	},
 	Assassin: {
 		1: (ctx) => [atk(ctx, 1.15)],
-		2: (ctx) => [
-			{ kind: 'text', value: `облик · +1 ур. · мораль +${ctx.lvl + 3}` },
-		],
+		2: (ctx) => [{ kind: 'text', value: `облик · +1 ур. · мораль +${ctx.lvl + 3}` }],
 	},
 	Paladin: {
 		1: (ctx) => [atk(ctx, 1.05), { kind: 'text', value: '×2 удара' }],
@@ -164,10 +162,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		1: (ctx) => [
 			{
 				kind: 'strength',
-				value: Math.max(
-					1,
-					round(ctx.damage * Math.min(0.5 + 0.05 * ctx.lvl, 0.95)),
-				),
+				value: Math.max(1, round(ctx.damage * Math.min(0.5 + 0.05 * ctx.lvl, 0.95))),
 			},
 			{ kind: 'duration', value: 1 + Math.floor(ctx.lvl / 9), label: 'р.' },
 		],
@@ -178,9 +173,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	Patriarch: {
 		1: (ctx) => [atk(ctx, 1)],
 		2: (ctx) => [heal(ctx.lvl * 7 + Math.floor(ctx.power / 3))],
-		4: (ctx) => [
-			{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 5), label: 'р. «Святилище»' },
-		],
+		4: (ctx) => [{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 5), label: 'р. «Святилище»' }],
 	},
 	Oracle: {
 		1: (ctx) => [
@@ -219,9 +212,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	EvilTree: {
 		2: (ctx) => [atk(ctx, 1.2)],
 		3: () => [{ kind: 'duration', value: 2, label: 'р. запрет лечения' }],
-		4: (ctx) => [
-			{ kind: 'duration', value: 3 + Math.floor(ctx.lvl / 4), label: 'р. урока' },
-		],
+		4: (ctx) => [{ kind: 'duration', value: 3 + Math.floor(ctx.lvl / 4), label: 'р. урока' }],
 		5: (ctx) => [
 			{
 				kind: 'text',
@@ -232,9 +223,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	Mermaid: {
 		1: mermaidBreeze,
 		2: (ctx) => [{ kind: 'chance', value: 38 + ctx.lvl, label: 'оглушение ряду' }],
-		4: (ctx) => [
-			{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 6), label: 'р. оковы' },
-		],
+		4: (ctx) => [{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 6), label: 'р. оковы' }],
 	},
 	Dracolich: {
 		1: (ctx) => [atk(ctx, 1)],
@@ -395,7 +384,7 @@ export function previewCtxFromUnit(
 		health: unit.health,
 		maxHp: unit.maxHp,
 		luck: unit.luck,
-		gold: unit.gold,
+		gold: unit.gold ?? 0,
 		cumRage: 0,
 		enemies,
 	};
