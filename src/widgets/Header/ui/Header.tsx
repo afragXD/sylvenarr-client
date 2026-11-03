@@ -131,7 +131,7 @@ export const Header = () => {
 									</UnstyledButton>
 								</Menu.Target>
 								<Menu.Dropdown className={classes.menu}>
-									<Menu.Item component={Link} to="/profile/settings">
+									<Menu.Item component={Link} to="/profile/dossier">
 										<Group gap="sm" wrap="nowrap" align="flex-start">
 											<Avatar src={avatarSrc} alt="" radius="xl" size={32} color="brand">
 												{initialsFromName(player.displayName)}
@@ -152,20 +152,14 @@ export const Header = () => {
 									<Menu.Item component={Link} to="/profile/dossier">
 										Досье
 									</Menu.Item>
+									<Menu.Item component={Link} to="/matches">
+										Мои матчи
+									</Menu.Item>
 									<Menu.Item component={Link} to="/profile/presets">
 										Пресеты
 									</Menu.Item>
 									<Menu.Item component={Link} to="/profile/settings">
 										Настройки
-									</Menu.Item>
-									<Menu.Item component={Link} to="/matches">
-										Мои матчи
-									</Menu.Item>
-									<Menu.Item component={Link} to="/lobby">
-										Лобби
-									</Menu.Item>
-									<Menu.Item component={Link} to="/rating">
-										Рейтинг
 									</Menu.Item>
 									{player.role === 'admin' ? (
 										<Menu.Item component={Link} to="/admin/news">

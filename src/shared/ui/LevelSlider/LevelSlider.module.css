@@ -13,6 +13,8 @@
 	display: flex;
 	align-items: center;
 	gap: 0.85rem;
+	/* Метки Mantine висят ниже дорожки и не входят в высоту слайдера. */
+	padding-bottom: 1.15rem;
 }
 
 .value {

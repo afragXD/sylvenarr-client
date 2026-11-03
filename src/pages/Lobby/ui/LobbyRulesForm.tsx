@@ -184,7 +184,7 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 				)}
 			</Stack>
 
-			<Stack gap={6}>
+			<Stack gap={14}>
 				<p className={styles.sectionTitle}>Бой</p>
 				<div className={styles.field}>
 					<span className={styles.fieldLabel}>Стартовое здоровье</span>
@@ -243,7 +243,7 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 					onChange={(event) => patch({ fairEnabled: event.currentTarget.checked })}
 				/>
 				{rules.fairEnabled && (
-					<Stack gap={6} className={styles.fairSliders}>
+					<Stack gap={14} className={styles.fairSliders}>
 						<div className={styles.field}>
 							<span className={styles.fieldLabel}>Ярмарка раз в N раундов</span>
 							<div className={styles.sliderRow}>
