@@ -115,23 +115,9 @@
 	padding-top: 0.65rem;
 	display: flex;
 	flex-direction: column;
-	gap: 0.2rem;
-	opacity: 0.72;
+	gap: 0.55rem;
 }
 
-.fairLabel {
-	font-size: 0.85rem;
-	font-weight: 600;
-	color: var(--app-text-muted);
-	display: inline-flex;
-	align-items: baseline;
-	gap: 0.45rem;
-}
-
-.fairSoon {
-	font-size: 0.72rem;
-	font-weight: 650;
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
-	color: color-mix(in srgb, var(--mantine-color-brand-4) 70%, var(--app-text-muted));
+.fairSliders {
+	padding-left: 0.1rem;
 }

@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 
 import {
-	DEFAULT_MATCH_RULES,
 	applyPreset,
+	DEFAULT_MATCH_RULES,
 	detectPreset,
 	formatRulesPlain,
 	formatRulesSummary,
@@ -48,39 +48,53 @@ describe('matchRules client', () => {
 
 	test('formatRulesSummary appends dupes mode', () => {
 		expect(formatRulesSummary(DEFAULT_MATCH_RULES)).not.toContain('дубл');
-		expect(
-			formatRulesSummary({ ...DEFAULT_MATCH_RULES, heroDupes: 'uniqueTeam' }),
-		).toContain('без дублей');
-		expect(
-			formatRulesSummary({ ...DEFAULT_MATCH_RULES, heroDupes: 'uniqueMatch' }),
-		).toContain('уникальны в матче');
+		expect(formatRulesSummary({ ...DEFAULT_MATCH_RULES, heroDupes: 'uniqueTeam' })).toContain(
+			'без дублей',
+		);
+		expect(formatRulesSummary({ ...DEFAULT_MATCH_RULES, heroDupes: 'uniqueMatch' })).toContain(
+			'уникальны в матче',
+		);
 	});
 
 	test('rejects startingLevel out of range', () => {
-		expect(validateMatchRules({ ...DEFAULT_MATCH_RULES, startingLevel: 0 }).ok).toBe(
-			false,
-		);
-		expect(validateMatchRules({ ...DEFAULT_MATCH_RULES, startingLevel: 31 }).ok).toBe(
-			false,
-		);
+		expect(validateMatchRules({ ...DEFAULT_MATCH_RULES, startingLevel: 0 }).ok).toBe(false);
+		expect(validateMatchRules({ ...DEFAULT_MATCH_RULES, startingLevel: 31 }).ok).toBe(false);
 	});
 
 	test('formatRulesSummary shows starting level when above 1', () => {
-		expect(
-			formatRulesSummary({ ...DEFAULT_MATCH_RULES, startingLevel: 10 }),
-		).toContain('ур. 10');
+		expect(formatRulesSummary({ ...DEFAULT_MATCH_RULES, startingLevel: 10 })).toContain('ур. 10');
 	});
 
 	test('formatRulesSummary marks friendly match', () => {
 		expect(formatRulesSummary(DEFAULT_MATCH_RULES)).not.toContain('товарищеский');
-		expect(
-			formatRulesSummary({ ...DEFAULT_MATCH_RULES, rated: false }),
-		).toContain('товарищеский');
+		expect(formatRulesSummary({ ...DEFAULT_MATCH_RULES, rated: false })).toContain('товарищеский');
 	});
 
 	test('applyPreset keeps rated from base', () => {
 		const next = applyPreset('fast', { ...DEFAULT_MATCH_RULES, rated: false });
 		expect(next.rated).toBe(false);
+	});
+
+	test('applyPreset resets fairEnabled to off', () => {
+		const next = applyPreset('classic', {
+			...DEFAULT_MATCH_RULES,
+			fairEnabled: true,
+			fairFrequency: 3,
+			shopSize: 12,
+			goldBonus: 2,
+		});
+		expect(next.fairEnabled).toBe(false);
+		expect(next.fairFrequency).toBe(DEFAULT_MATCH_RULES.fairFrequency);
+		expect(next.shopSize).toBe(DEFAULT_MATCH_RULES.shopSize);
+		expect(next.goldBonus).toBe(DEFAULT_MATCH_RULES.goldBonus);
+	});
+
+	test('validateMatchRules snaps goldBonus to 0.25 step', () => {
+		const result = validateMatchRules({ ...DEFAULT_MATCH_RULES, goldBonus: 1.07 });
+		expect(result.ok).toBe(true);
+		if (result.ok) {
+			expect(result.rules.goldBonus).toBe(1);
+		}
 	});
 
 	test('formatRulesPlain uses spoken wording', () => {

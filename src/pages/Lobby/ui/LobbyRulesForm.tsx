@@ -2,12 +2,12 @@ import { SegmentedControl, Slider, Stack, Switch, Text } from '@mantine/core';
 import { useMemo } from 'react';
 
 import {
-	MATCH_RULES_LIMITS,
 	applyPreset,
 	detectPreset,
+	type HeroDupesMode,
 	healthBonusToPercent,
 	healthPercentToBonus,
-	type HeroDupesMode,
+	MATCH_RULES_LIMITS,
 	type MatchRules,
 	validateMatchRules,
 } from '@/entities/match';
@@ -86,7 +86,7 @@ const SidePreview = ({ title, mirror, slotCount }: SidePreviewProps) => {
 };
 
 /**
- * Форма правил матча: пресеты, сегменты квот, слайдеры боя, заглушка ярмарки.
+ * Форма правил матча: пресеты, сегменты квот, слайдеры боя, ярмарка/перки/предметы.
  */
 export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 	const preset = detectPreset(rules);
@@ -117,12 +117,7 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 
 			<div className={styles.field}>
 				<span className={styles.fieldLabel}>Режим</span>
-				<SegmentedControl
-					fullWidth
-					value={preset}
-					onChange={setPreset}
-					data={[...PRESET_DATA]}
-				/>
+				<SegmentedControl fullWidth value={preset} onChange={setPreset} data={[...PRESET_DATA]} />
 			</div>
 
 			<div className={styles.field}>
@@ -240,13 +235,76 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 				/>
 			</Stack>
 
-			<div className={styles.fairBlock} aria-disabled="true">
-				<span className={styles.fairLabel}>
-					Ярмарка <span className={styles.fairSoon}>скоро</span>
-				</span>
-				<Text size="xs" c="var(--app-text-muted)" style={{ lineHeight: 1.35 }}>
-					Покупка героев между раундами — пока недоступна.
-				</Text>
+			<div className={styles.fairBlock}>
+				<Switch
+					label="Ярмарка, перки и предметы"
+					description="Торговля между раундами, выбор перков, инвентарь отряда"
+					checked={rules.fairEnabled}
+					onChange={(event) => patch({ fairEnabled: event.currentTarget.checked })}
+				/>
+				{rules.fairEnabled && (
+					<Stack gap={6} className={styles.fairSliders}>
+						<div className={styles.field}>
+							<span className={styles.fieldLabel}>Ярмарка раз в N раундов</span>
+							<div className={styles.sliderRow}>
+								<Slider
+									style={{ flex: 1 }}
+									min={MATCH_RULES_LIMITS.fairFrequency.min}
+									max={MATCH_RULES_LIMITS.fairFrequency.max}
+									step={1}
+									value={rules.fairFrequency}
+									onChange={(value) => patch({ fairFrequency: value })}
+									marks={[
+										{ value: 3, label: '3' },
+										{ value: 5, label: '5' },
+										{ value: 10, label: '10' },
+									]}
+								/>
+								<span className={styles.sliderValue}>{rules.fairFrequency}</span>
+							</div>
+						</div>
+						<div className={styles.field}>
+							<span className={styles.fieldLabel}>Товаров на прилавке</span>
+							<div className={styles.sliderRow}>
+								<Slider
+									style={{ flex: 1 }}
+									min={MATCH_RULES_LIMITS.shopSize.min}
+									max={MATCH_RULES_LIMITS.shopSize.max}
+									step={1}
+									value={rules.shopSize}
+									onChange={(value) => patch({ shopSize: value })}
+									marks={[
+										{ value: 4, label: '4' },
+										{ value: 8, label: '8' },
+										{ value: 12, label: '12' },
+									]}
+								/>
+								<span className={styles.sliderValue}>{rules.shopSize}</span>
+							</div>
+						</div>
+						<div className={styles.field}>
+							<span className={styles.fieldLabel}>Стартовое золото</span>
+							<div className={styles.sliderRow}>
+								<Slider
+									style={{ flex: 1 }}
+									min={MATCH_RULES_LIMITS.goldBonus.min}
+									max={MATCH_RULES_LIMITS.goldBonus.max}
+									step={MATCH_RULES_LIMITS.goldBonus.step}
+									value={rules.goldBonus}
+									onChange={(value) => patch({ goldBonus: value })}
+									marks={[
+										{ value: 0.5, label: '×0,5' },
+										{ value: 1, label: '×1' },
+										{ value: 2, label: '×2' },
+									]}
+								/>
+								<span className={styles.sliderValue}>
+									×{String(rules.goldBonus).replace('.', ',')}
+								</span>
+							</div>
+						</div>
+					</Stack>
+				)}
 			</div>
 		</div>
 	);

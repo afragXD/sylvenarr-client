@@ -1,10 +1,6 @@
 export type HeroDupesMode = 'allow' | 'uniqueTeam' | 'uniqueMatch';
 
-const HERO_DUPES_MODES: ReadonlySet<string> = new Set([
-	'allow',
-	'uniqueTeam',
-	'uniqueMatch',
-]);
+const HERO_DUPES_MODES: ReadonlySet<string> = new Set(['allow', 'uniqueTeam', 'uniqueMatch']);
 
 export type MatchRules = {
 	initialTeamSize: number;
@@ -58,12 +54,7 @@ export const RULES_PRESETS: Record<
 	Exclude<RulesPresetId, 'custom'>,
 	Pick<
 		MatchRules,
-		| 'initialTeamSize'
-		| 'maxTeamSize'
-		| 'maxRowSize'
-		| 'maxRounds'
-		| 'healthBonus'
-		| 'startingLevel'
+		'initialTeamSize' | 'maxTeamSize' | 'maxRowSize' | 'maxRounds' | 'healthBonus' | 'startingLevel'
 	>
 > = {
 	classic: {
@@ -203,14 +194,18 @@ export function validateMatchRules(input: MatchRules): ValidateMatchRulesResult 
 				MATCH_RULES_LIMITS.shopSize.max,
 				Math.max(MATCH_RULES_LIMITS.shopSize.min, Math.round(shopSize)),
 			),
-			goldBonus: Math.min(
-				MATCH_RULES_LIMITS.goldBonus.max,
-				Math.max(MATCH_RULES_LIMITS.goldBonus.min, goldBonus),
-			),
+			goldBonus: snapGoldBonus(goldBonus),
 			heroDupes: normalizeHeroDupes(heroDupes),
 			rated: typeof rated === 'boolean' ? rated : DEFAULT_MATCH_RULES.rated,
 		},
 	};
+}
+
+function snapGoldBonus(value: number): number {
+	const { min, max, step } = MATCH_RULES_LIMITS.goldBonus;
+	const clamped = Math.min(max, Math.max(min, value));
+	const steps = Math.round((clamped - min) / step);
+	return Math.round((min + steps * step) * 100) / 100;
 }
 
 export function detectPreset(rules: MatchRules): RulesPresetId {
@@ -234,8 +229,8 @@ export function applyPreset(id: Exclude<RulesPresetId, 'custom'>, base: MatchRul
 	return {
 		...base,
 		...RULES_PRESETS[id],
-		// Ярмарка до 4.1 всегда дефолт бота
-		fairEnabled: DEFAULT_MATCH_RULES.fairEnabled,
+		// Пресеты всегда сбрасывают экономику в выкл. (CUT-2026-11-03b T14).
+		fairEnabled: false,
 		fairFrequency: DEFAULT_MATCH_RULES.fairFrequency,
 		shopSize: DEFAULT_MATCH_RULES.shopSize,
 		goldBonus: DEFAULT_MATCH_RULES.goldBonus,
@@ -244,8 +239,7 @@ export function applyPreset(id: Exclude<RulesPresetId, 'custom'>, base: MatchRul
 
 export function formatRulesSummary(rules: MatchRules): string {
 	const hp = healthBonusToPercent(rules.healthBonus);
-	const lvl =
-		rules.startingLevel > 1 ? ` · ур. ${rules.startingLevel}` : '';
+	const lvl = rules.startingLevel > 1 ? ` · ур. ${rules.startingLevel}` : '';
 	const ratedMark = rules.rated ? '' : ' · товарищеский';
 	const base = `Отряд ${rules.initialTeamSize}/${rules.maxTeamSize} · ряд ${rules.maxRowSize} · ${rules.maxRounds} р. · ОЗ ${hp}%${lvl}${ratedMark}`;
 	if (rules.heroDupes === 'uniqueTeam') {
