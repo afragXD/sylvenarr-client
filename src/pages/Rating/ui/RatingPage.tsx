@@ -42,11 +42,22 @@ export const RatingPage = () => {
 		let isMounted = true;
 		const load = async () => {
 			try {
-				const [items, me] = await Promise.all([fetchRating(), fetchCurrentPlayer()]);
-				if (isMounted) {
-					setRows(items);
-					setMyId(me?.id ?? null);
-					setError(null);
+				const items = await fetchRating();
+				if (!isMounted) {
+					return;
+				}
+				setRows(items);
+				setError(null);
+				try {
+					const me = await fetchCurrentPlayer();
+					if (isMounted) {
+						setMyId(me?.id ?? null);
+					}
+				} catch {
+					// Гость / сбой сессии не должен прятать таблицу рейтинга
+					if (isMounted) {
+						setMyId(null);
+					}
 				}
 			} catch (err) {
 				if (isMounted) {
