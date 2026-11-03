@@ -1,5 +1,6 @@
 import { Button } from '@mantine/core';
 
+import { tierRarity } from '@/entities/item';
 import type { BattleUnit, InventoryStack } from '@/entities/match';
 import { ItemGlyph } from '@/shared/ui/ItemGlyph';
 
@@ -53,6 +54,7 @@ export function BattleInventoryPanel({
 								const hasPerk = unitHasItemPerk(actor.perks, stack.category);
 								const sellOnly = stack.target === 'sellOnly';
 								const blocked = !hasPerk || sellOnly;
+								const rarity = tierRarity(stack.tier);
 								const reason = sellOnly
 									? 'Только на продажу'
 									: !hasPerk && perk
@@ -74,7 +76,12 @@ export function BattleInventoryPanel({
 											title={stack.name}
 										/>
 										<span className={styles.meta}>
-											<span className={styles.name}>{stack.name}</span>
+											<span
+												className={styles.name}
+												style={rarity.color ? { color: rarity.color } : undefined}
+											>
+												{stack.name}
+											</span>
 											<span className={styles.hint}>{reason}</span>
 										</span>
 									</button>

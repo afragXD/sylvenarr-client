@@ -8,6 +8,7 @@ import {
 	ITEM_CATEGORY_LABEL,
 	ITEM_TARGET_LABEL,
 	type ItemBrief,
+	tierRarity,
 } from '@/entities/item';
 import { ItemGlyph } from '@/shared/ui/ItemGlyph';
 import { PageFrame } from '@/shared/ui/PageFrame';
@@ -194,32 +195,40 @@ export const ItemsCodexPage = () => {
 										</Table.Tr>
 									</Table.Thead>
 									<Table.Tbody>
-										{filteredItems.map((item) => (
-											<Table.Tr key={item.code}>
-												<Table.Td>
-													<div className={styles.itemCell}>
-														<ItemGlyph
-															category={item.category}
-															tier={item.tier}
-															size={28}
-															title={categoryLabel(item.category)}
-														/>
-														<div>
-															<div className={styles.itemName}>{item.name}</div>
-															<div className={styles.muted}>{item.description}</div>
+										{filteredItems.map((item) => {
+											const rarity = tierRarity(item.tier);
+											const rarityStyle = rarity.color ? { color: rarity.color } : undefined;
+											return (
+												<Table.Tr key={item.code}>
+													<Table.Td>
+														<div className={styles.itemCell}>
+															<ItemGlyph
+																category={item.category}
+																tier={item.tier}
+																size={28}
+																title={categoryLabel(item.category)}
+															/>
+															<div>
+																<div className={styles.itemName} style={rarityStyle}>
+																	{item.name}
+																</div>
+																<div className={styles.muted}>{item.description}</div>
+															</div>
 														</div>
-													</div>
-												</Table.Td>
-												<Table.Td className="sylvenarr-tabular">{item.code}</Table.Td>
-												<Table.Td>{categoryLabel(item.category)}</Table.Td>
-												<Table.Td className="sylvenarr-tabular">{item.tier}</Table.Td>
-												<Table.Td className="sylvenarr-tabular">{item.cost}</Table.Td>
-												<Table.Td>
-													{ITEM_TARGET_LABEL[item.target] ?? item.target}
-													{item.sellOnly ? ' · продажа' : ''}
-												</Table.Td>
-											</Table.Tr>
-										))}
+													</Table.Td>
+													<Table.Td className="sylvenarr-tabular">{item.code}</Table.Td>
+													<Table.Td>{categoryLabel(item.category)}</Table.Td>
+													<Table.Td className="sylvenarr-tabular" style={rarityStyle}>
+														{item.tier}
+													</Table.Td>
+													<Table.Td className="sylvenarr-tabular">{item.cost}</Table.Td>
+													<Table.Td>
+														{ITEM_TARGET_LABEL[item.target] ?? item.target}
+														{item.sellOnly ? ' · продажа' : ''}
+													</Table.Td>
+												</Table.Tr>
+											);
+										})}
 									</Table.Tbody>
 								</Table>
 							</div>

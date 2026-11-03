@@ -3,9 +3,9 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	border: 1px solid color-mix(in srgb, var(--app-text) 28%, transparent);
-	background: color-mix(in srgb, var(--app-text) 6%, transparent);
-	color: color-mix(in srgb, var(--app-text) 72%, transparent);
+	border: 1px solid var(--item-rarity, color-mix(in srgb, var(--app-text) 28%, transparent));
+	background: color-mix(in srgb, var(--item-rarity, var(--app-text)) 6%, transparent);
+	color: var(--item-rarity, color-mix(in srgb, var(--app-text) 72%, transparent));
 	font-weight: 650;
 	line-height: 1;
 	flex-shrink: 0;
@@ -29,7 +29,7 @@
 	flex: 1;
 	max-width: 3px;
 	height: 2px;
-	background: color-mix(in srgb, var(--app-text) 55%, transparent);
+	background: var(--item-rarity, color-mix(in srgb, var(--app-text) 55%, transparent));
 }
 
 .qty {

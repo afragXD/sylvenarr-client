@@ -1,6 +1,7 @@
 import { Button } from '@mantine/core';
 import { useEffect, useRef, useState } from 'react';
 
+import { tierRarity } from '@/entities/item';
 import type { BattleUnit, FairShopEntry, FairSummary } from '@/entities/match';
 import { ItemGlyph } from '@/shared/ui/ItemGlyph';
 
@@ -133,29 +134,35 @@ export function BattleFairBar({
 					<p className={styles.turn}>Всё распродано</p>
 				) : (
 					<div className={styles.shop}>
-						{fair.shop.map((item) => (
-							<button
-								key={`${item.code}-${item.buyPrice}`}
-								type="button"
-								className={`${styles.card}${selectedShop === item.code ? ` ${styles.cardSelected}` : ''}`}
-								disabled={!isMyTurn || busy}
-								title={item.description}
-								onClick={() => {
-									setSelectedShop(item.code);
-									setSelectedSell(null);
-								}}
-							>
-								<span className={styles.cardTop}>
-									<ItemGlyph category={item.category} tier={item.tier} size={24} />
-									<span className={styles.cardName}>{item.name}</span>
-								</span>
-								<span
-									className={`${styles.price}${traderGold < item.buyPrice ? ` ${styles.priceShort}` : ''}`}
+						{fair.shop.map((item) => {
+							const rarity = tierRarity(item.tier);
+							const rarityStyle = rarity.color ? { color: rarity.color } : undefined;
+							return (
+								<button
+									key={`${item.code}-${item.buyPrice}`}
+									type="button"
+									className={`${styles.card}${selectedShop === item.code ? ` ${styles.cardSelected}` : ''}`}
+									disabled={!isMyTurn || busy}
+									title={item.description}
+									onClick={() => {
+										setSelectedShop(item.code);
+										setSelectedSell(null);
+									}}
 								>
-									{item.buyPrice}
-								</span>
-							</button>
-						))}
+									<span className={styles.cardTop}>
+										<ItemGlyph category={item.category} tier={item.tier} size={24} />
+										<span className={styles.cardName} style={rarityStyle}>
+											{item.name}
+										</span>
+									</span>
+									<span
+										className={`${styles.price}${traderGold < item.buyPrice ? ` ${styles.priceShort}` : ''}`}
+									>
+										{item.buyPrice}
+									</span>
+								</button>
+							);
+						})}
 					</div>
 				)}
 
@@ -164,21 +171,28 @@ export function BattleFairBar({
 						className={`${styles.shop} ${styles.sellList}`}
 						aria-label="Ваши предметы на продажу"
 					>
-						{mySell.map((item) => (
-							<button
-								key={`sell-${item.code}`}
-								type="button"
-								className={`${styles.card}${selectedSell === item.code ? ` ${styles.cardSelected}` : ''}`}
-								disabled={!isMyTurn || busy}
-								onClick={() => {
-									setSelectedSell(item.code);
-									setSelectedShop(null);
-								}}
-							>
-								<span className={styles.cardName}>{item.name}</span>
-								<span className={styles.price}>прод. {item.sellPrice}</span>
-							</button>
-						))}
+						{mySell.map((item) => {
+							const tier = Number(String(item.code)[0]);
+							const rarity = tierRarity(tier);
+							const rarityStyle = rarity.color ? { color: rarity.color } : undefined;
+							return (
+								<button
+									key={`sell-${item.code}`}
+									type="button"
+									className={`${styles.card}${selectedSell === item.code ? ` ${styles.cardSelected}` : ''}`}
+									disabled={!isMyTurn || busy}
+									onClick={() => {
+										setSelectedSell(item.code);
+										setSelectedShop(null);
+									}}
+								>
+									<span className={styles.cardName} style={rarityStyle}>
+										{item.name}
+									</span>
+									<span className={styles.price}>прод. {item.sellPrice}</span>
+								</button>
+							);
+						})}
 					</fieldset>
 				) : null}
 

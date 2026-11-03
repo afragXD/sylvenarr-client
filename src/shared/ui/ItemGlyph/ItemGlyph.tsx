@@ -1,3 +1,7 @@
+import type { CSSProperties } from 'react';
+
+import { tierRarity, tierRarityTitle } from '@/entities/item';
+
 import styles from './ItemGlyph.module.css';
 
 const CATEGORY_MARK: Record<number, string> = {
@@ -21,16 +25,26 @@ type ItemGlyphProps = {
 };
 
 /**
- * Приглушённый глиф категории предмета + насечки тира (CUT-2026-11-03b T15).
+ * Глиф категории и насечки тира. Рамка и буква красятся по редкости тира.
  */
 export function ItemGlyph({ category, tier, quantity, size = 28, title }: ItemGlyphProps) {
 	const mark = CATEGORY_MARK[category] ?? String(category);
 	const notches = Math.max(1, Math.min(9, Math.round(tier)));
+	const rarity = tierRarity(tier);
+	const rarityTitle = tierRarityTitle(tier);
+	const style: CSSProperties & { '--item-rarity'?: string } = {
+		width: size,
+		height: size,
+		fontSize: size * 0.32,
+	};
+	if (rarity.color) {
+		style['--item-rarity'] = rarity.color;
+	}
 	return (
 		<span
 			className={styles.glyph}
-			style={{ width: size, height: size, fontSize: size * 0.32 }}
-			title={title}
+			style={style}
+			title={title ? `${title}. ${rarityTitle}` : rarityTitle}
 			aria-hidden={title ? undefined : true}
 		>
 			<span className={styles.mark}>{mark}</span>
