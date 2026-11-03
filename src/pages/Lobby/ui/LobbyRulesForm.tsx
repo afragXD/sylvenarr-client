@@ -98,7 +98,7 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 	};
 
 	const setPreset = (value: string) => {
-		if (value === 'custom' || value === preset) {
+		if (value === 'custom') {
 			return;
 		}
 		if (value === 'classic' || value === 'fast' || value === 'siege') {

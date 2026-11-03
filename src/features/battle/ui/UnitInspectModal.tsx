@@ -20,6 +20,7 @@ import {
 	HeroImage,
 	previewCtxFromUnit,
 } from '@/entities/hero';
+import { perkName } from '@/entities/item';
 import type { BattleUnit } from '@/entities/match';
 
 import {
@@ -39,6 +40,8 @@ import styles from './UnitInspectModal.module.css';
 
 type UnitInspectModalProps = {
 	unit: BattleUnit | null;
+	/** Ярмарка/перки включены правилами матча. */
+	economyEnabled?: boolean;
 	onClose: () => void;
 };
 
@@ -96,7 +99,11 @@ function classRoleLabel(isSummon: boolean): string {
 /**
  * Инспектор юнита в бою: live-статы, эффекты, описание способностей.
  */
-export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
+export const UnitInspectModal = ({
+	unit,
+	economyEnabled = false,
+	onClose,
+}: UnitInspectModalProps) => {
 	const doc = unit ? getHeroAbilities(unit.heroClassCode, true) : null;
 	const previewCtx = unit ? previewCtxFromUnit(unit) : null;
 	const passivePreview =
@@ -144,27 +151,25 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 									ряд {unit.row + 1}
 								</Text>
 							</CombatStatRow>
-							{(unit.perks?.length ?? 0) > 0 ||
-							typeof unit.merchant === 'number' ||
-							typeof unit.weaponReach === 'number' ? (
-								<Text size="sm" c="var(--app-text-muted)" mt={4}>
-									{[
-										(unit.perks?.length ?? 0) > 0 ? `Перки: ${unit.perks!.join(', ')}` : null,
-										typeof unit.merchant === 'number'
-											? `Навык торговли ${Math.round(unit.merchant * 100)} %`
-											: null,
-										`Радиус оружия ${
-											typeof unit.weaponReach === 'number'
-												? unit.weaponReach
-												: unit.heroClassCode === 'Knight' || unit.heroClassCode === 'DemonLord'
-													? 2
-													: 1
-										}`,
-									]
-										.filter(Boolean)
-										.join(' · ')}
-								</Text>
-							) : null}
+							<Text size="sm" c="var(--app-text-muted)" mt={4}>
+								{[
+									economyEnabled && (unit.perks?.length ?? 0) > 0
+										? `Перки: ${(unit.perks ?? []).map(perkName).join(', ')}`
+										: null,
+									economyEnabled && typeof unit.merchant === 'number'
+										? `Навык торговли ${Math.round(unit.merchant * 100)} %`
+										: null,
+									`Радиус оружия ${
+										typeof unit.weaponReach === 'number'
+											? unit.weaponReach
+											: unit.heroClassCode === 'Knight' || unit.heroClassCode === 'DemonLord'
+												? 2
+												: 1
+									}`,
+								]
+									.filter(Boolean)
+									.join(' · ')}
+							</Text>
 							{/* Эффекты без вардов — варды только в блоке ниже (AC-5, без дубля). */}
 							{(unit.effects?.length ?? 0) > 0 ? (
 								<div className={styles.effects}>

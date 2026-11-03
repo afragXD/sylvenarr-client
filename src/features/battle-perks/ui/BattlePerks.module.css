@@ -46,7 +46,7 @@
 
 .option:hover:not(:disabled),
 .option:focus-visible {
-	border-color: color-mix(in srgb, #e9c08f 50%, var(--app-border));
+	border-color: color-mix(in srgb, var(--app-text) 50%, var(--app-border));
 	outline: none;
 }
 

@@ -47,13 +47,13 @@
 
 .row:hover:not(:disabled),
 .row:focus-visible {
-	border-color: color-mix(in srgb, #e9c08f 45%, var(--app-border));
+	border-color: color-mix(in srgb, var(--app-text) 45%, var(--app-border));
 	outline: none;
 }
 
 .rowActive {
-	border-color: #e9c08f;
-	background: color-mix(in srgb, #e9c08f 10%, transparent);
+	border-color: var(--app-text);
+	background: color-mix(in srgb, var(--app-text) 8%, transparent);
 }
 
 .row:disabled {

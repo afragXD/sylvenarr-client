@@ -209,6 +209,14 @@ function snapGoldBonus(value: number): number {
 }
 
 export function detectPreset(rules: MatchRules): RulesPresetId {
+	if (
+		rules.fairEnabled ||
+		rules.fairFrequency !== DEFAULT_MATCH_RULES.fairFrequency ||
+		rules.shopSize !== DEFAULT_MATCH_RULES.shopSize ||
+		rules.goldBonus !== DEFAULT_MATCH_RULES.goldBonus
+	) {
+		return 'custom';
+	}
 	for (const id of ['classic', 'fast', 'siege'] as const) {
 		const preset = RULES_PRESETS[id];
 		if (

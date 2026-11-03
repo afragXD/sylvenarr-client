@@ -29,7 +29,7 @@
 	flex: 1;
 	max-width: 3px;
 	height: 2px;
-	background: color-mix(in srgb, #e9c08f 55%, transparent);
+	background: color-mix(in srgb, var(--app-text) 55%, transparent);
 }
 
 .qty {
@@ -43,7 +43,7 @@
 	font-variant-numeric: tabular-nums;
 	line-height: 1.2;
 	text-align: center;
-	color: #1a130e;
-	background: #e9c08f;
-	border: 1px solid color-mix(in srgb, #8a6b52 60%, #e9c08f);
+	color: var(--app-surface);
+	background: var(--app-text);
+	border: 1px solid var(--app-border);
 }

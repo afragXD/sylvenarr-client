@@ -20,15 +20,7 @@ export function TeamWallet({ gold }: TeamWalletProps) {
 		if (prev === gold) {
 			return;
 		}
-		const diff = gold - prev;
-		setDelta(diff);
-		const reduced =
-			typeof window !== 'undefined' &&
-			window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		if (reduced) {
-			setDelta(null);
-			return;
-		}
+		setDelta(gold - prev);
 		const timer = window.setTimeout(() => setDelta(null), 1000);
 		return () => window.clearTimeout(timer);
 	}, [gold]);
@@ -38,7 +30,7 @@ export function TeamWallet({ gold }: TeamWalletProps) {
 			<span className={styles.amount}>{gold}</span>
 			{delta !== null && delta !== 0 ? (
 				<span className={delta > 0 ? styles.deltaUp : styles.deltaDown} aria-live="polite">
-					{delta > 0 ? `+${delta}` : String(delta)}
+					{delta > 0 ? `+${delta}` : `−${Math.abs(delta)}`}
 				</span>
 			) : null}
 		</span>

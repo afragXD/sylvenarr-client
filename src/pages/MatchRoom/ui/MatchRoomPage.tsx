@@ -140,7 +140,7 @@ const mergeBattleFrame = (
 				horseIsDead: unit.horseIsDead ?? false,
 				mana: unit.mana ?? 0,
 				perks: unit.perks ?? [],
-				merchant: unit.merchant ?? 0,
+				merchant: unit.merchant,
 				weaponReach: unit.weaponReach,
 			})),
 		},

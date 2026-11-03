@@ -975,7 +975,11 @@ export const BattlePanel = ({
 				</div>
 			)}
 
-			<UnitInspectModal unit={inspectUnit} onClose={() => setInspectUnitId(null)} />
+			<UnitInspectModal
+				unit={inspectUnit}
+				economyEnabled={economyEnabled}
+				onClose={() => setInspectUnitId(null)}
+			/>
 
 			<Modal
 				opened={surrenderOpened}

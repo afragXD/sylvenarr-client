@@ -24,10 +24,9 @@
 .sectionTitle {
 	margin: 0;
 	font-family: var(--mantine-font-family-headings);
-	font-size: 0.8rem;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: var(--copper);
+	font-size: 0.95rem;
+	letter-spacing: 0.02em;
+	color: var(--app-text);
 }
 
 .tableWrap {
@@ -72,10 +71,8 @@
 
 .perkKind {
 	font-family: var(--mantine-font-family-headings);
-	font-size: 0.72rem;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: var(--copper);
+	font-size: 0.8rem;
+	color: var(--app-text-muted);
 }
 
 .perkName {

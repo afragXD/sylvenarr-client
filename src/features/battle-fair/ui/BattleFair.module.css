@@ -30,7 +30,6 @@
 	display: inline-block;
 	width: 0.55em;
 	height: 0.55em;
-	border-radius: 50%;
 	background: #e9c08f;
 }
 
@@ -48,6 +47,13 @@
 	overflow-x: auto;
 	padding-bottom: 0.15rem;
 	-webkit-overflow-scrolling: touch;
+}
+
+.sellList {
+	margin: 0;
+	border: 0;
+	min-width: 0;
+	padding: 0 0 0.15rem;
 }
 
 .card {
@@ -69,7 +75,7 @@
 .card:hover:not(:disabled),
 .card:focus-visible,
 .cardSelected {
-	border-color: color-mix(in srgb, #e9c08f 55%, var(--app-border));
+	border-color: color-mix(in srgb, var(--app-text) 55%, var(--app-border));
 	outline: none;
 }
 
@@ -96,6 +102,10 @@
 	font-size: 0.78rem;
 	font-weight: 700;
 	font-variant-numeric: tabular-nums;
+	color: var(--app-text);
+}
+
+.priceShort {
 	color: #8a6b52;
 }
 
@@ -113,15 +123,47 @@
 
 .fly {
 	position: fixed;
+	left: 50%;
+	top: 60%;
 	z-index: 40;
 	pointer-events: none;
-	transition:
-		transform 200ms ease-out,
-		opacity 200ms ease-out;
+	transform: translate(-50%, -50%);
+	animation: 200ms ease-out forwards;
+}
+
+.flyHost {
+	animation-name: fly-host;
+}
+
+.flyGuest {
+	animation-name: fly-guest;
+}
+
+@keyframes fly-host {
+	from {
+		transform: translate(-50%, -50%);
+		opacity: 1;
+	}
+	to {
+		transform: translate(calc(-50% - 40vw), -50%);
+		opacity: 0;
+	}
+}
+
+@keyframes fly-guest {
+	from {
+		transform: translate(-50%, -50%);
+		opacity: 1;
+	}
+	to {
+		transform: translate(calc(-50% + 40vw), -50%);
+		opacity: 0;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.fly {
-		transition: none;
+		display: none;
+		animation: none;
 	}
 }

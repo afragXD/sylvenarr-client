@@ -1,5 +1,7 @@
 import type { BattleUnit, InventoryStack } from '@/entities/match';
 
+import { isUnholyClass } from './unholyClasses';
+
 export function legalItemTargetIds(
 	units: readonly BattleUnit[],
 	invoker: BattleUnit,
@@ -21,7 +23,7 @@ export function legalItemTargetIds(
 				case 'enemy':
 					return unit.team !== invoker.team;
 				case 'enemySummon':
-					return unit.team !== invoker.team && unit.isSummon;
+					return unit.team !== invoker.team && unit.isSummon && isUnholyClass(unit.heroClassCode);
 				default:
 					return false;
 			}

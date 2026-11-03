@@ -1,10 +1,17 @@
 import { Button } from '@mantine/core';
 import { useEffect, useRef, useState } from 'react';
 
-import type { BattleUnit, FairSummary } from '@/entities/match';
+import type { BattleUnit, FairShopEntry, FairSummary } from '@/entities/match';
 import { ItemGlyph } from '@/shared/ui/ItemGlyph';
 
 import styles from './BattleFair.module.css';
+
+type FlyItem = {
+	readonly seq: number;
+	readonly category: number;
+	readonly tier: number;
+	readonly buyerTeam: 0 | 1;
+};
 
 type BattleFairBarProps = {
 	readonly fair: FairSummary;
@@ -42,8 +49,13 @@ export function BattleFairBar({
 }: BattleFairBarProps) {
 	const [selectedShop, setSelectedShop] = useState<number | null>(null);
 	const [selectedSell, setSelectedSell] = useState<number | null>(null);
-	const [fly, setFly] = useState<{ code: number; category: number; tier: number } | null>(null);
-	const prevShopRef = useRef(fair.shop.map((s) => s.code).join(','));
+	const [fly, setFly] = useState<FlyItem | null>(null);
+	const prevFairRef = useRef<{ index: number; turnTeam: 0 | 1; shop: FairShopEntry[] }>({
+		index: fair.index,
+		turnTeam: fair.turnTeam,
+		shop: fair.shop,
+	});
+	const flySeqRef = useRef(0);
 
 	const turnName =
 		fair.turnTeam === 0
@@ -51,21 +63,29 @@ export function BattleFairBar({
 			: (units.find((u) => u.id === fair.traderIds[1])?.displayName ?? guestName);
 
 	const myGold = myTeam === 0 ? hostGold : guestGold;
+	const traderGold = fair.turnTeam === 0 ? hostGold : guestGold;
 	const mySell = fair.sellByTeam[myTeam] ?? [];
 	const selectedBuy = fair.shop.find((s) => s.code === selectedShop) ?? null;
+	const selectedSellEntry = mySell.find((s) => s.code === selectedSell) ?? null;
 	const canBuy = Boolean(isMyTurn && selectedBuy && myGold >= selectedBuy.buyPrice);
-	const canSell = Boolean(isMyTurn && selectedSell != null);
+	const canSell = Boolean(isMyTurn && selectedSellEntry);
 
 	useEffect(() => {
-		const key = fair.shop.map((s) => s.code).join(',');
-		const prev = prevShopRef.current;
-		prevShopRef.current = key;
-		if (!prev || prev === key) {
+		const prev = prevFairRef.current;
+		prevFairRef.current = { index: fair.index, turnTeam: fair.turnTeam, shop: fair.shop };
+		if (prev.index !== fair.index || prev.shop === fair.shop) {
 			return;
 		}
-		const prevCodes = new Set(prev.split(',').filter(Boolean).map(Number));
-		const bought = [...prevCodes].find((code) => !fair.shop.some((s) => s.code === code));
-		if (bought == null) {
+		const rest = [...fair.shop];
+		const bought = prev.shop.find((entry) => {
+			const at = rest.findIndex((s) => s.code === entry.code);
+			if (at < 0) {
+				return true;
+			}
+			rest.splice(at, 1);
+			return false;
+		});
+		if (!bought) {
 			return;
 		}
 		const reduced =
@@ -74,15 +94,22 @@ export function BattleFairBar({
 		if (reduced) {
 			return;
 		}
-		const entry = fair.shop.find((s) => s.code === bought);
+		flySeqRef.current += 1;
 		setFly({
-			code: bought,
-			category: entry?.category ?? 7,
-			tier: entry?.tier ?? 1,
+			seq: flySeqRef.current,
+			category: bought.category,
+			tier: bought.tier,
+			buyerTeam: prev.turnTeam,
 		});
-		const t = window.setTimeout(() => setFly(null), 220);
+	}, [fair.index, fair.turnTeam, fair.shop]);
+
+	useEffect(() => {
+		if (!fly) {
+			return;
+		}
+		const t = window.setTimeout(() => setFly(null), 260);
 		return () => window.clearTimeout(t);
-	}, [fair.shop]);
+	}, [fly]);
 
 	useEffect(() => {
 		setSelectedShop(null);
@@ -91,7 +118,7 @@ export function BattleFairBar({
 
 	return (
 		<>
-			<div className={styles.bar} role="region" aria-label={`Ярмарка ${fair.index}`}>
+			<section className={styles.bar} aria-label={`Ярмарка ${fair.index}`}>
 				<div className={styles.wallets}>
 					<span className={styles.walletSide} title={hostName}>
 						{hostGold}
@@ -122,14 +149,21 @@ export function BattleFairBar({
 									<ItemGlyph category={item.category} tier={item.tier} size={24} />
 									<span className={styles.cardName}>{item.name}</span>
 								</span>
-								<span className={styles.price}>{item.buyPrice}</span>
+								<span
+									className={`${styles.price}${traderGold < item.buyPrice ? ` ${styles.priceShort}` : ''}`}
+								>
+									{item.buyPrice}
+								</span>
 							</button>
 						))}
 					</div>
 				)}
 
 				{mySell.length > 0 ? (
-					<div className={styles.shop} aria-label="Ваши предметы на продажу">
+					<fieldset
+						className={`${styles.shop} ${styles.sellList}`}
+						aria-label="Ваши предметы на продажу"
+					>
 						{mySell.map((item) => (
 							<button
 								key={`sell-${item.code}`}
@@ -145,7 +179,7 @@ export function BattleFairBar({
 								<span className={styles.price}>прод. {item.sellPrice}</span>
 							</button>
 						))}
-					</div>
+					</fieldset>
 				) : null}
 
 				<div className={styles.actions}>
@@ -155,25 +189,22 @@ export function BattleFairBar({
 						disabled={!canBuy}
 						onClick={() => selectedBuy && onBuy(selectedBuy.code)}
 					>
-						Купить за {selectedBuy ? selectedBuy.buyPrice : 'N'}
+						{selectedBuy ? `Купить за ${selectedBuy.buyPrice}` : 'Купить'}
 					</Button>
 					<Button
 						variant="light"
 						color="accent"
 						loading={busy}
 						disabled={!canSell}
-						onClick={() => selectedSell != null && onSell(selectedSell)}
+						onClick={() => selectedSellEntry && onSell(selectedSellEntry.code)}
 					>
-						Продать за{' '}
-						{selectedSell != null
-							? (mySell.find((s) => s.code === selectedSell)?.sellPrice ?? 'N')
-							: 'N'}
+						{selectedSellEntry ? `Продать за ${selectedSellEntry.sellPrice}` : 'Продать'}
 					</Button>
 					<Button
 						variant="light"
 						color="brand"
 						loading={busy}
-						disabled={!isMyTurn}
+						disabled={!isMyTurn || mySell.length === 0}
 						onClick={onSellAll}
 					>
 						Продать всё
@@ -182,15 +213,13 @@ export function BattleFairBar({
 						Закончить торги
 					</Button>
 				</div>
-			</div>
+			</section>
 			{fly ? (
 				<span
-					className={styles.fly}
-					style={{
-						left: '50%',
-						top: '60%',
-						transform: myTeam === 0 ? 'translate(-120%, -40%)' : 'translate(20%, -40%)',
-					}}
+					key={fly.seq}
+					className={`${styles.fly} ${fly.buyerTeam === 0 ? styles.flyHost : styles.flyGuest}`}
+					aria-hidden
+					onAnimationEnd={() => setFly(null)}
 				>
 					<ItemGlyph category={fly.category} tier={fly.tier} size={32} />
 				</span>

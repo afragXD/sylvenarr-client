@@ -89,6 +89,15 @@ describe('matchRules client', () => {
 		expect(next.goldBonus).toBe(DEFAULT_MATCH_RULES.goldBonus);
 	});
 
+	test('detectPreset returns custom when fair is enabled or fair sliders changed', () => {
+		const withFair = { ...DEFAULT_MATCH_RULES, fairEnabled: true };
+		expect(detectPreset(withFair)).toBe('custom');
+		expect(detectPreset({ ...DEFAULT_MATCH_RULES, shopSize: 12 })).toBe('custom');
+		const reset = applyPreset('classic', withFair);
+		expect(reset.fairEnabled).toBe(false);
+		expect(detectPreset(reset)).toBe('classic');
+	});
+
 	test('validateMatchRules snaps goldBonus to 0.25 step', () => {
 		const result = validateMatchRules({ ...DEFAULT_MATCH_RULES, goldBonus: 1.07 });
 		expect(result.ok).toBe(true);
