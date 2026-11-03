@@ -13,27 +13,28 @@ const COLUMNS = [
 	{
 		title: 'Игра',
 		links: [
-			{ to: '/heroes', label: 'Герои' },
-			{ to: '/heroes/effects', label: 'Кодекс эффектов' },
+			{ to: '/heroes' as const, label: 'Герои' },
+			{ to: '/heroes/effects' as const, label: 'Кодекс эффектов' },
+			{ to: '/heroes/items' as const, label: 'Кодекс предметов' },
 		],
 	},
 	{
 		title: 'Арена',
 		links: [
-			{ to: '/lobby', label: 'Лобби' },
-			{ to: '/matches', label: 'Матчи' },
-			{ to: '/rating', label: 'Рейтинг' },
+			{ to: '/lobby' as const, label: 'Лобби' },
+			{ to: '/matches' as const, label: 'Матчи' },
+			{ to: '/rating' as const, label: 'Рейтинг' },
 		],
 	},
 	{
 		title: 'Проект',
 		links: [
-			{ to: '/news', label: 'Новости' },
-			{ to: '/#faq', label: 'Вопросы и ответы' },
-			{ to: '/privacy', label: 'Конфиденциальность' },
+			{ to: '/news' as const, label: 'Новости' },
+			{ to: '/' as const, hash: 'faq', label: 'Вопросы и ответы' },
+			{ to: '/privacy' as const, label: 'Конфиденциальность' },
 		],
 	},
-] as const;
+];
 
 type SiteMenuProps = {
 	opened: boolean;
@@ -93,7 +94,12 @@ export const SiteMenu = ({
 								<ul className={classes.list}>
 									{column.links.map((link) => (
 										<li key={link.to}>
-											<Link to={link.to} className={classes.link} onClick={onClose}>
+											<Link
+												to={link.to}
+												hash={'hash' in link ? link.hash : undefined}
+												className={classes.link}
+												onClick={onClose}
+											>
 												{link.label}
 											</Link>
 										</li>
@@ -163,9 +169,7 @@ export const SiteMenu = ({
 							<p className={classes.promoTitle}>Сыграть сейчас</p>
 							{showSignedInPromo ? (
 								<>
-									<p className={classes.promoText}>
-										Соберите отряд и выйдите на арену с другом.
-									</p>
+									<p className={classes.promoText}>Соберите отряд и выйдите на арену с другом.</p>
 									<Link to={promoTo} onClick={onClose} style={{ textDecoration: 'none' }}>
 										<span className={classes.promoCta}>{promoCta}</span>
 									</Link>

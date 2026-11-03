@@ -27,6 +27,7 @@ import { Route as AdminNewsRouteImport } from './routes/admin.news'
 import { Route as HeroesIndexRouteImport } from './routes/heroes.index'
 import { Route as HeroesCodeRouteImport } from './routes/heroes.$code'
 import { Route as HeroesEffectsRouteImport } from './routes/heroes.effects'
+import { Route as HeroesItemsRouteImport } from './routes/heroes.items'
 import { Route as HeroesPopularRouteImport } from './routes/heroes.popular'
 import { Route as LobbyIndexRouteImport } from './routes/lobby.index'
 import { Route as LobbyMatchIdRouteImport } from './routes/lobby.$matchId'
@@ -132,6 +133,11 @@ const HeroesEffectsRoute = HeroesEffectsRouteImport.update({
   path: '/effects',
   getParentRoute: () => HeroesRoute,
 } as any)
+const HeroesItemsRoute = HeroesItemsRouteImport.update({
+  id: '/items',
+  path: '/items',
+  getParentRoute: () => HeroesRoute,
+} as any)
 const HeroesPopularRoute = HeroesPopularRouteImport.update({
   id: '/popular',
   path: '/popular',
@@ -221,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/admin/news': typeof AdminNewsRouteWithChildren
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
+  '/heroes/items': typeof HeroesItemsRoute
   '/heroes/popular': typeof HeroesPopularRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
+  '/heroes/items': typeof HeroesItemsRoute
   '/heroes/popular': typeof HeroesPopularRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/admin/news': typeof AdminNewsRouteWithChildren
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
+  '/heroes/items': typeof HeroesItemsRoute
   '/heroes/popular': typeof HeroesPopularRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
@@ -320,6 +329,7 @@ export interface FileRouteTypes {
     | '/admin/news'
     | '/heroes/$code'
     | '/heroes/effects'
+    | '/heroes/items'
     | '/heroes/popular'
     | '/lobby/$matchId'
     | '/matches/$matchId'
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/heroes/$code'
     | '/heroes/effects'
+    | '/heroes/items'
     | '/heroes/popular'
     | '/lobby/$matchId'
     | '/matches/$matchId'
@@ -382,6 +393,7 @@ export interface FileRouteTypes {
     | '/admin/news'
     | '/heroes/$code'
     | '/heroes/effects'
+    | '/heroes/items'
     | '/heroes/popular'
     | '/lobby/$matchId'
     | '/matches/$matchId'
@@ -545,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HeroesEffectsRouteImport
       parentRoute: typeof HeroesRoute
     }
+    '/heroes/items': {
+      id: '/heroes/items'
+      path: '/items'
+      fullPath: '/heroes/items'
+      preLoaderRoute: typeof HeroesItemsRouteImport
+      parentRoute: typeof HeroesRoute
+    }
     '/heroes/popular': {
       id: '/heroes/popular'
       path: '/popular'
@@ -649,6 +668,7 @@ declare module '@tanstack/react-router' {
 interface HeroesRouteChildren {
   HeroesCodeRoute: typeof HeroesCodeRoute
   HeroesEffectsRoute: typeof HeroesEffectsRoute
+  HeroesItemsRoute: typeof HeroesItemsRoute
   HeroesPopularRoute: typeof HeroesPopularRoute
   HeroesIndexRoute: typeof HeroesIndexRoute
 }
@@ -656,6 +676,7 @@ interface HeroesRouteChildren {
 const HeroesRouteChildren: HeroesRouteChildren = {
   HeroesCodeRoute: HeroesCodeRoute,
   HeroesEffectsRoute: HeroesEffectsRoute,
+  HeroesItemsRoute: HeroesItemsRoute,
   HeroesPopularRoute: HeroesPopularRoute,
   HeroesIndexRoute: HeroesIndexRoute,
 }

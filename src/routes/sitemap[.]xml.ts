@@ -4,7 +4,15 @@ import { fetchHeroes } from '@/entities/hero/api/heroesApi';
 import { fetchNewsList } from '@/entities/news';
 import { absoluteUrl } from '@/shared/constants';
 
-const STATIC_PATHS = ['/', '/heroes', '/heroes/effects', '/rating', '/privacy', '/news'] as const;
+const STATIC_PATHS = [
+	'/',
+	'/heroes',
+	'/heroes/effects',
+	'/heroes/items',
+	'/rating',
+	'/privacy',
+	'/news',
+] as const;
 
 const escapeXml = (value: string): string =>
 	value

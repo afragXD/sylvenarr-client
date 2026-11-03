@@ -67,6 +67,9 @@ export const HeroesPage = () => {
 						<Anchor component={Link} to="/heroes/effects" size="sm" c="brand" w="fit-content">
 							Кодекс эффектов
 						</Anchor>
+						<Anchor component={Link} to="/heroes/items" size="sm" c="brand" w="fit-content">
+							Кодекс предметов
+						</Anchor>
 					</Group>
 				</Stack>
 				{showTable && (

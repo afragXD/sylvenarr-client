@@ -20,6 +20,7 @@ const BASE_COLUMNS = [
 		links: [
 			{ to: '/heroes', label: 'Герои' },
 			{ to: '/heroes/effects', label: 'Кодекс эффектов' },
+			{ to: '/heroes/items', label: 'Кодекс предметов' },
 		],
 	},
 	{
