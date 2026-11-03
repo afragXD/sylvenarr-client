@@ -17,6 +17,7 @@ import {
 	heroStatsAtLevel,
 	isTransformForm,
 } from '@/entities/hero';
+import { classStartingPerks, perkName } from '@/entities/item';
 import { ArtFade } from '@/shared/ui/ArtFade';
 import { LevelSlider } from '@/shared/ui/LevelSlider';
 import { OrnateFrame } from '@/shared/ui/OrnateFrame';
@@ -123,6 +124,12 @@ export const HeroDetailPage = () => {
 							{hero.roleSummary ? (
 								<Text size="sm" c="var(--app-text-muted)" maw="42rem" style={{ lineHeight: 1.5 }}>
 									{hero.roleSummary}
+								</Text>
+							) : null}
+							{hero.isPlayable ? (
+								<Text size="sm" c="var(--app-text-muted)" maw="42rem" style={{ lineHeight: 1.5 }}>
+									Стартовые перки (ярмарка вкл.):{' '}
+									{classStartingPerks(hero.code).map(perkName).join(', ')}
 								</Text>
 							) : null}
 							<LevelSlider

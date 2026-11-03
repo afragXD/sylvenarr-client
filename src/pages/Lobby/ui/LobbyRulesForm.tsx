@@ -238,7 +238,7 @@ export const LobbyRulesForm = ({ rules, onChange }: LobbyRulesFormProps) => {
 			<div className={styles.fairBlock}>
 				<Switch
 					label="Ярмарка, перки и предметы"
-					description="Торговля между раундами, выбор перков, инвентарь отряда"
+					description="Перки за раунд до ярмарки; торговля каждые N раундов; инвентарь отряда"
 					checked={rules.fairEnabled}
 					onChange={(event) => patch({ fairEnabled: event.currentTarget.checked })}
 				/>

@@ -79,6 +79,7 @@ const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
 		entry('FIRE', 'Огонь', { value: -15 }),
 		entry('ARROWS', 'Снаряды', { value: 20 }),
 		entry('WEAPON', 'Оружие', { value: 15 }),
+		entry('DEATH', 'Смерть', { value: 60 }),
 	],
 	Demiurge: [
 		entry('IMITATION', 'Копирование', { immune: true }),

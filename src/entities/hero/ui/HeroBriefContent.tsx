@@ -1,5 +1,7 @@
 import { Badge, Box, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 
+import { classStartingPerks, perkName } from '@/entities/item';
+
 import { formatBaseResistsLine } from '../model/heroBaseResists';
 import { isTransformForm } from '../model/heroKinds';
 import type { HeroClass } from '../model/types';
@@ -103,6 +105,11 @@ export const HeroBriefContent = ({ hero }: HeroBriefContentProps) => {
 			{resistsLine ? (
 				<Text size="xs" c="var(--app-text-muted)" style={{ lineHeight: 1.5 }}>
 					Сопротивления и варды: {resistsLine}
+				</Text>
+			) : null}
+			{hero.isPlayable ? (
+				<Text size="xs" c="var(--app-text-muted)" style={{ lineHeight: 1.5 }}>
+					Стартовые перки (ярмарка вкл.): {classStartingPerks(hero.code).map(perkName).join(', ')}
 				</Text>
 			) : null}
 		</Stack>

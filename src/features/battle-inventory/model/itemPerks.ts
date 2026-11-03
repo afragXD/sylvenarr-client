@@ -22,3 +22,12 @@ export function unitHasItemPerk(perks: readonly string[] | undefined, category: 
 	}
 	return (perks ?? []).includes(need.id);
 }
+
+/** Есть ли у кого-то из списка юнитов перк категории предмета. */
+export function teamHasItemPerk(units: readonly { perks?: readonly string[] }[], category: number): boolean {
+	const need = requiredPerkForCategory(category);
+	if (!need) {
+		return true;
+	}
+	return units.some((unit) => (unit.perks ?? []).includes(need.id));
+}

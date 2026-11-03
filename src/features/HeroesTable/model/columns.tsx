@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { createColumnHelper } from '@tanstack/react-table';
 
 import { displayAttack, type HeroClass, HeroImage } from '@/entities/hero';
+import { classStartingPerks, perkName } from '@/entities/item';
 
 import type { heroesTableFeatures } from './table-features';
 
@@ -69,6 +70,16 @@ export const heroesColumns = columnHelper.columns([
 	columnHelper.accessor('accuracy', {
 		header: 'Точность',
 		sortFn: 'basic',
+	}),
+	columnHelper.accessor((row) => classStartingPerks(row.code).map(perkName).join(', '), {
+		id: 'startingPerks',
+		header: 'Перки',
+		enableSorting: false,
+		cell: (info) => (
+			<Text size="xs" c="var(--app-text-muted)" style={{ lineHeight: 1.35 }}>
+				{info.getValue()}
+			</Text>
+		),
 	}),
 	columnHelper.accessor('gold', {
 		header: 'Золото',

@@ -43,10 +43,51 @@
 
 .shop {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 0.4rem;
-	overflow-x: auto;
 	padding-bottom: 0.15rem;
-	-webkit-overflow-scrolling: touch;
+}
+
+.teamPerks {
+	border: 1px solid var(--app-border);
+	padding: 0.4rem 0.5rem;
+}
+
+.teamPerksTitle {
+	margin: 0 0 0.3rem;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--app-text-muted);
+}
+
+.teamPerksList {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+}
+
+.teamPerksList li {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem 0.6rem;
+	font-size: 0.78rem;
+	line-height: 1.3;
+}
+
+.teamPerksHero {
+	font-weight: 650;
+	min-width: 7rem;
+}
+
+.teamPerksValues {
+	color: var(--app-text-muted);
+	flex: 1;
+	min-width: 0;
 }
 
 .sellList {
@@ -96,6 +137,21 @@
 	font-weight: 650;
 	line-height: 1.25;
 	min-width: 0;
+}
+
+.cardNoPerk {
+	border-color: #c45a4a;
+}
+
+.cardPerk {
+	font-size: 0.68rem;
+	line-height: 1.2;
+	color: var(--app-text-muted);
+}
+
+.cardPerkMissing {
+	color: #c45a4a;
+	font-weight: 650;
 }
 
 .price {

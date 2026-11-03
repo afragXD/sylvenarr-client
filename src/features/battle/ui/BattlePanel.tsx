@@ -9,6 +9,7 @@ import {
 	HeroImage,
 	previewCtxFromUnit,
 } from '@/entities/hero';
+import { perkName } from '@/entities/item';
 import type { AbilityInfo, BattleState, BattleUnit, InventoryStack, Match } from '@/entities/match';
 import { BattleFairBar, battleFairStyles } from '@/features/battle-fair';
 import { BattleInventoryPanel, legalItemTargetIds } from '@/features/battle-inventory';
@@ -57,8 +58,8 @@ type DamageFloat = {
 	heal: boolean;
 };
 
-/** CUT AC-13 п.16: портреты на поле +25% (было 28). */
-const FIELD_PORTRAIT = 35;
+/** Портрет на карточке поля (крупнее: имена и перки читаются). */
+const FIELD_PORTRAIT = 52;
 
 type BattleActionKind =
 	| 'attack'
@@ -1183,51 +1184,61 @@ const RowColumn = ({
 									</span>
 								))}
 								<div className={styles.unitHead}>
-									<Group gap={6} wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
-										<PortraitHpCurtain health={unit.health} maxHp={unit.maxHp}>
-											<HeroImage
-												code={unit.heroClassCode}
-												alt={unit.displayName}
-												w={FIELD_PORTRAIT}
-												h={FIELD_PORTRAIT}
-												radius={0}
-											/>
-										</PortraitHpCurtain>
-										<Text size="sm" lineClamp={1}>
+									<PortraitHpCurtain health={unit.health} maxHp={unit.maxHp}>
+										<HeroImage
+											code={unit.heroClassCode}
+											alt={unit.displayName}
+											w={FIELD_PORTRAIT}
+											h={FIELD_PORTRAIT}
+											radius={0}
+										/>
+									</PortraitHpCurtain>
+									<div className={styles.unitHeadMain}>
+										<div className={styles.unitHeadTop}>
 											<span className={styles.slotIndex} title="Место на поле">
 												{unit.row === 0 ? 'П' : 'З'}
 												{unit.column + 1}
-											</span>{' '}
+											</span>
+											<span className={styles.unitHeadSpacer} />
+											{typeof unit.lvl === 'number' ? (
+												<span
+													className={styles.lvl}
+													title="Уровень"
+													aria-label={`Уровень ${unit.lvl}`}
+												>
+													Ур.{unit.lvl}
+												</span>
+											) : null}
+											<button
+												type="button"
+												className={styles.unitInfoBtn}
+												aria-label={`Сведения: ${unit.displayName}`}
+												title="Сведения о герое"
+												onClick={(event) => {
+													event.stopPropagation();
+													onInspectUnit(unit.id);
+												}}
+											>
+												i
+											</button>
+										</div>
+										<div className={styles.unitName}>
 											{unit.isSummon ? '✦ ' : ''}
 											{unit.displayName}
 											{unit.defending ? ' 🛡' : ''}
 											{unit.horseIsDead ? ' ✗конь' : ''}
-										</Text>
-									</Group>
-									<Group gap={4} wrap="nowrap">
-										{typeof unit.lvl === 'number' ? (
-											<span
-												className={styles.lvl}
-												title="Уровень"
-												aria-label={`Уровень ${unit.lvl}`}
-											>
-												Ур.{unit.lvl}
-											</span>
-										) : null}
-										<button
-											type="button"
-											className={styles.unitInfoBtn}
-											aria-label={`Сведения: ${unit.displayName}`}
-											title="Сведения о герое"
-											onClick={(event) => {
-												event.stopPropagation();
-												onInspectUnit(unit.id);
-											}}
-										>
-											i
-										</button>
-									</Group>
+										</div>
+									</div>
 								</div>
+								{(unit.perks?.length ?? 0) > 0 ? (
+									<div className={styles.unitPerks} title={(unit.perks ?? []).map(perkName).join(', ')}>
+										{(unit.perks ?? []).map((id) => (
+											<span key={id} className={styles.unitPerkChip}>
+												{perkName(id)}
+											</span>
+										))}
+									</div>
+								) : null}
 								<div className={styles.hpBar} aria-label={`ОЗ: ${unit.health} из ${unit.maxHp}`}>
 									<div className={styles.hpBarTrack}>
 										<div

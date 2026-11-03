@@ -1,8 +1,9 @@
 import { Button } from '@mantine/core';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { tierRarity } from '@/entities/item';
+import { perkName, tierRarity } from '@/entities/item';
 import type { BattleUnit, FairShopEntry, FairSummary } from '@/entities/match';
+import { requiredPerkForCategory, teamHasItemPerk } from '@/features/battle-inventory';
 import { ItemGlyph } from '@/shared/ui/ItemGlyph';
 
 import styles from './BattleFair.module.css';
@@ -71,6 +72,11 @@ export function BattleFairBar({
 	const canBuy = Boolean(isMyTurn && selectedBuy && myGold >= selectedBuy.buyPrice);
 	const canSell = Boolean(isMyTurn && selectedSellEntry);
 
+	const myAllies = useMemo(
+		() => units.filter((unit) => unit.team === myTeam && unit.alive && !unit.isSummon),
+		[units, myTeam],
+	);
+
 	useEffect(() => {
 		const prev = prevFairRef.current;
 		prevFairRef.current = { index: fair.index, turnTeam: fair.turnTeam, shop: fair.shop };
@@ -130,6 +136,24 @@ export function BattleFairBar({
 					</span>
 				</div>
 
+				{myAllies.length > 0 ? (
+					<div className={styles.teamPerks} aria-label="Перки вашего отряда">
+						<p className={styles.teamPerksTitle}>Перки отряда</p>
+						<ul className={styles.teamPerksList}>
+							{myAllies.map((unit) => (
+								<li key={unit.id}>
+									<span className={styles.teamPerksHero}>{unit.displayName}</span>
+									<span className={styles.teamPerksValues}>
+										{(unit.perks ?? []).length > 0
+											? (unit.perks ?? []).map(perkName).join(', ')
+											: '—'}
+									</span>
+								</li>
+							))}
+						</ul>
+					</div>
+				) : null}
+
 				{fair.shop.length === 0 ? (
 					<p className={styles.turn}>Всё распродано</p>
 				) : (
@@ -137,13 +161,16 @@ export function BattleFairBar({
 						{fair.shop.map((item) => {
 							const rarity = tierRarity(item.tier);
 							const rarityStyle = rarity.color ? { color: rarity.color } : undefined;
+							const perk = requiredPerkForCategory(item.category);
+							const hasTeamPerk = teamHasItemPerk(myAllies, item.category);
+							const reason = !hasTeamPerk && perk ? `Нужен навык: ${perk.name}` : item.description;
 							return (
 								<button
 									key={`${item.code}-${item.buyPrice}`}
 									type="button"
-									className={`${styles.card}${selectedShop === item.code ? ` ${styles.cardSelected}` : ''}`}
+									className={`${styles.card}${selectedShop === item.code ? ` ${styles.cardSelected}` : ''}${!hasTeamPerk ? ` ${styles.cardNoPerk}` : ''}`}
 									disabled={!isMyTurn || busy}
-									title={item.description}
+									title={reason}
 									onClick={() => {
 										setSelectedShop(item.code);
 										setSelectedSell(null);
@@ -160,6 +187,13 @@ export function BattleFairBar({
 									>
 										{item.buyPrice}
 									</span>
+									{perk ? (
+										<span
+											className={`${styles.cardPerk}${!hasTeamPerk ? ` ${styles.cardPerkMissing}` : ''}`}
+										>
+											{hasTeamPerk ? perk.name : `Нужен: ${perk.name}`}
+										</span>
+									) : null}
 								</button>
 							);
 						})}
