@@ -553,6 +553,7 @@ export const BattlePanel = ({
 					/>
 				)}
 				<div className={styles.field}>
+					<p className={styles.rowLegend}>П — передний ряд, З — задний</p>
 					<TeamSide
 						title={
 							<PlayerIdentity
@@ -995,6 +996,7 @@ const RowColumn = ({
 						const preview = attackPreviewFor(unit);
 						const isTarget = legalTargets.includes(unit.id);
 						const ratio = unit.maxHp > 0 ? Math.max(0, Math.min(1, unit.health / unit.maxHp)) : 0;
+						const hpBand = ratio >= 0.5 ? 'high' : ratio >= 0.25 ? 'mid' : 'low';
 						const floats = damageFloats.filter((item) => item.unitId === unit.id);
 						const button = (
 							<div
@@ -1086,21 +1088,18 @@ const RowColumn = ({
 									<div className={styles.hpBarTrack}>
 										<div
 											className={styles.hpBarFill}
-											data-low={ratio <= 0.35 ? 'true' : undefined}
+											data-band={hpBand === 'high' ? undefined : hpBand}
 											style={{ width: `${Math.round(ratio * 100)}%` }}
 										/>
 									</div>
-									<span className={styles.hpBarValue}>
+									<span
+										className={styles.hpBarValue}
+										data-band={hpBand === 'low' ? 'low' : undefined}
+									>
 										{unit.health}/{unit.maxHp}
 									</span>
 								</div>
 								<CombatStatRow className={styles.hp}>
-									<CombatStat
-										kind="health"
-										value={`${unit.health}/${unit.maxHp}`}
-										size={14}
-										textSize="sm"
-									/>
 									{typeof unit.armor === 'number' ? (
 										<CombatStat kind="armor" value={unit.armor} size={14} textSize="sm" muted />
 									) : null}

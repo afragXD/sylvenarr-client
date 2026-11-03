@@ -21,6 +21,10 @@
 	min-width: 0;
 }
 
+.field > .rowLegend {
+	grid-column: 1 / -1;
+}
+
 @media (max-width: 56em) {
 	.battlefield {
 		grid-template-columns: 1fr;
@@ -74,7 +78,7 @@
 }
 
 .unit[data-active="true"] {
-	outline: 2px solid var(--mantine-color-accent-filled);
+	outline: 2px solid #e9c08f; /* CUT-2026-11-03: рамка хода золотая, не красная */
 }
 
 .unit[data-target="true"] {
@@ -131,23 +135,23 @@
 .hpBarTrack {
 	flex: 1;
 	min-width: 0;
-	height: 0.45rem;
-	border: 1px solid var(--app-border);
+	height: 8px;
+	border: 1px solid #9a8a73;
 	background: color-mix(in srgb, #1a130e 70%, #000);
 	overflow: hidden;
 }
 
 .hpBarFill {
 	height: 100%;
-	background: linear-gradient(
-		90deg,
-		color-mix(in srgb, var(--enemy, #d9574a) 80%, #7a2e28),
-		color-mix(in srgb, #84a36c 70%, #4a6b3a)
-	);
+	background: #84a36c; /* ≥50% */
 }
 
-.hpBarFill[data-low='true'] {
-	background: var(--enemy, #d9574a);
+.hpBarFill[data-band='mid'] {
+	background: #e9c08f; /* 25–49%, ровно 25% = золото */
+}
+
+.hpBarFill[data-band='low'] {
+	background: #ec5e4f; /* <25% */
 }
 
 .hpBarValue {
@@ -156,6 +160,10 @@
 	line-height: 1.2;
 	font-variant-numeric: tabular-nums;
 	color: var(--app-text);
+}
+
+.hpBarValue[data-band='low'] {
+	color: #ec5e4f;
 }
 
 .damageFloat {
@@ -196,12 +204,26 @@
 
 .slotIndex {
 	flex-shrink: 0;
-	font-size: 0.72rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.35rem;
+	padding: 0.05rem 0.28rem;
+	border: 1px solid #cbb48c;
+	font-size: 0.65rem;
 	font-weight: 700;
 	font-variant-numeric: tabular-nums;
 	letter-spacing: 0.02em;
-	color: var(--mantine-color-blue-6);
+	color: #cbb48c;
 	line-height: 1.2;
+	vertical-align: 0.05em;
+}
+
+.rowLegend {
+	margin: 0 0 0.5rem;
+	font-size: 0.78rem;
+	color: var(--app-text-muted);
+	letter-spacing: 0.02em;
 }
 
 .lvl {

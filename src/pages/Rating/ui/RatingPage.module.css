@@ -29,18 +29,59 @@
 	line-height: 1.2;
 }
 
-.stickyPlace {
-	position: sticky;
-	bottom: calc(0.75rem + var(--cookie-notice-offset, 0px));
-	z-index: 5;
-	margin-top: 0.75rem;
-	padding: 0.55rem 0.85rem;
-	border: 1px solid color-mix(in srgb, var(--brass, #cbb48c) 50%, var(--app-border));
-	background: color-mix(in srgb, #1a130e 92%, var(--copper, #e9c08f));
-	color: var(--app-text);
+.myPlace {
+	margin: 0 0 0.75rem;
+	font-size: 14px;
+	color: var(--app-text-muted);
+	line-height: 1.4;
+}
+
+.myPlaceNum {
+	color: #e9c08f;
 	font-weight: 700;
-	font-family: var(--mantine-font-family-headings);
-	pointer-events: none;
+	font-variant-numeric: tabular-nums;
+}
+
+.showMe {
+	color: #e9c08f;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
+	cursor: pointer;
+}
+
+.showMe:hover {
+	color: #cbb48c;
+}
+
+.ptsNeutral {
+	color: var(--app-text);
+	font-variant-numeric: tabular-nums;
+}
+
+.thresholdRow td {
+	padding: 0.55rem 0.85rem !important;
+	border-top: 1px solid #cbb48c;
+	border-bottom: 1px solid #cbb48c;
+	background: transparent;
+	text-align: center;
+}
+
+.thresholdLabel {
+	display: inline-block;
+	font-size: 12px;
+	color: #e9c08f;
+	letter-spacing: 0.04em;
+}
+
+.thresholdMobile {
+	list-style: none;
+	margin: 0;
+	padding: 0.55rem 0.7rem;
+	border-top: 1px solid #cbb48c;
+	border-bottom: 1px solid #cbb48c;
+	text-align: center;
 }
 
 .desktopTable {
