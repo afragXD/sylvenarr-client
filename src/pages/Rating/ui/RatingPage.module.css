@@ -55,8 +55,7 @@
 	color: #cbb48c;
 }
 
-.ptsNeutral {
-	color: var(--app-text);
+.ptsValue {
 	font-variant-numeric: tabular-nums;
 }
 

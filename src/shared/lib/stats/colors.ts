@@ -49,27 +49,28 @@ export const getWinrateColor = (winrate: number): string => {
 /** Нулевой уровень ПТС (Heroes III / StickyFingaz). */
 export const START_PTS = 1500;
 
-/**
- * Цвет ПТС относительно нулевого уровня 1500:
- * ниже — враг #D9574A (≥4,5:1 на дыме), на уровне — muted, выше — moss.
- */
+/** ПТС выше 1500 — moss 4 (≥5:1 на #1A130E и на строке «вы» с 12% меди) */
+export const PTS_ABOVE_START = '#84A36C';
+/** ПТС ниже 1500 — светлый враг (≥5:1 на #1A130E и на строке «вы» с 12% меди) */
+export const PTS_BELOW_START = '#E87A6E';
+
+/** Цвет ПТС относительно нулевого уровня 1500 (CSS-значение, годится и для `c`, и для `style.color`). */
 export const getPtsColor = (pts: number): string => {
 	if (pts > START_PTS) {
-		return 'moss';
+		return PTS_ABOVE_START;
 	}
 	if (pts < START_PTS) {
-		return MATCH_RESULT_LOSS;
+		return PTS_BELOW_START;
 	}
 	return 'var(--app-text-muted)';
 };
 
-/** Знак изменения ПТС для grayscale (AC-3). */
-export const getPtsTrendMark = (pts: number): string => {
+export const getPtsTitle = (pts: number): string => {
 	if (pts > START_PTS) {
-		return '▲';
+		return `Выше стартового уровня ${START_PTS}`;
 	}
 	if (pts < START_PTS) {
-		return '▼';
+		return `Ниже стартового уровня ${START_PTS}`;
 	}
-	return '';
+	return `Стартовый уровень ${START_PTS}`;
 };

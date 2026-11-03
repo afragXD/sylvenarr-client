@@ -5,7 +5,7 @@ import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { fetchCurrentPlayer } from '@/entities/player';
 import { fetchRating, type RatingRow } from '@/entities/rating';
 import { ApiError } from '@/shared/api/http';
-import { START_PTS } from '@/shared/lib/stats';
+import { getPtsColor, getPtsTitle, START_PTS } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
@@ -89,8 +89,8 @@ export const RatingPage = () => {
 		node?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 	};
 
-	const renderPtsCell = (pts: number) => (
-		<span className={styles.ptsNeutral} title={`ПТС ${pts}`}>
+	const renderPts = (pts: number, className: string) => (
+		<span className={className} style={{ color: getPtsColor(pts) }} title={getPtsTitle(pts)}>
 			{pts}
 		</span>
 	);
@@ -150,7 +150,7 @@ export const RatingPage = () => {
 					</Group>
 				</Table.Td>
 				<Table.Td ff="monospace" fw={700} style={{ fontVariantNumeric: 'tabular-nums' }}>
-					{renderPtsCell(row.pts)}
+					{renderPts(row.pts, styles.ptsValue)}
 				</Table.Td>
 				<Table.Td ff="monospace" style={{ fontVariantNumeric: 'tabular-nums' }}>
 					{row.wins}
@@ -182,7 +182,7 @@ export const RatingPage = () => {
 					<PlayerIdentity name={row.displayName} avatarUrl={row.avatarUrl} size={28} />
 					{isYou ? <span className={styles.youBadge}>вы</span> : null}
 				</span>
-				<span className={styles.mobilePts}>{row.pts}</span>
+				{renderPts(row.pts, styles.mobilePts)}
 			</li>,
 		);
 	});
@@ -205,7 +205,8 @@ export const RatingPage = () => {
 					<Stack gap={8} mt="sm">
 						<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55, maxWidth: '75ch' }}>
 							У каждого игрока есть очки рейтинга — ПТС. Новый игрок начинает с {START_PTS}. После
-							победы вы получаете ПТС, после поражения — теряете; объём зависит от разницы рейтингов.
+							победы вы получаете ПТС, после поражения — теряете; объём зависит от разницы
+							рейтингов.
 						</Text>
 						<Text c="var(--app-text-muted)" style={{ lineHeight: 1.55, maxWidth: '75ch' }}>
 							Ничья слегка выравнивает очки. Ниже нуля опуститься нельзя. В таблице — ПТС и счёт
@@ -218,7 +219,7 @@ export const RatingPage = () => {
 				<p className={styles.myPlace}>
 					Вы на <span className={styles.myPlaceNum}>{myRank}</span>-м месте из{' '}
 					<span className={styles.myPlaceNum}>{rows.length}</span> ·{' '}
-					<span className={styles.myPlaceNum}>{myPts}</span> ПТС
+					{renderPts(myPts, styles.myPlaceNum)} ПТС
 					{myRowOffscreen ? (
 						<>
 							{' · '}
