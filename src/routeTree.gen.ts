@@ -28,6 +28,7 @@ import { Route as HeroesIndexRouteImport } from './routes/heroes.index'
 import { Route as HeroesCodeRouteImport } from './routes/heroes.$code'
 import { Route as HeroesEffectsRouteImport } from './routes/heroes.effects'
 import { Route as HeroesItemsRouteImport } from './routes/heroes.items'
+import { Route as HeroesPerksRouteImport } from './routes/heroes.perks'
 import { Route as HeroesPopularRouteImport } from './routes/heroes.popular'
 import { Route as LobbyIndexRouteImport } from './routes/lobby.index'
 import { Route as LobbyMatchIdRouteImport } from './routes/lobby.$matchId'
@@ -138,6 +139,11 @@ const HeroesItemsRoute = HeroesItemsRouteImport.update({
   path: '/items',
   getParentRoute: () => HeroesRoute,
 } as any)
+const HeroesPerksRoute = HeroesPerksRouteImport.update({
+  id: '/perks',
+  path: '/perks',
+  getParentRoute: () => HeroesRoute,
+} as any)
 const HeroesPopularRoute = HeroesPopularRouteImport.update({
   id: '/popular',
   path: '/popular',
@@ -228,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
   '/heroes/items': typeof HeroesItemsRoute
+  '/heroes/perks': typeof HeroesPerksRoute
   '/heroes/popular': typeof HeroesPopularRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
@@ -257,6 +264,7 @@ export interface FileRoutesByTo {
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
   '/heroes/items': typeof HeroesItemsRoute
+  '/heroes/perks': typeof HeroesPerksRoute
   '/heroes/popular': typeof HeroesPopularRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
@@ -293,6 +301,7 @@ export interface FileRoutesById {
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
   '/heroes/items': typeof HeroesItemsRoute
+  '/heroes/perks': typeof HeroesPerksRoute
   '/heroes/popular': typeof HeroesPopularRoute
   '/lobby/$matchId': typeof LobbyMatchIdRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
@@ -330,6 +339,7 @@ export interface FileRouteTypes {
     | '/heroes/$code'
     | '/heroes/effects'
     | '/heroes/items'
+    | '/heroes/perks'
     | '/heroes/popular'
     | '/lobby/$matchId'
     | '/matches/$matchId'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/heroes/$code'
     | '/heroes/effects'
     | '/heroes/items'
+    | '/heroes/perks'
     | '/heroes/popular'
     | '/lobby/$matchId'
     | '/matches/$matchId'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/heroes/$code'
     | '/heroes/effects'
     | '/heroes/items'
+    | '/heroes/perks'
     | '/heroes/popular'
     | '/lobby/$matchId'
     | '/matches/$matchId'
@@ -564,6 +576,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HeroesItemsRouteImport
       parentRoute: typeof HeroesRoute
     }
+    '/heroes/perks': {
+      id: '/heroes/perks'
+      path: '/perks'
+      fullPath: '/heroes/perks'
+      preLoaderRoute: typeof HeroesPerksRouteImport
+      parentRoute: typeof HeroesRoute
+    }
     '/heroes/popular': {
       id: '/heroes/popular'
       path: '/popular'
@@ -669,6 +688,7 @@ interface HeroesRouteChildren {
   HeroesCodeRoute: typeof HeroesCodeRoute
   HeroesEffectsRoute: typeof HeroesEffectsRoute
   HeroesItemsRoute: typeof HeroesItemsRoute
+  HeroesPerksRoute: typeof HeroesPerksRoute
   HeroesPopularRoute: typeof HeroesPopularRoute
   HeroesIndexRoute: typeof HeroesIndexRoute
 }
@@ -677,6 +697,7 @@ const HeroesRouteChildren: HeroesRouteChildren = {
   HeroesCodeRoute: HeroesCodeRoute,
   HeroesEffectsRoute: HeroesEffectsRoute,
   HeroesItemsRoute: HeroesItemsRoute,
+  HeroesPerksRoute: HeroesPerksRoute,
   HeroesPopularRoute: HeroesPopularRoute,
   HeroesIndexRoute: HeroesIndexRoute,
 }

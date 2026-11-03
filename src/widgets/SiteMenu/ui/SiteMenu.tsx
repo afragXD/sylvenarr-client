@@ -16,6 +16,7 @@ const COLUMNS = [
 			{ to: '/heroes' as const, label: 'Герои' },
 			{ to: '/heroes/effects' as const, label: 'Кодекс эффектов' },
 			{ to: '/heroes/items' as const, label: 'Кодекс предметов' },
+			{ to: '/heroes/perks' as const, label: 'Кодекс перков' },
 		],
 	},
 	{

@@ -1,50 +1,45 @@
-import { Group, Loader, Select, Stack, Table, Text, TextInput } from '@mantine/core';
+import { Anchor, Group, Loader, Select, Stack, Table, Text, TextInput } from '@mantine/core';
+import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 
 import {
 	categoryLabel,
 	fetchItems,
-	fetchPerks,
 	ITEM_CATEGORY_LABEL,
 	ITEM_TARGET_LABEL,
 	type ItemBrief,
-	type PerkBrief,
 } from '@/entities/item';
-import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { ItemGlyph } from '@/shared/ui/ItemGlyph';
 import { PageFrame } from '@/shared/ui/PageFrame';
 
 import styles from './ItemsCodexPage.module.css';
 
 /**
- * Кодекс предметов и перков — публичные каталоги с фильтрами.
+ * Кодекс предметов — публичный каталог ярмарки.
  */
 export const ItemsCodexPage = () => {
 	const [items, setItems] = useState<ItemBrief[]>([]);
-	const [perks, setPerks] = useState<PerkBrief[]>([]);
 	const [pending, setPending] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [query, setQuery] = useState('');
 	const [category, setCategory] = useState<string | null>(null);
 	const [tier, setTier] = useState<string | null>(null);
+	const [target, setTarget] = useState<string | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
 		setPending(true);
 		setError(null);
-		Promise.all([fetchItems(), fetchPerks()])
-			.then(([nextItems, nextPerks]) => {
-				if (cancelled) {
-					return;
+		fetchItems()
+			.then((nextItems) => {
+				if (!cancelled) {
+					setItems(nextItems);
 				}
-				setItems(nextItems);
-				setPerks(nextPerks);
 			})
 			.catch((err: unknown) => {
-				if (cancelled) {
-					return;
+				if (!cancelled) {
+					setError(err instanceof Error ? err.message : 'Не удалось загрузить предметы');
 				}
-				setError(err instanceof Error ? err.message : 'Не удалось загрузить каталоги');
 			})
 			.finally(() => {
 				if (!cancelled) {
@@ -72,6 +67,13 @@ export const ItemsCodexPage = () => {
 		[],
 	);
 
+	const targetOptions = useMemo(() => {
+		const set = new Set(items.map((item) => item.target));
+		return [...set]
+			.sort((a, b) => (ITEM_TARGET_LABEL[a] ?? a).localeCompare(ITEM_TARGET_LABEL[b] ?? b, 'ru'))
+			.map((value) => ({ value, label: ITEM_TARGET_LABEL[value] ?? value }));
+	}, [items]);
+
 	const filteredItems = useMemo(() => {
 		const q = query.trim().toLocaleLowerCase('ru');
 		const categoryNum = category ? Number(category) : null;
@@ -83,6 +85,9 @@ export const ItemsCodexPage = () => {
 			if (tierNum !== null && item.tier !== tierNum) {
 				return false;
 			}
+			if (target && item.target !== target) {
+				return false;
+			}
 			if (!q) {
 				return true;
 			}
@@ -91,29 +96,19 @@ export const ItemsCodexPage = () => {
 				.toLocaleLowerCase('ru');
 			return hay.includes(q);
 		});
-	}, [items, query, category, tier]);
-
-	const filteredPerks = useMemo(() => {
-		const q = query.trim().toLocaleLowerCase('ru');
-		if (!q) {
-			return perks;
-		}
-		return perks.filter((perk) => {
-			const hay = [perk.name, perk.description, perk.id, perk.kind]
-				.join(' ')
-				.toLocaleLowerCase('ru');
-			return hay.includes(q);
-		});
-	}, [perks, query]);
+	}, [items, query, category, tier, target]);
 
 	return (
 		<PageFrame
 			width="wide"
 			eyebrow="Справочник"
 			title="Кодекс предметов"
-			lead="Каталог ярмарки и перки: категории, тиры и что даёт каждый навык."
-			scene={getSceneUrl('effects.webp')}
+			lead="Каталог ярмарки: категории, тиры и на кого действует предмет."
 		>
+			<Anchor component={Link} to="/heroes/perks" size="sm" c="brand" w="fit-content">
+				Кодекс перков
+			</Anchor>
+
 			{pending ? (
 				<Group justify="center" py="xl">
 					<Loader color="brand" />
@@ -130,7 +125,7 @@ export const ItemsCodexPage = () => {
 							placeholder="Поиск по названию, описанию, коду…"
 							value={query}
 							onChange={(event) => setQuery(event.currentTarget.value)}
-							aria-label="Поиск предметов и перков"
+							aria-label="Поиск предметов"
 						/>
 						<Select
 							className={styles.filterControl}
@@ -150,21 +145,23 @@ export const ItemsCodexPage = () => {
 							value={tier}
 							onChange={setTier}
 						/>
+						<Select
+							className={styles.filterControl}
+							label="Цель"
+							placeholder="Все"
+							clearable
+							data={targetOptions}
+							value={target}
+							onChange={setTarget}
+						/>
 						<Text size="sm" c="var(--app-text-muted)" className="sylvenarr-tabular" pb={6}>
 							{filteredItems.length === items.length
 								? `${items.length} предметов`
 								: `${filteredItems.length} из ${items.length}`}
-							{' · '}
-							{filteredPerks.length === perks.length
-								? `${perks.length} перков`
-								: `${filteredPerks.length} из ${perks.length}`}
 						</Text>
 					</div>
 
-					<section className={styles.section} aria-labelledby="items-codex-items">
-						<h2 id="items-codex-items" className={styles.sectionTitle}>
-							Предметы
-						</h2>
+					<section className={styles.section} aria-label="Предметы">
 						{filteredItems.length === 0 ? (
 							<Text c="var(--app-text-muted)">Ничего не найдено.</Text>
 						) : (
@@ -225,29 +222,6 @@ export const ItemsCodexPage = () => {
 										))}
 									</Table.Tbody>
 								</Table>
-							</div>
-						)}
-					</section>
-
-					<section className={styles.section} aria-labelledby="items-codex-perks">
-						<h2 id="items-codex-perks" className={styles.sectionTitle}>
-							Перки
-						</h2>
-						{filteredPerks.length === 0 ? (
-							<Text c="var(--app-text-muted)">Ничего не найдено.</Text>
-						) : (
-							<div className={styles.perkGrid}>
-								{filteredPerks.map((perk) => (
-									<article key={perk.id} className={styles.perkCard}>
-										<span className={styles.perkKind}>
-											{perk.kind === 'item'
-												? `Предметы${perk.category ? ` · ${categoryLabel(perk.category)}` : ''}`
-												: 'Прочий'}
-										</span>
-										<h3 className={styles.perkName}>{perk.name}</h3>
-										<p className={styles.perkDesc}>{perk.description}</p>
-									</article>
-								))}
 							</div>
 						)}
 					</section>

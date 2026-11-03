@@ -21,6 +21,7 @@ const BASE_COLUMNS = [
 			{ to: '/heroes', label: 'Герои' },
 			{ to: '/heroes/effects', label: 'Кодекс эффектов' },
 			{ to: '/heroes/items', label: 'Кодекс предметов' },
+			{ to: '/heroes/perks', label: 'Кодекс перков' },
 		],
 	},
 	{

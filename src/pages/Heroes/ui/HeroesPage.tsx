@@ -70,6 +70,9 @@ export const HeroesPage = () => {
 						<Anchor component={Link} to="/heroes/items" size="sm" c="brand" w="fit-content">
 							Кодекс предметов
 						</Anchor>
+						<Anchor component={Link} to="/heroes/perks" size="sm" c="brand" w="fit-content">
+							Кодекс перков
+						</Anchor>
 					</Group>
 				</Stack>
 				{showTable && (
@@ -120,11 +123,7 @@ export const HeroesPage = () => {
 					<ul className={styles.mobileCards}>
 						{filtered.map((hero) => (
 							<li key={hero.code}>
-								<Link
-									to="/heroes/$code"
-									params={{ code: hero.code }}
-									className={styles.card}
-								>
+								<Link to="/heroes/$code" params={{ code: hero.code }} className={styles.card}>
 									<HeroImage
 										code={hero.code}
 										alt={hero.displayName}

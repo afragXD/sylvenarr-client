@@ -9,7 +9,7 @@ export const Route = createFileRoute('/heroes/items')({
 		meta: seo({
 			title: 'Кодекс предметов',
 			description:
-				'Справочник предметов и перков Sylvenarr: Origins — каталог ярмарки, категории и навыки.',
+				'Справочник предметов Sylvenarr: Origins — каталог ярмарки, категории, тиры и цели.',
 			url: absoluteUrl('/heroes/items'),
 		}),
 		links: [{ rel: 'canonical', href: absoluteUrl('/heroes/items') }],

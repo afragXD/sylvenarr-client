@@ -9,6 +9,7 @@ const STATIC_PATHS = [
 	'/heroes',
 	'/heroes/effects',
 	'/heroes/items',
+	'/heroes/perks',
 	'/rating',
 	'/privacy',
 	'/news',
