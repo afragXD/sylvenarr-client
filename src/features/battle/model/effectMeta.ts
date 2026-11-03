@@ -25,8 +25,8 @@ import {
 	Skull,
 	Smile,
 	Sparkles,
-	Swords,
 	Sword,
+	Swords,
 	ThumbsDown,
 	Timer,
 	VolumeX,
@@ -90,7 +90,13 @@ export type EffectId =
 	| 'PAIN_REFLECT'
 	| 'LIFE_FETTERS'
 	| 'LIFE_THREAD'
-	| 'ERUPTION';
+	| 'ERUPTION'
+	| 'REFLECTION'
+	| 'REGENMANA'
+	| 'KILLMANA'
+	| 'DRUNK'
+	| 'POISONEDWEAPON'
+	| 'BREAKWEAPON';
 
 export type EffectKind = 'buff' | 'debuff';
 
@@ -143,6 +149,10 @@ const BUFF_ORDER: EffectId[] = [
 	'DEATHWARD',
 	'PAIN_REFLECT',
 	'LIFE_THREAD',
+	'REFLECTION',
+	'REGENMANA',
+	'POISONEDWEAPON',
+	'BREAKWEAPON',
 ];
 
 const DEBUFF_ORDER: EffectId[] = [
@@ -171,6 +181,8 @@ const DEBUFF_ORDER: EffectId[] = [
 	'IMMOLATION',
 	'LIFE_FETTERS',
 	'ERUPTION',
+	'KILLMANA',
+	'DRUNK',
 ];
 
 const CATALOG: Record<EffectId, EffectMeta> = {
@@ -663,6 +675,60 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		exampleAtL: exampleTypical('−75% макс. ОЗ через 2 р.'),
 		Icon: Flame,
 		kind: 'debuff',
+	},
+	REFLECTION: {
+		id: 'REFLECTION',
+		label: 'Отражение',
+		description: 'Дебафф, наложенный на носителя, уходит случайному врагу без Отражения.',
+		mechanics: 'перенаправление дебаффов · по длительности эффекта',
+		exampleAtL: exampleTypical('дебафф → случайный враг без Отражения'),
+		Icon: Shuffle,
+		kind: 'buff',
+	},
+	REGENMANA: {
+		id: 'REGENMANA',
+		label: 'Источник маны',
+		description: 'В начале хода восстанавливает ману.',
+		mechanics: '+power МР в начале хода',
+		exampleAtL: exampleTypical('+N МР за ход'),
+		Icon: Droplet,
+		kind: 'buff',
+	},
+	KILLMANA: {
+		id: 'KILLMANA',
+		label: 'Высасывание',
+		description: 'В начале хода отнимает ману.',
+		mechanics: '−power МР в начале хода',
+		exampleAtL: exampleTypical('−N МР за ход'),
+		Icon: Droplets,
+		kind: 'debuff',
+	},
+	DRUNK: {
+		id: 'DRUNK',
+		label: 'Опьянение',
+		description: 'Снижает точность на время эффекта; при снятии откатывается.',
+		mechanics: '−power точности на время эффекта',
+		exampleAtL: exampleTypical('−N точности'),
+		Icon: Smile,
+		kind: 'debuff',
+	},
+	POISONEDWEAPON: {
+		id: 'POISONEDWEAPON',
+		label: 'Отравленный клинок',
+		description: 'После попадания в ближнем бою отравляет цель.',
+		mechanics: 'melee hit → POISON 1–2 р., power 1,2',
+		exampleAtL: exampleTypical('яд 1–2 р. после удара'),
+		Icon: Biohazard,
+		kind: 'buff',
+	},
+	BREAKWEAPON: {
+		id: 'BREAKWEAPON',
+		label: 'Рунический клинок',
+		description: 'После попадания в ближнем бою разрушает броню цели.',
+		mechanics: 'melee hit → destroyArmor(10 + lvl атакующего)',
+		exampleAtL: exampleAtL('−(10+5) брони после удара'),
+		Icon: ShieldOff,
+		kind: 'buff',
 	},
 };
 

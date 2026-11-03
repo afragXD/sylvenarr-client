@@ -1,0 +1,49 @@
+.glyph {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid color-mix(in srgb, var(--app-text) 28%, transparent);
+	background: color-mix(in srgb, var(--app-text) 6%, transparent);
+	color: color-mix(in srgb, var(--app-text) 72%, transparent);
+	font-weight: 650;
+	line-height: 1;
+	flex-shrink: 0;
+}
+
+.mark {
+	letter-spacing: 0.02em;
+}
+
+.notches {
+	position: absolute;
+	left: 2px;
+	right: 2px;
+	bottom: 2px;
+	display: flex;
+	gap: 1px;
+	justify-content: center;
+}
+
+.notch {
+	flex: 1;
+	max-width: 3px;
+	height: 2px;
+	background: color-mix(in srgb, #e9c08f 55%, transparent);
+}
+
+.qty {
+	position: absolute;
+	top: -0.35em;
+	right: -0.35em;
+	min-width: 1.1em;
+	padding: 0 0.15em;
+	font-size: 0.65em;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.2;
+	text-align: center;
+	color: #1a130e;
+	background: #e9c08f;
+	border: 1px solid color-mix(in srgb, #8a6b52 60%, #e9c08f);
+}

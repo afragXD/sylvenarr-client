@@ -1,0 +1,127 @@
+.bar {
+	display: flex;
+	flex-direction: column;
+	gap: 0.55rem;
+	padding: 0.55rem 0.65rem;
+	border: 1px solid var(--app-border);
+	background: color-mix(in srgb, var(--app-surface) 94%, #1a130e);
+	z-index: 2;
+}
+
+.wallets {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+}
+
+.walletSide {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.35rem;
+	font-variant-numeric: tabular-nums;
+	color: #e9c08f;
+	font-weight: 600;
+}
+
+.walletSide::before {
+	content: "";
+	display: inline-block;
+	width: 0.55em;
+	height: 0.55em;
+	border-radius: 50%;
+	background: #e9c08f;
+}
+
+.turn {
+	font-size: 0.85rem;
+	font-weight: 650;
+	margin: 0;
+	flex: 1;
+	text-align: center;
+}
+
+.shop {
+	display: flex;
+	gap: 0.4rem;
+	overflow-x: auto;
+	padding-bottom: 0.15rem;
+	-webkit-overflow-scrolling: touch;
+}
+
+.card {
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.25rem;
+	min-width: 7.5rem;
+	max-width: 9.5rem;
+	padding: 0.4rem 0.45rem;
+	border: 1px solid var(--app-border);
+	background: transparent;
+	color: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.card:hover:not(:disabled),
+.card:focus-visible,
+.cardSelected {
+	border-color: color-mix(in srgb, #e9c08f 55%, var(--app-border));
+	outline: none;
+}
+
+.card:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.cardTop {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	width: 100%;
+}
+
+.cardName {
+	font-size: 0.78rem;
+	font-weight: 650;
+	line-height: 1.25;
+	min-width: 0;
+}
+
+.price {
+	font-size: 0.78rem;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: #8a6b52;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+.dimmed {
+	opacity: 0.42;
+	pointer-events: none;
+	filter: grayscale(0.15);
+}
+
+.fly {
+	position: fixed;
+	z-index: 40;
+	pointer-events: none;
+	transition:
+		transform 200ms ease-out,
+		opacity 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fly {
+		transition: none;
+	}
+}

@@ -92,11 +92,70 @@ export type BattleUnit = {
 	morale?: number;
 	/** Ненулевые сопротивления / варды / иммунитеты. */
 	resists?: ResistBrief[];
+	/** Изученные перки (economyOn). */
+	perks?: string[];
+	/** Навык торговли 0…1+. */
+	merchant?: number;
+	/** Радиус оружия по колонкам. */
+	weaponReach?: number;
+};
+
+export type InventoryStack = {
+	code: number;
+	name: string;
+	description: string;
+	quantity: number;
+	category: number;
+	tier: number;
+	target: 'self' | 'ally' | 'allySummon' | 'enemy' | 'enemySummon' | 'sellOnly';
 };
 
 /** Кошелёк отряда в сводке боя (CUT-2026-11-03b T3). */
 export type BattleTeamEconomy = {
 	gold: number;
+	inventory?: InventoryStack[];
+};
+
+export type BattlePhase = 'combat' | 'perks' | 'fair';
+
+export type PerkOfferOption = {
+	id: string;
+	name: string;
+	description: string;
+	kind: 'item' | 'other';
+	learned: boolean;
+};
+
+export type PerkOffer = {
+	unitId: string;
+	playerId: string;
+	done: boolean;
+	options: PerkOfferOption[];
+};
+
+export type FairShopEntry = {
+	code: number;
+	name: string;
+	description: string;
+	category: number;
+	tier: number;
+	cost: number;
+	buyPrice: number;
+};
+
+export type FairSellEntry = {
+	code: number;
+	name: string;
+	sellPrice: number;
+};
+
+export type FairSummary = {
+	index: number;
+	turnTeam: 0 | 1;
+	stopped: [boolean, boolean];
+	traderIds: [string, string];
+	shop: FairShopEntry[];
+	sellByTeam: [FairSellEntry[], FairSellEntry[]];
 };
 
 export type TurnOrderPhase = 'acted' | 'active' | 'waiting' | 'delayed' | 'dead';
@@ -135,8 +194,10 @@ export type AbilityInfo = {
 export type PendingPrompt = {
 	unitId: string;
 	kind: string;
-	slot: 1 | 2 | 3 | 4 | 5;
+	slot: 1 | 2 | 3 | 4 | 5 | null;
 	options: { id: string; label: string; description?: string }[];
+	source?: 'ability' | 'item';
+	itemCode?: number | null;
 };
 
 export type BattleSfxEvent = {
@@ -168,6 +229,11 @@ export type BattleState = {
 	units: BattleUnit[];
 	/** Кошельки [host, guest]; у старого сервера поля нет. */
 	teams?: [BattleTeamEconomy, BattleTeamEconomy];
+	/** Ярмарка/перки/предметы включены. */
+	economyEnabled?: boolean;
+	phase?: BattlePhase;
+	perkOffers?: PerkOffer[] | null;
+	fair?: FairSummary | null;
 };
 
 /** ПТС текущего игрока по матчу; null — матч без рейтинга. */

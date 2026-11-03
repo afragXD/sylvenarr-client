@@ -204,10 +204,25 @@ export async function declineDraw(id: string): Promise<Match> {
 export async function battleAction(input: {
 	readonly matchId: string;
 	readonly unitId: string;
-	readonly action: 'attack' | 'defend' | 'wait' | 'skill' | 'ability' | 'move';
+	readonly action:
+		| 'attack'
+		| 'defend'
+		| 'wait'
+		| 'skill'
+		| 'ability'
+		| 'move'
+		| 'item'
+		| 'perk_pick'
+		| 'perk_skip'
+		| 'fair_buy'
+		| 'fair_sell'
+		| 'fair_sell_all'
+		| 'fair_stop';
 	readonly targetId?: string;
 	readonly slot?: 1 | 2 | 3 | 4 | 5;
 	readonly choice?: string;
+	readonly itemCode?: number;
+	readonly perkId?: string;
 }): Promise<Match> {
 	return apiFetchJson(
 		`/matches/${encodeURIComponent(input.matchId)}/battle/action`,
@@ -219,6 +234,8 @@ export async function battleAction(input: {
 				targetId: input.targetId,
 				slot: input.slot,
 				choice: input.choice,
+				itemCode: input.itemCode,
+				perkId: input.perkId,
 			}),
 		},
 		parseMatch,

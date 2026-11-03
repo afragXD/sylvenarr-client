@@ -9,7 +9,10 @@ import {
 	HeroImage,
 	previewCtxFromUnit,
 } from '@/entities/hero';
-import type { AbilityInfo, BattleState, BattleUnit, Match } from '@/entities/match';
+import type { AbilityInfo, BattleState, BattleUnit, InventoryStack, Match } from '@/entities/match';
+import { BattleFairBar, battleFairStyles } from '@/features/battle-fair';
+import { BattleInventoryPanel, legalItemTargetIds } from '@/features/battle-inventory';
+import { BattlePerksPanel } from '@/features/battle-perks';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 import {
@@ -57,7 +60,20 @@ type DamageFloat = {
 /** CUT AC-13 п.16: портреты на поле +25% (было 28). */
 const FIELD_PORTRAIT = 35;
 
-type BattleActionKind = 'attack' | 'defend' | 'wait' | 'skill' | 'ability' | 'move';
+type BattleActionKind =
+	| 'attack'
+	| 'defend'
+	| 'wait'
+	| 'skill'
+	| 'ability'
+	| 'move'
+	| 'item'
+	| 'perk_pick'
+	| 'perk_skip'
+	| 'fair_buy'
+	| 'fair_sell'
+	| 'fair_sell_all'
+	| 'fair_stop';
 
 type BattlePanelProps = {
 	match: Match;
@@ -69,6 +85,8 @@ type BattlePanelProps = {
 		targetId?: string;
 		slot?: 1 | 2 | 3 | 4 | 5;
 		choice?: string;
+		itemCode?: number;
+		perkId?: string;
 	}) => void;
 	onSurrender: () => void;
 	onOfferDraw: () => void;
@@ -86,6 +104,7 @@ type PendingMode =
 	| { kind: 'attack' }
 	| { kind: 'skill' }
 	| { kind: 'ability'; slot: 1 | 2 | 3 | 4 | 5 }
+	| { kind: 'item'; itemCode: number; target: InventoryStack['target'] }
 	| null;
 
 type ConfirmState = {
@@ -97,6 +116,9 @@ type ConfirmState = {
 		action: BattleActionKind;
 		targetId?: string;
 		slot?: 1 | 2 | 3 | 4 | 5;
+		choice?: string;
+		itemCode?: number;
+		perkId?: string;
 	};
 };
 
@@ -122,27 +144,48 @@ export const BattlePanel = ({
 	const [confirm, setConfirm] = useState<ConfirmState | null>(null);
 	const [promptHoverUnitId, setPromptHoverUnitId] = useState<string | null>(null);
 	const [inspectUnitId, setInspectUnitId] = useState<string | null>(null);
+	const [bagOpen, setBagOpen] = useState(false);
 	const [surrenderOpened, surrenderHandlers] = useDisclosure(false);
 	const [damageFloats, setDamageFloats] = useState<DamageFloat[]>([]);
 	const [cachedMyAbilities, setCachedMyAbilities] = useState<AbilityInfo[]>([]);
 	const wasMyTurnRef = useRef(false);
+	const prevPhaseRef = useRef<string | null>(null);
 	const logRef = useRef<HTMLDivElement>(null);
 	const prevHpRef = useRef<Map<string, number> | null>(null);
 	const floatSeqRef = useRef(0);
 
+	const phase = battle?.phase ?? 'combat';
+	const economyEnabled = Boolean(battle?.economyEnabled);
 	const isMyTurn =
-		Boolean(battle) && battle!.turnPlayerId === playerId && battle!.outcome === 'ongoing';
+		Boolean(battle) &&
+		battle!.outcome === 'ongoing' &&
+		(phase === 'perks'
+			? Boolean(battle!.perkOffers?.some((o) => o.playerId === playerId && !o.done))
+			: battle!.turnPlayerId === playerId);
 
 	useEffect(() => {
-		if (isMyTurn && !wasMyTurnRef.current) {
+		if (isMyTurn && !wasMyTurnRef.current && phase === 'combat') {
 			playYourTurnSound();
 		}
-		if (!isMyTurn) {
+		if (!isMyTurn && phase === 'combat') {
 			setPendingMode(null);
 			setConfirm(null);
+			setBagOpen(false);
 		}
 		wasMyTurnRef.current = isMyTurn;
-	}, [isMyTurn]);
+	}, [isMyTurn, phase]);
+
+	useEffect(() => {
+		if (!battle || battle.outcome !== 'ongoing') {
+			prevPhaseRef.current = phase;
+			return;
+		}
+		const prev = prevPhaseRef.current;
+		prevPhaseRef.current = phase;
+		if (prev && prev !== phase && (phase === 'fair' || phase === 'perks')) {
+			playYourTurnSound();
+		}
+	}, [battle, phase]);
 
 	/** AC-5: Esc отменяет выбор цели. */
 	useEffect(() => {
@@ -294,6 +337,15 @@ export const BattlePanel = ({
 	const prompt = battle.pendingPrompt;
 	const abilityDocs = active ? getHeroAbilities(active.heroClassCode, true).slots : [];
 
+	const myTeam: 0 | 1 = match.host.id === playerId ? 0 : 1;
+	const myInventory = battle.teams?.[myTeam]?.inventory ?? [];
+	const fairActor =
+		phase === 'fair' && battle.fair
+			? (battle.units.find((u) => u.id === battle.fair!.traderIds[myTeam]) ??
+				battle.units.find((u) => u.playerId === playerId && u.alive) ??
+				null)
+			: null;
+
 	const highlightTargets = (() => {
 		if (!pendingMode) {
 			return [];
@@ -304,8 +356,14 @@ export const BattlePanel = ({
 		if (pendingMode.kind === 'skill') {
 			return battle.legalSkillTargetIds ?? [];
 		}
-		const ability = abilities.find((item) => item.slot === pendingMode.slot);
-		return ability?.legalTargetIds ?? [];
+		if (pendingMode.kind === 'item' && active) {
+			return legalItemTargetIds(battle.units, active, pendingMode.target);
+		}
+		if (pendingMode.kind === 'ability') {
+			const ability = abilities.find((item) => item.slot === pendingMode.slot);
+			return ability?.legalTargetIds ?? [];
+		}
+		return [];
 	})();
 
 	const openConfirm = (next: ConfirmState) => {
@@ -347,7 +405,7 @@ export const BattlePanel = ({
 	};
 
 	const handleAttackClick = () => {
-		if (!active || !isMyTurn || prompt) {
+		if (!active || !isMyTurn || prompt || phase !== 'combat') {
 			return;
 		}
 		if (battle.legalTargetIds.length === 0) {
@@ -358,7 +416,7 @@ export const BattlePanel = ({
 	};
 
 	const handleSkillClick = () => {
-		if (!active || !isMyTurn || !skillLabel || prompt) {
+		if (!active || !isMyTurn || !skillLabel || prompt || phase !== 'combat') {
 			return;
 		}
 		if (!skillNeedsTarget) {
@@ -375,7 +433,7 @@ export const BattlePanel = ({
 	};
 
 	const handleAbilityClick = (ability: AbilityInfo) => {
-		if (!active || !isMyTurn || prompt || ability.disabledReason) {
+		if (!active || !isMyTurn || prompt || ability.disabledReason || phase !== 'combat') {
 			return;
 		}
 		if (!ability.needsTarget) {
@@ -402,11 +460,39 @@ export const BattlePanel = ({
 			}
 			return;
 		}
+		if (pendingMode.kind === 'item') {
+			castNow({
+				unitId: active.id,
+				action: 'item',
+				itemCode: pendingMode.itemCode,
+				targetId: unitId,
+			});
+			setBagOpen(false);
+			return;
+		}
 		if (pendingMode.kind === 'attack') {
 			castNow({ unitId: active.id, action: 'attack', targetId: unitId });
 			return;
 		}
 		castNow({ unitId: active.id, action: 'skill', targetId: unitId });
+	};
+
+	const handleItemSelect = (stack: InventoryStack) => {
+		if (!active || !isMyTurn || prompt || phase !== 'combat') {
+			return;
+		}
+		if (stack.target === 'self') {
+			openConfirm({
+				title: stack.name,
+				detail: stack.description || 'Применить на себя?',
+				isAoe: false,
+				payload: { unitId: active.id, action: 'item', itemCode: stack.code },
+			});
+			setBagOpen(false);
+			return;
+		}
+		setPendingMode({ kind: 'item', itemCode: stack.code, target: stack.target });
+		setConfirm(null);
 	};
 
 	/** AC-5: клик по юниту бьёт только в режиме цели; модалка — «i» / ПКМ. */
@@ -420,11 +506,13 @@ export const BattlePanel = ({
 		if (!active || !isMyTurn || !prompt) {
 			return;
 		}
+		const isItemPrompt = prompt.source === 'item';
 		onAction({
 			unitId: active.id,
-			action: 'ability',
-			slot: prompt.slot,
+			action: isItemPrompt ? 'item' : 'ability',
+			slot: prompt.slot ?? undefined,
 			choice: choiceId,
+			itemCode: isItemPrompt ? (prompt.itemCode ?? undefined) : undefined,
 		});
 		setPendingMode(null);
 		setConfirm(null);
@@ -556,7 +644,7 @@ export const BattlePanel = ({
 						onMatches={onMatches}
 					/>
 				)}
-				<div className={styles.field}>
+				<div className={`${styles.field}${phase === 'fair' ? ` ${battleFairStyles.dimmed}` : ''}`}>
 					<p className={styles.rowLegend}>П — передний ряд, З — задний</p>
 					<TeamSide
 						title={
@@ -617,6 +705,35 @@ export const BattlePanel = ({
 				</div>
 			</div>
 
+			{battle.outcome === 'ongoing' && phase === 'fair' && battle.fair && fairActor ? (
+				<BattleFairBar
+					fair={battle.fair}
+					units={battle.units}
+					hostGold={battle.teams?.[0]?.gold ?? 0}
+					guestGold={battle.teams?.[1]?.gold ?? 0}
+					myTeam={myTeam}
+					isMyTurn={battle.turnPlayerId === playerId}
+					busy={busy}
+					hostName={match.host.displayName}
+					guestName={match.guest?.displayName ?? '…'}
+					onBuy={(itemCode) => onAction({ unitId: fairActor.id, action: 'fair_buy', itemCode })}
+					onSell={(itemCode) => onAction({ unitId: fairActor.id, action: 'fair_sell', itemCode })}
+					onSellAll={() => onAction({ unitId: fairActor.id, action: 'fair_sell_all' })}
+					onStop={() => onAction({ unitId: fairActor.id, action: 'fair_stop' })}
+				/>
+			) : null}
+
+			{battle.outcome === 'ongoing' && phase === 'perks' ? (
+				<BattlePerksPanel
+					offers={battle.perkOffers ?? []}
+					units={battle.units}
+					playerId={playerId}
+					busy={busy}
+					onPick={(unitId, perkId) => onAction({ unitId, action: 'perk_pick', perkId })}
+					onSkip={(unitId) => onAction({ unitId, action: 'perk_skip' })}
+				/>
+			) : null}
+
 			{confirm && isMyTurn && (
 				<div className={styles.confirm} data-aoe={confirm.isAoe ? 'true' : undefined}>
 					<Text size="sm" fw={600}>
@@ -672,7 +789,7 @@ export const BattlePanel = ({
 				</div>
 			)}
 
-			{battle.outcome === 'ongoing' && !prompt && !confirm && (
+			{battle.outcome === 'ongoing' && phase === 'combat' && !prompt && !confirm && (
 				<div className={styles.actions} data-opponent={isMyTurn ? undefined : 'true'}>
 					{pendingMode && isMyTurn ? (
 						<div className={styles.targetHint} role="status">
@@ -827,6 +944,21 @@ export const BattlePanel = ({
 							>
 								Ждать
 							</Button>
+							{economyEnabled ? (
+								<BattleInventoryPanel
+									inventory={myInventory}
+									actor={active}
+									open={bagOpen}
+									selectedCode={pendingMode?.kind === 'item' ? pendingMode.itemCode : null}
+									busy={busy}
+									onToggle={() => {
+										setBagOpen((v) => !v);
+										setPendingMode(null);
+										setConfirm(null);
+									}}
+									onSelect={handleItemSelect}
+								/>
+							) : null}
 						</>
 					) : (
 						(cachedMyAbilities.length > 0 ? cachedMyAbilities : abilities).map((ability) => (

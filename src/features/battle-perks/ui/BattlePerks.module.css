@@ -1,0 +1,73 @@
+.overlay {
+	display: flex;
+	flex-direction: column;
+	gap: 0.55rem;
+	padding: 0.65rem 0.7rem;
+	border: 1px solid var(--app-border);
+	background: color-mix(in srgb, var(--app-surface) 92%, #1a130e);
+}
+
+.hero {
+	font-size: 0.95rem;
+	font-weight: 650;
+	margin: 0;
+}
+
+.wait {
+	font-size: 0.85rem;
+	color: var(--app-text-muted);
+	margin: 0;
+}
+
+.options {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0.4rem;
+}
+
+@media (min-width: 40em) {
+	.options {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.option {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.2rem;
+	padding: 0.45rem 0.55rem;
+	border: 1px solid var(--app-border);
+	background: transparent;
+	color: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.option:hover:not(:disabled),
+.option:focus-visible {
+	border-color: color-mix(in srgb, #e9c08f 50%, var(--app-border));
+	outline: none;
+}
+
+.option:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.optionName {
+	font-weight: 650;
+	font-size: 0.88rem;
+}
+
+.optionDesc {
+	font-size: 0.75rem;
+	color: var(--app-text-muted);
+	line-height: 1.35;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}

@@ -144,6 +144,27 @@ export const UnitInspectModal = ({ unit, onClose }: UnitInspectModalProps) => {
 									ряд {unit.row + 1}
 								</Text>
 							</CombatStatRow>
+							{(unit.perks?.length ?? 0) > 0 ||
+							typeof unit.merchant === 'number' ||
+							typeof unit.weaponReach === 'number' ? (
+								<Text size="sm" c="var(--app-text-muted)" mt={4}>
+									{[
+										(unit.perks?.length ?? 0) > 0 ? `Перки: ${unit.perks!.join(', ')}` : null,
+										typeof unit.merchant === 'number'
+											? `Навык торговли ${Math.round(unit.merchant * 100)} %`
+											: null,
+										`Радиус оружия ${
+											typeof unit.weaponReach === 'number'
+												? unit.weaponReach
+												: unit.heroClassCode === 'Knight' || unit.heroClassCode === 'DemonLord'
+													? 2
+													: 1
+										}`,
+									]
+										.filter(Boolean)
+										.join(' · ')}
+								</Text>
+							) : null}
 							{/* Эффекты без вардов — варды только в блоке ниже (AC-5, без дубля). */}
 							{(unit.effects?.length ?? 0) > 0 ? (
 								<div className={styles.effects}>

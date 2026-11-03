@@ -39,7 +39,7 @@ import {
 	HeroDetailModal,
 } from '@/features/draft';
 import { ApiError } from '@/shared/api/http';
-import { absoluteUrl, API_BASE_URL } from '@/shared/constants';
+import { API_BASE_URL, absoluteUrl } from '@/shared/constants';
 import { takePendingLobbyDraftPresetId } from '@/shared/lib/lobbyDraftPreset';
 import { InviteCodeChip } from '@/shared/ui/InviteCodeChip';
 import { PageFrame } from '@/shared/ui/PageFrame';
@@ -100,9 +100,7 @@ const mergeBattleFrame = (
 	const justFinished = nextStatus === 'finished' && prev.status !== 'finished';
 	const meta = payload.resultMeta;
 	const ownRating =
-		meta && viewerId
-			? (meta.ratings?.find((row) => row.playerId === viewerId) ?? null)
-			: undefined;
+		meta && viewerId ? (meta.ratings?.find((row) => row.playerId === viewerId) ?? null) : undefined;
 	const fromMeta =
 		justFinished && meta
 			? {
@@ -130,12 +128,20 @@ const mergeBattleFrame = (
 			legalSkillTargetIds: battle.legalSkillTargetIds ?? [],
 			abilities: battle.abilities ?? [],
 			pendingPrompt: battle.pendingPrompt ?? null,
+			economyEnabled: battle.economyEnabled ?? false,
+			phase: battle.phase ?? 'combat',
+			perkOffers: battle.perkOffers ?? null,
+			fair: battle.fair ?? null,
+			teams: battle.teams,
 			units: (battle.units ?? []).map((unit) => ({
 				...unit,
 				effects: unit.effects ?? [],
 				isSummon: unit.isSummon ?? false,
 				horseIsDead: unit.horseIsDead ?? false,
 				mana: unit.mana ?? 0,
+				perks: unit.perks ?? [],
+				merchant: unit.merchant ?? 0,
+				weaponReach: unit.weaponReach,
 			})),
 		},
 	};
@@ -553,10 +559,25 @@ export const MatchRoomPage = () => {
 
 	const handleBattleAction = (input: {
 		unitId: string;
-		action: 'attack' | 'defend' | 'wait' | 'skill' | 'ability' | 'move';
+		action:
+			| 'attack'
+			| 'defend'
+			| 'wait'
+			| 'skill'
+			| 'ability'
+			| 'move'
+			| 'item'
+			| 'perk_pick'
+			| 'perk_skip'
+			| 'fair_buy'
+			| 'fair_sell'
+			| 'fair_sell_all'
+			| 'fair_stop';
 		targetId?: string;
 		slot?: 1 | 2 | 3 | 4 | 5;
 		choice?: string;
+		itemCode?: number;
+		perkId?: string;
 	}) => {
 		if (!match) {
 			return;
@@ -936,9 +957,7 @@ export const MatchRoomPage = () => {
 						)}
 					</Group>
 
-					{match.status === 'waiting' && (
-						<WaitingOpponentPanel match={match} />
-					)}
+					{match.status === 'waiting' && <WaitingOpponentPanel match={match} />}
 
 					{(match.status === 'fighting' || match.status === 'finished') && !squadsReadyVisible && (
 						<Box className="sylvenarr-panel">
@@ -1307,11 +1326,7 @@ const WaitingOpponentPanel = ({ match }: { match: Match }) => {
 					variant="light"
 					color="accent"
 					leftSection={
-						linkCopied ? (
-							<Check size={16} aria-hidden />
-						) : (
-							<Link2 size={16} aria-hidden />
-						)
+						linkCopied ? <Check size={16} aria-hidden /> : <Link2 size={16} aria-hidden />
 					}
 					onClick={() => void handleCopyLink()}
 				>
