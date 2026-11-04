@@ -31,7 +31,14 @@
 	text-align: left;
 }
 
+.perkHead {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.65rem;
+}
+
 .perkKind {
+	display: block;
 	font-family: var(--mantine-font-family-headings);
 	font-size: 0.8rem;
 	color: var(--app-text-muted);

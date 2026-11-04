@@ -1,0 +1,29 @@
+.glyph {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid color-mix(in srgb, var(--app-text) 28%, transparent);
+	background: color-mix(in srgb, var(--app-text) 6%, transparent);
+	color: color-mix(in srgb, var(--app-text) 72%, transparent);
+	font-weight: 650;
+	line-height: 1;
+	flex-shrink: 0;
+}
+
+.glyph[data-kind='item'] {
+	border-color: color-mix(in srgb, #cbb48c 55%, var(--app-border));
+	background: color-mix(in srgb, #cbb48c 10%, transparent);
+	color: #cbb48c;
+}
+
+.glyph[data-kind='other'] {
+	border-color: color-mix(in srgb, #8fa8c4 55%, var(--app-border));
+	background: color-mix(in srgb, #8fa8c4 10%, transparent);
+	color: #8fa8c4;
+}
+
+.mark {
+	letter-spacing: 0.02em;
+	padding: 0 0.1em;
+}

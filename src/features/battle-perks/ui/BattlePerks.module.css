@@ -35,13 +35,21 @@
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 0.2rem;
+	gap: 0.25rem;
 	padding: 0.45rem 0.55rem;
 	border: 1px solid var(--app-border);
 	background: transparent;
 	color: inherit;
 	text-align: left;
 	cursor: pointer;
+}
+
+.optionHead {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+	width: 100%;
+	min-width: 0;
 }
 
 .option:hover:not(:disabled),

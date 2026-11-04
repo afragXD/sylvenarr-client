@@ -14,6 +14,7 @@ import type { AbilityInfo, BattleState, BattleUnit, InventoryStack, Match } from
 import { BattleFairBar, battleFairStyles } from '@/features/battle-fair';
 import { BattleInventoryPanel, legalItemTargetIds } from '@/features/battle-inventory';
 import { BattlePerksPanel } from '@/features/battle-perks';
+import { PerkGlyph } from '@/shared/ui/PerkGlyph';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 import {
@@ -645,64 +646,68 @@ export const BattlePanel = ({
 						onMatches={onMatches}
 					/>
 				)}
-				<div className={`${styles.field}${phase === 'fair' ? ` ${battleFairStyles.dimmed}` : ''}`}>
-					<p className={styles.rowLegend}>П — передний ряд, З — задний</p>
-					<TeamSide
-						title={
-							<PlayerIdentity
-								name={match.host.displayName}
-								avatarUrl={match.host.avatarUrl}
-								prefix="Игрок 1"
-								size={FIELD_PORTRAIT}
-							/>
-						}
-						teamGold={battle.teams?.[0]?.gold ?? 0}
-						playerName={match.host.displayName}
-						presetName={match.draft.hostPresetName}
-						presetActive={battle.outcome === 'ongoing'}
-						presetAlign="start"
-						units={hostUnits}
-						mirror
-						activeId={battle.activeUnitId}
-						legalTargets={highlightTargets}
-						promptHoverUnitId={promptHoverUnitId}
-						onUnitClick={handleUnitClick}
-						onInspectUnit={(unitId) => setInspectUnitId(unitId)}
-						attackPreviewFor={attackPreviewFor}
-						damageFloats={damageFloats}
-					/>
-					<TeamSide
-						title={
-							<PlayerIdentity
-								name={match.guest?.displayName ?? '…'}
-								avatarUrl={match.guest?.avatarUrl}
-								prefix="Игрок 2"
-								size={FIELD_PORTRAIT}
-							/>
-						}
-						teamGold={battle.teams?.[1]?.gold ?? 0}
-						playerName={match.guest?.displayName ?? '…'}
-						presetName={match.draft.guestPresetName}
-						presetActive={battle.outcome === 'ongoing'}
-						presetAlign="end"
-						units={guestUnits}
-						mirror={false}
-						activeId={battle.activeUnitId}
-						legalTargets={highlightTargets}
-						promptHoverUnitId={promptHoverUnitId}
-						onUnitClick={handleUnitClick}
-						onInspectUnit={(unitId) => setInspectUnitId(unitId)}
-						attackPreviewFor={attackPreviewFor}
-						damageFloats={damageFloats}
-					/>
-				</div>
-				<div className={styles.log} aria-live="polite" ref={logRef}>
-					<Text size="sm" c="var(--app-text-muted)" mb={6}>
-						Журнал
-					</Text>
-					{battle.log.map((line, index) => (
-						<span key={`${index}-${line}`}>{renderBattleLogLine(line)}</span>
-					))}
+				<p className={styles.rowLegend}>П — передний ряд, З — задний</p>
+				<div className={styles.board}>
+					<div className={`${styles.field}${phase === 'fair' ? ` ${battleFairStyles.dimmed}` : ''}`}>
+						<TeamSide
+							title={
+								<PlayerIdentity
+									name={match.host.displayName}
+									avatarUrl={match.host.avatarUrl}
+									prefix="Игрок 1"
+									size={FIELD_PORTRAIT}
+								/>
+							}
+							teamGold={battle.teams?.[0]?.gold ?? 0}
+							playerName={match.host.displayName}
+							presetName={match.draft.hostPresetName}
+							presetActive={battle.outcome === 'ongoing'}
+							presetAlign="start"
+							units={hostUnits}
+							mirror
+							activeId={battle.activeUnitId}
+							legalTargets={highlightTargets}
+							promptHoverUnitId={promptHoverUnitId}
+							onUnitClick={handleUnitClick}
+							onInspectUnit={(unitId) => setInspectUnitId(unitId)}
+							attackPreviewFor={attackPreviewFor}
+							damageFloats={damageFloats}
+						/>
+						<TeamSide
+							title={
+								<PlayerIdentity
+									name={match.guest?.displayName ?? '…'}
+									avatarUrl={match.guest?.avatarUrl}
+									prefix="Игрок 2"
+									size={FIELD_PORTRAIT}
+								/>
+							}
+							teamGold={battle.teams?.[1]?.gold ?? 0}
+							playerName={match.guest?.displayName ?? '…'}
+							presetName={match.draft.guestPresetName}
+							presetActive={battle.outcome === 'ongoing'}
+							presetAlign="end"
+							units={guestUnits}
+							mirror={false}
+							activeId={battle.activeUnitId}
+							legalTargets={highlightTargets}
+							promptHoverUnitId={promptHoverUnitId}
+							onUnitClick={handleUnitClick}
+							onInspectUnit={(unitId) => setInspectUnitId(unitId)}
+							attackPreviewFor={attackPreviewFor}
+							damageFloats={damageFloats}
+						/>
+					</div>
+					<div className={styles.logCell}>
+						<div className={styles.log} aria-live="polite" ref={logRef}>
+							<Text size="sm" c="var(--app-text-muted)" mb={6}>
+								Журнал
+							</Text>
+							{battle.log.map((line, index) => (
+								<span key={`${index}-${line}`}>{renderBattleLogLine(line)}</span>
+							))}
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -1234,7 +1239,8 @@ const RowColumn = ({
 									<div className={styles.unitPerks} title={(unit.perks ?? []).map(perkName).join(', ')}>
 										{(unit.perks ?? []).map((id) => (
 											<span key={id} className={styles.unitPerkChip}>
-												{perkName(id)}
+												<PerkGlyph perkId={id} size={18} />
+												<span>{perkName(id)}</span>
 											</span>
 										))}
 									</div>

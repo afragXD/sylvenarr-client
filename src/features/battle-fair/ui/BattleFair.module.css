@@ -85,9 +85,18 @@
 }
 
 .teamPerksValues {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem 0.45rem;
 	color: var(--app-text-muted);
 	flex: 1;
 	min-width: 0;
+}
+
+.teamPerkChip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.2rem;
 }
 
 .sellList {

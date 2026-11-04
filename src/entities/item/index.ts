@@ -1,6 +1,7 @@
 export { fetchItems, fetchPerks } from './api/itemsApi';
 export { classStartingPerks } from './model/classStartingPerks';
 export { categoryLabel, ITEM_CATEGORY_LABEL, ITEM_TARGET_LABEL } from './model/labels';
+export { perkGlyphMeta, type PerkGlyphMeta } from './model/perkGlyphMeta';
 export { PERK_NAME, perkName } from './model/perkNames';
 export { tierRarity, tierRarityTitle } from './model/tierRarity';
 export type { ItemBrief, ItemTarget, PerkBrief } from './model/types';

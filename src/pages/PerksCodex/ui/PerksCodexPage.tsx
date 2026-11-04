@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { categoryLabel, fetchPerks, type PerkBrief } from '@/entities/item';
 import { PageFrame } from '@/shared/ui/PageFrame';
+import { PerkGlyph } from '@/shared/ui/PerkGlyph';
 
 import styles from './PerksCodexPage.module.css';
 
@@ -114,12 +115,17 @@ export const PerksCodexPage = () => {
 						<div className={styles.perkGrid}>
 							{filteredPerks.map((perk) => (
 								<article key={perk.id} className={styles.perkCard}>
-									<span className={styles.perkKind}>
-										{perk.kind === 'item'
-											? `Предметы${perk.category ? ` · ${categoryLabel(perk.category)}` : ''}`
-											: 'Прочий'}
-									</span>
-									<h2 className={styles.perkName}>{perk.name}</h2>
+									<div className={styles.perkHead}>
+										<PerkGlyph perkId={perk.id} size={36} title={perk.name} />
+										<div>
+											<span className={styles.perkKind}>
+												{perk.kind === 'item'
+													? `Предметы${perk.category ? ` · ${categoryLabel(perk.category)}` : ''}`
+													: 'Прочий'}
+											</span>
+											<h2 className={styles.perkName}>{perk.name}</h2>
+										</div>
+									</div>
 									<p className={styles.perkDesc}>{perk.description}</p>
 								</article>
 							))}

@@ -22,6 +22,7 @@ import {
 } from '@/entities/hero';
 import { perkName } from '@/entities/item';
 import type { BattleUnit } from '@/entities/match';
+import { PerkGlyph } from '@/shared/ui/PerkGlyph';
 
 import {
 	describeResist,
@@ -151,11 +152,20 @@ export const UnitInspectModal = ({
 									ряд {unit.row + 1}
 								</Text>
 							</CombatStatRow>
+							{economyEnabled && (unit.perks?.length ?? 0) > 0 ? (
+								<Group gap={6} mt={6} wrap="wrap">
+									{(unit.perks ?? []).map((id) => (
+										<Group key={id} gap={4} wrap="nowrap">
+											<PerkGlyph perkId={id} size={18} />
+											<Text size="xs" c="var(--app-text-muted)">
+												{perkName(id)}
+											</Text>
+										</Group>
+									))}
+								</Group>
+							) : null}
 							<Text size="sm" c="var(--app-text-muted)" mt={4}>
 								{[
-									economyEnabled && (unit.perks?.length ?? 0) > 0
-										? `Перки: ${(unit.perks ?? []).map(perkName).join(', ')}`
-										: null,
 									economyEnabled && typeof unit.merchant === 'number'
 										? `Навык торговли ${Math.round(unit.merchant * 100)} %`
 										: null,

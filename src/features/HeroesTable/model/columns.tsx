@@ -4,6 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 
 import { displayAttack, type HeroClass, HeroImage } from '@/entities/hero';
 import { classStartingPerks, perkName } from '@/entities/item';
+import { PerkGlyph } from '@/shared/ui/PerkGlyph';
 
 import type { heroesTableFeatures } from './table-features';
 
@@ -76,9 +77,16 @@ export const heroesColumns = columnHelper.columns([
 		header: 'Перки',
 		enableSorting: false,
 		cell: (info) => (
-			<Text size="xs" c="var(--app-text-muted)" style={{ lineHeight: 1.35 }}>
-				{info.getValue()}
-			</Text>
+			<Group gap={4} wrap="wrap">
+				{classStartingPerks(info.row.original.code).map((id) => (
+					<Group key={id} gap={3} wrap="nowrap" title={perkName(id)}>
+						<PerkGlyph perkId={id} size={16} />
+						<Text size="xs" c="var(--app-text-muted)">
+							{perkName(id)}
+						</Text>
+					</Group>
+				))}
+			</Group>
 		),
 	}),
 	columnHelper.accessor('gold', {

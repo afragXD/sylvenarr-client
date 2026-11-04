@@ -1,6 +1,7 @@
 import { Button } from '@mantine/core';
 
 import type { BattleUnit, PerkOffer } from '@/entities/match';
+import { PerkGlyph } from '@/shared/ui/PerkGlyph';
 
 import styles from './BattlePerks.module.css';
 
@@ -49,9 +50,12 @@ export function BattlePerksPanel({
 						onClick={() => onPick(current.unitId, option.id)}
 						title={option.learned ? 'Уже изучен' : option.description}
 					>
-						<span className={styles.optionName}>
-							{option.name}
-							{option.learned ? ' (изучен)' : ''}
+						<span className={styles.optionHead}>
+							<PerkGlyph perkId={option.id} size={32} title={option.name} />
+							<span className={styles.optionName}>
+								{option.name}
+								{option.learned ? ' (изучен)' : ''}
+							</span>
 						</span>
 						<span className={styles.optionDesc}>{option.description}</span>
 					</button>

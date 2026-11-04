@@ -5,6 +5,7 @@ import { perkName, tierRarity } from '@/entities/item';
 import type { BattleUnit, FairShopEntry, FairSummary } from '@/entities/match';
 import { requiredPerkForCategory, teamHasItemPerk } from '@/features/battle-inventory';
 import { ItemGlyph } from '@/shared/ui/ItemGlyph';
+import { PerkGlyph } from '@/shared/ui/PerkGlyph';
 
 import styles from './BattleFair.module.css';
 
@@ -145,7 +146,12 @@ export function BattleFairBar({
 									<span className={styles.teamPerksHero}>{unit.displayName}</span>
 									<span className={styles.teamPerksValues}>
 										{(unit.perks ?? []).length > 0
-											? (unit.perks ?? []).map(perkName).join(', ')
+											? (unit.perks ?? []).map((id) => (
+													<span key={id} className={styles.teamPerkChip}>
+														<PerkGlyph perkId={id} size={16} />
+														{perkName(id)}
+													</span>
+												))
 											: '—'}
 									</span>
 								</li>
