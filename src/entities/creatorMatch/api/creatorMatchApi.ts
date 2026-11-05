@@ -71,17 +71,29 @@ const parseDetail = (data: unknown): CreatorMatchDetail => {
 	};
 };
 
-export async function fetchCreatorMatches(): Promise<CreatorMatchListItem[]> {
-	const data = await apiFetchJson<unknown>('/creator/matches');
+const parseList = (data: unknown): CreatorMatchListItem[] => {
 	if (!Array.isArray(data)) {
 		throw new Error('Некорректный список матчей');
 	}
 	return data.map(parseListItem);
+};
+
+export async function fetchCreatorMatches(): Promise<CreatorMatchListItem[]> {
+	return apiFetchJson(
+		'/creator/matches',
+		undefined,
+		parseList,
+		'Не удалось загрузить матчи'
+	);
 }
 
 export async function fetchCreatorMatch(id: string): Promise<CreatorMatchDetail> {
-	const data = await apiFetchJson<unknown>(`/creator/matches/${id}`);
-	return parseDetail(data);
+	return apiFetchJson(
+		`/creator/matches/${id}`,
+		undefined,
+		parseDetail,
+		'Не удалось загрузить матч'
+	);
 }
 
 export async function patchCreatorUnit(
@@ -89,9 +101,13 @@ export async function patchCreatorUnit(
 	unitId: string,
 	patch: CreatorUnitPatch
 ): Promise<CreatorMatchDetail> {
-	const data = await apiFetchJson<unknown>(`/creator/matches/${matchId}/units/${unitId}`, {
-		method: 'PATCH',
-		body: JSON.stringify(patch),
-	});
-	return parseDetail(data);
+	return apiFetchJson(
+		`/creator/matches/${matchId}/units/${unitId}`,
+		{
+			method: 'PATCH',
+			body: JSON.stringify(patch),
+		},
+		parseDetail,
+		'Не удалось сохранить юнита'
+	);
 }
