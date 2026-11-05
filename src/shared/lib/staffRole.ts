@@ -7,3 +7,8 @@ import type { PlayerRole } from '@/entities/player';
 export function isStaffRole(role: PlayerRole | string | null | undefined): boolean {
 	return role === 'admin' || role === 'creator';
 }
+
+/** Только creator (редактор живых матчей). */
+export function isCreatorRole(role: PlayerRole | string | null | undefined): boolean {
+	return role === 'creator';
+}

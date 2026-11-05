@@ -24,6 +24,7 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminNewsRouteImport } from './routes/admin.news'
+import { Route as CreatorMatchesRouteImport } from './routes/creator.matches'
 import { Route as HeroesIndexRouteImport } from './routes/heroes.index'
 import { Route as HeroesCodeRouteImport } from './routes/heroes.$code'
 import { Route as HeroesEffectsRouteImport } from './routes/heroes.effects'
@@ -43,6 +44,8 @@ import { Route as ProfileSettingsRouteImport } from './routes/profile.settings'
 import { Route as AdminNewsIndexRouteImport } from './routes/admin.news.index'
 import { Route as AdminNewsIdRouteImport } from './routes/admin.news.$id'
 import { Route as AdminNewsNewRouteImport } from './routes/admin.news.new'
+import { Route as CreatorMatchesIndexRouteImport } from './routes/creator.matches.index'
+import { Route as CreatorMatchesIdRouteImport } from './routes/creator.matches.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -117,6 +120,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const AdminNewsRoute = AdminNewsRouteImport.update({
   id: '/admin/news',
   path: '/admin/news',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorMatchesRoute = CreatorMatchesRouteImport.update({
+  id: '/creator/matches',
+  path: '/creator/matches',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HeroesIndexRoute = HeroesIndexRouteImport.update({
@@ -214,6 +222,16 @@ const AdminNewsNewRoute = AdminNewsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AdminNewsRoute,
 } as any)
+const CreatorMatchesIndexRoute = CreatorMatchesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CreatorMatchesRoute,
+} as any)
+const CreatorMatchesIdRoute = CreatorMatchesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => CreatorMatchesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -231,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/news': typeof AdminNewsRouteWithChildren
+  '/creator/matches': typeof CreatorMatchesRouteWithChildren
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
   '/heroes/items': typeof HeroesItemsRoute
@@ -249,7 +268,9 @@ export interface FileRoutesByFullPath {
   '/profile/': typeof ProfileIndexRoute
   '/admin/news/$id': typeof AdminNewsIdRoute
   '/admin/news/new': typeof AdminNewsNewRoute
+  '/creator/matches/$id': typeof CreatorMatchesIdRoute
   '/admin/news/': typeof AdminNewsIndexRoute
+  '/creator/matches/': typeof CreatorMatchesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -279,7 +300,9 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileIndexRoute
   '/admin/news/$id': typeof AdminNewsIdRoute
   '/admin/news/new': typeof AdminNewsNewRoute
+  '/creator/matches/$id': typeof CreatorMatchesIdRoute
   '/admin/news': typeof AdminNewsIndexRoute
+  '/creator/matches': typeof CreatorMatchesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -298,6 +321,7 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/news': typeof AdminNewsRouteWithChildren
+  '/creator/matches': typeof CreatorMatchesRouteWithChildren
   '/heroes/$code': typeof HeroesCodeRoute
   '/heroes/effects': typeof HeroesEffectsRoute
   '/heroes/items': typeof HeroesItemsRoute
@@ -316,7 +340,9 @@ export interface FileRoutesById {
   '/profile/': typeof ProfileIndexRoute
   '/admin/news/$id': typeof AdminNewsIdRoute
   '/admin/news/new': typeof AdminNewsNewRoute
+  '/creator/matches/$id': typeof CreatorMatchesIdRoute
   '/admin/news/': typeof AdminNewsIndexRoute
+  '/creator/matches/': typeof CreatorMatchesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -336,6 +362,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/sitemap.xml'
     | '/admin/news'
+    | '/creator/matches'
     | '/heroes/$code'
     | '/heroes/effects'
     | '/heroes/items'
@@ -354,7 +381,9 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/admin/news/$id'
     | '/admin/news/new'
+    | '/creator/matches/$id'
     | '/admin/news/'
+    | '/creator/matches/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -384,7 +413,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/admin/news/$id'
     | '/admin/news/new'
+    | '/creator/matches/$id'
     | '/admin/news'
+    | '/creator/matches'
   id:
     | '__root__'
     | '/'
@@ -402,6 +433,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/sitemap.xml'
     | '/admin/news'
+    | '/creator/matches'
     | '/heroes/$code'
     | '/heroes/effects'
     | '/heroes/items'
@@ -420,7 +452,9 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/admin/news/$id'
     | '/admin/news/new'
+    | '/creator/matches/$id'
     | '/admin/news/'
+    | '/creator/matches/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -439,6 +473,7 @@ export interface RootRouteChildren {
   SignUpRoute: typeof SignUpRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminNewsRoute: typeof AdminNewsRouteWithChildren
+  CreatorMatchesRoute: typeof CreatorMatchesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -546,6 +581,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/news'
       fullPath: '/admin/news'
       preLoaderRoute: typeof AdminNewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creator/matches': {
+      id: '/creator/matches'
+      path: '/creator/matches'
+      fullPath: '/creator/matches'
+      preLoaderRoute: typeof CreatorMatchesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/heroes/': {
@@ -681,6 +723,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNewsNewRouteImport
       parentRoute: typeof AdminNewsRoute
     }
+    '/creator/matches/': {
+      id: '/creator/matches/'
+      path: '/'
+      fullPath: '/creator/matches/'
+      preLoaderRoute: typeof CreatorMatchesIndexRouteImport
+      parentRoute: typeof CreatorMatchesRoute
+    }
+    '/creator/matches/$id': {
+      id: '/creator/matches/$id'
+      path: '/$id'
+      fullPath: '/creator/matches/$id'
+      preLoaderRoute: typeof CreatorMatchesIdRouteImport
+      parentRoute: typeof CreatorMatchesRoute
+    }
   }
 }
 
@@ -775,6 +831,20 @@ const AdminNewsRouteWithChildren = AdminNewsRoute._addFileChildren(
   AdminNewsRouteChildren,
 )
 
+interface CreatorMatchesRouteChildren {
+  CreatorMatchesIdRoute: typeof CreatorMatchesIdRoute
+  CreatorMatchesIndexRoute: typeof CreatorMatchesIndexRoute
+}
+
+const CreatorMatchesRouteChildren: CreatorMatchesRouteChildren = {
+  CreatorMatchesIdRoute: CreatorMatchesIdRoute,
+  CreatorMatchesIndexRoute: CreatorMatchesIndexRoute,
+}
+
+const CreatorMatchesRouteWithChildren = CreatorMatchesRoute._addFileChildren(
+  CreatorMatchesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
@@ -791,16 +861,8 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpRoute: SignUpRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminNewsRoute: AdminNewsRouteWithChildren,
+  CreatorMatchesRoute: CreatorMatchesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

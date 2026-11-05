@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { $player, $sessionChecked, logoutFx, sessionRequested } from '@/entities/player';
 import { APP_TITLE } from '@/shared/constants';
 import { takeAuthRedirect } from '@/shared/lib/authRedirect';
-import { isStaffRole } from '@/shared/lib/staffRole';
+import { isCreatorRole, isStaffRole } from '@/shared/lib/staffRole';
 import { resolveStaticUrl } from '@/shared/lib/staticUrl';
 import { RuneGateIcon } from '@/shared/ui/BrandMark';
 import { OrnateLink } from '@/shared/ui/OrnateButton';
@@ -167,6 +167,11 @@ export const Header = () => {
 											Новости (админ)
 										</Menu.Item>
 									) : null}
+									{isCreatorRole(player.role) ? (
+										<Menu.Item component={Link} to="/creator/matches">
+											Матчи (креатор)
+										</Menu.Item>
+									) : null}
 									<Menu.Divider />
 									<Menu.Item
 										className={classes.logoutItem}
@@ -205,6 +210,7 @@ export const Header = () => {
 				opened={menuOpen}
 				onClose={() => setMenuOpen(false)}
 				isAdmin={isStaffRole(player?.role)}
+				isCreator={isCreatorRole(player?.role)}
 				isSignedIn={Boolean(player)}
 				sessionChecked={sessionChecked}
 				displayName={player?.displayName}

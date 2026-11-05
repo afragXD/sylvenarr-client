@@ -41,6 +41,7 @@ type SiteMenuProps = {
 	opened: boolean;
 	onClose: () => void;
 	isAdmin?: boolean;
+	isCreator?: boolean;
 	/** Вошедший — промо ведёт в /lobby, гость — на вход. */
 	isSignedIn?: boolean;
 	/** Пока false — не показывать гостевой CTA (AC-4). */
@@ -57,6 +58,7 @@ export const SiteMenu = ({
 	opened,
 	onClose,
 	isAdmin = false,
+	isCreator = false,
 	isSignedIn = false,
 	sessionChecked = false,
 	displayName,
@@ -136,6 +138,13 @@ export const SiteMenu = ({
 										<li>
 											<Link to="/admin/news" className={classes.link} onClick={onClose}>
 												Новости (админ)
+											</Link>
+										</li>
+									) : null}
+									{isCreator ? (
+										<li>
+											<Link to="/creator/matches" className={classes.link} onClick={onClose}>
+												Матчи (креатор)
 											</Link>
 										</li>
 									) : null}
