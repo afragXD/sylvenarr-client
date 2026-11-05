@@ -12,6 +12,7 @@ import {
 	updatePreset,
 } from '@/entities/presets';
 import { ApiError } from '@/shared/api/http';
+import { isStaffRole } from '@/shared/lib/staffRole';
 import { useAc6DeferredLoad } from '@/shared/lib/useAc6DeferredLoad';
 import { OrnateButton } from '@/shared/ui/OrnateButton';
 
@@ -67,7 +68,7 @@ export const PresetsLibraryPage = () => {
 		return null;
 	}
 
-	const canEditGlobal = player?.role === 'admin';
+	const canEditGlobal = isStaffRole(player?.role);
 	const mine = presets.filter((preset) => !preset.isGlobal);
 	const globals = presets.filter((preset) => preset.isGlobal);
 

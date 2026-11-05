@@ -514,7 +514,8 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		},
 	},
 	BeerElemental: {
-		passiveMechanics: 'В начале хода: −10…80 золота.',
+		passiveMechanics:
+			'В начале раунда: при F≥1 → −5·F боевого духа; при F=0 и M≥1 → +4·M (союзники без себя). В начале хода: −10…80 золота.',
 		slots: {
 			1: {
 				mechanics: 'Союзнику +7+2L боевого духа.',

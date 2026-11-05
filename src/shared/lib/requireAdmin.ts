@@ -2,8 +2,10 @@ import { isRedirect, redirect } from '@tanstack/react-router';
 
 import { fetchCurrentPlayer } from '@/entities/player';
 
+import { isStaffRole } from './staffRole';
+
 /**
- * beforeLoad: только admin, иначе на главную.
+ * beforeLoad: admin или creator, иначе на главную.
  * Неавторизованных — на вход.
  */
 export async function requireAdmin(): Promise<void> {
@@ -12,7 +14,7 @@ export async function requireAdmin(): Promise<void> {
 		if (!player) {
 			throw redirect({ to: '/sign-in' });
 		}
-		if (player.role !== 'admin') {
+		if (!isStaffRole(player.role)) {
 			throw redirect({ to: '/' });
 		}
 	} catch (error) {

@@ -13,7 +13,8 @@ const parsePlayer = (data: unknown): Player => {
 	const providers = Array.isArray(data.providers)
 		? data.providers.filter((item): item is string => typeof item === 'string')
 		: [];
-	const role = data.role === 'admin' ? 'admin' : 'player';
+	const role =
+		data.role === 'admin' || data.role === 'creator' ? data.role : 'player';
 	return {
 		id: data.id,
 		displayName: data.displayName,

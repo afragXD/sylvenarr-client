@@ -16,4 +16,4 @@ export {
 	playerUpdated,
 	sessionRequested,
 } from './model/session';
-export type { AuthProvider, Player } from './model/types';
+export type { AuthProvider, Player, PlayerRole } from './model/types';

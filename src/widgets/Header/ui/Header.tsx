@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { $player, $sessionChecked, logoutFx, sessionRequested } from '@/entities/player';
 import { APP_TITLE } from '@/shared/constants';
 import { takeAuthRedirect } from '@/shared/lib/authRedirect';
+import { isStaffRole } from '@/shared/lib/staffRole';
 import { resolveStaticUrl } from '@/shared/lib/staticUrl';
 import { RuneGateIcon } from '@/shared/ui/BrandMark';
 import { OrnateLink } from '@/shared/ui/OrnateButton';
@@ -161,7 +162,7 @@ export const Header = () => {
 									<Menu.Item component={Link} to="/profile/settings">
 										Настройки
 									</Menu.Item>
-									{player.role === 'admin' ? (
+									{isStaffRole(player.role) ? (
 										<Menu.Item component={Link} to="/admin/news">
 											Новости (админ)
 										</Menu.Item>
@@ -203,7 +204,7 @@ export const Header = () => {
 			<SiteMenu
 				opened={menuOpen}
 				onClose={() => setMenuOpen(false)}
-				isAdmin={player?.role === 'admin'}
+				isAdmin={isStaffRole(player?.role)}
 				isSignedIn={Boolean(player)}
 				sessionChecked={sessionChecked}
 				displayName={player?.displayName}

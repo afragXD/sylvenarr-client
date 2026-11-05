@@ -77,6 +77,8 @@ export type BattleUnit = {
 	/** Хозяин саммона (CUT-2026-11-05 AC-1). */
 	summonerId?: string | null;
 	summonerName?: string | null;
+	/** Пол юнита (переиспользуемо; CUT-2026-11-05 ПЭ). */
+	gender?: 'female' | 'male' | 'none';
 	horseIsDead: boolean;
 	mana: number;
 	maxMana: number;

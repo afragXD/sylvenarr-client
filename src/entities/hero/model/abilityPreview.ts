@@ -226,6 +226,10 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		1: (ctx) => [atk(ctx, 0.9)],
 	},
 	BeerElemental: {
+		passive: () => [
+			{ kind: 'text', value: 'F≥1: −5·F морали; F=0: +4·M' },
+			{ kind: 'text', value: 'ход: −10…80 золота' },
+		],
 		5: (ctx) => [atk(ctx, 1)],
 	},
 	EvilTree: {
