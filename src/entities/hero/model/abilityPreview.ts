@@ -144,6 +144,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		1: (ctx) => [atk(ctx, 1)],
 		2: (ctx) => [atk(ctx, 1)],
 		3: (ctx) => [atk(ctx, 1)],
+		5: () => [{ kind: 'text', value: 'бес на 2 р. · КД 4' }],
 	},
 	Inquisitor: {
 		1: (ctx) => [atk(ctx, 1)],
@@ -194,14 +195,32 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		1: (ctx) => [atk(ctx, 1)],
 	},
 	Specter: {
-		1: (ctx) => [atk(ctx, 1)],
+		1: (ctx) => [
+			atk(ctx, 1),
+			{
+				kind: 'text',
+				value: `паралич −7 пп; при провале Разум ${5 + ctx.lvl * 2}–${9 + ctx.lvl * 2}`,
+			},
+		],
 	},
 	Detective: {
 		1: (ctx) => [atk(ctx, 1.1)],
+		2: (ctx) => [
+			{ kind: 'chance', value: 50 + ctx.lvl * 2, label: 'яд ряду на 2 р.' },
+		],
 		4: (ctx) => [atk(ctx, 0.5)],
 	},
 	GhostWarrior: {
-		1: (ctx) => [atk(ctx, 1)],
+		1: (ctx) => [
+			atk(ctx, 1),
+			{ kind: 'chance', value: 68 + ctx.lvl, label: 'паралич (Смерть)' },
+		],
+		2: () => [
+			{ kind: 'text', value: '+1 крит-банк себе' },
+			{ kind: 'text', value: '+20% точности на 2 р.' },
+		],
+		3: () => [{ kind: 'text', value: 'скелет: ⌊ур. трупа союзника / 2⌋' }],
+		4: () => [{ kind: 'text', value: 'только при ОЗ < 50%' }],
 	},
 	GoldGolem: {
 		1: (ctx) => [atk(ctx, 0.9)],
@@ -221,9 +240,16 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		],
 	},
 	Mermaid: {
-		1: mermaidBreeze,
-		2: (ctx) => [{ kind: 'chance', value: 38 + ctx.lvl, label: 'оглушение ряду' }],
-		4: (ctx) => [{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 6), label: 'р. оковы' }],
+		1: (ctx) => [...mermaidBreeze(ctx), { kind: 'text', value: '1 МР' }],
+		2: (ctx) => [
+			{ kind: 'chance', value: 38 + ctx.lvl, label: 'оглушение ряду' },
+			{ kind: 'text', value: '2 МР · КД 3' },
+		],
+		3: () => [{ kind: 'text', value: 'без маны (заряды ульты)' }],
+		4: (ctx) => [
+			{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 6), label: 'р. оковы' },
+			{ kind: 'text', value: '2 МР' },
+		],
 	},
 	Dracolich: {
 		1: (ctx) => [atk(ctx, 1)],
@@ -234,6 +260,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		3: (ctx) => [
 			{ kind: 'damage', value: Math.floor(ctx.damage / 3) + ctx.lvl * 2 },
 			{ kind: 'chance', value: 50 + ctx.lvl * 2, label: 'кровотечение' },
+			{ kind: 'text', value: 'через ≤1 ряд; не З→З' },
 		],
 		5: (ctx) => [atk(ctx, 1), { kind: 'text', value: '×1.2 по святым' }],
 	},
@@ -260,7 +287,11 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	},
 	Incub: {
 		passive: (ctx) => [
-			{ kind: 'chance', value: 60 + ctx.lvl, label: `−${5 + Math.floor(ctx.lvl / 2)} морали` },
+			{
+				kind: 'chance',
+				value: 60 + ctx.lvl,
+				label: `−${5 + Math.floor(ctx.lvl / 2)} морали (не на нежить)`,
+			},
 		],
 		1: (ctx) => [
 			{ kind: 'text', value: `${ctx.power} урона на ряд` },

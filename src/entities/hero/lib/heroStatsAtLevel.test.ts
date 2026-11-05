@@ -52,4 +52,63 @@ describe('heroStatsAtLevel AC-14', () => {
 		expect(at10.health).toBe(100 + 9 * 5);
 		expect(at10.power).toBeGreaterThan(40);
 	});
+
+	test('CUT-2026-11-05: Кентавр L8 броня = 31', () => {
+		const knight = abbess({
+			code: 'Knight',
+			health: 210,
+			damage: 20,
+			armor: 15,
+			initiative: 40,
+			accuracy: 92,
+			mana: 0,
+			maxMana: 0,
+			power: 0,
+		});
+		expect(heroStatsAtLevel(knight, 8).armor).toBe(31);
+	});
+
+	test('CUT-2026-11-05 AC-9: все 27 playable кодов дают статы на L1/15/30', () => {
+		const codes = [
+			'Assassin',
+			'Paladin',
+			'Inquisitor',
+			'Detective',
+			'DemonLord',
+			'Abbess',
+			'OrcKing',
+			'Marauder',
+			'Werewolf',
+			'Archlich',
+			'Witch',
+			'GhostWarrior',
+			'Specter',
+			'Oracle',
+			'Herbalist',
+			'Demiurge',
+			'GoldGolem',
+			'BeerElemental',
+			'Knight',
+			'Mermaid',
+			'Patriarch',
+			'Pyro',
+			'EvilTree',
+			'Dracolich',
+			'Antipaladin',
+			'Angel',
+			'Titan',
+		] as const;
+		expect(codes.length).toBe(27);
+		for (const code of codes) {
+			const hero = abbess({ code, armor: code === 'Knight' ? 15 : 5 });
+			for (const lvl of [1, 15, 30] as const) {
+				const snap = heroStatsAtLevel(hero, lvl);
+				expect(snap.lvl).toBe(lvl);
+				expect(Number.isFinite(snap.damage)).toBe(true);
+				expect(Number.isFinite(snap.armor)).toBe(true);
+				expect(Number.isFinite(snap.power)).toBe(true);
+				expect(snap.health).toBeGreaterThan(0);
+			}
+		}
+	});
 });

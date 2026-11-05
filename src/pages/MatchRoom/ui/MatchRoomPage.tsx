@@ -137,6 +137,8 @@ const mergeBattleFrame = (
 				...unit,
 				effects: unit.effects ?? [],
 				isSummon: unit.isSummon ?? false,
+				summonerId: unit.summonerId ?? null,
+				summonerName: unit.summonerName ?? null,
 				horseIsDead: unit.horseIsDead ?? false,
 				mana: unit.mana ?? 0,
 				perks: unit.perks ?? [],

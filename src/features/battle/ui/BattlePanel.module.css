@@ -435,6 +435,12 @@
 	color: color-mix(in srgb, var(--mantine-color-accent-filled) 65%, var(--app-text));
 }
 
+/* CUT-2026-11-05 AC-9: «Снижение точности» — тот же красный, что HP < 25%. */
+.effectTag[data-accuracy-down="true"] {
+	border-color: #ec5e4f;
+	color: #ec5e4f;
+}
+
 .effectRounds {
 	font-size: 0.6rem;
 }

@@ -157,6 +157,11 @@ const EffectBadge = ({ effect }: { effect: BattleEffectBrief }) => {
 			<span
 				className={styles.effectTag}
 				data-kind={meta.kind}
+				data-accuracy-down={
+					effect.id === 'FOCUSED' && typeof effect.power === 'number' && effect.power < 0
+						? 'true'
+						: undefined
+				}
 				tabIndex={0}
 				aria-label={`${meta.label}${roundsLabel ? ` · ${roundsLabel}` : ''}`}
 			>

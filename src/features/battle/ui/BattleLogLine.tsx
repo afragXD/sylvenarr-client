@@ -75,6 +75,10 @@ export function renderBattleLogLine(line: string): ReactNode {
 	if (/^——\s*ХОД:/u.test(cleaned) || /^——\s*ход:/iu.test(cleaned)) {
 		return <div className={styles.logTurn}>{cleaned}</div>;
 	}
+	// CUT-2026-11-05 AC-1: явный стиль промаха (не путать с вардом).
+	if (/промах/iu.test(cleaned)) {
+		return <div className={styles.logMiss}>{cleaned}</div>;
+	}
 	if (
 		cleaned.length > 1 &&
 		!/\(\s*-?\d+\s*\)/.test(cleaned) &&

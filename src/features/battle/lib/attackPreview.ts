@@ -114,7 +114,8 @@ export function previewWeaponAttack(
 		blockedLabel: resist.blockedLabel,
 		resistValue: resist.resistValue,
 		source,
-		lowDamage: !resist.blockedLabel && (maxDamage < 10 || minDamage < 10),
+		// CUT-2026-11-05 AC-9: при полном блоке показываем «0» красным.
+		lowDamage: Boolean(resist.blockedLabel) || maxDamage < 10 || minDamage < 10,
 	};
 }
 

@@ -1230,6 +1230,9 @@ const RowColumn = ({
 										<div className={styles.unitName}>
 											{unit.isSummon ? '✦ ' : ''}
 											{unit.displayName}
+											{unit.isSummon && unit.summonerName
+												? ` ← ${unit.summonerName}`
+												: ''}
 											{unit.defending ? ' 🛡' : ''}
 											{unit.horseIsDead ? ' ✗конь' : ''}
 										</div>

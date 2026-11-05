@@ -74,6 +74,9 @@ export type BattleUnit = {
 	defending: boolean;
 	effects: BattleEffectBrief[];
 	isSummon: boolean;
+	/** Хозяин саммона (CUT-2026-11-05 AC-1). */
+	summonerId?: string | null;
+	summonerName?: string | null;
 	horseIsDead: boolean;
 	mana: number;
 	maxMana: number;

@@ -118,12 +118,14 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 		bump(s);
 	},
 	Witch(s) {
+		// CUT-2026-11-05: прирост урона как у Мародёра (без раундового спайка).
+		s.damage += expectedRandInt(2, 5) + Math.floor(s.lvl / 2);
 		addMana(s, expectedRandInt(1, 2));
 		s.power += Math.floor(s.lvl / 2) + 3;
 		bump(s);
 	},
 	GhostWarrior(s) {
-		s.damage += 3 + Math.floor(s.lvl / 3);
+		s.damage += 1 + Math.floor(s.lvl / 4);
 		s.initiative += 2;
 		bump(s);
 	},
@@ -152,10 +154,12 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 		bump(s);
 	},
 	Knight(s) {
-		s.armor += 2 + Math.floor(s.lvl / 4);
+		const armorFloorBefore = Math.floor(s.lvl / 4);
+		s.armor += 2;
 		s.accuracy += 3;
 		s.damage += expectedRandInt(1, 2) + Math.floor(s.lvl / 3);
 		bump(s);
+		s.armor += Math.floor(s.lvl / 4) - armorFloorBefore;
 	},
 	Mermaid(s) {
 		addMana(s, 1);
@@ -196,10 +200,10 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 		bump(s);
 	},
 	Titan(s) {
-		s.power += Math.floor(s.lvl / 4) + 2;
+		s.power += Math.floor(s.lvl / 4) + 3;
 		s.maxHp += 10;
 		s.health = s.maxHp;
-		s.damage += Math.floor(s.lvl / 3) + 1;
+		s.damage += Math.floor(s.lvl / 3) + 2;
 		s.luck += expectedRandInt(0, 1);
 		addMana(s, 1);
 		bump(s);

@@ -51,6 +51,20 @@ describe('attackPreview AC-13', () => {
 		expect(preview.hitChance).toBe(100);
 	});
 
+	test('CUT-2026-11-05 AC-9: полный блок → 0 красным', () => {
+		const atk = unit({ damage: 40 });
+		const def = unit({
+			id: 'd',
+			armor: 0,
+			resists: [{ source: 'WEAPON', value: 0, immune: true, wardCharges: null }],
+		});
+		const preview = previewWeaponAttack(atk, def, 'melee');
+		expect(preview.minDamage).toBe(0);
+		expect(preview.maxDamage).toBe(0);
+		expect(preview.blockedLabel).toBe('иммунитет');
+		expect(preview.lowDamage).toBe(true);
+	});
+
 	test('ability heal preview', () => {
 		const preview = previewAbilityOnTarget(unit(), unit({ id: 'ally' }), {
 			slot: 2,

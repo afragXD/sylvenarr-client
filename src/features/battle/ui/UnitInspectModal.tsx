@@ -90,9 +90,9 @@ function formatMorale(value: number): string {
 	return value > 0 ? `+${value}` : String(value);
 }
 
-function classRoleLabel(isSummon: boolean): string {
+function classRoleLabel(isSummon: boolean, summonerName?: string | null): string {
 	if (isSummon) {
-		return 'саммон';
+		return summonerName ? `саммон ← ${summonerName}` : 'саммон';
 	}
 	return 'герой';
 }
@@ -136,7 +136,7 @@ export const UnitInspectModal = ({
 						<div>
 							<Group gap={6} wrap="wrap">
 								<Text size="sm" c="var(--app-text-muted)">
-									{classRoleLabel(Boolean(unit.isSummon))}
+									{classRoleLabel(Boolean(unit.isSummon), unit.summonerName)}
 									{unit.defending ? ' · защита' : ''}
 								</Text>
 								{!unit.alive ? <CombatStat kind="fallen" size={14} /> : null}
