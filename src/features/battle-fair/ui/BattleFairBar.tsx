@@ -189,7 +189,7 @@ export function BattleFairBar({
 											code={item.code}
 											category={item.category}
 											tier={item.tier}
-											size={24}
+											size={44}
 											title={item.name}
 										/>
 										<span className={styles.cardName} style={rarityStyle}>
@@ -241,7 +241,7 @@ export function BattleFairBar({
 											code={item.code}
 											category={category}
 											tier={tier}
-											size={24}
+											size={44}
 											title={item.name}
 										/>
 										<span className={styles.cardName} style={rarityStyle}>
@@ -298,7 +298,7 @@ export function BattleFairBar({
 						code={fly.code}
 						category={fly.category}
 						tier={fly.tier}
-						size={32}
+						size={56}
 					/>
 				</span>
 			) : null}

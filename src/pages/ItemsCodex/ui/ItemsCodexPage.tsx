@@ -206,7 +206,7 @@ export const ItemsCodexPage = () => {
 																code={item.code}
 																category={item.category}
 																tier={item.tier}
-																size={28}
+																size={52}
 																title={item.name}
 															/>
 															<div>

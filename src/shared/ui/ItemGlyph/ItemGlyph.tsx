@@ -30,7 +30,7 @@ type ItemGlyphProps = {
 /**
  * Иконка предмета: WebP по `code`, иначе глиф категории + насечки тира.
  */
-export function ItemGlyph({ category, tier, code, quantity, size = 28, title }: ItemGlyphProps) {
+export function ItemGlyph({ category, tier, code, quantity, size = 40, title }: ItemGlyphProps) {
 	const [imgFailed, setImgFailed] = useState(false);
 	useEffect(() => {
 		setImgFailed(false);

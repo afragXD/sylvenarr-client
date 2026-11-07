@@ -74,6 +74,7 @@ export function BattleInventoryPanel({
 											category={stack.category}
 											tier={stack.tier}
 											quantity={stack.quantity}
+											size={44}
 											title={stack.name}
 										/>
 										<span className={styles.meta}>
