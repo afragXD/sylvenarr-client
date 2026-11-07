@@ -203,10 +203,11 @@ export const ItemsCodexPage = () => {
 													<Table.Td>
 														<div className={styles.itemCell}>
 															<ItemGlyph
+																code={item.code}
 																category={item.category}
 																tier={item.tier}
 																size={28}
-																title={categoryLabel(item.category)}
+																title={item.name}
 															/>
 															<div>
 																<div className={styles.itemName} style={rarityStyle}>

@@ -70,6 +70,7 @@ export function BattleInventoryPanel({
 										title={reason}
 									>
 										<ItemGlyph
+											code={stack.code}
 											category={stack.category}
 											tier={stack.tier}
 											quantity={stack.quantity}

@@ -9,6 +9,21 @@
 	font-weight: 650;
 	line-height: 1;
 	flex-shrink: 0;
+	overflow: hidden;
+}
+
+.glyphArt {
+	border: none;
+	background: transparent;
+	color: inherit;
+}
+
+.art {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	pointer-events: none;
 }
 
 .mark {

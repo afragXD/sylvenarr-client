@@ -11,6 +11,7 @@ import styles from './BattleFair.module.css';
 
 type FlyItem = {
 	readonly seq: number;
+	readonly code: number;
 	readonly category: number;
 	readonly tier: number;
 	readonly buyerTeam: 0 | 1;
@@ -105,6 +106,7 @@ export function BattleFairBar({
 		flySeqRef.current += 1;
 		setFly({
 			seq: flySeqRef.current,
+			code: bought.code,
 			category: bought.category,
 			tier: bought.tier,
 			buyerTeam: prev.turnTeam,
@@ -183,7 +185,13 @@ export function BattleFairBar({
 									}}
 								>
 									<span className={styles.cardTop}>
-										<ItemGlyph category={item.category} tier={item.tier} size={24} />
+										<ItemGlyph
+											code={item.code}
+											category={item.category}
+											tier={item.tier}
+											size={24}
+											title={item.name}
+										/>
 										<span className={styles.cardName} style={rarityStyle}>
 											{item.name}
 										</span>
@@ -212,7 +220,9 @@ export function BattleFairBar({
 						aria-label="Ваши предметы на продажу"
 					>
 						{mySell.map((item) => {
-							const tier = Number(String(item.code)[0]);
+							const codeStr = String(item.code);
+							const tier = Number(codeStr[0]);
+							const category = Number(codeStr[codeStr.length - 1]);
 							const rarity = tierRarity(tier);
 							const rarityStyle = rarity.color ? { color: rarity.color } : undefined;
 							return (
@@ -226,8 +236,17 @@ export function BattleFairBar({
 										setSelectedShop(null);
 									}}
 								>
-									<span className={styles.cardName} style={rarityStyle}>
-										{item.name}
+									<span className={styles.cardTop}>
+										<ItemGlyph
+											code={item.code}
+											category={category}
+											tier={tier}
+											size={24}
+											title={item.name}
+										/>
+										<span className={styles.cardName} style={rarityStyle}>
+											{item.name}
+										</span>
 									</span>
 									<span className={styles.price}>прод. {item.sellPrice}</span>
 								</button>
@@ -275,7 +294,12 @@ export function BattleFairBar({
 					aria-hidden
 					onAnimationEnd={() => setFly(null)}
 				>
-					<ItemGlyph category={fly.category} tier={fly.tier} size={32} />
+					<ItemGlyph
+						code={fly.code}
+						category={fly.category}
+						tier={fly.tier}
+						size={32}
+					/>
 				</span>
 			) : null}
 		</>

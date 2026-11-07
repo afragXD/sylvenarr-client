@@ -1,4 +1,5 @@
 export { fetchItems, fetchPerks } from './api/itemsApi';
+export { getItemIconUrl } from './lib/item-images';
 export { classStartingPerks } from './model/classStartingPerks';
 export { categoryLabel, ITEM_CATEGORY_LABEL, ITEM_TARGET_LABEL } from './model/labels';
 export { perkGlyphMeta, type PerkGlyphMeta } from './model/perkGlyphMeta';
