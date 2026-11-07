@@ -170,6 +170,29 @@ describe('abilityPreview', () => {
 		expect(formatAbilityPreview(null)).toBeNull();
 	});
 
+	test('Witch slot 3: −броня, без урона', () => {
+		// L=1 → −(5+⌊27/10⌋)=−7; Метка 2+⌊1/6⌋=2
+		expect(getAbilityPreview('Witch', 3, base({ lvl: 1, damage: 74, power: 74 }))).toEqual([
+			{ kind: 'text', value: '−7 брони' },
+			{ kind: 'duration', value: 2, label: 'р. «Смертный приговор»' },
+			{ kind: 'duration', value: 2, label: 'р. «Метка»' },
+		]);
+		// L=5 → −(5+⌊35/10⌋)=−8; Метка 2; L=6 → Метка 3
+		expect(getAbilityPreview('Witch', 3, base({ lvl: 5 }))).toEqual([
+			{ kind: 'text', value: '−8 брони' },
+			{ kind: 'duration', value: 2, label: 'р. «Смертный приговор»' },
+			{ kind: 'duration', value: 2, label: 'р. «Метка»' },
+		]);
+		expect(getAbilityPreview('Witch', 3, base({ lvl: 6 }))?.[2]).toEqual({
+			kind: 'duration',
+			value: 3,
+			label: 'р. «Метка»',
+		});
+		expect(formatAbilityPreview(getAbilityPreview('Witch', 3, base({ lvl: 5 })))).not.toContain(
+			'урона',
+		);
+	});
+
 	test('Incub slot 2: огненный хлыст, без мнимых ОЗ', () => {
 		const parts = getAbilityPreview('Incub', 2, base({ lvl: 1, damage: 0, power: 30 }));
 		expect(parts).toEqual([

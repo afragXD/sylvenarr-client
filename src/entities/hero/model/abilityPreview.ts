@@ -143,7 +143,19 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	Witch: {
 		1: (ctx) => [atk(ctx, 1)],
 		2: (ctx) => [atk(ctx, 1)],
-		3: (ctx) => [atk(ctx, 1)],
+		// DEATHSENTENCE: −(5+⌊(25+2L)/10⌋) брони · 2 р.; MARKED · 2+⌊L/6⌋ р.
+		3: (ctx) => [
+			{
+				kind: 'text',
+				value: `−${5 + Math.floor((25 + ctx.lvl * 2) / 10)} брони`,
+			},
+			{ kind: 'duration', value: 2, label: 'р. «Смертный приговор»' },
+			{
+				kind: 'duration',
+				value: 2 + Math.floor(ctx.lvl / 6),
+				label: 'р. «Метка»',
+			},
+		],
 		5: () => [{ kind: 'text', value: 'бес на 2 р. · КД 4' }],
 	},
 	Inquisitor: {
