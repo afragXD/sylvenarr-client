@@ -325,7 +325,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 	Patriarch: {
 		slots: {
 			1: { mechanics: '2 МР: урон колонне.', tags: ['attack', 'aoe'] },
-			2: { mechanics: '3 МР: лечение ≈ L×7 + сила/3.', tags: ['heal'] },
+			2: { mechanics: '3 МР: лечение L×7…L×7+сила/3 (диапазон от силы).', tags: ['heal'] },
 			3: { mechanics: '5 МР: воскрешение с кладбища.', tags: ['heal', 'summon'] },
 			4: { mechanics: '«Святилище» союзнику (ульта).', tags: ['buff'] },
 			5: { mechanics: 'Базовые действия.', tags: ['buff'] },
@@ -466,7 +466,7 @@ export const PILOT_EXTRAS: Record<string, PilotExtras> = {
 		slots: {
 			1: {
 				mechanics:
-					'Призрачная катана ×1; стан Смертью 68+L% (−7 пп); при провале стана −(randint(5, 8)+L) морали (матожидание ≈ 6,5+L).',
+					'Призрачная катана ×1; стан Смертью 68+L% (−7 пп); при провале стана −(5…8+L) морали.',
 				tags: ['attack', 'debuff'],
 			},
 			2: {

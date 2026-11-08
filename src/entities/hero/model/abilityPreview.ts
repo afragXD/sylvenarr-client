@@ -4,7 +4,7 @@
  * Дополнять вместе с портами abilities на сервисе.
  */
 
-import { expectedRandInt, pyRound } from '../lib/expectedValue';
+import { pyRound } from '../lib/expectedValue';
 
 export type PreviewCtx = {
 	readonly lvl: number;
@@ -133,11 +133,11 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	},
 	Abbess: {
 		1: (ctx) => [atk(ctx, 1)],
-		// CUT AC-4/AC-14: randint(pyRound(p*0.5), pyRound(p*0.75)) → матожидание ceil.
+		// CUT AC-4: randint(pyRound(p*0.5), pyRound(p*0.75)) — в UI диапазон, не матожидание.
 		2: (ctx) => {
 			const lo = pyRound(ctx.power * 0.5);
 			const hi = pyRound(ctx.power * 0.75);
-			return [heal(expectedRandInt(lo, hi))];
+			return [{ kind: 'healRange', min: Math.min(lo, hi), max: Math.max(lo, hi) }];
 		},
 	},
 	Witch: {
@@ -228,7 +228,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 			{ kind: 'chance', value: 68 + ctx.lvl, label: 'паралич (Смерть)' },
 			{
 				kind: 'text',
-				value: `при провале стана: −(≈${6.5 + ctx.lvl}) морали (randint(5, 8)+L)`,
+				value: `при провале стана: −(5…8+${ctx.lvl}) морали`,
 			},
 		],
 		2: () => [

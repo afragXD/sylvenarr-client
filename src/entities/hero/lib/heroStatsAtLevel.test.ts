@@ -88,7 +88,21 @@ describe('heroStatsAtLevel AC-14', () => {
 		expect(heroStatsAtLevel(beer, 30).power).toBeLessThan(10 + 29 * 2);
 	});
 
-	test('Воин-призрак: превью катаны показывает ≈6.5+L; статы L1/15/30', () => {
+	test('Травница: L15 урон 53, L30 урон 91 (mean 2.5, один ceil)', () => {
+		const herbalist = abbess({
+			code: 'Herbalist',
+			damage: 18,
+			armor: 20,
+			health: 165,
+			power: 30,
+			mana: 3,
+			maxMana: 3,
+		});
+		expect(heroStatsAtLevel(herbalist, 15).damage).toBe(53);
+		expect(heroStatsAtLevel(herbalist, 30).damage).toBe(91);
+	});
+
+	test('Воин-призрак: превью катаны −(5…8+L); статы L1/15/30', () => {
 		const gw = abbess({
 			code: 'GhostWarrior',
 			damage: 23,
@@ -104,10 +118,9 @@ describe('heroStatsAtLevel AC-14', () => {
 			damage: 23,
 			power: 0,
 		});
-		expect(preview.some((p) => p.kind === 'text' && p.value.includes('≈10.5'))).toBe(true);
-		expect(preview.some((p) => p.kind === 'text' && p.value.includes('randint(5, 8)'))).toBe(
-			true,
-		);
+		expect(
+			preview.some((p) => p.kind === 'text' && p.value.includes('−(5…8+4) морали')),
+		).toBe(true);
 
 		const at1 = heroStatsAtLevel(gw, 1);
 		const at15 = heroStatsAtLevel(gw, 15);
