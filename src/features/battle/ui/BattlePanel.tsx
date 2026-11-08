@@ -1300,13 +1300,13 @@ const RowColumn = ({
 										<Text size="xs" fw={600}>
 											{preview.mode === 'heal' ? 'Прогноз лечения' : 'Прогноз урона'}
 										</Text>
+										{/* CUT AC-13: заблок/иммун не исключаем — красный «≈0». */}
+										<Text size="xs" c={amountColor} fw={preview.lowDamage ? 700 : undefined}>
+											{amountLabel} {preview.mode === 'heal' ? 'лечения' : 'урона'}
+										</Text>
 										{preview.blockedLabel ? (
 											<Text size="xs">Удар заблокирован: {preview.blockedLabel}</Text>
-										) : (
-											<Text size="xs" c={amountColor} fw={preview.lowDamage ? 700 : undefined}>
-												{amountLabel} {preview.mode === 'heal' ? 'лечения' : 'урона'}
-											</Text>
-										)}
+										) : null}
 										{preview.hitChance !== null ? (
 											<Text size="xs" c="dimmed">
 												Попадание {preview.hitChance}%

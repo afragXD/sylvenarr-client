@@ -51,7 +51,7 @@ describe('attackPreview AC-13', () => {
 		expect(preview.hitChance).toBe(100);
 	});
 
-	test('CUT-2026-11-05 AC-9: полный блок → 0 красным', () => {
+	test('CUT AC-13: полный блок / иммунитет → ≈0 красным (не исключать)', () => {
 		const atk = unit({ damage: 40 });
 		const def = unit({
 			id: 'd',
@@ -62,6 +62,20 @@ describe('attackPreview AC-13', () => {
 		expect(preview.minDamage).toBe(0);
 		expect(preview.maxDamage).toBe(0);
 		expect(preview.blockedLabel).toBe('иммунитет');
+		expect(preview.lowDamage).toBe(true);
+	});
+
+	test('CUT AC-13: вард → ≈0 красным', () => {
+		const atk = unit({ damage: 40 });
+		const def = unit({
+			id: 'd',
+			armor: 0,
+			resists: [{ source: 'WEAPON', value: 0, immune: false, wardCharges: 2 }],
+		});
+		const preview = previewWeaponAttack(atk, def, 'melee');
+		expect(preview.minDamage).toBe(0);
+		expect(preview.maxDamage).toBe(0);
+		expect(preview.blockedLabel).toBe('вард ×2');
 		expect(preview.lowDamage).toBe(true);
 	});
 
