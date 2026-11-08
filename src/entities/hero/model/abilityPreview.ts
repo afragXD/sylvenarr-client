@@ -226,6 +226,10 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		1: (ctx) => [
 			atk(ctx, 1),
 			{ kind: 'chance', value: 68 + ctx.lvl, label: 'паралич (Смерть)' },
+			{
+				kind: 'text',
+				value: `при провале стана: −(≈${6.5 + ctx.lvl}) морали (randint(5, 8)+L)`,
+			},
 		],
 		2: () => [
 			{ kind: 'text', value: '+1 крит-банк себе' },

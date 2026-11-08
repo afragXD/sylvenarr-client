@@ -1,11 +1,20 @@
 /**
- * CUT AC-14: матожидание randint(lo, hi) включительно, округлённое вверх.
- * Пример: randint(5, 8) → 6.5 → 7.
+ * Неокруглённое матожидание randint(lo, hi) включительно.
+ * Пример: randint(1, 2) → 1.5; randint(5, 8) → 6.5.
  */
-export function expectedRandInt(lo: number, hi: number): number {
+export function expectedMean(lo: number, hi: number): number {
 	const a = Math.min(lo, hi);
 	const b = Math.max(lo, hi);
-	return Math.ceil((a + b) / 2);
+	return (a + b) / 2;
+}
+
+/**
+ * Матожидание одного броска, округлённое вверх (для одиночных превью способностей).
+ * Пример: randint(5, 8) → 6.5 → 7.
+ * Для слайдера уровня используйте expectedMean и один Math.ceil в конце.
+ */
+export function expectedRandInt(lo: number, hi: number): number {
+	return Math.ceil(expectedMean(lo, hi));
 }
 
 /**

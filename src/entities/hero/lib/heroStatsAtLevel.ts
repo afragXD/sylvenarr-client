@@ -1,6 +1,6 @@
 import type { HeroClass } from '../model/types';
 
-import { expectedRandInt } from './expectedValue';
+import { expectedMean } from './expectedValue';
 
 export type HeroStatsSnapshot = {
 	lvl: number;
@@ -53,39 +53,39 @@ const bump = (s: MutableStats): void => {
 
 /**
  * Ожидаемые приросты (без stage-бонусов боя) — порт levelup/pilots.ts.
- * Случайные слагаемые → expectedRandInt.
+ * Случайные слагаемые → expectedMean (без ceil); один Math.ceil в heroStatsAtLevel.
  */
 const LEVEL_GAINS: Record<string, LevelGainFn> = {
 	Assassin(s) {
-		s.luck += expectedRandInt(1, 3);
+		s.luck += expectedMean(1, 3);
 		s.damage += s.lvl;
 		bump(s);
 	},
 	Paladin(s) {
-		s.armor += expectedRandInt(1, 2) * Math.floor(s.lvl / 3);
+		s.armor += expectedMean(1, 2) * Math.floor(s.lvl / 3);
 		s.damage += 2 + Math.floor(s.lvl / 4);
 		bump(s);
 	},
 	Inquisitor(s) {
-		s.damage += expectedRandInt(1, 3) + Math.floor(s.lvl / 3);
-		addMana(s, expectedRandInt(1, 2));
+		s.damage += expectedMean(1, 3) + Math.floor(s.lvl / 3);
+		addMana(s, expectedMean(1, 2));
 		bump(s);
 	},
 	Detective(s) {
-		s.dodge += expectedRandInt(1, 2);
-		s.damage += Math.floor(s.lvl / 2) + expectedRandInt(1, 3);
+		s.dodge += expectedMean(1, 2);
+		s.damage += Math.floor(s.lvl / 2) + expectedMean(1, 3);
 		bump(s);
 	},
 	DemonLord(s) {
-		s.power += expectedRandInt(2, 4);
+		s.power += expectedMean(2, 4);
 		s.luck += 2;
 		addMana(s, 1);
-		s.damage += Math.floor(s.lvl / 2) + expectedRandInt(1, 2);
-		s.initiative += expectedRandInt(-2, 3);
+		s.damage += Math.floor(s.lvl / 2) + expectedMean(1, 2);
+		s.initiative += expectedMean(-2, 3);
 		bump(s);
 	},
 	Abbess(s) {
-		s.power += expectedRandInt(0, 2) + Math.floor(s.lvl / 2);
+		s.power += expectedMean(0, 2) + Math.floor(s.lvl / 2);
 		addMana(s, 1);
 		s.maxHp += 5;
 		s.health = s.maxHp;
@@ -98,29 +98,29 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 		bump(s);
 	},
 	Marauder(s) {
-		s.damage += expectedRandInt(2, 5) + Math.floor(s.lvl / 2);
-		s.gold += expectedRandInt(30, 50);
+		s.damage += expectedMean(2, 5) + Math.floor(s.lvl / 2);
+		s.gold += expectedMean(30, 50);
 		addMana(s, 1);
 		s.power += Math.floor(s.lvl / 2) + 1;
 		bump(s);
 	},
 	Werewolf(s) {
-		s.damage += expectedRandInt(2, 3) + Math.floor(s.lvl / 2);
+		s.damage += expectedMean(2, 3) + Math.floor(s.lvl / 2);
 		s.luck += Math.floor(s.lvl / 2) + 1;
-		s.maxHp += s.lvl * 2 + expectedRandInt(1, 5);
+		s.maxHp += s.lvl * 2 + expectedMean(1, 5);
 		s.health = s.maxHp;
-		s.morale -= expectedRandInt(4, 6);
+		s.morale -= expectedMean(4, 6);
 		bump(s);
 	},
 	Archlich(s) {
-		s.power += Math.floor((expectedRandInt(0, 2) * s.lvl) / 2);
-		addMana(s, expectedRandInt(1, 2));
+		s.power += Math.floor((expectedMean(0, 2) * s.lvl) / 2);
+		addMana(s, expectedMean(1, 2));
 		bump(s);
 	},
 	Witch(s) {
 		// CUT-2026-11-05: прирост урона как у Мародёра (без раундового спайка).
-		s.damage += expectedRandInt(2, 5) + Math.floor(s.lvl / 2);
-		addMana(s, expectedRandInt(1, 2));
+		s.damage += expectedMean(2, 5) + Math.floor(s.lvl / 2);
+		addMana(s, expectedMean(1, 2));
 		s.power += Math.floor(s.lvl / 2) + 3;
 		bump(s);
 	},
@@ -135,13 +135,13 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 	},
 	Herbalist(s) {
 		s.armor += 2;
-		s.damage += expectedRandInt(2, 3);
+		s.damage += expectedMean(2, 3);
 		bump(s);
 	},
 	Demiurge(s) {
 		bump(s);
 		s.power += 2;
-		addMana(s, expectedRandInt(1, 3));
+		addMana(s, expectedMean(1, 3));
 		s.armor += 2;
 	},
 	GoldGolem(s) {
@@ -149,7 +149,7 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 		bump(s);
 	},
 	BeerElemental(s) {
-		s.power += expectedRandInt(1, 2);
+		s.power += expectedMean(1, 2);
 		s.luck += 1;
 		bump(s);
 	},
@@ -157,7 +157,7 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 		const armorFloorBefore = Math.floor(s.lvl / 4);
 		s.armor += 2;
 		s.accuracy += 3;
-		s.damage += expectedRandInt(1, 2) + Math.floor(s.lvl / 3);
+		s.damage += expectedMean(1, 2) + Math.floor(s.lvl / 3);
 		bump(s);
 		s.armor += Math.floor(s.lvl / 4) - armorFloorBefore;
 	},
@@ -177,9 +177,9 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 		bump(s);
 	},
 	EvilTree(s) {
-		s.damage += expectedRandInt(1, 3);
-		s.power += expectedRandInt(2, 3);
-		addMana(s, expectedRandInt(1, 2));
+		s.damage += expectedMean(1, 3);
+		s.power += expectedMean(2, 3);
+		addMana(s, expectedMean(1, 2));
 		bump(s);
 	},
 	Dracolich(s) {
@@ -188,15 +188,15 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 		bump(s);
 	},
 	Antipaladin(s) {
-		s.armor += expectedRandInt(1, 2) * Math.floor(s.lvl / 4);
-		s.damage += expectedRandInt(1, 3) + Math.floor(s.lvl / 3);
+		s.armor += expectedMean(1, 2) * Math.floor(s.lvl / 4);
+		s.damage += expectedMean(1, 3) + Math.floor(s.lvl / 3);
 		bump(s);
 	},
 	Angel(s) {
-		s.power += expectedRandInt(1, 2);
-		s.initiative += expectedRandInt(1, 2);
+		s.power += expectedMean(1, 2);
+		s.initiative += expectedMean(1, 2);
 		s.dodge += 1;
-		s.luck += expectedRandInt(1, 2);
+		s.luck += expectedMean(1, 2);
 		bump(s);
 	},
 	Titan(s) {
@@ -204,19 +204,19 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 		s.maxHp += 10;
 		s.health = s.maxHp;
 		s.damage += Math.floor(s.lvl / 3) + 2;
-		s.luck += expectedRandInt(0, 1);
+		s.luck += expectedMean(0, 1);
 		addMana(s, 1);
 		bump(s);
 	},
 	Incub(s) {
 		s.power += 2 + Math.floor(s.lvl / 5);
-		s.initiative += expectedRandInt(0, 1);
+		s.initiative += expectedMean(0, 1);
 		s.armor += 1;
-		addMana(s, expectedRandInt(2, 3));
+		addMana(s, expectedMean(2, 3));
 		bump(s);
 	},
 	SkeletonChampion(s) {
-		s.damage += expectedRandInt(2, 5);
+		s.damage += expectedMean(2, 5);
 		s.luck += 2;
 		bump(s);
 	},
@@ -253,20 +253,21 @@ export function heroStatsAtLevel(hero: HeroClass, level: number): HeroStatsSnaps
 	while (s.lvl < target) {
 		gain(s);
 	}
+	// Один ceil по накопленным неокруглённым матожиданиям (не на каждом уровне).
 	return {
 		lvl: s.lvl,
-		health: s.health,
-		damage: s.damage,
-		armor: s.armor,
-		initiative: s.initiative,
-		dodge: s.dodge,
-		luck: s.luck,
-		morale: s.morale,
-		mana: s.mana,
-		maxMana: s.maxMana,
-		power: s.power,
-		accuracy: s.accuracy,
-		gold: s.gold,
+		health: Math.ceil(s.health),
+		damage: Math.ceil(s.damage),
+		armor: Math.ceil(s.armor),
+		initiative: Math.ceil(s.initiative),
+		dodge: Math.ceil(s.dodge),
+		luck: Math.ceil(s.luck),
+		morale: Math.ceil(s.morale),
+		mana: Math.ceil(s.mana),
+		maxMana: Math.ceil(s.maxMana),
+		power: Math.ceil(s.power),
+		accuracy: Math.ceil(s.accuracy),
+		gold: Math.ceil(s.gold),
 		size: hero.size,
 	};
 }

@@ -1,7 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 
 import type { HeroClass } from '../model/types';
+import { getAbilityPreview } from '../model/abilityPreview';
 
+import { expectedMean } from './expectedValue';
 import { heroStatsAtLevel } from './heroStatsAtLevel';
 
 const abbess = (over: Partial<HeroClass> = {}): HeroClass =>
@@ -66,6 +68,58 @@ describe('heroStatsAtLevel AC-14', () => {
 			power: 0,
 		});
 		expect(heroStatsAtLevel(knight, 8).armor).toBe(31);
+	});
+
+	test('случайный прирост: сумма средних, один ceil (1–2 → 1.5) на L1/15/30', () => {
+		const beer = abbess({
+			code: 'BeerElemental',
+			power: 10,
+			luck: 0,
+			mana: 0,
+			maxMana: 0,
+		});
+		expect(expectedMean(1, 2)).toBe(1.5);
+		expect(heroStatsAtLevel(beer, 1).power).toBe(10);
+		// 14 приростов × 1.5 = 21
+		expect(heroStatsAtLevel(beer, 15).power).toBe(10 + 14 * 1.5);
+		// 29 × 1.5 = 43.5 → ceil → 44
+		expect(heroStatsAtLevel(beer, 30).power).toBe(10 + Math.ceil(29 * 1.5));
+		// Старый ceil-на-уровне дал бы 10+29*2=68
+		expect(heroStatsAtLevel(beer, 30).power).toBeLessThan(10 + 29 * 2);
+	});
+
+	test('Воин-призрак: превью катаны показывает ≈6.5+L; статы L1/15/30', () => {
+		const gw = abbess({
+			code: 'GhostWarrior',
+			damage: 23,
+			dodge: 7,
+			initiative: 15,
+			power: 0,
+			mana: 0,
+			maxMana: 0,
+			accuracy: 95,
+		});
+		const preview = getAbilityPreview('GhostWarrior', 1, {
+			lvl: 4,
+			damage: 23,
+			power: 0,
+		});
+		expect(preview.some((p) => p.kind === 'text' && p.value.includes('≈10.5'))).toBe(true);
+		expect(preview.some((p) => p.kind === 'text' && p.value.includes('randint(5, 8)'))).toBe(
+			true,
+		);
+
+		const at1 = heroStatsAtLevel(gw, 1);
+		const at15 = heroStatsAtLevel(gw, 15);
+		const at30 = heroStatsAtLevel(gw, 30);
+		expect(at1.lvl).toBe(1);
+		expect(at1.damage).toBe(23);
+		expect(at15.lvl).toBe(15);
+		expect(at30.lvl).toBe(30);
+		expect(at15.damage).toBeGreaterThan(at1.damage);
+		expect(at30.damage).toBeGreaterThan(at15.damage);
+		expect(at15.initiative).toBe(15 + 14 * 2);
+		expect(at30.initiative).toBe(15 + 29 * 2);
 	});
 
 	test('CUT-2026-11-05 AC-9: все 27 playable кодов дают статы на L1/15/30', () => {

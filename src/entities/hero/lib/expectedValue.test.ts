@@ -1,10 +1,15 @@
 import { describe, expect, test } from 'bun:test';
 
-import { expectedRandInt, pyRound } from './expectedValue';
+import { expectedMean, expectedRandInt, pyRound } from './expectedValue';
 import { getAbilityPreview } from '../model/abilityPreview';
 
 describe('CUT AC-14 expected values', () => {
-	test('randint(5, 8) → 7 (матожидание 6.5 вверх)', () => {
+	test('expectedMean: randint(1, 2) → 1.5; randint(5, 8) → 6.5', () => {
+		expect(expectedMean(1, 2)).toBe(1.5);
+		expect(expectedMean(5, 8)).toBe(6.5);
+	});
+
+	test('randint(5, 8) одиночный превью → 7 (матожидание 6.5 вверх)', () => {
 		expect(expectedRandInt(5, 8)).toBe(7);
 	});
 
