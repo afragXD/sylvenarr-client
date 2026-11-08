@@ -99,6 +99,7 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 	},
 	Marauder(s) {
 		s.damage += expectedMean(2, 5) + Math.floor(s.lvl / 2);
+		// Командный доход randint(30,50) → mean 40; старт каталога 430 → L15=990, L30=1590.
 		s.gold += expectedMean(30, 50);
 		addMana(s, 1);
 		s.power += Math.floor(s.lvl / 2) + 1;
@@ -113,7 +114,8 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 		bump(s);
 	},
 	Archlich(s) {
-		s.power += Math.floor((expectedMean(0, 2) * s.lvl) / 2);
+		// E[floor(randint(0,2)×L/2)] = (⌊L/2⌋ + L) / 3; без ceil на шаге.
+		s.power += (Math.floor(s.lvl / 2) + s.lvl) / 3;
 		addMana(s, expectedMean(1, 2));
 		bump(s);
 	},
@@ -254,20 +256,22 @@ export function heroStatsAtLevel(hero: HeroClass, level: number): HeroStatsSnaps
 		gain(s);
 	}
 	// Один ceil по накопленным неокруглённым матожиданиям (не на каждом уровне).
+	// −eps: защита от float (напр. ровно 247 → 247.00000000000003).
+	const ceilStat = (n: number): number => Math.ceil(n - 1e-9);
 	return {
 		lvl: s.lvl,
-		health: Math.ceil(s.health),
-		damage: Math.ceil(s.damage),
-		armor: Math.ceil(s.armor),
-		initiative: Math.ceil(s.initiative),
-		dodge: Math.ceil(s.dodge),
-		luck: Math.ceil(s.luck),
-		morale: Math.ceil(s.morale),
-		mana: Math.ceil(s.mana),
-		maxMana: Math.ceil(s.maxMana),
-		power: Math.ceil(s.power),
-		accuracy: Math.ceil(s.accuracy),
-		gold: Math.ceil(s.gold),
+		health: ceilStat(s.health),
+		damage: ceilStat(s.damage),
+		armor: ceilStat(s.armor),
+		initiative: ceilStat(s.initiative),
+		dodge: ceilStat(s.dodge),
+		luck: ceilStat(s.luck),
+		morale: ceilStat(s.morale),
+		mana: ceilStat(s.mana),
+		maxMana: ceilStat(s.maxMana),
+		power: ceilStat(s.power),
+		accuracy: ceilStat(s.accuracy),
+		gold: ceilStat(s.gold),
 		size: hero.size,
 	};
 }

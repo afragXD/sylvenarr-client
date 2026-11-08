@@ -228,7 +228,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 			{ kind: 'chance', value: 68 + ctx.lvl, label: 'паралич (Смерть)' },
 			{
 				kind: 'text',
-				value: `при провале стана: −(5…8+${ctx.lvl}) морали`,
+				value: `при провале стана: −(${5 + ctx.lvl}…${8 + ctx.lvl}) морали`,
 			},
 		],
 		2: () => [

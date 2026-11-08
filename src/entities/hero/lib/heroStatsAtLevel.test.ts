@@ -88,7 +88,21 @@ describe('heroStatsAtLevel AC-14', () => {
 		expect(heroStatsAtLevel(beer, 30).power).toBeLessThan(10 + 29 * 2);
 	});
 
-	test('Травница: L15 урон 53, L30 урон 91 (mean 2.5, один ceil)', () => {
+	test('L1/15/30: Архилич сила, Травница урон, Воин-призрак превью, Мародёр золото', () => {
+		const archlich = abbess({
+			code: 'Archlich',
+			power: 32,
+			mana: 14,
+			maxMana: 14,
+			gold: 400,
+			damage: 5,
+			armor: 5,
+			health: 215,
+		});
+		expect(heroStatsAtLevel(archlich, 1).power).toBe(32);
+		expect(heroStatsAtLevel(archlich, 15).power).toBe(84);
+		expect(heroStatsAtLevel(archlich, 30).power).toBe(247);
+
 		const herbalist = abbess({
 			code: 'Herbalist',
 			damage: 18,
@@ -98,11 +112,24 @@ describe('heroStatsAtLevel AC-14', () => {
 			mana: 3,
 			maxMana: 3,
 		});
+		expect(heroStatsAtLevel(herbalist, 1).damage).toBe(18);
 		expect(heroStatsAtLevel(herbalist, 15).damage).toBe(53);
 		expect(heroStatsAtLevel(herbalist, 30).damage).toBe(91);
-	});
 
-	test('Воин-призрак: превью катаны −(5…8+L); статы L1/15/30', () => {
+		const marauder = abbess({
+			code: 'Marauder',
+			gold: 430,
+			damage: 24,
+			power: 25,
+			mana: 7,
+			maxMana: 7,
+			health: 210,
+			luck: 8,
+		});
+		expect(heroStatsAtLevel(marauder, 1).gold).toBe(430);
+		expect(heroStatsAtLevel(marauder, 15).gold).toBe(990);
+		expect(heroStatsAtLevel(marauder, 30).gold).toBe(1590);
+
 		const gw = abbess({
 			code: 'GhostWarrior',
 			damage: 23,
@@ -112,27 +139,27 @@ describe('heroStatsAtLevel AC-14', () => {
 			mana: 0,
 			maxMana: 0,
 			accuracy: 95,
+			gold: 50,
 		});
-		const preview = getAbilityPreview('GhostWarrior', 1, {
-			lvl: 4,
-			damage: 23,
-			power: 0,
-		});
-		expect(
-			preview.some((p) => p.kind === 'text' && p.value.includes('−(5…8+4) морали')),
-		).toBe(true);
-
-		const at1 = heroStatsAtLevel(gw, 1);
-		const at15 = heroStatsAtLevel(gw, 15);
-		const at30 = heroStatsAtLevel(gw, 30);
-		expect(at1.lvl).toBe(1);
-		expect(at1.damage).toBe(23);
-		expect(at15.lvl).toBe(15);
-		expect(at30.lvl).toBe(30);
-		expect(at15.damage).toBeGreaterThan(at1.damage);
-		expect(at30.damage).toBeGreaterThan(at15.damage);
-		expect(at15.initiative).toBe(15 + 14 * 2);
-		expect(at30.initiative).toBe(15 + 29 * 2);
+		for (const [lvl, lo, hi] of [
+			[1, 6, 9],
+			[15, 20, 23],
+			[30, 35, 38],
+		] as const) {
+			const preview = getAbilityPreview('GhostWarrior', 1, {
+				lvl,
+				damage: 23,
+				power: 0,
+			});
+			expect(
+				preview.some(
+					(p) => p.kind === 'text' && p.value.includes(`−(${lo}…${hi}) морали`),
+				),
+			).toBe(true);
+		}
+		expect(heroStatsAtLevel(gw, 1).damage).toBe(23);
+		expect(heroStatsAtLevel(gw, 15).initiative).toBe(15 + 14 * 2);
+		expect(heroStatsAtLevel(gw, 30).initiative).toBe(15 + 29 * 2);
 	});
 
 	test('CUT-2026-11-05 AC-9: все 27 playable кодов дают статы на L1/15/30', () => {
