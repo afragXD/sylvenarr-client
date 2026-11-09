@@ -47,16 +47,19 @@ describe('abilityPreview', () => {
 	});
 
 	test('Mermaid slot 1: heal range without target; exact with ratio', () => {
-		// base L×2 + power×(2−ratio); power=20 → min 4+20, max 4+40; acc L+2
+		// mermaid.ts слот 1: лечение L×2 + power×(2−ratio), точность L+2, trySpendMana(actor, 1).
+		// Подпись боя: «Морской бриз (1 МР)». L=2, power=20 → без цели 24…44, при полном ОЗ ровно 24.
 		const range = getAbilityPreview('Mermaid', 1, base({ lvl: 2, power: 20 }));
 		expect(range).toEqual([
 			{ kind: 'healRange', min: 24, max: 44 },
 			{ kind: 'accuracy', value: 4 },
+			{ kind: 'text', value: '1 МР' },
 		]);
 		const exact = getAbilityPreview('Mermaid', 1, base({ lvl: 2, power: 20, targetHpRatio: 1 }));
 		expect(exact).toEqual([
 			{ kind: 'heal', value: 24 },
 			{ kind: 'accuracy', value: 4 },
+			{ kind: 'text', value: '1 МР' },
 		]);
 	});
 
@@ -159,9 +162,13 @@ describe('abilityPreview', () => {
 	});
 
 	test('Antipaladin slot 3: ⌊атака/3⌋ + 2L и шанс кровотечения', () => {
+		// antipaladin.ts слот 3: урон ⌊damage/3⌋+2L, шанс 50+2L.
+		// Цели: |ряд актёра − ряд цели| ≤ 1 и не задний→задний (оба row === 1).
+		// L=2, damage=24 → 12 урона, шанс 54.
 		expect(getAbilityPreview('Antipaladin', 3, base({ lvl: 2, damage: 24 }))).toEqual([
 			{ kind: 'damage', value: 12 },
 			{ kind: 'chance', value: 54, label: 'кровотечение' },
+			{ kind: 'text', value: 'через ≤1 ряд; не З→З' },
 		]);
 	});
 
