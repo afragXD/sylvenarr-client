@@ -1,6 +1,6 @@
 import { Box, Group, Loader, Stack, Table, Text, UnstyledButton } from '@mantine/core';
 import { type LucideIcon, Medal, Trophy } from 'lucide-react';
-import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { fetchCurrentPlayer } from '@/entities/player';
 import { fetchRating, type RatingRow } from '@/entities/rating';
@@ -9,6 +9,11 @@ import { getPtsColor, getPtsTitle, START_PTS } from '@/shared/lib/stats';
 import { PageFrame } from '@/shared/ui/PageFrame';
 import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
+import {
+	pickVisibleObserveTarget,
+	shouldShowShowMeLink,
+	thresholdInsertIndex,
+} from '../lib/ratingUi';
 import styles from './RatingPage.module.css';
 
 const TOP_RANK_ICONS: Record<number, { Icon: LucideIcon; color: string }> = {
@@ -17,24 +22,14 @@ const TOP_RANK_ICONS: Record<number, { Icon: LucideIcon; color: string }> = {
 	3: { Icon: Medal, color: '#8E2A22' },
 };
 
-/** Индекс вставки разделителя 1500: после последнего ≥1500, иначе 0 или length. */
-const thresholdInsertIndex = (items: RatingRow[]): number => {
-	const firstBelow = items.findIndex((row) => row.pts < START_PTS);
-	if (firstBelow === -1) {
-		return items.length;
-	}
-	if (firstBelow === 0) {
-		return 0;
-	}
-	return firstBelow;
-};
+const SELF_ATTR = 'data-rating-self';
 
 export const RatingPage = () => {
 	const [rows, setRows] = useState<RatingRow[]>([]);
 	const [myId, setMyId] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
-	const [myRowOffscreen, setMyRowOffscreen] = useState(false);
+	const [myRowVisible, setMyRowVisible] = useState(true);
 	const myRowRef = useRef<HTMLTableRowElement | null>(null);
 	const myListRef = useRef<HTMLLIElement | null>(null);
 
@@ -78,26 +73,73 @@ export const RatingPage = () => {
 	const myRank = myId ? rows.findIndex((row) => row.playerId === myId) + 1 : 0;
 	const myPts = myRank > 0 ? rows[myRank - 1]?.pts : undefined;
 	const splitAt = useMemo(() => thresholdInsertIndex(rows), [rows]);
+	const showMe = shouldShowShowMeLink({ myRank, rowVisible: myRowVisible });
 
-	useEffect(() => {
-		const node = myRowRef.current ?? myListRef.current;
-		if (!node || myRank <= 0) {
-			setMyRowOffscreen(false);
+	useLayoutEffect(() => {
+		if (myRank <= 0 || isLoading || rows.length === 0) {
+			setMyRowVisible(true);
 			return;
 		}
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				setMyRowOffscreen(!entry?.isIntersecting);
-			},
-			{ root: null, threshold: 0 },
-		);
-		observer.observe(node);
-		return () => observer.disconnect();
-	}, [myRank, rows.length, isLoading]);
+
+		const resolveNode = (): Element | null =>
+			pickVisibleObserveTarget([
+				myRowRef.current,
+				myListRef.current,
+				...Array.from(document.querySelectorAll(`[${SELF_ATTR}="1"]`)),
+			]);
+
+		let observer: IntersectionObserver | null = null;
+		let cancelled = false;
+		let tries = 0;
+
+		const attach = () => {
+			if (cancelled) {
+				return;
+			}
+			const node = resolveNode();
+			if (!node) {
+				// Строка ещё не в DOM (ref после paint) — повторить кадр.
+				tries += 1;
+				if (tries < 30) {
+					requestAnimationFrame(attach);
+				}
+				return;
+			}
+			observer?.disconnect();
+			observer = new IntersectionObserver(
+				([entry]) => {
+					setMyRowVisible(Boolean(entry?.isIntersecting));
+				},
+				{ root: null, threshold: 0, rootMargin: '0px' },
+			);
+			observer.observe(node);
+			// Синхронный снимок: до первого колбэка IO не оставляем «видима» по умолчанию.
+			const rect = node.getBoundingClientRect();
+			const inView =
+				rect.bottom > 0 &&
+				rect.top < (window.innerHeight || document.documentElement.clientHeight) &&
+				rect.right > 0 &&
+				rect.left < (window.innerWidth || document.documentElement.clientWidth);
+			setMyRowVisible(inView);
+		};
+
+		attach();
+		return () => {
+			cancelled = true;
+			observer?.disconnect();
+		};
+	}, [myRank, myId, rows.length, isLoading]);
 
 	const scrollToMe = () => {
-		const node = myRowRef.current ?? myListRef.current;
-		node?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		const marked = Array.from(document.querySelectorAll(`[${SELF_ATTR}="1"]`));
+		const node =
+			pickVisibleObserveTarget([myRowRef.current, myListRef.current, ...marked]) ??
+			myRowRef.current ??
+			myListRef.current;
+		node?.scrollIntoView({
+			behavior: 'smooth',
+			block: 'center',
+		});
 	};
 
 	const renderPts = (pts: number, className: string) => (
@@ -134,6 +176,7 @@ export const RatingPage = () => {
 			<Table.Tr
 				key={row.playerId}
 				ref={isYou ? myRowRef : undefined}
+				{...(isYou ? { [SELF_ATTR]: '1' } : {})}
 				className={isYou ? styles.youRow : undefined}
 				style={{ borderBottom: '1px solid var(--app-border)' }}
 			>
@@ -186,6 +229,7 @@ export const RatingPage = () => {
 			<li
 				key={row.playerId}
 				ref={isYou ? myListRef : undefined}
+				{...(isYou ? { [SELF_ATTR]: '1' } : {})}
 				className={[styles.mobileRow, isYou ? styles.youRow : null].filter(Boolean).join(' ')}
 			>
 				<span className={styles.mobileRank}>{rank}</span>
@@ -231,7 +275,7 @@ export const RatingPage = () => {
 					Вы на <span className={styles.myPlaceNum}>{myRank}</span>-м месте из{' '}
 					<span className={styles.myPlaceNum}>{rows.length}</span> ·{' '}
 					{renderPts(myPts, styles.myPlaceNum)} ПТС
-					{myRowOffscreen ? (
+					{showMe ? (
 						<>
 							{' · '}
 							<UnstyledButton type="button" className={styles.showMe} onClick={scrollToMe}>

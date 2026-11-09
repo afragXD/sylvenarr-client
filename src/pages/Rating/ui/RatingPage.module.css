@@ -61,10 +61,15 @@
 
 .thresholdRow td {
 	padding: 0.55rem 0.85rem !important;
+	/* AC-4: одна линия 1px #CBB48C на всю ширину (не top+bottom). */
 	border-top: 1px solid #cbb48c;
-	border-bottom: 1px solid #cbb48c;
+	border-bottom: none !important;
 	background: transparent;
 	text-align: center;
+}
+
+.thresholdRow {
+	border-bottom: none !important;
 }
 
 .thresholdLabel {
@@ -79,7 +84,7 @@
 	margin: 0;
 	padding: 0.55rem 0.7rem;
 	border-top: 1px solid #cbb48c;
-	border-bottom: 1px solid #cbb48c;
+	border-bottom: none;
 	text-align: center;
 }
 
