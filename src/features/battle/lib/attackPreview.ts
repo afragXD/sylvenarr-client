@@ -27,6 +27,20 @@ export type DamagePreviewOpts = {
 	readonly accuracyPenalty?: number;
 };
 
+/** Наведение на чужого невидимого: без прогноза урона. */
+export function concealedTargetLabel(
+	actor: { readonly id: string } | null,
+	unit: { readonly id: string; readonly alive: boolean; readonly effects: readonly { id: string }[] },
+): string | null {
+	if (!actor || !unit.alive || unit.id === actor.id) {
+		return null;
+	}
+	if (!unit.effects.some((effect) => effect.id === 'INVISIBLE')) {
+		return null;
+	}
+	return 'Нельзя: цель невидима';
+}
+
 /** Fallback, если abilityMeta не передала previewSource (магия без source → FIRE). */
 const SOURCE_BY_KIND: Record<AttackKind, string> = {
 	melee: 'WEAPON',

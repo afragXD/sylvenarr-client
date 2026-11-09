@@ -542,9 +542,10 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	INVISIBLE: {
 		id: 'INVISIBLE',
 		label: 'Невидимость',
-		description: 'Повышает уклонение; ближняя атака бьёт как дальняя.',
-		mechanics: '+power уклонения · 2 р.',
-		exampleAtL: exampleTypical('+25 уклонения · 2 р.'),
+		description:
+			'Нельзя выбрать целью. Своя атака ещё бьёт издалека, затем невидимость спадает. Защита и ожидание её не снимают.',
+		mechanics: 'нельзя выбрать · спадает после своего действия',
+		exampleAtL: exampleTypical('2 р. или до своего действия'),
 		Icon: EyeOff,
 		kind: 'buff',
 	},
@@ -560,9 +561,9 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	MAGIC_SHACKLES: {
 		id: 'MAGIC_SHACKLES',
 		label: 'Волшебные оковы',
-		description: 'Трата маны обжигает носителя.',
-		mechanics: 'трата маны → −стоимость×(10+⌊L/4⌋) ОЗ · (2 + ⌊L/6⌋) р.',
-		exampleAtL: exampleAtL('2 МР → −22 ОЗ · 2 р.'),
+		description: 'Трата маны обжигает носителя жизнью через резисты. Уровень Полуденницы записан в эффекте.',
+		mechanics: 'трата X МР → X×(5+⌊L Полуденницы/4⌋) Жизнь · (2+⌊L/6⌋) р.',
+		exampleAtL: exampleAtL('2 МР при L1 → 10 Жизнь'),
 		Icon: Link,
 		kind: 'debuff',
 	},
@@ -743,15 +744,19 @@ const FALLBACK: EffectMeta = {
 };
 
 /**
- * Мета эффекта. Для FOCUSED учитывает знак силы (CUT AC-12):
- * + → «Повышение точности» (buff), − → «Снижение точности» (debuff, красная иконка).
+ * Мета эффекта. Знак силы для двухсторонних эффектов:
+ * FOCUSED (CUT AC-12): + точность / − точность;
+ * STRENGTH / ABSOLUTEPOWER (мораль): + бафф / − дебафф (упадок духа).
  */
 export function getEffectMeta(id: string, power?: number): EffectMeta {
 	const known = CATALOG[id as EffectId];
 	if (!known) {
 		return { ...FALLBACK, label: id || FALLBACK.label };
 	}
-	if (id === 'FOCUSED' && typeof power === 'number') {
+	if (typeof power !== 'number') {
+		return known;
+	}
+	if (id === 'FOCUSED') {
 		if (power > 0) {
 			return {
 				...known,
@@ -770,6 +775,24 @@ export function getEffectMeta(id: string, power?: number): EffectMeta {
 				kind: 'debuff',
 			};
 		}
+	}
+	if (id === 'STRENGTH' && power < 0) {
+		return {
+			...known,
+			label: 'Ослабление атаки',
+			description: 'Снижает наносимый урон (упадок духа или иной источник).',
+			mechanics: `${Math.round(power)} к урону`,
+			kind: 'debuff',
+		};
+	}
+	if (id === 'ABSOLUTEPOWER' && power < 0) {
+		return {
+			...known,
+			label: 'Ослабление магии',
+			description: 'Снижает силу магии носителя (упадок духа или иной источник).',
+			mechanics: `${Math.round(power)} к силе магии`,
+			kind: 'debuff',
+		};
 	}
 	return known;
 }

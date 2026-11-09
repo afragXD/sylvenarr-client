@@ -165,6 +165,7 @@ const LEVEL_GAINS: Record<string, LevelGainFn> = {
 	},
 	Mermaid(s) {
 		addMana(s, 1);
+		s.power += expectedMean(0, 1) + Math.floor(s.lvl / 2);
 		bump(s);
 	},
 	Patriarch(s) {

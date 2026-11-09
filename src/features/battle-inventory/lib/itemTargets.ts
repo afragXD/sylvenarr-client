@@ -15,6 +15,12 @@ export function legalItemTargetIds(
 			if (!unit.alive) {
 				return false;
 			}
+			if (
+				unit.id !== invoker.id &&
+				(unit.effects ?? []).some((effect) => effect.id === 'INVISIBLE')
+			) {
+				return false;
+			}
 			switch (target) {
 				case 'ally':
 					return unit.team === invoker.team;

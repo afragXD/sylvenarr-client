@@ -194,6 +194,7 @@ export type AbilityInfo = {
 	previewAccuracyPenalty?: number;
 	previewHealMin?: number;
 	previewHealMax?: number;
+	hint?: string | null;
 };
 
 export type PendingPrompt = {

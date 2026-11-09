@@ -5,6 +5,18 @@ import { PerkGlyph } from '@/shared/ui/PerkGlyph';
 
 import styles from './BattlePerks.module.css';
 
+function formatBattleUnitLabel(unit: BattleUnit, units: readonly BattleUnit[]): string {
+	const place = `${unit.row === 0 ? 'П' : 'З'}${unit.column + 1}`;
+	if (!unit.isSummon) {
+		return `${unit.displayName} (${place})`;
+	}
+	const summoner = units.find((item) => item.id === unit.summonerId);
+	const owner = summoner
+		? ` — саммон ${summoner.displayName} (${summoner.row === 0 ? 'П' : 'З'}${summoner.column + 1})`
+		: '';
+	return `✦ ${unit.displayName} (${place})${owner}`;
+}
+
 type BattlePerksPanelProps = {
 	readonly offers: readonly PerkOffer[];
 	readonly units: readonly BattleUnit[];
@@ -28,6 +40,7 @@ export function BattlePerksPanel({
 	const mine = offers.filter((o) => o.playerId === playerId && !o.done);
 	const current = mine[0] ?? null;
 	const unit = current ? units.find((u) => u.id === current.unitId) : null;
+	const heroLabel = unit ? formatBattleUnitLabel(unit, units) : '';
 
 	if (!current || !unit) {
 		return (
@@ -39,7 +52,7 @@ export function BattlePerksPanel({
 
 	return (
 		<div className={styles.overlay} role="dialog" aria-label="Выбор перка">
-			<p className={styles.hero}>{unit.displayName}</p>
+			<p className={styles.hero}>{heroLabel}</p>
 			<div className={styles.options}>
 				{current.options.map((option) => (
 					<button

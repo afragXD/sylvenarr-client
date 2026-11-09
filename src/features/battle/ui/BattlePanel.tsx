@@ -19,6 +19,7 @@ import { PlayerIdentity } from '@/shared/ui/PlayerAvatar';
 
 import {
 	type AttackPreview,
+	concealedTargetLabel,
 	previewAbilityOnTarget,
 	previewHealFromAbilityParts,
 	previewWeaponAttack,
@@ -521,8 +522,19 @@ export const BattlePanel = ({
 		setPromptHoverUnitId(null);
 	};
 
+	/** CUT-2026-11-09 AC-1: невидимого нельзя выбрать — подсказка без прогноза. */
+	const concealedHint = (unit: BattleUnit): string | null => {
+		if (!pendingMode || !active || !isMyTurn || prompt) {
+			return null;
+		}
+		return concealedTargetLabel(active, unit);
+	};
+
 	/** CUT AC-13 п.25: прогноз урона/лечения/попадания при наведении на цель. */
 	const attackPreviewFor = (unit: BattleUnit): AttackPreview | null => {
+		if (concealedHint(unit)) {
+			return null;
+		}
 		if (!active || !pendingMode || !highlightTargets.includes(unit.id)) {
 			return null;
 		}
@@ -546,6 +558,7 @@ export const BattlePanel = ({
 						gold: battle.teams?.[active.team]?.gold ?? 0,
 					}),
 					targetHpRatio: unit.maxHp > 0 ? unit.health / unit.maxHp : 1,
+					targetLvl: unit.lvl,
 				}),
 			);
 		}
@@ -671,6 +684,7 @@ export const BattlePanel = ({
 							onUnitClick={handleUnitClick}
 							onInspectUnit={(unitId) => setInspectUnitId(unitId)}
 							attackPreviewFor={attackPreviewFor}
+							concealedHint={concealedHint}
 							damageFloats={damageFloats}
 						/>
 						<TeamSide
@@ -695,6 +709,7 @@ export const BattlePanel = ({
 							onUnitClick={handleUnitClick}
 							onInspectUnit={(unitId) => setInspectUnitId(unitId)}
 							attackPreviewFor={attackPreviewFor}
+							concealedHint={concealedHint}
 							damageFloats={damageFloats}
 						/>
 					</div>
@@ -854,6 +869,9 @@ export const BattlePanel = ({
 											{doc ? <span>{doc.body}</span> : null}
 											{doc?.mechanics ? (
 												<span className={styles.abilityTipMeta}>{doc.mechanics}</span>
+											) : null}
+											{ability.hint ? (
+												<span className={styles.abilityTipMeta}>{ability.hint}</span>
 											) : null}
 											{preview ? <span className={styles.abilityTipMeta}>{preview}</span> : null}
 											{blockReason ? (
@@ -1039,6 +1057,7 @@ const TeamSide = ({
 	onUnitClick,
 	onInspectUnit,
 	attackPreviewFor,
+	concealedHint,
 	damageFloats,
 }: {
 	title: ReactNode;
@@ -1055,6 +1074,7 @@ const TeamSide = ({
 	onUnitClick: (unit: BattleUnit) => void;
 	onInspectUnit: (unitId: string) => void;
 	attackPreviewFor: (unit: BattleUnit) => AttackPreview | null;
+	concealedHint: (unit: BattleUnit) => string | null;
 	damageFloats: DamageFloat[];
 }) => {
 	const front = units.filter((unit) => unit.row === 0);
@@ -1086,6 +1106,7 @@ const TeamSide = ({
 					onUnitClick={onUnitClick}
 					onInspectUnit={onInspectUnit}
 					attackPreviewFor={attackPreviewFor}
+					concealedHint={concealedHint}
 					damageFloats={damageFloats}
 				/>
 				<RowColumn
@@ -1097,6 +1118,7 @@ const TeamSide = ({
 					onUnitClick={onUnitClick}
 					onInspectUnit={onInspectUnit}
 					attackPreviewFor={attackPreviewFor}
+					concealedHint={concealedHint}
 					damageFloats={damageFloats}
 				/>
 			</div>
@@ -1121,6 +1143,7 @@ const RowColumn = ({
 	onUnitClick,
 	onInspectUnit,
 	attackPreviewFor,
+	concealedHint,
 	damageFloats,
 }: {
 	label: string;
@@ -1131,6 +1154,7 @@ const RowColumn = ({
 	onUnitClick: (unit: BattleUnit) => void;
 	onInspectUnit: (unitId: string) => void;
 	attackPreviewFor: (unit: BattleUnit) => AttackPreview | null;
+	concealedHint: (unit: BattleUnit) => string | null;
 	damageFloats: DamageFloat[];
 }) => {
 	const ordered = sortRowUnits(units);
@@ -1146,7 +1170,8 @@ const RowColumn = ({
 					</Text>
 				) : (
 					ordered.map((unit) => {
-						const preview = attackPreviewFor(unit);
+						const blocked = concealedHint(unit);
+						const preview = blocked ? null : attackPreviewFor(unit);
 						const isTarget = legalTargets.includes(unit.id);
 						const ratio = unit.maxHp > 0 ? Math.max(0, Math.min(1, unit.health / unit.maxHp)) : 0;
 						const hpBand = ratio >= 0.5 ? 'high' : ratio >= 0.25 ? 'mid' : 'low';
@@ -1281,6 +1306,13 @@ const RowColumn = ({
 								<UnitEffects effects={unit.effects ?? []} resists={unit.resists ?? []} />
 							</div>
 						);
+						if (blocked) {
+							return (
+								<Tooltip key={unit.id} withArrow label={blocked}>
+									{button}
+								</Tooltip>
+							);
+						}
 						if (!preview) {
 							return button;
 						}

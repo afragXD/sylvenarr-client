@@ -3,6 +3,7 @@ import { describe, expect, test } from 'bun:test';
 import type { BattleUnit } from '@/entities/match';
 
 import {
+	concealedTargetLabel,
 	previewAbilityOnTarget,
 	previewHeal,
 	previewHealFromAbilityParts,
@@ -170,5 +171,18 @@ describe('attackPreview AC-13', () => {
 		expect(death!.maxDamage).toBeLessThan(missing!.maxDamage);
 		// 85% резист → остаётся ~15% от урона без резиста.
 		expect(death!.maxDamage).toBeLessThanOrEqual(Math.round(fire!.maxDamage * 0.15) + 1);
+	});
+
+	test('невидимая цель — отказ без прогноза', () => {
+		const actor = unit({ id: 'me' });
+		const hidden = unit({
+			id: 'hid',
+			effects: [{ id: 'INVISIBLE', rounds: 2, power: 0 }],
+		});
+		expect(concealedTargetLabel(actor, hidden)).toBe('Нельзя: цель невидима');
+		expect(concealedTargetLabel(actor, unit({ id: 'me', effects: [{ id: 'INVISIBLE', rounds: 2 }] }))).toBe(
+			null,
+		);
+		expect(concealedTargetLabel(actor, unit())).toBeNull();
 	});
 });

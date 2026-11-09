@@ -14,6 +14,7 @@ export type PreviewCtx = {
 	readonly maxHp?: number;
 	/** 0..1; для лечения, зависящего от ОЗ цели (напр. Русалка). */
 	readonly targetHpRatio?: number;
+	readonly targetLvl?: number;
 	readonly luck?: number;
 	/** Накопленная ярость Оркхана; в бою пока не в API — по умолчанию 0. */
 	readonly cumRage?: number;
@@ -185,7 +186,12 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	},
 	Patriarch: {
 		1: (ctx) => [atk(ctx, 1)],
-		2: (ctx) => [heal(ctx.lvl * 7 + Math.floor(ctx.power / 3))],
+		2: (ctx) => {
+			const lo = pyRound(ctx.power * 0.5);
+			const hi = pyRound(ctx.power * 0.6);
+			const flat = ctx.lvl * 2 + (ctx.targetLvl ?? ctx.lvl) * 4;
+			return [{ kind: 'healRange', min: flat + Math.min(lo, hi), max: flat + Math.max(lo, hi) }];
+		},
 		4: (ctx) => [{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 5), label: 'р. «Святилище»' }],
 	},
 	Oracle: {

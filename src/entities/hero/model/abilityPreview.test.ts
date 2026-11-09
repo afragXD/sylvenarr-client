@@ -35,10 +35,10 @@ describe('abilityPreview', () => {
 		]);
 	});
 
-	test('Patriarch slot 2: heal L×7 + floor(power/3)', () => {
-		// lvl=10, power=30 → 70 + 10 = 80
+	test('Patriarch slot 2: 2L + 4L + round(P×0.5…0.6)', () => {
+		// lvl=10, power=30 → 60 + round(15)…round(18) = 75…78
 		const parts = getAbilityPreview('Patriarch', 2, base({ lvl: 10, power: 30 }));
-		expect(parts).toEqual([{ kind: 'heal', value: 80 }]);
+		expect(parts).toEqual([{ kind: 'healRange', min: 75, max: 78 }]); // CUT-2026-11-09 AC-12
 	});
 
 	test('Herbalist slot 4: heal 5 + lvl', () => {
