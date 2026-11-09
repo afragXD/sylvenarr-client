@@ -43,6 +43,11 @@ describe('статика героя совпадает со срезом CUT-202
 		expect(slot('Titan', 4)?.body).toContain('КД 3');
 		expect(slot('Titan', 4)?.body).not.toContain('Заряд');
 		expect(slot('Titan', 5)?.title).toBe('Дрожь земли');
+		expect(slot('Titan', 5)?.body).toContain('кроме невидимых');
+		expect(slot('Titan', 5)?.body).not.toContain('охраной');
+		expect(slot('DemonLord', 2)?.body).toContain('КД 2');
+		expect(slot('Incub', 1)?.body).toContain('Золотой голем');
+		expect(slot('Incub', 1)?.body).not.toContain('бес');
 		expect(slot('Abbess', 1)?.body).toContain('3 МР');
 		expect(slot('Patriarch', 5)?.title).toBe('Оковы любви');
 		expect(slot('Specter', 3)?.body).toContain('волшебные оковы');
@@ -60,6 +65,9 @@ describe('статика героя совпадает со срезом CUT-202
 	test('карточки LOVE_SHACKLES, GALL и STUN_IMMUNE', () => {
 		expect(getEffectMeta('LOVE_SHACKLES').label).toBe('Оковы любви');
 		expect(getEffectMeta('GALL').mechanics).toContain('3 + ⌊L/5⌋');
+		expect(getEffectMeta('GALL').exampleAtL).toContain('15 Вода');
+		expect(getEffectMeta('GALL').exampleAtL).toContain('2 р.');
+		expect(getEffectMeta('GALL').exampleAtL).not.toContain('20 Вода');
 		expect(getEffectMeta('STUN_IMMUNE').mechanics).toContain('50%');
 		expect(getEffectMeta('STUN_IMMUNE').mechanics).toContain('100%');
 		expect(getEffectMeta('MAGIC_SHACKLES').mechanics).toContain('Жизнь');

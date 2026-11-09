@@ -212,6 +212,18 @@ describe('abilityPreview', () => {
 		expect(formatAbilityPreview(parts)).not.toContain('мнимых');
 	});
 
+	test('Titan slot 5: дрожь земли, без инициативы Восточного ветра', () => {
+		// CUT-2026-11-09 AC-6
+		const parts = getAbilityPreview('Titan', 5, base({ lvl: 1, damage: 40, power: 30 }));
+		expect(parts).toEqual([
+			{ kind: 'damage', value: 30 }, // max(40,30)×0.75
+			{ kind: 'text', value: 'Земля ×0,75' },
+			{ kind: 'chance', value: 81, label: 'слабость' },
+			{ kind: 'text', value: '2 МР + 1 заряд' },
+		]); // CUT-2026-11-09 AC-6
+		expect(formatAbilityPreview(parts)).not.toContain('инициатив');
+	});
+
 	test('Oracle slot 5: мнимые ОЗ Чудесного доктора', () => {
 		expect(getAbilityPreview('Oracle', 5, base({ lvl: 1 }))).toEqual([
 			{ kind: 'text', value: '+55 мнимых ОЗ' },

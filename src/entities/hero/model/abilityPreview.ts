@@ -334,7 +334,12 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 			heal(Math.floor(ctx.power / 2) + ctx.lvl * 2),
 			{ kind: 'armor', value: 15 + ctx.lvl * 2 },
 		],
-		5: (ctx) => [{ kind: 'text', value: `+${15 + ctx.lvl} инициативы ряду` }],
+		5: (ctx) => [
+			atk(ctx, 0.75),
+			{ kind: 'text', value: 'Земля ×0,75' },
+			{ kind: 'chance', value: 80 + ctx.lvl, label: 'слабость' },
+			{ kind: 'text', value: '2 МР + 1 заряд' },
+		],
 	},
 	Incub: {
 		passive: (ctx) => [

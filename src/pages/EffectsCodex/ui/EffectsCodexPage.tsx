@@ -1,7 +1,7 @@
 import { Stack, Text, TextInput } from '@mantine/core';
 import { useMemo, useState } from 'react';
 
-import { CODEX_L, type EffectMeta, listBuffs, listDebuffs } from '@/features/battle';
+import { type EffectMeta, listBuffs, listDebuffs } from '@/features/battle';
 import { getSceneUrl } from '@/shared/lib/staticUrl';
 import { GoldRule } from '@/shared/ui/GoldRule';
 import { OrnateFrame } from '@/shared/ui/OrnateFrame';
@@ -115,7 +115,7 @@ export const EffectsCodexPage = () => {
 								</Text>
 								<p className={styles.mechanics}>{selected.mechanics}</p>
 								<Text size="sm" c="var(--app-text-muted)">
-									Пример при L={CODEX_L}: {selected.exampleAtL}
+									{selected.exampleAtL}
 								</Text>
 							</Stack>
 						</OrnateFrame>

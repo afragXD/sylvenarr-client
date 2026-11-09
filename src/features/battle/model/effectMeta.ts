@@ -502,7 +502,7 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		description:
 			'Каждый ход наносит урон водой и навсегда разъедает броню; после конца эффекта броня не возвращается.',
 		mechanics: '(10 + L) Вода/тик + −(3 + ⌊L/5⌋) брони/тик · (2 + ⌊L/8⌋) р.',
-		exampleAtL: exampleAtL('20 Вода и −4 брони за тик · 3 р.'),
+		exampleAtL: exampleAtL('15 Вода и −4 брони за тик · 2 р.'),
 		Icon: Biohazard,
 		kind: 'debuff',
 	},
