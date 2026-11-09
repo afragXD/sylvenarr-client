@@ -41,26 +41,27 @@ describe('abilityPreview', () => {
 		expect(parts).toEqual([{ kind: 'healRange', min: 75, max: 78 }]); // CUT-2026-11-09 AC-12
 	});
 
-	test('Herbalist slot 4: heal 5 + lvl', () => {
+	test('Herbalist slot 4: heal 15+2L…15+3L', () => {
 		const parts = getAbilityPreview('Herbalist', 4, base({ lvl: 3 }));
-		expect(parts).toEqual([{ kind: 'heal', value: 8 }]);
+		expect(parts).toEqual([
+			{ kind: 'healRange', min: 21, max: 24 },
+			{ kind: 'armor', value: 21 },
+		]); // CUT-2026-11-09 AC-9
 	});
 
 	test('Mermaid slot 1: heal range without target; exact with ratio', () => {
-		// mermaid.ts слот 1: лечение L×2 + power×(2−ratio), точность L+2, trySpendMana(actor, 1).
-		// Подпись боя: «Морской бриз (1 МР)». L=2, power=20 → без цели 24…44, при полном ОЗ ровно 24.
+		// mermaid.ts слот 1: 2L + round(P×(1+0.5×(1−ratio))), без точности, 2 МР.
+		// L=2, power=20 → без цели 24…34, при полном ОЗ ровно 24.
 		const range = getAbilityPreview('Mermaid', 1, base({ lvl: 2, power: 20 }));
 		expect(range).toEqual([
-			{ kind: 'healRange', min: 24, max: 44 },
-			{ kind: 'accuracy', value: 4 },
-			{ kind: 'text', value: '1 МР' },
-		]);
+			{ kind: 'healRange', min: 24, max: 34 },
+			{ kind: 'text', value: '2 МР' },
+		]); // CUT-2026-11-09 AC-2
 		const exact = getAbilityPreview('Mermaid', 1, base({ lvl: 2, power: 20, targetHpRatio: 1 }));
 		expect(exact).toEqual([
 			{ kind: 'heal', value: 24 },
-			{ kind: 'accuracy', value: 4 },
-			{ kind: 'text', value: '1 МР' },
-		]);
+			{ kind: 'text', value: '2 МР' },
+		]); // CUT-2026-11-09 AC-2
 	});
 
 	test('OrcKing passive: luck steal lvl−1', () => {
@@ -92,7 +93,8 @@ describe('abilityPreview', () => {
 			{ kind: 'gold', value: 120 },
 			{ kind: 'strength', value: 25 },
 			{ kind: 'duration', value: 3, label: 'р. «Сила»' },
-		]);
+			{ kind: 'duration', value: 2, label: 'р. «Благословение»' },
+		]); // CUT-2026-11-09 AC-11
 	});
 
 	test('Knight slot 4: только длительность охраны', () => {

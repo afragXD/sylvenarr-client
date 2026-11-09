@@ -15,6 +15,8 @@ export type PreviewCtx = {
 	/** 0..1; для лечения, зависящего от ОЗ цели (напр. Русалка). */
 	readonly targetHpRatio?: number;
 	readonly targetLvl?: number;
+	/** Текущая мана цели — для числа в Сглазе. */
+	readonly targetMana?: number;
 	readonly luck?: number;
 	/** Накопленная ярость Оркхана; в бою пока не в API — по умолчанию 0. */
 	readonly cumRage?: number;
@@ -63,13 +65,27 @@ function orcRage(ctx: PreviewCtx): number {
 function mermaidBreeze(ctx: PreviewCtx): PreviewPart[] {
 	const base = ctx.lvl * 2;
 	const power = ctx.power;
-	const acc: PreviewPart = { kind: 'accuracy', value: ctx.lvl + 2 };
 	if (typeof ctx.targetHpRatio === 'number') {
 		const ratio = Math.min(1, Math.max(0, ctx.targetHpRatio));
-		const bonus = round(power * (2 - ratio));
-		return [heal(base + bonus), acc];
+		const bonus = round(power * (1 + 0.5 * (1 - ratio)));
+		return [heal(base + bonus)];
 	}
-	return [{ kind: 'healRange', min: base + power, max: base + power * 2 }, acc];
+	return [{ kind: 'healRange', min: base + power, max: base + round(power * 1.5) }];
+}
+
+function specterEvilEye(ctx: PreviewCtx): PreviewPart[] {
+	const cap = 30 + 2 * ctx.lvl;
+	const fire =
+		typeof ctx.targetMana === 'number'
+			? Math.min(Math.floor(ctx.targetMana / 2) * 8, cap)
+			: cap;
+	return [
+		{ kind: 'duration', value: 1 + Math.floor(ctx.lvl / 4), label: 'р. «Метка»' },
+		{ kind: 'text', value: `головокружение −${15 + Math.floor(ctx.lvl / 2)}` },
+		{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 6), label: 'р. оковы' },
+		{ kind: 'text', value: `${fire} Огонь при наложении` },
+		{ kind: 'text', value: `оковы: X×${5 + Math.floor(ctx.lvl / 4)} Жизнь` },
+	];
 }
 
 function angelWings(ctx: PreviewCtx): PreviewPart[] {
@@ -87,13 +103,17 @@ function angelWings(ctx: PreviewCtx): PreviewPart[] {
 /** Слоты и пассивки с числовым превью; нет записи → только текстовый mechanics. */
 const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	Knight: {
-		passive: (ctx) => [{ kind: 'armor', value: ctx.lvl + 1 }],
+		passive: (ctx) => [
+			{ kind: 'chance', value: 65 + ctx.lvl, label: 'укрепить ряд' },
+			{ kind: 'armor', value: 1 + Math.floor(ctx.lvl / 5) },
+		],
 		1: (ctx) => [atk(ctx, 1.05)],
 		2: (ctx) => [atk(ctx, 0.75)],
 		3: (ctx) => [
 			{ kind: 'gold', value: 100 + ctx.lvl * 2 },
 			{ kind: 'strength', value: 15 + ctx.lvl },
 			{ kind: 'duration', value: 1 + Math.floor(ctx.lvl / 5), label: 'р. «Сила»' },
+			{ kind: 'duration', value: 2, label: 'р. «Благословение»' },
 		],
 		4: () => [{ kind: 'duration', value: 2, label: 'р. «Под охраной»' }],
 	},
@@ -134,10 +154,10 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 	},
 	Abbess: {
 		1: (ctx) => [atk(ctx, 1)],
-		// CUT AC-4: randint(pyRound(p*0.5), pyRound(p*0.75)) — в UI диапазон, не матожидание.
+		// CUT-2026-11-09 AC-4: randint(pyRound(p*0.6), pyRound(p*0.85)).
 		2: (ctx) => {
-			const lo = pyRound(ctx.power * 0.5);
-			const hi = pyRound(ctx.power * 0.75);
+			const lo = pyRound(ctx.power * 0.6);
+			const hi = pyRound(ctx.power * 0.85);
 			return [{ kind: 'healRange', min: Math.min(lo, hi), max: Math.max(lo, hi) }];
 		},
 	},
@@ -181,7 +201,10 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 			{ kind: 'duration', value: 1 + Math.floor(ctx.lvl / 9), label: 'р.' },
 		],
 		2: (ctx) => [{ kind: 'accuracy', value: 20 + ctx.lvl }],
-		4: (ctx) => [heal(5 + ctx.lvl)],
+		4: (ctx) => [
+			{ kind: 'healRange', min: 15 + ctx.lvl * 2, max: 15 + ctx.lvl * 3 },
+			{ kind: 'armor', value: 15 + ctx.lvl * 2 },
+		],
 		5: (ctx) => [atk(ctx, 1)],
 	},
 	Patriarch: {
@@ -213,6 +236,7 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		1: (ctx) => [atk(ctx, 1)],
 	},
 	Specter: {
+		3: specterEvilEye,
 		1: (ctx) => [
 			atk(ctx, 1),
 			{
@@ -266,16 +290,17 @@ const PREVIEWS: Record<string, Partial<Record<AbilitySlotKey, PreviewFn>>> = {
 		],
 	},
 	Mermaid: {
-		1: (ctx) => [...mermaidBreeze(ctx), { kind: 'text', value: '1 МР' }],
+		1: (ctx) => [...mermaidBreeze(ctx), { kind: 'text', value: '2 МР' }],
 		2: (ctx) => [
 			{ kind: 'chance', value: 38 + ctx.lvl, label: 'оглушение ряду' },
 			{ kind: 'text', value: '2 МР · КД 3' },
 		],
 		3: () => [{ kind: 'text', value: 'без маны (заряды ульты)' }],
 		4: (ctx) => [
-			{ kind: 'duration', value: 2 + Math.floor(ctx.lvl / 6), label: 'р. оковы' },
-			{ kind: 'text', value: '2 МР' },
+			{ kind: 'accuracy', value: ctx.lvl + 3 },
+			{ kind: 'text', value: '50% к оглушению · 2 р. · 1 МР · КД 3' },
 		],
+		5: (ctx) => [{ kind: 'text', value: `ряд +${15 + ctx.lvl} инициативы · 2 МР` }],
 	},
 	Dracolich: {
 		1: (ctx) => [atk(ctx, 1)],

@@ -20,23 +20,23 @@ describe('CUT AC-14 expected values', () => {
 		expect(pyRound(20.6)).toBe(21);
 	});
 
-	test('Аббатиса power 40: превью лечения диапазоном 20…30', () => {
+	test('Аббатиса power 40: превью лечения диапазоном 24…34', () => {
 		const parts = getAbilityPreview('Abbess', 2, {
 			lvl: 1,
 			damage: 10,
 			power: 40,
 		});
-		expect(parts).toEqual([{ kind: 'healRange', min: 20, max: 30 }]);
+		expect(parts).toEqual([{ kind: 'healRange', min: 24, max: 34 }]); // CUT-2026-11-09 AC-4
 	});
 
-	test('Аббатиса power 41: превью 20…31 (не матожидание)', () => {
-		expect(pyRound(41 * 0.5)).toBe(20);
-		expect(pyRound(41 * 0.75)).toBe(31);
+	test('Аббатиса power 41: превью 25…35 (не матожидание)', () => {
+		expect(pyRound(41 * 0.6)).toBe(25); // CUT-2026-11-09 AC-4
+		expect(pyRound(41 * 0.85)).toBe(35); // CUT-2026-11-09 AC-4
 		const parts = getAbilityPreview('Abbess', 2, {
 			lvl: 1,
 			damage: 10,
 			power: 41,
 		});
-		expect(parts).toEqual([{ kind: 'healRange', min: 20, max: 31 }]);
+		expect(parts).toEqual([{ kind: 'healRange', min: 25, max: 35 }]); // CUT-2026-11-09 AC-4
 	});
 });

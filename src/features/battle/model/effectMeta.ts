@@ -79,6 +79,7 @@ export type EffectId =
 	| 'INVISIBLE'
 	| 'INTERDICT'
 	| 'MAGIC_SHACKLES'
+	| 'LOVE_SHACKLES'
 	| 'ENSLAVED'
 	| 'ROW_FORTIFY'
 	| 'ASHILLNESS'
@@ -137,6 +138,7 @@ const BUFF_ORDER: EffectId[] = [
 	'LUCKY',
 	'FOCUSED',
 	'SANCTUM',
+	'LOVE_SHACKLES',
 	'FIREDWEAPON',
 	'AIRWEAPON',
 	'MIND_WARD',
@@ -469,8 +471,9 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 	STUN_IMMUNE: {
 		id: 'STUN_IMMUNE',
 		label: 'Сопротивление оглушению',
-		description: 'После пережитого оглушения цель нельзя оглушить повторно.',
-		mechanics: '100% сопротивление оглушению · 2 р. после стана',
+		description:
+			'Сила эффекта — шанс пережить оглушение. Мыло слоад и военная молитва дают 50%. После пережитого оглушения сила становится 100%.',
+		mechanics: 'шанс power% (мыло и молитва — 50%; после стана — 100%)',
 		exampleAtL: exampleTypical('2 р.'),
 		Icon: Shield,
 		kind: 'buff',
@@ -498,7 +501,7 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		label: 'Желчь',
 		description:
 			'Каждый ход наносит урон водой и навсегда разъедает броню; после конца эффекта броня не возвращается.',
-		mechanics: '(10 + L) Вода/тик + −(2 + ⌊L/5⌋) брони/тик · (2 + ⌊L/8⌋) р.',
+		mechanics: '(10 + L) Вода/тик + −(3 + ⌊L/5⌋) брони/тик · (2 + ⌊L/8⌋) р.',
 		exampleAtL: exampleAtL('20 Вода и −4 брони за тик · 3 р.'),
 		Icon: Biohazard,
 		kind: 'debuff',
@@ -525,7 +528,7 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		id: 'AIRWEAPON',
 		label: 'Электрическое оружие',
 		description: 'Удары наносят доп. урон воздухом и могут оглушить.',
-		mechanics: 'доп. воздух ≈ сила/5+4; стан 50+⌊сила/5⌋% · 2 р.',
+		mechanics: 'доп. воздух round(сила/5+4)+⌊L оракула/3⌋; стан 50+⌊сила/5⌋% · 2 р.',
 		exampleAtL: exampleTypical('искры + шанс стана'),
 		Icon: Zap,
 		kind: 'buff',
@@ -557,6 +560,16 @@ const CATALOG: Record<EffectId, EffectMeta> = {
 		exampleAtL: exampleTypical('2 р.'),
 		Icon: Ban,
 		kind: 'debuff',
+	},
+	LOVE_SHACKLES: {
+		id: 'LOVE_SHACKLES',
+		label: 'Оковы любви',
+		description:
+			'Реальное лечение одного конца копируется партнёру один раз и не уходит дальше. Смерть любого конца рвёт связь.',
+		mechanics: 'копия фактического прироста ОЗ · 3+⌊L/7⌋ р.',
+		exampleAtL: exampleAtL('4 р.; +12 ОЗ партнёру, если сам получил +12'),
+		Icon: Heart,
+		kind: 'buff',
 	},
 	MAGIC_SHACKLES: {
 		id: 'MAGIC_SHACKLES',

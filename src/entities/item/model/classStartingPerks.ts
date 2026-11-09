@@ -11,7 +11,8 @@ const CLASS_STARTING_PERKS: Record<string, readonly string[]> = {
 	Archlich: [...BASE, 'ORBS'],
 	Marauder: [...BASE, 'DOUBLE_USING_INVENTORY'],
 	DemonLord: [...BASE, 'TALISMANS'],
-	Abbess: [...BASE, 'GRAND_MERCHANT', 'RELICS'],
+	Abbess: [...BASE, 'RELICS'],
+	Titan: [...BASE, 'GRAND_MERCHANT'],
 	Detective: [...BASE],
 };
 

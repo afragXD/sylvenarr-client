@@ -68,6 +68,8 @@ const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
 		entry('DEATH', 'Смерть', { value: 80, ward: 1 }),
 		entry('LOWERINGLEVEL', 'Понижение уровня', { immune: true }),
 		entry('POLYMORPH', 'Превращение', { ward: 1 }),
+		entry('STUN', 'Оглушение', { value: 25 }),
+		entry('AIR', 'Воздух', { value: 20 }),
 	],
 	GhostWarrior: [
 		entry('FIRE', 'Огонь', { value: -15 }),
@@ -89,7 +91,9 @@ const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
 	DemonLord: [
 		entry('MOVEMENT', 'Перемещение', { immune: true }),
 		entry('FIRE', 'Огонь', { value: 50, ward: 1 }),
-		entry('MIND', 'Разум', { ward: 1 }),
+		entry('MIND', 'Разум', { value: 33, ward: 1 }),
+		entry('STUN', 'Оглушение', { value: 25 }),
+		entry('DEATH', 'Смерть', { value: 20 }),
 	],
 	Abbess: [
 		entry('IMITATION', 'Копирование', { ward: 1 }),
@@ -127,9 +131,11 @@ const BASE_RESISTS: Record<string, BaseResistEntry[]> = {
 		entry('POLYMORPH', 'Превращение', { ward: 1 }),
 	],
 	Titan: [
-		entry('STUN', 'Оглушение', { value: 25, ward: 1 }),
+		entry('STUN', 'Оглушение', { value: 40, ward: 1 }),
 		entry('HOLY', 'Сакральный', { value: 25 }),
 		entry('DEATH', 'Смерть', { value: 25 }),
+		entry('POLYMORPH', 'Превращение', { value: 25 }),
+		entry('EARTH', 'Земля', { value: 25 }),
 	],
 	Incub: [
 		entry('MIND', 'Разум', { value: 30 }),

@@ -559,6 +559,7 @@ export const BattlePanel = ({
 					}),
 					targetHpRatio: unit.maxHp > 0 ? unit.health / unit.maxHp : 1,
 					targetLvl: unit.lvl,
+					targetMana: unit.mana,
 				}),
 			);
 		}
