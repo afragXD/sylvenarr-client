@@ -139,3 +139,38 @@
 .sylvenarr-tabular {
 	font-variant-numeric: tabular-nums;
 }
+
+/* Markdown-списки в новостях и FAQ. Маркер — латунь темы (#CBB48C). */
+.sylvenarr-md-list {
+	margin: 0 0 var(--mantine-spacing-sm);
+	padding-inline-start: 1.35rem;
+	list-style-position: outside;
+	line-height: 1.55;
+}
+
+ol.sylvenarr-md-list {
+	padding-inline-start: 1.75rem;
+}
+
+.sylvenarr-md-list li + li {
+	margin-top: 0.35rem;
+}
+
+.sylvenarr-md-list li::marker {
+	color: var(--brass, #cbb48c);
+}
+
+.sylvenarr-md-list strong {
+	font-weight: 700;
+	color: var(--app-text);
+}
+
+@media (max-width: 480px) {
+	.sylvenarr-md-list {
+		padding-inline-start: 1.15rem;
+	}
+
+	ol.sylvenarr-md-list {
+		padding-inline-start: 1.5rem;
+	}
+}
