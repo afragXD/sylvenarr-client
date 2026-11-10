@@ -92,7 +92,8 @@ function formatMorale(value: number): string {
 
 function classRoleLabel(isSummon: boolean, summonerName?: string | null): string {
 	if (isSummon) {
-		return summonerName ? `саммон ← ${summonerName}` : 'саммон';
+		// CUT-2026-11-09 AC-16: без «←»; позиции — на карточке/в выборе юнита.
+		return summonerName ? `саммон ${summonerName}` : 'саммон';
 	}
 	return 'герой';
 }

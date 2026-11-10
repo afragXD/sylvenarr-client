@@ -26,6 +26,7 @@ import {
 } from '../lib/attackPreview';
 import { playBattleSfxEvents, preloadUnitSfx, unlockBattleSfx } from '../lib/battleSfx';
 import { formatAbilityBlockReason } from '../lib/formatAbilityBlockReason';
+import { formatBattleUnitLabel } from '../lib/formatBattleUnitLabel';
 import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
 import { AbilityTags } from './AbilityTags';
 import { renderBattleLogLine } from './BattleLogLine';
@@ -1254,11 +1255,7 @@ const RowColumn = ({
 											</button>
 										</div>
 										<div className={styles.unitName}>
-											{unit.isSummon ? '✦ ' : ''}
-											{unit.displayName}
-											{unit.isSummon && unit.summonerName
-												? ` ← ${unit.summonerName}`
-												: ''}
+											{formatBattleUnitLabel(unit, battle.units)}
 											{unit.defending ? ' 🛡' : ''}
 											{unit.horseIsDead ? ' ✗конь' : ''}
 										</div>

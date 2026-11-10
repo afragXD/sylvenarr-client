@@ -8,6 +8,8 @@ export {
 	listEffectCatalog,
 	MAX_VISIBLE_EFFECTS,
 } from './model/effectMeta';
+export { formatBattleUnitLabel } from './lib/formatBattleUnitLabel';
+export type { BattleUnitLabelSource } from './lib/formatBattleUnitLabel';
 export { AbilityTags } from './ui/AbilityTags';
 export { renderBattleLogLine } from './ui/BattleLogLine';
 export { BattlePanel } from './ui/BattlePanel';
