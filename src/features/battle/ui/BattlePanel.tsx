@@ -26,9 +26,9 @@ import {
 } from '../lib/attackPreview';
 import { playBattleSfxEvents, preloadUnitSfx, unlockBattleSfx } from '../lib/battleSfx';
 import { formatAbilityBlockReason } from '../lib/formatAbilityBlockReason';
-import { formatBattleUnitLabel } from '../lib/formatBattleUnitLabel';
 import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
 import { AbilityTags } from './AbilityTags';
+import { BattleFieldUnitName } from './BattleFieldUnitName';
 import { renderBattleLogLine } from './BattleLogLine';
 import styles from './BattlePanel.module.css';
 import { BattleSoundControl } from './BattleSoundControl';
@@ -679,6 +679,7 @@ export const BattlePanel = ({
 							presetActive={battle.outcome === 'ongoing'}
 							presetAlign="start"
 							units={hostUnits}
+							allUnits={battle.units}
 							mirror
 							activeId={battle.activeUnitId}
 							legalTargets={highlightTargets}
@@ -704,6 +705,7 @@ export const BattlePanel = ({
 							presetActive={battle.outcome === 'ongoing'}
 							presetAlign="end"
 							units={guestUnits}
+							allUnits={battle.units}
 							mirror={false}
 							activeId={battle.activeUnitId}
 							legalTargets={highlightTargets}
@@ -1052,6 +1054,7 @@ const TeamSide = ({
 	presetActive,
 	presetAlign,
 	units,
+	allUnits,
 	mirror,
 	activeId,
 	legalTargets,
@@ -1069,6 +1072,7 @@ const TeamSide = ({
 	presetActive: boolean;
 	presetAlign: 'start' | 'end';
 	units: BattleUnit[];
+	allUnits: BattleUnit[];
 	mirror: boolean;
 	activeId: string | null;
 	legalTargets: string[];
@@ -1102,6 +1106,7 @@ const TeamSide = ({
 				<RowColumn
 					label={leftLabel}
 					units={left}
+					allUnits={allUnits}
 					activeId={activeId}
 					legalTargets={legalTargets}
 					promptHoverUnitId={promptHoverUnitId}
@@ -1114,6 +1119,7 @@ const TeamSide = ({
 				<RowColumn
 					label={rightLabel}
 					units={right}
+					allUnits={allUnits}
 					activeId={activeId}
 					legalTargets={legalTargets}
 					promptHoverUnitId={promptHoverUnitId}
@@ -1139,6 +1145,7 @@ const sortRowUnits = (units: BattleUnit[]): BattleUnit[] =>
 const RowColumn = ({
 	label,
 	units,
+	allUnits,
 	activeId,
 	legalTargets,
 	promptHoverUnitId,
@@ -1150,6 +1157,7 @@ const RowColumn = ({
 }: {
 	label: string;
 	units: BattleUnit[];
+	allUnits: BattleUnit[];
 	activeId: string | null;
 	legalTargets: string[];
 	promptHoverUnitId: string | null;
@@ -1254,11 +1262,11 @@ const RowColumn = ({
 												i
 											</button>
 										</div>
-										<div className={styles.unitName}>
-											{formatBattleUnitLabel(unit, battle.units)}
-											{unit.defending ? ' 🛡' : ''}
-											{unit.horseIsDead ? ' ✗конь' : ''}
-										</div>
+										<BattleFieldUnitName
+											unit={unit}
+											allUnits={allUnits}
+											className={styles.unitName}
+										/>
 									</div>
 								</div>
 								{(unit.perks?.length ?? 0) > 0 ? (

@@ -11,6 +11,7 @@ export {
 export { formatBattleUnitLabel } from './lib/formatBattleUnitLabel';
 export type { BattleUnitLabelSource } from './lib/formatBattleUnitLabel';
 export { AbilityTags } from './ui/AbilityTags';
+export { BattleFieldUnitName } from './ui/BattleFieldUnitName';
 export { renderBattleLogLine } from './ui/BattleLogLine';
 export { BattlePanel } from './ui/BattlePanel';
 export { MatchResultOverlay } from './ui/MatchResultOverlay';
