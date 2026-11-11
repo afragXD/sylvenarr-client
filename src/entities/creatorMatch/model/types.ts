@@ -34,6 +34,21 @@ export type CreatorEditorUnit = {
 	isSummon: boolean;
 };
 
+export type CreatorInventoryStack = {
+	code: number;
+	name: string;
+	description: string;
+	quantity: number;
+	category: number;
+	tier: number;
+	target: 'self' | 'ally' | 'allySummon' | 'enemy' | 'enemySummon' | 'sellOnly';
+};
+
+export type CreatorEditorTeam = {
+	gold: number;
+	inventory: CreatorInventoryStack[];
+};
+
 export type CreatorMatchDetail = {
 	id: string;
 	status: 'fighting';
@@ -43,6 +58,7 @@ export type CreatorMatchDetail = {
 	phase: string;
 	activeUnitId: string | null;
 	units: CreatorEditorUnit[];
+	teams: [CreatorEditorTeam, CreatorEditorTeam];
 };
 
 export type CreatorUnitPatch = Partial<{
@@ -62,3 +78,8 @@ export type CreatorUnitPatch = Partial<{
 	ultaCharges: number;
 	critBank: number;
 }>;
+
+export type CreatorInventoryStackPatch = {
+	code: number;
+	quantity: number;
+};

@@ -1,6 +1,9 @@
 import { apiFetchJson } from '@/shared/api/http';
 
 import type {
+	CreatorEditorTeam,
+	CreatorInventoryStack,
+	CreatorInventoryStackPatch,
 	CreatorMatchDetail,
 	CreatorMatchListItem,
 	CreatorUnitPatch,
@@ -55,10 +58,48 @@ const parseUnit = (data: unknown) => {
 	};
 };
 
+const parseInventoryStack = (data: unknown): CreatorInventoryStack => {
+	if (!isRecord(data) || typeof data.code !== 'number') {
+		throw new Error('Некорректный стек инвентаря');
+	}
+	const targetRaw = String(data.target ?? 'self');
+	const target =
+		targetRaw === 'ally' ||
+		targetRaw === 'allySummon' ||
+		targetRaw === 'enemy' ||
+		targetRaw === 'enemySummon' ||
+		targetRaw === 'sellOnly'
+			? targetRaw
+			: 'self';
+	return {
+		code: data.code,
+		name: String(data.name ?? ''),
+		description: String(data.description ?? ''),
+		quantity: Number(data.quantity ?? 0),
+		category: Number(data.category ?? 0),
+		tier: Number(data.tier ?? 0),
+		target,
+	};
+};
+
+const emptyTeam = (): CreatorEditorTeam => ({ gold: 0, inventory: [] });
+
+const parseTeam = (data: unknown): CreatorEditorTeam => {
+	if (!isRecord(data)) {
+		return emptyTeam();
+	}
+	const inventory = Array.isArray(data.inventory) ? data.inventory.map(parseInventoryStack) : [];
+	return {
+		gold: Number(data.gold ?? 0),
+		inventory,
+	};
+};
+
 const parseDetail = (data: unknown): CreatorMatchDetail => {
 	if (!isRecord(data) || typeof data.id !== 'string' || !Array.isArray(data.units)) {
 		throw new Error('Некорректный снимок боя');
 	}
+	const teamsRaw = Array.isArray(data.teams) ? data.teams : [];
 	return {
 		id: data.id,
 		status: 'fighting',
@@ -68,6 +109,7 @@ const parseDetail = (data: unknown): CreatorMatchDetail => {
 		phase: String(data.phase ?? 'combat'),
 		activeUnitId: typeof data.activeUnitId === 'string' ? data.activeUnitId : null,
 		units: data.units.map(parseUnit),
+		teams: [parseTeam(teamsRaw[0]), parseTeam(teamsRaw[1])],
 	};
 };
 
@@ -79,12 +121,7 @@ const parseList = (data: unknown): CreatorMatchListItem[] => {
 };
 
 export async function fetchCreatorMatches(): Promise<CreatorMatchListItem[]> {
-	return apiFetchJson(
-		'/creator/matches',
-		undefined,
-		parseList,
-		'Не удалось загрузить матчи'
-	);
+	return apiFetchJson('/creator/matches', undefined, parseList, 'Не удалось загрузить матчи');
 }
 
 export async function fetchCreatorMatch(id: string): Promise<CreatorMatchDetail> {
@@ -92,14 +129,14 @@ export async function fetchCreatorMatch(id: string): Promise<CreatorMatchDetail>
 		`/creator/matches/${id}`,
 		undefined,
 		parseDetail,
-		'Не удалось загрузить матч'
+		'Не удалось загрузить матч',
 	);
 }
 
 export async function patchCreatorUnit(
 	matchId: string,
 	unitId: string,
-	patch: CreatorUnitPatch
+	patch: CreatorUnitPatch,
 ): Promise<CreatorMatchDetail> {
 	return apiFetchJson(
 		`/creator/matches/${matchId}/units/${unitId}`,
@@ -108,6 +145,22 @@ export async function patchCreatorUnit(
 			body: JSON.stringify(patch),
 		},
 		parseDetail,
-		'Не удалось сохранить юнита'
+		'Не удалось сохранить юнита',
+	);
+}
+
+export async function patchCreatorTeamInventory(
+	matchId: string,
+	team: 0 | 1,
+	inventory: CreatorInventoryStackPatch[],
+): Promise<CreatorMatchDetail> {
+	return apiFetchJson(
+		`/creator/matches/${matchId}/teams/${team}`,
+		{
+			method: 'PATCH',
+			body: JSON.stringify({ inventory }),
+		},
+		parseDetail,
+		'Не удалось сохранить инвентарь',
 	);
 }
