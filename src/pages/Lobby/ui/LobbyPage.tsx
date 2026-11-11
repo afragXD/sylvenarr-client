@@ -191,11 +191,13 @@ export const LobbyPage = () => {
 							color="brand"
 							component={Link}
 							to="/sign-in"
-							search={{
-								redirect: search.code
-									? `/lobby?code=${encodeURIComponent(search.code)}`
-									: '/lobby',
-							}}
+							search={
+								{
+									redirect: search.code
+										? `/lobby?code=${encodeURIComponent(search.code)}`
+										: '/lobby',
+								} as never
+							}
 						>
 							Войти и играть
 						</Button>

@@ -98,7 +98,7 @@ export const MatchHistoryPage = () => {
 						color="brand"
 						component={Link}
 						to="/sign-in"
-						search={{ redirect: '/matches' }}
+						search={{ redirect: '/matches' } as never}
 					>
 						Войти и играть
 					</Button>

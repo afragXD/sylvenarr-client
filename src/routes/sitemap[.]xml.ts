@@ -30,44 +30,49 @@ const urlEntry = (loc: string, priority: string): string => `  <url>
   </url>`;
 
 export const Route = createFileRoute('/sitemap.xml')({
-	server: {
-		handlers: {
-			GET: async () => {
-				const staticEntries = STATIC_PATHS.map((path) =>
-					urlEntry(absoluteUrl(path), path === '/' ? '1.0' : '0.8'),
-				);
-
-				let heroEntries: string[] = [];
-				try {
-					const heroes = await fetchHeroes();
-					heroEntries = heroes.map((hero) => urlEntry(absoluteUrl(`/heroes/${hero.code}`), '0.7'));
-				} catch {
-					// Sitemap still useful without dynamic hero URLs if API is down.
-				}
-
-				let newsEntries: string[] = [];
-				try {
-					const news = await fetchNewsList({ limit: 50 });
-					newsEntries = news.items.map((item) =>
-						urlEntry(absoluteUrl(`/news/${item.slug}`), '0.6'),
+	// CUT-2026-11-09 r6: server handlers есть в runtime Start, типы router отстают.
+	...({
+		server: {
+			handlers: {
+				GET: async () => {
+					const staticEntries = STATIC_PATHS.map((path) =>
+						urlEntry(absoluteUrl(path), path === '/' ? '1.0' : '0.8'),
 					);
-				} catch {
-					// ignore
-				}
 
-				const body = `<?xml version="1.0" encoding="UTF-8"?>
+					let heroEntries: string[] = [];
+					try {
+						const heroes = await fetchHeroes();
+						heroEntries = heroes.map((hero) =>
+							urlEntry(absoluteUrl(`/heroes/${hero.code}`), '0.7'),
+						);
+					} catch {
+						// Sitemap still useful without dynamic hero URLs if API is down.
+					}
+
+					let newsEntries: string[] = [];
+					try {
+						const news = await fetchNewsList({ limit: 50 });
+						newsEntries = news.items.map((item) =>
+							urlEntry(absoluteUrl(`/news/${item.slug}`), '0.6'),
+						);
+					} catch {
+						// ignore
+					}
+
+					const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
 ${[...staticEntries, ...heroEntries, ...newsEntries].join('\n')}
 </urlset>
 `;
 
-				return new Response(body, {
-					headers: {
-						'Content-Type': 'application/xml; charset=utf-8',
-						'Cache-Control': 'public, max-age=3600',
-					},
-				});
+					return new Response(body, {
+						headers: {
+							'Content-Type': 'application/xml; charset=utf-8',
+							'Cache-Control': 'public, max-age=3600',
+						},
+					});
+				},
 			},
 		},
-	},
+	} as object),
 });

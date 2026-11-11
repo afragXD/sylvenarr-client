@@ -6,6 +6,9 @@ describe('formatAbilityBlockReason', () => {
 	test('normalizes cooldown labels', () => {
 		expect(formatAbilityBlockReason('Кулдаун 2 р.')).toBe('перезарядка 2');
 		expect(formatAbilityBlockReason('перезарядка 3')).toBe('перезарядка 3');
+		// CUT-2026-11-09 AC-4: сервер шлёт N/M — не обрезать знаменатель.
+		expect(formatAbilityBlockReason('перезарядка 3/4')).toBe('перезарядка 3/4');
+		expect(formatAbilityBlockReason('Кулдаун 1/4')).toBe('перезарядка 1/4');
 	});
 
 	test('formats mana with current/max', () => {

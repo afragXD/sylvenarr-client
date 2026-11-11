@@ -1,11 +1,18 @@
 /**
- * Нормализует disabledReason сервера под AC-5: «нет маны 6/8», «перезарядка 2».
+ * Нормализует disabledReason сервера под AC-5: «нет маны 6/8», «перезарядка 2» или «перезарядка 3/4».
  */
 export function formatAbilityBlockReason(
 	reason: string,
 	mana?: number,
 	maxMana?: number,
 ): string {
+	const cdFrac =
+		reason.match(/перезарядка\s+(\d+)\s*\/\s*(\d+)/i) ??
+		reason.match(/кулдаун\s+(\d+)\s*\/\s*(\d+)/i) ??
+		reason.match(/cooldown\s+(\d+)\s*\/\s*(\d+)/i);
+	if (cdFrac) {
+		return `перезарядка ${cdFrac[1]}/${cdFrac[2]}`;
+	}
 	const cd =
 		reason.match(/перезарядка\s+(\d+)/i) ??
 		reason.match(/кулдаун\s+(\d+)/i) ??

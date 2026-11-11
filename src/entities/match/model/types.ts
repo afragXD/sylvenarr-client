@@ -90,7 +90,13 @@ export type BattleUnit = {
 	accuracy: number;
 	power: number;
 	critBank: number;
+	/** Банк уклонений (превью атаки). */
+	dodgeBank?: number;
 	ultaCharges: number;
+	/** Патроны ведьмы / детектива. */
+	gun?: number;
+	/** Дротики ассасина. */
+	darts?: number;
 	/** Уровень юнита в бою. */
 	lvl?: number;
 	/** Боевой дух. */

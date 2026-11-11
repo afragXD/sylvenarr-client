@@ -26,6 +26,7 @@ import {
 } from '../lib/attackPreview';
 import { playBattleSfxEvents, preloadUnitSfx, unlockBattleSfx } from '../lib/battleSfx';
 import { formatAbilityBlockReason } from '../lib/formatAbilityBlockReason';
+import { liveAbilityChargeLabel } from '../lib/liveAbilityChargeLabel';
 import { playYourTurnSound, unlockTurnAudio } from '../lib/turnNotify';
 import { AbilityTags } from './AbilityTags';
 import { BattleFieldUnitName } from './BattleFieldUnitName';
@@ -152,6 +153,7 @@ export const BattlePanel = ({
 	const [surrenderOpened, surrenderHandlers] = useDisclosure(false);
 	const [damageFloats, setDamageFloats] = useState<DamageFloat[]>([]);
 	const [cachedMyAbilities, setCachedMyAbilities] = useState<AbilityInfo[]>([]);
+	const [cachedAbilityUnitId, setCachedAbilityUnitId] = useState<string | null>(null);
 	const wasMyTurnRef = useRef(false);
 	const prevPhaseRef = useRef<string | null>(null);
 	const logRef = useRef<HTMLDivElement>(null);
@@ -256,6 +258,7 @@ export const BattlePanel = ({
 		}
 		if (battle.turnPlayerId === playerId && (battle.abilities?.length ?? 0) > 0) {
 			setCachedMyAbilities(battle.abilities ?? []);
+			setCachedAbilityUnitId(battle.activeUnitId);
 		}
 	}, [battle, playerId]);
 
@@ -989,16 +992,24 @@ export const BattlePanel = ({
 							) : null}
 						</>
 					) : (
-						(cachedMyAbilities.length > 0 ? cachedMyAbilities : abilities).map((ability) => (
-							<Button
-								key={`opp-${ability.slot}`}
-								variant={ability.slot === 1 ? 'filled' : 'light'}
-								color="accent"
-								disabled
-							>
-								[{ability.slot}] {ability.label}
-							</Button>
-						))
+						(cachedMyAbilities.length > 0 ? cachedMyAbilities : abilities).map((ability) => {
+							// CUT-2026-11-09 AC-24: живые заряды в серых подписях.
+							const owner =
+								battle?.units.find((u) => u.id === cachedAbilityUnitId) ??
+								battle?.units.find((u) => u.playerId === playerId && u.alive) ??
+								null;
+							const label = liveAbilityChargeLabel(ability.label, owner);
+							return (
+								<Button
+									key={`opp-${ability.slot}`}
+									variant={ability.slot === 1 ? 'filled' : 'light'}
+									color="accent"
+									disabled
+								>
+									[{ability.slot}] {label}
+								</Button>
+							);
+						})
 					)}
 				</div>
 			)}

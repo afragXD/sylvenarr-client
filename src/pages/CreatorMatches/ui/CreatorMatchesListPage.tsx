@@ -67,7 +67,7 @@ export const CreatorMatchesListPage = () => {
 									<Button
 										component={Link}
 										to="/creator/matches/$id"
-										params={{ id: item.id }}
+										params={{ id: item.id } as never}
 										size="compact-sm"
 										variant="light"
 									>

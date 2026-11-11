@@ -8,7 +8,7 @@ import type { AppShellLayoutProps } from '../model/types';
 
 export const AppShellLayout = ({ children }: AppShellLayoutProps) => {
 	return (
-		<AppShell header={{ height: 72, offset: 0 }} padding={0} withBorder={false}>
+		<AppShell header={{ height: 72, offset: false }} padding={0} withBorder={false}>
 			<AppShell.Header
 				withBorder={false}
 				/* Выше SiteMenu Drawer (400): бургер «Закрыть» остаётся на месте (AC-9). */
